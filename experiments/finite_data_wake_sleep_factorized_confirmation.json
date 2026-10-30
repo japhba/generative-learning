@@ -1,0 +1,80 @@
+{
+  "output": "results/finite_data_wake_sleep/factorized_confirmation",
+  "config": {
+    "world_seed": 9850,
+    "latent_bits": 4,
+    "context_bits": 6,
+    "target_bits": 2,
+    "strength": 2.0,
+    "maximum_data": 8192,
+    "generator_restarts": 2,
+    "generator_lr": 0.05,
+    "generator_steps": 2048,
+    "prior_precision": 1.0,
+    "batch": 64,
+    "budget": 4096,
+    "decay_scale": 128,
+    "eval_points": 40,
+    "report_budgets": [
+      256,
+      1024,
+      4096
+    ],
+    "recognition_family": "factorized"
+  },
+  "seeds": [
+    9851,
+    9852,
+    9853,
+    9854,
+    9855,
+    9856,
+    9857,
+    9858,
+    9859,
+    9860,
+    9861,
+    9862
+  ],
+  "data_sizes": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "rates": {
+    "wake": [
+      0.01
+    ],
+    "sleep": [
+      0.01
+    ],
+    "forward": [
+      0.01
+    ],
+    "predictive": [
+      0.003
+    ]
+  },
+  "analysis_windows": [
+    [
+      32,
+      8192
+    ],
+    [
+      128,
+      2048
+    ],
+    [
+      512,
+      8192
+    ]
+  ],
+  "scope": "Targeted approximation follow-up after full-capacity null result; new fixed world and independent paired datasets, with rates frozen on the original separate tuning world."
+}

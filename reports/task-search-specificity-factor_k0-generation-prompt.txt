@@ -1,0 +1,7 @@
+Problem family: product_decomposition_k3_d3.
+Examples:
+
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:

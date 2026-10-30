@@ -1,0 +1,1686 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/million_size",
+    "visible": 6,
+    "strength": 2.0,
+    "coupled": false,
+    "sampled": false,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "budget": 1048576,
+    "eval_points": 192,
+    "eval_interval": 2048,
+    "accuracy_stop": 0.1,
+    "checkpoint_seconds": 60,
+    "wall_limit_seconds": 3600,
+    "extra_eval_steps": []
+  },
+  "cases": [
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "name": "bridge_sleep_s9540",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        20,
+        23,
+        27,
+        31,
+        36,
+        42,
+        49,
+        57,
+        66
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "name": "bridge_elbo_s9540",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        17,
+        19,
+        23,
+        27,
+        31,
+        36,
+        42,
+        50,
+        58,
+        68,
+        79,
+        93,
+        108,
+        127,
+        148,
+        173,
+        203,
+        237,
+        277,
+        324,
+        378,
+        442,
+        517,
+        604,
+        707,
+        826,
+        966,
+        1129,
+        1320,
+        1543,
+        1804,
+        2109,
+        2465,
+        2882,
+        3369,
+        3939
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "name": "bridge_sleep_s9541",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        20,
+        23,
+        27,
+        31,
+        36,
+        42,
+        49,
+        57,
+        66,
+        77
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "name": "bridge_elbo_s9541",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        17,
+        19,
+        23,
+        27,
+        31,
+        36,
+        42,
+        50,
+        58,
+        68,
+        79,
+        93,
+        108,
+        127,
+        148,
+        173,
+        203,
+        237,
+        277,
+        324,
+        378,
+        442,
+        517,
+        604,
+        707,
+        826,
+        966,
+        1129,
+        1320,
+        1543,
+        1804,
+        2109,
+        2465,
+        2882,
+        3369,
+        3939,
+        4605,
+        5384,
+        6294,
+        7358,
+        8602,
+        10056,
+        11756
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "name": "bridge_sleep_s9542",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        20,
+        23,
+        27,
+        31,
+        36,
+        42,
+        49,
+        57,
+        66,
+        77,
+        90
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "name": "bridge_elbo_s9542",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        17,
+        19,
+        23,
+        27,
+        31,
+        36,
+        42,
+        50,
+        58,
+        68,
+        79,
+        93,
+        108,
+        127,
+        148,
+        173,
+        203,
+        237,
+        277,
+        324,
+        378,
+        442,
+        517,
+        604,
+        707,
+        826,
+        966,
+        1129,
+        1320,
+        1543,
+        1804,
+        2109,
+        2465,
+        2882,
+        3369,
+        3939,
+        4605,
+        5384,
+        6294,
+        7358,
+        8602,
+        10056,
+        11756,
+        13744,
+        16067,
+        18784,
+        21959,
+        25672,
+        30012,
+        35086,
+        41017,
+        47952,
+        56059
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "name": "bridge_sleep_s9543",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        20,
+        23,
+        27,
+        31,
+        36,
+        42,
+        49,
+        57,
+        66,
+        77
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "name": "bridge_elbo_s9543",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        17,
+        19,
+        23,
+        27,
+        31,
+        36,
+        42,
+        50,
+        58,
+        68,
+        79,
+        93,
+        108,
+        127,
+        148,
+        173,
+        203,
+        237,
+        277,
+        324,
+        378,
+        442,
+        517,
+        604,
+        707,
+        826,
+        966,
+        1129,
+        1320,
+        1543,
+        1804,
+        2109,
+        2465,
+        2882,
+        3369,
+        3939,
+        4605,
+        5384,
+        6294,
+        7358
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "name": "bridge_sleep_s9544",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        20,
+        23,
+        27,
+        31,
+        36,
+        42,
+        49,
+        57,
+        66,
+        77
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "name": "bridge_elbo_s9544",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        17,
+        19,
+        23,
+        27,
+        31,
+        36,
+        42,
+        50,
+        58,
+        68,
+        79,
+        93,
+        108,
+        127,
+        148,
+        173,
+        203,
+        237,
+        277,
+        324,
+        378,
+        442,
+        517,
+        604,
+        707,
+        826,
+        966,
+        1129,
+        1320,
+        1543,
+        1804,
+        2109,
+        2465,
+        2882,
+        3369,
+        3939,
+        4605,
+        5384,
+        6294
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "name": "bridge_sleep_s9545",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        13,
+        15,
+        17,
+        20,
+        23,
+        27,
+        31,
+        36,
+        42,
+        49,
+        57,
+        66
+      ]
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "name": "bridge_elbo_s9545",
+      "extra_eval_steps": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        14,
+        17,
+        19,
+        23,
+        27,
+        31,
+        36,
+        42,
+        50,
+        58,
+        68,
+        79,
+        93,
+        108,
+        127,
+        148,
+        173,
+        203,
+        237,
+        277,
+        324,
+        378,
+        442,
+        517,
+        604,
+        707,
+        826,
+        966,
+        1129,
+        1320,
+        1543
+      ]
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b14_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b14_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b14_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b14_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b14_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b14_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b14_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b14_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b14_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b14_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b14_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b14_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        7,
+        7
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b14_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b16_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b16_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b16_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b16_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b16_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b16_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b16_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b16_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b16_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b16_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b16_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b16_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        8,
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b16_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b18_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b18_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b18_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b18_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b18_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b18_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b18_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b18_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b18_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b18_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b18_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b18_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        9,
+        9
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b18_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b20_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b20_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b20_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b20_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b20_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b20_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b20_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b20_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b20_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b20_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b20_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b20_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        10,
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b20_adam_elbo_s9543"
+    }
+  ],
+  "runtime_sha256": "456cb31637dffdffb78c76bbcac1004cdfda849be2526dc8692ed6150c3f3ae1",
+  "reference_sha256": "dd8bfd3382036e40993c037c6cadcf8e45e7938644eab89c2cf9263431cda70c",
+  "notes": "Prespecified six original replication seeds, no seed selection. Extend K from 4096 to 16384, 65536, 262144, 1048576 in the same fixed two-layer generator and affine recognition family. Adam rates remain .1 ELBO/.3 sleep; no largest-size tuning. Both eps=1e-8 and eps=1e-12 at every new size. Twelve K4096 bridge cases check trajectory agreement with the NumPy implementation. Float64 exact population updates, fixed generator cached. Store original reference FLOPs and executed recognition dense FLOPs separately. Target KL<=.1; retain stationarity, 1048576 wake-equivalent update and 1h active-training caps as censored if target not reached. Per-run full checkpoints every 60s, local then async persistent. No LLM claims follow from this size axis."
+}

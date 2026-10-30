@@ -1,0 +1,242 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/wide_size_replication",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.001,
+    "batch": 128,
+    "sampled": false,
+    "budget": 98304,
+    "eval_points": 96,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "accuracy_stop": 0.1
+  },
+  "cases": [
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9546,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9546"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9546,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9546"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9547,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9547"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9547,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9547"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9548,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9548"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9548,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9548"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9549,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9549"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9549,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9549"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9550,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9550"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9550,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9550"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9551,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9551"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9551,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9551"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9552,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9552"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9552,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9552"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9553,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9553"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9553,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9553"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9554,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9554"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9554,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9554"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9555,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_g2_elbo_s9555"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9555,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_g2_sleep_s9555"
+    }
+  ],
+  "notes": "Complete the 4096-state extension for all sixteen original replication seeds. First six seeds were already measured in the epsilon audit; these are the remaining ten, with no seed selection. Same fixed two-layer probabilistic generator, affine recognizer, neglect=3, epsilon=1e-8 and original selected rates. Cap 98304 wake-equivalent updates, target KL .1, retain censoring. Existing 4096 measurements all attained the target at the earlier cap and are not rerun. Expected individual runtime below 30 minutes based on measured 4096-state CPU timings."
+}

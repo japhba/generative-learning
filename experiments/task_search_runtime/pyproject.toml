@@ -1,0 +1,8 @@
+[project]
+name = "generative-task-search-runtime"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["vllm==0.28.0", "nvidia-cuda-nvcc==13.0.88", "nvidia-cuda-crt==13.0.88", "nvidia-nvvm==13.0.88", "httpx", "numpy", "matplotlib", "python-dotenv", "tqdm", "huggingface-hub", "reasoning-gym"]
+
+[tool.uv]
+package = false

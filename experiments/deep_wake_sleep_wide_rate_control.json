@@ -1,0 +1,202 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/wide_rate_control",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.001,
+    "batch": 128,
+    "sampled": false,
+    "budget": 262144,
+    "eval_points": 100,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "accuracy_stop": 1e-09
+  },
+  "cases": [
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.01,
+      "name": "b8_g2_elbo_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.03,
+      "name": "b8_g2_sleep_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "forward",
+      "seed": 9540,
+      "lr_r": 0.03,
+      "name": "b8_g2_forward_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.01,
+      "name": "b8_g2_elbo_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.03,
+      "name": "b8_g2_sleep_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "forward",
+      "seed": 9541,
+      "lr_r": 0.03,
+      "name": "b8_g2_forward_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.01,
+      "name": "b8_g2_elbo_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.03,
+      "name": "b8_g2_sleep_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "forward",
+      "seed": 9542,
+      "lr_r": 0.03,
+      "name": "b8_g2_forward_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.01,
+      "name": "b8_g2_elbo_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.03,
+      "name": "b8_g2_sleep_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "forward",
+      "seed": 9543,
+      "lr_r": 0.03,
+      "name": "b8_g2_forward_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.01,
+      "name": "b8_g2_elbo_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.03,
+      "name": "b8_g2_sleep_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "forward",
+      "seed": 9544,
+      "lr_r": 0.03,
+      "name": "b8_g2_forward_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.01,
+      "name": "b8_g2_elbo_s9545"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.03,
+      "name": "b8_g2_sleep_s9545"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "forward",
+      "seed": 9545,
+      "lr_r": 0.03,
+      "name": "b8_g2_forward_s9545"
+    }
+  ],
+  "notes": "Optimizer-floor diagnostic: same six seeds and middle state count (256); multiply every method learning rate by 0.1, keep all objectives, budgets, data, and stopping rules. This is a second declared protocol, not replacement of the constant-rate results. No exponent selected from these runs. Earlier high rates were tuned to reach KL .1, not for high-accuracy convergence."
+}

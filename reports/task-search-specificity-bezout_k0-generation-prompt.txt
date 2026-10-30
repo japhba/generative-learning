@@ -1,0 +1,7 @@
+Problem family: witness_bezout_l0.
+Examples:
+
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 7*y = 1. Negative integers are allowed.
+Answer:

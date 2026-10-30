@@ -1,0 +1,3 @@
+[submodule "tex"]
+	path = tex
+	url = https://overlyx.app/git/jan/generative-learning.git

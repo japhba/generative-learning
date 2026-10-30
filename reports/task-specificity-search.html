@@ -1,0 +1,2868 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate"><meta http-equiv="pragma" content="no-cache"><meta http-equiv="expires" content="0">
+<title>Own versus other rehearsal</title><style>
+:root{color-scheme:light;--blue:#216897;--orange:#a95209;--ink:#172b3c;--muted:#536575;--line:#d9e1e6;--good:#1d6b3a;--bad:#9b2c2c}
+*{box-sizing:border-box}body{margin:0;background:#edf1f4;color:var(--ink);font:14px/1.4 system-ui,sans-serif}
+main{max-width:1060px;margin:24px auto;padding:28px 34px;background:white;border:1px solid var(--line)}
+header{border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:12px}h1{font-size:26px;line-height:1.15;margin:0 0 7px}h2{font-size:17px;margin:20px 0 6px;border-top:1px solid var(--line);padding-top:12px}h3{font-size:14px;margin:12px 0 4px}p{margin:5px 0}
+.eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.lead{font-size:15px}
+code,pre{font-family:ui-monospace,monospace;font-size:12px}code{overflow-wrap:anywhere}pre{white-space:pre-wrap;margin:3px 0;line-height:1.35;overflow-wrap:anywhere}
+table{border-collapse:collapse;width:100%;margin:8px 0}th,td{padding:5px 8px;border:1px solid var(--line);vertical-align:top;text-align:left}th{background:#f4f6f8}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.own{font-weight:700}.small{font-size:12px;color:var(--muted)}.hit{background:#fff6ed}.sel{background:#fde9d6}
+.ok{color:var(--good)}.no{color:var(--bad)}figure{margin:8px 0}img{width:100%;height:auto;display:block}figcaption{font-size:12px;color:var(--muted);margin-top:2px}
+details{margin:6px 0;border:1px solid var(--line);padding:4px 10px}summary{cursor:pointer;font-weight:600}.scroll{overflow-x:auto}.ex td{font-size:12px}.ex td pre{max-height:180px;overflow-y:auto}
+footer{margin-top:14px;font-size:11px;color:var(--muted)}a{color:#216897}
+@media screen and (max-width:650px){main{margin:0;padding:16px}th,td{padding:4px}h1{font-size:22px}}
+</style></head><body><main>
+<header><div class="eyebrow">Qwen3.5-9B × Gemma 4 · frozen weights · cross-task search · 5 October 2026</div><h1>Own versus other model's rehearsal, across tasks</h1>
+<p><a href='#confirmation'>Confirmation</a> · <a href='#examples'>Examples</a> · <a href='#screen'>Screen</a> · <a href='#design'>Design</a> · <a href='task-search-report.html'>Earlier report</a></p>
+<div class="lead"><p><strong>No task showed both models learning better from their own unjudged rehearsal than from the other model's.</strong> Of 76 screened reasoning_gym settings, three passed the screen; none confirmed on fresh data (16 episodes × 12 tests). The screen as a whole matches chance: 3 settings passed the “both ≥ 6.25 pp” bar where label-swapping predicts 2.6 (P = 0.48).</p>
+<p>The closest case is <strong>colour-cube rotation (level 1, K = 4)</strong>: mean preference H = +4.4 pp [+0.8, +7.8], one-sided p = 0.024, Holm p = 0.071. It is one-sided: Gemma prefers its own examples (+6.8 pp [+1.6, +12.5]), Qwen does not (+2.1 pp [−3.1, +6.2]). As before, the large effects in the screen are one-way transfers, where one model's examples help (or hurt) both readers, e.g. simple integration (K = 0), where Gemma scores 91% with Qwen's examples and 66% with its own, while Qwen scores 69% with its own and 28% with Gemma's.</p></div></header>
+<h2 id='confirmation'>Fresh confirmation: 16 episodes × 12 tests per setting</h2>
+<p>New questions, new rehearsal sets, new generations; nothing from the screen is reused. Primary endpoint: H at N = 16 (the screened count), one-sided exact sign-flip test over episodes, Holm-corrected across the confirmed settings. A setting counts as a <em>mutual</em> own-source advantage only if Holm p &lt; 0.05 <em>and</em> both readers' preferences have 95% intervals above zero.</p>
+<table><thead><tr><th>Setting / reader</th><th class='num'>Initial only<br>N = 0</th><th class='num'>Qwen source<br>N = 16</th><th class='num'>Gemma source<br>N = 16</th><th class='num'>Teacher source<br>N = 16</th></tr></thead><tbody>
+<tr><td>knights_knaves  · K=4<br><span class='small'>Qwen reads</span></td><td class='num'>55.2%</td><td class='num own'>52.1%</td><td class='num'>54.2%</td><td class='num'>51.0%</td></tr>
+<tr><td>knights_knaves  · K=4<br><span class='small'>Gemma reads</span></td><td class='num'>72.4%</td><td class='num'>67.2%</td><td class='num own'>68.2%</td><td class='num'>75.5%</td></tr>
+<tr><td>color_cube_rotation · 1  · K=4<br><span class='small'>Qwen reads</span></td><td class='num'>21.9%</td><td class='num own'>22.9%</td><td class='num'>20.8%</td><td class='num'>22.4%</td></tr>
+<tr><td>color_cube_rotation · 1  · K=4<br><span class='small'>Gemma reads</span></td><td class='num'>6.8%</td><td class='num'>7.8%</td><td class='num own'>14.6%</td><td class='num'>12.5%</td></tr>
+<tr><td>largest_island  · K=4<br><span class='small'>Qwen reads</span></td><td class='num'>38.5%</td><td class='num own'>38.0%</td><td class='num'>37.0%</td><td class='num'>39.1%</td></tr>
+<tr><td>largest_island  · K=4<br><span class='small'>Gemma reads</span></td><td class='num'>50.5%</td><td class='num'>50.5%</td><td class='num own'>51.0%</td><td class='num'>52.6%</td></tr>
+</tbody></table><p class='small'>192 test questions per cell. Bold = reader's own source.</p>
+<table><thead><tr><th>Setting</th><th class='num'>Qwen: own − Gemma src</th><th class='num'>Gemma: own − Qwen src</th><th class='num'>Mean preference H</th><th class='num'>Holm p</th><th>Mutual?</th></tr></thead><tbody>
+<tr><td>knights_knaves  · K=4</td><td class='num'>-2.1 <span class="small">[-6.8, +3.1]</span></td><td class='num'>+1.0 <span class="small">[-3.1, +5.2]</span></td><td class='num'>-0.5 <span class="small">[-3.1, +2.1]</span></td><td class='num'>0.723</td><td class='no'>no</td></tr>
+<tr><td>color_cube_rotation · 1  · K=4</td><td class='num'>+2.1 <span class="small">[-3.1, +6.2]</span></td><td class='num'>+6.8 <span class="small">[+1.6, +12.5]</span></td><td class='num'>+4.4 <span class="small">[+0.8, +7.8]</span></td><td class='num'>0.071</td><td class='no'>no</td></tr>
+<tr><td>largest_island  · K=4</td><td class='num'>+1.0 <span class="small">[-1.6, +4.2]</span></td><td class='num'>+0.5 <span class="small">[-3.1, +4.2]</span></td><td class='num'>+0.8 <span class="small">[-1.8, +3.6]</span></td><td class='num'>0.723</td><td class='no'>no</td></tr>
+</tbody></table><p class='small'>Percentage points; brackets are 95% paired episode-bootstrap intervals (20,000 resamples).</p>
+<figure><img src='xspec-confirmation-preferences.png' alt='Confirmation preferences'></figure>
+<table><thead><tr><th>Setting</th><th class='num'>Qwen own − teacher</th><th class='num'>Qwen own − initial</th><th class='num'>Gemma own − teacher</th><th class='num'>Gemma own − initial</th></tr></thead><tbody>
+<tr><td>knights_knaves  · K=4</td><td class='num'>+1.0 <span class="small">[-3.1, +4.7]</span></td><td class='num'>-3.1 <span class="small">[-9.4, +3.1]</span></td><td class='num'>-7.3 <span class="small">[-12.0, -3.1]</span></td><td class='num'>-4.2 <span class="small">[-8.3, +0.0]</span></td></tr>
+<tr><td>color_cube_rotation · 1  · K=4</td><td class='num'>+0.5 <span class="small">[-2.1, +3.1]</span></td><td class='num'>+1.0 <span class="small">[-2.1, +4.2]</span></td><td class='num'>+2.1 <span class="small">[-4.2, +8.9]</span></td><td class='num'>+7.8 <span class="small">[+2.6, +13.5]</span></td></tr>
+<tr><td>largest_island  · K=4</td><td class='num'>-1.0 <span class="small">[-4.2, +2.1]</span></td><td class='num'>-0.5 <span class="small">[-6.8, +5.7]</span></td><td class='num'>-1.6 <span class="small">[-4.7, +1.6]</span></td><td class='num'>+0.5 <span class="small">[-3.6, +4.7]</span></td></tr>
+</tbody></table>
+<h3>Learning curves (all N)</h3><figure><img src='xspec-confirmation-curves.png' alt='Learning curves'><figcaption>Shaded: 95% episode-bootstrap intervals. N = 0 is the shared initial-only baseline. </figcaption></figure>
+<h3>Rehearsal-source diagnostics</h3><table><thead><tr><th>Setting</th><th class='num'>Qwen answers correct</th><th class='num'>Gemma answers correct</th><th class='num'>Qwen / Gemma truncated</th><th class='num'>Qwen / Gemma mean chars</th></tr></thead><tbody>
+<tr><td>knights_knaves  · K=4</td><td class='num'>47.9%</td><td class='num'>68.9%</td><td class='num'>0.0% / 0.0%</td><td class='num'>42 / 42</td></tr>
+<tr><td>color_cube_rotation · 1  · K=4</td><td class='num'>24.2%</td><td class='num'>6.4%</td><td class='num'>0.0% / 75.8%</td><td class='num'>5 / 651</td></tr>
+<tr><td>largest_island  · K=4</td><td class='num'>34.4%</td><td class='num'>47.5%</td><td class='num'>0.0% / 0.0%</td><td class='num'>1 / 1</td></tr>
+</tbody></table><p class='small'>Checked after inference only; never used to filter what readers saw.</p><h2 id='interpretation'>Reading the one positive-looking case</h2>
+<p><strong>Colour-cube rotation.</strong> Qwen answers with a bare colour name (mean 5 characters, 24% correct). Gemma writes out the rotation step by step even though the prompt asks for the answer only: 76% of its rehearsal answers hit the 256-token cap (mean 651 characters, 6% correct). As a reader, Gemma keeps writing working under every source, so many final answers are truncated and scored wrong: 77% truncated with initial-only, 46% with Qwen's examples, 44% with teacher's, 36% with its own. Its own (mostly truncated) worked examples come with fewer truncated final answers and slightly higher accuracy; Qwen shows no comparable preference. This looks like a length/format interaction with the output cap rather than a model-specific skill transfer.</p>
+<p><strong>Gemma provider blocks</strong> (episode mod 3; within-episode comparison unaffected), colour cube at N = 16, Gemma own vs Qwen source: DekaLLM 13.9% vs 11.1%, NextBit 11.7% vs 10.0%, Novita 18.3% vs 1.7%. Most of the Gemma preference comes from the Novita block, another sign that the effect is fragile. knights_knaves and largest_island show no preference in any block.</p>
+<p><strong>What the screen does show.</strong> Source effects are common but mostly <em>source main effects</em>: one model's examples are better for both readers, or a reader copies the other model's format. They cancel out of H. The largest are in the lower-right of the scatter, where Gemma does much better with Qwen's terse answers than with its own (simple integration K = 0, graph colouring). This is the same pattern as the 12 September factorization result.</p>
+<p><strong>Formatting check (code fences).</strong> The most extreme screen point, graph colouring level 3 with K = 4 (Gemma 3% with its own examples vs 69% with Qwen's), is a formatting artefact. After reading its own examples, Gemma wraps otherwise-correct JSON in a <code>```json</code> fence, which the strict validity check rejects. Re-scoring with fences stripped changes 98 screen scores and makes that setting Gemma 78% own vs 75% Qwen-source. The same three settings qualify, and <strong>no confirmation score changes</strong>. Primary scores stay strict, as frozen (<code>xspec/fence_sensitivity.json</code>).</p><h2 id='examples'>What the readers actually saw and answered</h2><details><summary>knights_knaves  · K=4: episode 0, first 8 rehearsals and first 8 tests (complete text)</summary>
+<p class='small'>Rehearsal answers in original order; all were replayed. ✓/✗ added for this report only. “…” marks the 256-token output cap.</p>
+<div class='scroll'><table class='ex'><thead><tr><th style='width:34%'>Rehearsal question</th><th>Teacher</th><th>Qwen generation</th><th>Gemma generation</th></tr></thead><tbody>
+<tr><td><pre>A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Riley, and Mason. &quot;Mason is a devil or Mason is an angel,&quot; Riley mentioned. As Mason put it, &quot;Riley is a devil&quot;. So who is an angel and who is a devil? (Format your answer like: &quot;Riley is a angel/devil, and Mason is a angel/devil&quot;)</pre></td><td><pre>Riley is an angel, and Mason is a devil.</pre></td><td><pre>Riley is an angel, and Mason is a devil.</pre><span class='ok'>✓</span></td><td><pre>Riley is an angel, and Mason is a devil.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by pioneers and laggards. Pioneers always tell the truth, and laggards always lie. You meet 2 inhabitants: Ethan, and Scarlett. Ethan said, &quot;Scarlett is a pioneer if and only if Ethan is a pioneer.&quot; Scarlett said that Ethan is a pioneer if and only if Scarlett is a pioneer. So who is a pioneer and who is a laggard? (Format your answer like: &quot;Ethan is a pioneer/laggard, and Scarlett is a pioneer/laggard&quot;)</pre></td><td><pre>Ethan is a pioneer, and Scarlett is a pioneer.</pre></td><td><pre>Ethan is a pioneer, and Scarlett is a pioneer.</pre><span class='ok'>✓</span></td><td><pre>Ethan is a pioneer, and Scarlett is a pioneer.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Benjamin, and Emily. In Benjamin&#x27;s words: &quot;Emily is a saint&quot;. Emily told you that Emily is a saint if and only if Benjamin is a sinner. So who is a saint and who is a sinner? (Format your answer like: &quot;Benjamin is a saint/sinner, and Emily is a saint/sinner&quot;)</pre></td><td><pre>Benjamin is a sinner, and Emily is a sinner.</pre></td><td><pre>Benjamin is a sinner, and Emily is a saint.</pre><span class='no'>✗</span></td><td><pre>Benjamin is a sinner, and Emily is a sinner.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Emily, and Lucas. Emily expressed that Emily is a hero or Lucas is a villain. Lucas said that if Lucas is a hero then Emily is a villain. So who is a hero and who is a villain? (Format your answer like: &quot;Emily is a hero/villain, and Lucas is a hero/villain&quot;)</pre></td><td><pre>Emily is a villain, and Lucas is a hero.</pre></td><td><pre>Emily is a villain, and Lucas is a hero.</pre><span class='ok'>✓</span></td><td><pre>Emily is a hero, and Lucas is a hero.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Sebastian, and Evelyn. Sebastian was heard saying, &quot;Evelyn is a hero&quot;. Evelyn commented, &quot;Evelyn is a hero if and only if Sebastian is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Sebastian is a hero/villain, and Evelyn is a hero/villain&quot;)</pre></td><td><pre>Sebastian is a hero, and Evelyn is a hero.</pre></td><td><pre>Sebastian is a hero, and Evelyn is a hero.</pre><span class='ok'>✓</span></td><td><pre>Sebastian is a villain, and Evelyn is a hero.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Mason, and Samuel. Mason noted, &quot;if Mason is a saint then Samuel is a saint&quot;. &quot;Mason is a saint,&quot; Samuel claimed. So who is a saint and who is a sinner? (Format your answer like: &quot;Mason is a saint/sinner, and Samuel is a saint/sinner&quot;)</pre></td><td><pre>Mason is a saint, and Samuel is a saint.</pre></td><td><pre>Mason is a saint, and Samuel is a saint.</pre><span class='ok'>✓</span></td><td><pre>Mason is a saint, and Samuel is a saint.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Alexander, and Matthew. Alexander told you that if Alexander is an angel then Matthew is a devil. Matthew expressed that Matthew is an angel if and only if Alexander is an angel. So who is an angel and who is a devil? (Format your answer like: &quot;Alexander is a angel/devil, and Matthew is a angel/devil&quot;)</pre></td><td><pre>Alexander is an angel, and Matthew is a devil.</pre></td><td><pre>Alexander is a devil, and Matthew is a devil.</pre><span class='no'>✗</span></td><td><pre>Alexander is an angel, and Matthew is a devil.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Lily, and Sofia. Lily was heard saying, &quot;Sofia is a fool and Sofia is a sage&quot;. According to Sofia, &quot;Lily is a sage&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Lily is a sage/fool, and Sofia is a sage/fool&quot;)</pre></td><td><pre>Lily is a fool, and Sofia is a fool.</pre></td><td><pre>Lily is a fool, and Sofia is a sage.</pre><span class='no'>✗</span></td><td><pre>Lily is a fool, and Sofia is a fool.</pre><span class='ok'>✓</span></td></tr>
+</tbody></table></div>
+<h3>Qwen reads (N = 16)</h3><div class='scroll'><table class='ex'><thead><tr><th style='width:26%'>Test question</th><th>Truth</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody>
+<tr><td><pre>A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Mia, and Evelyn. Mia remarked, &quot;Mia is a sage or Evelyn is a fool&quot;. In a statement by Evelyn: &quot;if Evelyn is a sage then Mia is a sage&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Mia is a sage/fool, and Evelyn is a sage/fool&quot;)</pre></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td><td class=own><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Ava, and Sophia. Ava stated, &quot;Sophia is a devil or Sophia is an angel&quot;. Sophia said that Ava is a devil and Sophia is an angel. So who is an angel and who is a devil? (Format your answer like: &quot;Ava is a angel/devil, and Sophia is a angel/devil&quot;)</pre></td><td><pre>Ava is an angel, and Sophia is a devil.</pre></td><td><pre>Ava is a devil, and Sophia is a devil.</pre><span class='no'>✗</span></td><td class=own><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td><td><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td><td><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Henry, and Isabella. Henry told you that if Henry is a hero then Isabella is a hero. Isabella remarked, &quot;Henry is a hero and Isabella is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Henry is a hero/villain, and Isabella is a hero/villain&quot;)</pre></td><td><pre>Henry is a hero, and Isabella is a hero.</pre></td><td><pre>Henry is a villain, and Isabella is a villain.</pre><span class='no'>✗</span></td><td class=own><pre>Henry is a villain, and Isabella is a villain.</pre><span class='no'>✗</span></td><td><pre>Henry is a hero, and Isabella is a hero.</pre><span class='ok'>✓</span></td><td><pre>Henry is a villain, and Isabella is a villain.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by knights and knaves. Knights always tell the truth, and knaves always lie. You meet 2 inhabitants: Daniel, and Noah. &quot;Daniel is a knight if and only if Noah is a knight,&quot; Daniel claimed. &quot;Daniel is a knight,&quot; Noah mentioned. So who is a knight and who is a knave? (Format your answer like: &quot;Daniel is a knight/knave, and Noah is a knight/knave&quot;)</pre></td><td><pre>Daniel is a knight, and Noah is a knight.</pre></td><td><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td><td class=own><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td><td><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td><td><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Noah, and William. As Noah put it, &quot;if Noah is a hero then William is a hero&quot;. According to William, &quot;Noah is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Noah is a hero/villain, and William is a hero/villain&quot;)</pre></td><td><pre>Noah is a hero, and William is a hero.</pre></td><td><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td><td class=own><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td><td><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td><td><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: David, and Liam. David remarked, &quot;if David is a sage then Liam is a fool&quot;. Liam noted, &quot;David is a fool&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;David is a sage/fool, and Liam is a sage/fool&quot;)</pre></td><td><pre>David is a sage, and Liam is a fool.</pre></td><td><pre>David is a fool, and Liam is a fool.</pre><span class='no'>✗</span></td><td class=own><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td><td><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td><td><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Jacob, and Charlotte. &quot;Charlotte is a villain,&quot; Jacob declared. Charlotte remarked, &quot;Jacob is a hero if and only if Charlotte is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Jacob is a hero/villain, and Charlotte is a hero/villain&quot;)</pre></td><td><pre>Jacob is a hero, and Charlotte is a villain.</pre></td><td><pre>Jacob is a villain, and Charlotte is a villain.</pre><span class='no'>✗</span></td><td class=own><pre>Jacob is a villain, and Charlotte is a villain.</pre><span class='no'>✗</span></td><td><pre>Jacob is a villain, and Charlotte is a villain.</pre><span class='no'>✗</span></td><td><pre>Jacob is a villain, and Charlotte is a villain.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by altruists and egoists. Altruists always tell the truth, and egoists always lie. You meet 2 inhabitants: Zoey, and Amelia. Zoey told you that if Amelia is an egoist then Amelia is an altruist. Amelia asserted: &quot;Zoey is an altruist if and only if Amelia is an altruist&quot;. So who is an altruist and who is an egoist? (Format your answer like: &quot;Zoey is a altruist/egoist, and Amelia is a altruist/egoist&quot;)</pre></td><td><pre>Zoey is an altruist, and Amelia is an altruist.</pre></td><td><pre>Zoey is an egoist, and Amelia is an altruist.</pre><span class='no'>✗</span></td><td class=own><pre>Zoey is an egoist, and Amelia is an egoist.</pre><span class='no'>✗</span></td><td><pre>Zoey is an egoist, and Amelia is an egoist.</pre><span class='no'>✗</span></td><td><pre>Zoey is an egoist, and Amelia is an egoist.</pre><span class='no'>✗</span></td></tr>
+</tbody></table></div>
+<h3>Gemma reads (N = 16)</h3><div class='scroll'><table class='ex'><thead><tr><th style='width:26%'>Test question</th><th>Truth</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody>
+<tr><td><pre>A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Mia, and Evelyn. Mia remarked, &quot;Mia is a sage or Evelyn is a fool&quot;. In a statement by Evelyn: &quot;if Evelyn is a sage then Mia is a sage&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Mia is a sage/fool, and Evelyn is a sage/fool&quot;)</pre></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td><td class=own><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td><td><pre>Mia is a sage, and Evelyn is a sage.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Ava, and Sophia. Ava stated, &quot;Sophia is a devil or Sophia is an angel&quot;. Sophia said that Ava is a devil and Sophia is an angel. So who is an angel and who is a devil? (Format your answer like: &quot;Ava is a angel/devil, and Sophia is a angel/devil&quot;)</pre></td><td><pre>Ava is an angel, and Sophia is a devil.</pre></td><td><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td><td><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td><td class=own><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td><td><pre>Ava is an angel, and Sophia is a devil.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Henry, and Isabella. Henry told you that if Henry is a hero then Isabella is a hero. Isabella remarked, &quot;Henry is a hero and Isabella is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Henry is a hero/villain, and Isabella is a hero/villain&quot;)</pre></td><td><pre>Henry is a hero, and Isabella is a hero.</pre></td><td><pre>Henry is a hero, and Isabella is a villain.</pre><span class='no'>✗</span></td><td><pre>Henry is a hero, and Isabella is a villain.</pre><span class='no'>✗</span></td><td class=own><pre>Henry is a hero, and Isabella is a hero.</pre><span class='ok'>✓</span></td><td><pre>Henry is a hero, and Isabella is a hero.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by knights and knaves. Knights always tell the truth, and knaves always lie. You meet 2 inhabitants: Daniel, and Noah. &quot;Daniel is a knight if and only if Noah is a knight,&quot; Daniel claimed. &quot;Daniel is a knight,&quot; Noah mentioned. So who is a knight and who is a knave? (Format your answer like: &quot;Daniel is a knight/knave, and Noah is a knight/knave&quot;)</pre></td><td><pre>Daniel is a knight, and Noah is a knight.</pre></td><td><pre>Daniel is a knave, and Noah is a knave.</pre><span class='no'>✗</span></td><td><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td><td class=own><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td><td><pre>Daniel is a knight, and Noah is a knight.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Noah, and William. As Noah put it, &quot;if Noah is a hero then William is a hero&quot;. According to William, &quot;Noah is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Noah is a hero/villain, and William is a hero/villain&quot;)</pre></td><td><pre>Noah is a hero, and William is a hero.</pre></td><td><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td><td><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td><td class=own><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td><td><pre>Noah is a hero, and William is a hero.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: David, and Liam. David remarked, &quot;if David is a sage then Liam is a fool&quot;. Liam noted, &quot;David is a fool&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;David is a sage/fool, and Liam is a sage/fool&quot;)</pre></td><td><pre>David is a sage, and Liam is a fool.</pre></td><td><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td><td><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td><td class=own><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td><td><pre>David is a sage, and Liam is a fool.</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Jacob, and Charlotte. &quot;Charlotte is a villain,&quot; Jacob declared. Charlotte remarked, &quot;Jacob is a hero if and only if Charlotte is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Jacob is a hero/villain, and Charlotte is a hero/villain&quot;)</pre></td><td><pre>Jacob is a hero, and Charlotte is a villain.</pre></td><td><pre>Jacob is a villain, and Charlotte is a hero.</pre><span class='no'>✗</span></td><td><pre>Jacob is a villain, and Charlotte is a hero.</pre><span class='no'>✗</span></td><td class=own><pre>Jacob is a villain, and Charlotte is a hero.</pre><span class='no'>✗</span></td><td><pre>Jacob is a villain, and Charlotte is a hero.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A very special island is inhabited only by altruists and egoists. Altruists always tell the truth, and egoists always lie. You meet 2 inhabitants: Zoey, and Amelia. Zoey told you that if Amelia is an egoist then Amelia is an altruist. Amelia asserted: &quot;Zoey is an altruist if and only if Amelia is an altruist&quot;. So who is an altruist and who is an egoist? (Format your answer like: &quot;Zoey is a altruist/egoist, and Amelia is a altruist/egoist&quot;)</pre></td><td><pre>Zoey is an altruist, and Amelia is an altruist.</pre></td><td><pre>Zoey is an altruist, and Amelia is an altruist.</pre><span class='ok'>✓</span></td><td><pre>Zoey is an altruist, and Amelia is an altruist.</pre><span class='ok'>✓</span></td><td class=own><pre>Zoey is an altruist, and Amelia is an altruist.</pre><span class='ok'>✓</span></td><td><pre>Zoey is an altruist, and Amelia is an altruist.</pre><span class='ok'>✓</span></td></tr>
+</tbody></table></div>
+<details><summary>Exact prompts</summary><p><strong>Offline generation prompt</strong> (rehearsal 0):</p><pre>Problem family: knights_knaves.
+Examples:
+Problem: A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Charlotte, and Riley. Charlotte expressed that Riley is a fool if and only if Charlotte is a sage. &quot;Charlotte is a fool&quot; - Riley. So who is a sage and who is a fool? (Format your answer like: &quot;Charlotte is a sage/fool, and Riley is a sage/fool&quot;)
+Answer: Charlotte is a sage, and Riley is a fool.
+
+Problem: A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Ethan, and Aiden. Ethan stated, &quot;Aiden is a fool&quot;. Aiden stated, &quot;if Aiden is a sage then Ethan is a fool&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Ethan is a sage/fool, and Aiden is a sage/fool&quot;)
+Answer: Ethan is a fool, and Aiden is a sage.
+
+Problem: A very special island is inhabited only by pioneers and laggards. Pioneers always tell the truth, and laggards always lie. You meet 2 inhabitants: James, and Logan. James was heard saying, &quot;James is a pioneer if and only if Logan is a laggard&quot;. &quot;James is a laggard,&quot; Logan claimed. So who is a pioneer and who is a laggard? (Format your answer like: &quot;James is a pioneer/laggard, and Logan is a pioneer/laggard&quot;)
+Answer: James is a pioneer, and Logan is a laggard.
+
+Problem: A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Ava, and Evelyn. Ava expressed that Evelyn is a devil. Evelyn commented, &quot;Ava is an angel or Ava is a devil&quot;. So who is an angel and who is a devil? (Format your answer like: &quot;Ava is a angel/devil, and Evelyn is a angel/devil&quot;)
+Answer: Ava is a devil, and Evelyn is an angel.
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Riley, and Mason. &quot;Mason is a devil or Mason is an angel,&quot; Riley mentioned. As Mason put it, &quot;Riley is a devil&quot;. So who is an angel and who is a devil? (Format your answer like: &quot;Riley is a angel/devil, and Mason is a angel/devil&quot;)
+Answer:</pre><p><strong>Final prompt with Qwen source</strong>, test 0, N = 16; other sources change only the answer strings:</p><pre>Problem family: knights_knaves.
+Examples:
+Problem: A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Charlotte, and Riley. Charlotte expressed that Riley is a fool if and only if Charlotte is a sage. &quot;Charlotte is a fool&quot; - Riley. So who is a sage and who is a fool? (Format your answer like: &quot;Charlotte is a sage/fool, and Riley is a sage/fool&quot;)
+Answer: Charlotte is a sage, and Riley is a fool.
+
+Problem: A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Ethan, and Aiden. Ethan stated, &quot;Aiden is a fool&quot;. Aiden stated, &quot;if Aiden is a sage then Ethan is a fool&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Ethan is a sage/fool, and Aiden is a sage/fool&quot;)
+Answer: Ethan is a fool, and Aiden is a sage.
+
+Problem: A very special island is inhabited only by pioneers and laggards. Pioneers always tell the truth, and laggards always lie. You meet 2 inhabitants: James, and Logan. James was heard saying, &quot;James is a pioneer if and only if Logan is a laggard&quot;. &quot;James is a laggard,&quot; Logan claimed. So who is a pioneer and who is a laggard? (Format your answer like: &quot;James is a pioneer/laggard, and Logan is a pioneer/laggard&quot;)
+Answer: James is a pioneer, and Logan is a laggard.
+
+Problem: A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Ava, and Evelyn. Ava expressed that Evelyn is a devil. Evelyn commented, &quot;Ava is an angel or Ava is a devil&quot;. So who is an angel and who is a devil? (Format your answer like: &quot;Ava is a angel/devil, and Evelyn is a angel/devil&quot;)
+Answer: Ava is a devil, and Evelyn is an angel.
+
+Additional examples:
+Problem: A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Riley, and Mason. &quot;Mason is a devil or Mason is an angel,&quot; Riley mentioned. As Mason put it, &quot;Riley is a devil&quot;. So who is an angel and who is a devil? (Format your answer like: &quot;Riley is a angel/devil, and Mason is a angel/devil&quot;)
+Answer: Riley is an angel, and Mason is a devil.
+
+Problem: A very special island is inhabited only by pioneers and laggards. Pioneers always tell the truth, and laggards always lie. You meet 2 inhabitants: Ethan, and Scarlett. Ethan said, &quot;Scarlett is a pioneer if and only if Ethan is a pioneer.&quot; Scarlett said that Ethan is a pioneer if and only if Scarlett is a pioneer. So who is a pioneer and who is a laggard? (Format your answer like: &quot;Ethan is a pioneer/laggard, and Scarlett is a pioneer/laggard&quot;)
+Answer: Ethan is a pioneer, and Scarlett is a pioneer.
+
+Problem: A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Benjamin, and Emily. In Benjamin&#x27;s words: &quot;Emily is a saint&quot;. Emily told you that Emily is a saint if and only if Benjamin is a sinner. So who is a saint and who is a sinner? (Format your answer like: &quot;Benjamin is a saint/sinner, and Emily is a saint/sinner&quot;)
+Answer: Benjamin is a sinner, and Emily is a saint.
+
+Problem: A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Emily, and Lucas. Emily expressed that Emily is a hero or Lucas is a villain. Lucas said that if Lucas is a hero then Emily is a villain. So who is a hero and who is a villain? (Format your answer like: &quot;Emily is a hero/villain, and Lucas is a hero/villain&quot;)
+Answer: Emily is a villain, and Lucas is a hero.
+
+Problem: A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: Sebastian, and Evelyn. Sebastian was heard saying, &quot;Evelyn is a hero&quot;. Evelyn commented, &quot;Evelyn is a hero if and only if Sebastian is a hero&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;Sebastian is a hero/villain, and Evelyn is a hero/villain&quot;)
+Answer: Sebastian is a hero, and Evelyn is a hero.
+
+Problem: A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Mason, and Samuel. Mason noted, &quot;if Mason is a saint then Samuel is a saint&quot;. &quot;Mason is a saint,&quot; Samuel claimed. So who is a saint and who is a sinner? (Format your answer like: &quot;Mason is a saint/sinner, and Samuel is a saint/sinner&quot;)
+Answer: Mason is a saint, and Samuel is a saint.
+
+Problem: A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Alexander, and Matthew. Alexander told you that if Alexander is an angel then Matthew is a devil. Matthew expressed that Matthew is an angel if and only if Alexander is an angel. So who is an angel and who is a devil? (Format your answer like: &quot;Alexander is a angel/devil, and Matthew is a angel/devil&quot;)
+Answer: Alexander is a devil, and Matthew is a devil.
+
+Problem: A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Lily, and Sofia. Lily was heard saying, &quot;Sofia is a fool and Sofia is a sage&quot;. According to Sofia, &quot;Lily is a sage&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Lily is a sage/fool, and Sofia is a sage/fool&quot;)
+Answer: Lily is a fool, and Sofia is a sage.
+
+Problem: A very special island is inhabited only by knights and knaves. Knights always tell the truth, and knaves always lie. You meet 2 inhabitants: Mason, and Henry. Mason remarked, &quot;Henry is a knight and Mason is a knight&quot;. Henry expressed that Mason is a knave. So who is a knight and who is a knave? (Format your answer like: &quot;Mason is a knight/knave, and Henry is a knight/knave&quot;)
+Answer: Mason is a knave, and Henry is a knight.
+
+Problem: A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Liam, and Noah. Liam told you that Noah is a sinner or Noah is a saint. &quot;Liam is a sinner,&quot; Noah declared. So who is a saint and who is a sinner? (Format your answer like: &quot;Liam is a saint/sinner, and Noah is a saint/sinner&quot;)
+Answer: Liam is a saint, and Noah is a sinner.
+
+Problem: A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Jacob, and Harper. Jacob said that Harper is a saint. Harper noted, &quot;Jacob is a sinner or Harper is a saint&quot;. So who is a saint and who is a sinner? (Format your answer like: &quot;Jacob is a saint/sinner, and Harper is a saint/sinner&quot;)
+Answer: Jacob is a saint, and Harper is a saint.
+
+Problem: A very special island is inhabited only by heros and villains. Heros always tell the truth, and villains always lie. You meet 2 inhabitants: David, and Benjamin. David told you that Benjamin is a villain if and only if David is a hero. As Benjamin put it, &quot;David is a villain&quot;. So who is a hero and who is a villain? (Format your answer like: &quot;David is a hero/villain, and Benjamin is a hero/villain&quot;)
+Answer: David is a hero, and Benjamin is a villain.
+
+Problem: A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: Liam, and Luke. Liam was heard saying, &quot;Liam is a saint or Luke is a saint&quot;. Luke asserted: &quot;Liam is a sinner&quot;. So who is a saint and who is a sinner? (Format your answer like: &quot;Liam is a saint/sinner, and Luke is a saint/sinner&quot;)
+Answer: Liam is a saint, and Luke is a sinner.
+
+Problem: A very special island is inhabited only by saints and sinners. Saints always tell the truth, and sinners always lie. You meet 2 inhabitants: David, and Jack. David noted, &quot;Jack is a sinner and Jack is a saint&quot;. Jack stated, &quot;Jack is a saint and David is a saint&quot;. So who is a saint and who is a sinner? (Format your answer like: &quot;David is a saint/sinner, and Jack is a saint/sinner&quot;)
+Answer: David is a sinner, and Jack is a sinner.
+
+Problem: A very special island is inhabited only by pioneers and laggards. Pioneers always tell the truth, and laggards always lie. You meet 2 inhabitants: Charlotte, and Mason. Charlotte asserted: &quot;Charlotte is a pioneer if and only if Mason is a pioneer&quot;. Mason said that Mason is a pioneer if and only if Charlotte is a laggard. So who is a pioneer and who is a laggard? (Format your answer like: &quot;Charlotte is a pioneer/laggard, and Mason is a pioneer/laggard&quot;)
+Answer: Charlotte is a pioneer, and Mason is a laggard.
+
+Problem: A very special island is inhabited only by angels and devils. Angels always tell the truth, and devils always lie. You meet 2 inhabitants: Michael, and Sofia. Michael remarked, &quot;Sofia is a devil&quot;. Sofia noted, &quot;Sofia is an angel if and only if Michael is an angel&quot;. So who is an angel and who is a devil? (Format your answer like: &quot;Michael is a angel/devil, and Sofia is a angel/devil&quot;)
+Answer: Michael is a devil, and Sofia is a devil.
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: A very special island is inhabited only by sages and fools. Sages always tell the truth, and fools always lie. You meet 2 inhabitants: Mia, and Evelyn. Mia remarked, &quot;Mia is a sage or Evelyn is a fool&quot;. In a statement by Evelyn: &quot;if Evelyn is a sage then Mia is a sage&quot;. So who is a sage and who is a fool? (Format your answer like: &quot;Mia is a sage/fool, and Evelyn is a sage/fool&quot;)
+Answer:</pre></details></details><details><summary>color_cube_rotation · 1  · K=4: episode 0, first 8 rehearsals and first 8 tests (complete text)</summary>
+<p class='small'>Rehearsal answers in original order; all were replayed. ✓/✗ added for this report only. “…” marks the 256-token output cap.</p>
+<div class='scroll'><table class='ex'><thead><tr><th style='width:34%'>Rehearsal question</th><th>Teacher</th><th>Qwen generation</th><th>Gemma generation</th></tr></thead><tbody>
+<tr><td><pre>A cube has:
+- a violet top side
+- a cyan right side
+- a brown front side
+- a orange left side
+- a white back side
+- a magenta bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the front face the top.
+
+Now the cube is rotated to place its front side at the top.
+
+Next, the back side is rotated to become the top face.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>violet</pre></td><td><pre>cyan</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation. The initial state is:
+- Top: violet
+- Bottom: magenta
+- Front: brown
+- Back: white
+- Right: cyan
+- Left: orange
+
+**1. Rotate so the bottom side (magenta) becomes the top:**
+- New Top: magenta (was bottom)
+- New Bottom: violet (was top)
+- New Front: white (was back)
+- New Back: brown (was front)
+- New Right: cyan (unchanged)
+- New Left: orange (unchanged)
+
+**2. Rotate so the right side (cyan) becomes the top:**
+- New Top: cyan (was right)
+- New Bottom: orange (was left)
+- New Right: violet (was bottom)
+- New Left: magenta (was top)
+- New Front: white (unchanged)
+- New Back: brown (unchanged)
+
+**3. Rotate so the left face (magenta) becomes the top:**
+- New Top: magenta (was left)
+- New Bottom: violet (was right)
+- New Right: cyan (was top)
+- New Left: orange ( …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a gray top side
+- a red right side
+- a blue front side
+- a magenta left side
+- a pink back side
+- a yellow bottom side
+
+The cube is rotated so that the side which was before at the right is now at the top.
+
+After that the cube is turned to make the left face the top.
+
+Now the cube is rotated to place its front side at the top.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>magenta</pre></td><td><pre>pink</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: gray
+- Bottom: yellow
+- Front: blue
+- Back: pink
+- Left: magenta
+- Right: red
+
+**1. Rotation: The side which was before at the right is now at the top.**
+(The &quot;right&quot; side was red. To bring the right side to the top, we rotate the cube around the Front-Back axis.)
+- New Top: red (was Right)
+- New Bottom: magenta (was Left)
+- New Left: gray (was Top)
+- New Right: yellow (was Bottom)
+- New Front: blue (remains Front)
+- New Back: pink (remains Back)
+
+**2. Rotation: The cube is turned to make the left face the top.**
+(The current &quot;left&quot; side is gray. To bring the left side to the top, we rotate around the Front-Back axis.)
+- New Top: gray (was Left)
+- New Bottom: yellow (was Right)
+- New Left: magenta (was Bottom)
+- New Right: red (was Top)
+- New Front: blue …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a yellow top side
+- a white right side
+- a gold front side
+- a purple left side
+- a indigo back side
+- a pink bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Next, the front side is rotated to become the top face.
+
+Then the cube is rotated to bring the left side to the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>pink</pre></td><td><pre>purple</pre><span class='no'>✗</span></td><td><pre>To solve this, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: yellow
+- Bottom: pink
+- Front: gold
+- Back: indigo
+- Left: purple
+- Right: white
+
+**Step 1: The side which was before at the front (gold) is now at the top.**
+- Rotation: Front $\rightarrow$ Top, Top $\rightarrow$ Back, Back $\rightarrow$ Bottom, Bottom $\rightarrow$ Front. (Rotation around the Left-Right axis)
+- New Top: gold
+- New Bottom: indigo
+- New Front: pink
+- New Back: yellow
+- New Left: purple (unchanged)
+- New Right: white (unchanged)
+
+**Step 2: The front side (pink) is rotated to become the top face.**
+- Rotation: Front $\rightarrow$ Top, Top $\rightarrow$ Back, Back $\rightarrow$ Bottom, Bottom $\rightarrow$ Front.
+- New Top: pink
+- New Bottom: yellow
+- New Front: indigo
+- New Back: gold
+- New Left: purple (unchanged)
+- New Right: white (unchanged)
+
+**Step 3: The left side ( …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a gray top side
+- a gold right side
+- a pink front side
+- a purple left side
+- a yellow back side
+- a silver bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Next, the front side is rotated to become the top face.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the bottom face the top.
+
+Now the cube is rotated to place its bottom side at the top.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>silver</pre></td><td><pre>pink</pre><span class='no'>✗</span></td><td><pre>To solve this, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: gray
+- Bottom: silver
+- Front: pink
+- Back: yellow
+- Left: purple
+- Right: gold
+
+**1. Rotate so the bottom side is now at the top:**
+(Bottom $\to$ Top, Top $\to$ Back, Back $\to$ Bottom, Front $\to$ Front (no, rotation around X-axis): Bottom $\to$ Top, Top $\to$ Back, Back $\to$ Bottom, Bottom $\to$ Top implies a 180-degree rotation or specific axis rotation. Usually, &quot;bottom to top&quot; implies rotating the cube around the Left-Right axis).
+- New Top: silver
+- New Bottom: gray
+- New Front: yellow
+- New Back: pink
+- New Left: purple (unchanged)
+- New Right: gold (unchanged)
+
+**2. Rotate to bring the front side to the top:**
+(Front $\to$ Top, Top $\to$ Back, Back $\to$ Bottom, Bottom $\to$ Front)
+- New Top: yellow
+- New Bottom: pink
+- New Front: gray …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a violet top side
+- a gray right side
+- a brown front side
+- a silver left side
+- a pink back side
+- a orange bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the back side to the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Now the cube is rotated to place its left side at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>orange</pre></td><td><pre>brown</pre><span class='no'>✗</span></td><td><pre>To solve this, we track the orientation of the cube through each rotation.
+Initial state:
+Top: violet
+Bottom: orange
+Front: brown
+Back: pink
+Left: silver
+Right: gray
+
+1. &quot;The cube is rotated so that the side which was before at the bottom is now at the top.&quot;
+(Bottom moves to Top, Top moves to Back, Back moves to Bottom, Front stays Front/Left/Right? No, rotation around the X-axis)
+New Top: orange
+New Bottom: violet
+New Front: pink
+New Back: brown
+New Left: silver
+New Right: gray
+
+2. &quot;Now the cube is rotated to place its back side at the top.&quot;
+(Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+New Top: brown
+New Bottom: pink
+New Front: orange
+New Back: violet
+New Left: silver
+New Right: gray
+
+3. &quot;Next, the bottom side is rotated to become the top face.&quot;
+(Bottom moves to Top, Top moves to Back, Back moves to Bottom, Front stays Front)
+New Top: pink
+New Bottom: brown
+New Front: orange
+New …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a silver top side
+- a green right side
+- a white front side
+- a indigo left side
+- a pink back side
+- a orange bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+After that the cube is turned to make the front face the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the left face the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the right face the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>silver</pre></td><td><pre>pink</pre><span class='no'>✗</span></td><td><pre>green</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a cyan top side
+- a purple right side
+- a gray front side
+- a orange left side
+- a pink back side
+- a blue bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+After that the cube is turned to make the right face the top.
+
+Next, the front side is rotated to become the top face.
+
+Then the cube is rotated to bring the left side to the top.
+
+After that the cube is turned to make the back face the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+After that the cube is turned to make the right face the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>blue</pre></td><td><pre>gray</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation. The initial state is:
+- Top: Cyan
+- Bottom: Blue
+- Front: Gray
+- Back: Pink
+- Left: Orange
+- Right: Purple
+
+1. **Rotate so the back side becomes the top:**
+   - New Top: Pink (was Back)
+   - New Bottom: Gray (was Front)
+   - New Front: Cyan (was Top)
+   - New Back: Blue (was Bottom)
+   - Left and Right remain: Orange, Purple
+
+2. **Rotate so the right face becomes the top:**
+   - New Top: Purple (was Right)
+   - New Bottom: Orange (was Left)
+   - New Right: Gray (was Bottom)
+   - New Left: Pink (was Top)
+   - Front and Back remain: Cyan, Blue
+
+3. **Rotate so the front side becomes the top:**
+   - New Top: Cyan (was Front)
+   - New Bottom: Blue (was Back)
+   - New Front: Orange (was Bottom)
+   - New Back: Purple (was Top)
+   - Left and Right remain: Pink, Gray …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a gold top side
+- a cyan right side
+- a brown front side
+- a white left side
+- a yellow back side
+- a red bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+What is now the color of the back side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>red</pre></td><td><pre>brown</pre><span class='no'>✗</span></td><td><pre>To solve this, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: Gold
+- Bottom: Red
+- Front: Brown
+- Back: Yellow
+- Left: White
+- Right: Cyan
+
+**Step 1: The side which was before at the back is now at the top.**
+- The Back (Yellow) moves to Top.
+- The Top (Gold) moves to Front.
+- The Front (Brown) moves to Bottom.
+- The Bottom (Red) moves to Back.
+- Left and Right remain unchanged.
+**Current State:**
+- Top: Yellow
+- Bottom: Brown
+- Front: Gold
+- Back: Red
+- Left: White
+- Right: Cyan
+
+**Step 2: The cube is rotated to bring the right side to the top.**
+- The Right (Cyan) moves to Top.
+- The Top (Yellow) moves to Left.
+- The Left (White) moves to Bottom.
+- The Bottom (Brown) moves to Right.
+- Front and Back remain unchanged.
+**Current State:**
+- Top: Cyan
+- Bottom: White
+- Front: Gold
+- Back: Red
+- Left …</pre><span class='no'>✗</span></td></tr>
+</tbody></table></div>
+<h3>Qwen reads (N = 16)</h3><div class='scroll'><table class='ex'><thead><tr><th style='width:26%'>Test question</th><th>Truth</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody>
+<tr><td><pre>A cube has:
+- a red top side
+- a indigo right side
+- a yellow front side
+- a blue left side
+- a brown back side
+- a cyan bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Then the cube is rotated to bring the left side to the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the bottom side is rotated to become the top face.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the back face the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>yellow</pre></td><td><pre>indigo</pre><span class='no'>✗</span></td><td class=own><pre>brown</pre><span class='no'>✗</span></td><td><pre>brown</pre><span class='no'>✗</span></td><td><pre>brown</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a orange top side
+- a cyan right side
+- a pink front side
+- a magenta left side
+- a purple back side
+- a brown bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>cyan</pre></td><td><pre>brown</pre><span class='no'>✗</span></td><td class=own><pre>cyan</pre><span class='ok'>✓</span></td><td><pre>brown</pre><span class='no'>✗</span></td><td><pre>cyan</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A cube has:
+- a cyan top side
+- a magenta right side
+- a blue front side
+- a violet left side
+- a gray back side
+- a yellow bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Now the cube is rotated to place its right side at the top.
+
+Next, the front side is rotated to become the top face.
+
+Now the cube is rotated to place its back side at the top.
+
+After that the cube is turned to make the back face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+After that the cube is turned to make the right face the top.
+
+Next, the back side is rotated to become the top face.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>cyan</pre></td><td><pre>magenta</pre><span class='no'>✗</span></td><td class=own><pre>gray</pre><span class='no'>✗</span></td><td><pre>gray</pre><span class='no'>✗</span></td><td><pre>gray</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a yellow top side
+- a green right side
+- a blue front side
+- a pink left side
+- a magenta back side
+- a gray bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the back side is rotated to become the top face.
+
+Next, the back side is rotated to become the top face.
+
+Now the cube is rotated to place its right side at the top.
+
+After that the cube is turned to make the right face the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the back side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>magenta</pre></td><td><pre>blue</pre><span class='no'>✗</span></td><td class=own><pre>magenta</pre><span class='ok'>✓</span></td><td><pre>magenta</pre><span class='ok'>✓</span></td><td><pre>magenta</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A cube has:
+- a gold top side
+- a brown right side
+- a gray front side
+- a silver left side
+- a green back side
+- a purple bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>green</pre></td><td><pre>green</pre><span class='ok'>✓</span></td><td class=own><pre>green</pre><span class='ok'>✓</span></td><td><pre>green</pre><span class='ok'>✓</span></td><td><pre>green</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A cube has:
+- a magenta top side
+- a purple right side
+- a cyan front side
+- a green left side
+- a red back side
+- a white bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>purple</pre></td><td><pre>purple</pre><span class='ok'>✓</span></td><td class=own><pre>purple</pre><span class='ok'>✓</span></td><td><pre>purple</pre><span class='ok'>✓</span></td><td><pre>purple</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A cube has:
+- a indigo top side
+- a orange right side
+- a white front side
+- a purple left side
+- a violet back side
+- a cyan bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the right face the top.
+
+Next, the left side is rotated to become the top face.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>cyan</pre></td><td><pre>orange</pre><span class='no'>✗</span></td><td class=own><pre>purple</pre><span class='no'>✗</span></td><td><pre>purple</pre><span class='no'>✗</span></td><td><pre>purple</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a pink top side
+- a yellow right side
+- a brown front side
+- a gray left side
+- a red back side
+- a orange bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+After that the cube is turned to make the right face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Now the cube is rotated to place its left side at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its front side at the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>gray</pre></td><td><pre>gray</pre><span class='ok'>✓</span></td><td class=own><pre>red</pre><span class='no'>✗</span></td><td><pre>brown</pre><span class='no'>✗</span></td><td><pre>red</pre><span class='no'>✗</span></td></tr>
+</tbody></table></div>
+<h3>Gemma reads (N = 16)</h3><div class='scroll'><table class='ex'><thead><tr><th style='width:26%'>Test question</th><th>Truth</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody>
+<tr><td><pre>A cube has:
+- a red top side
+- a indigo right side
+- a yellow front side
+- a blue left side
+- a brown back side
+- a cyan bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Then the cube is rotated to bring the left side to the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the bottom side is rotated to become the top face.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the back face the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>yellow</pre></td><td><pre>To solve this, we track the orientation of the cube through each rotation. Let the faces be (Top, Bottom, Front, Back, Left, Right).
+
+**Initial State:**
+Top: red, Bottom: cyan, Front: yellow, Back: brown, Left: blue, Right: indigo
+(T: red, Bo: cyan, F: yellow, Ba: brown, L: blue, R: indigo)
+
+1. **Front to Top:** (The side that was front becomes top)
+   New Top: yellow, New Bottom: brown, New Front: cyan, New Back: red, New Left: blue, New Right: indigo
+   (T: yellow, Bo: brown, F: cyan, Ba: red, L: blue, R: indigo)
+
+2. **Front to Top:**
+   New Top: cyan, New Bottom: red, New Front: brown, New Back: yellow, New Left: blue, New Right: indigo
+   (T: cyan, Bo: red, F: brown, Ba: yellow, L: blue, R: indigo)
+
+3. **Right to Top:**
+   New Top: indigo, New Bottom: blue, New Front: brown, New Back: …</pre><span class='no'>✗</span></td><td><pre>The cube starts with:
+Top: red, Right: indigo, Front: yellow, Left: blue, Back: brown, Bottom: cyan.
+
+1. Rotate front to top:
+New Top: yellow, New Bottom: brown, New Front: cyan, New Back: red, New Left: blue, New Right: indigo.
+
+2. Rotate front to top:
+New Top: cyan, New Bottom: red, New Front: brown, New Back: yellow, New Left: blue, New Right: indigo.
+
+3. Rotate right to top:
+New Top: indigo, New Bottom: blue, New Right: red, New Left: cyan, New Front: brown, New Back: yellow.
+
+4. Rotate front to top:
+New Top: brown, New Bottom: yellow, New Front: blue, New Back: indigo, New Left: cyan, New Right: red.
+
+5. Rotate left to top:
+New Top: cyan, New Bottom: red, New Left: yellow, New Right: brown, New Front: blue, New Back: indigo.
+
+6. Rotate front to top:
+New Top: blue, New Bottom: indigo, New Front: red, New Back: cyan, New Left …</pre><span class='no'>✗</span></td><td class=own><pre>To solve this problem, we track the orientation of the cube through each rotation. We define the faces as: Top (T), Bottom (Bo), Front (F), Back (Ba), Left (L), and Right (R).
+
+**Initial State:**
+- T: red
+- Bo: cyan
+- F: yellow
+- Ba: brown
+- L: blue
+- R: indigo
+
+**1. Rotate so the front side (yellow) is now at the top:**
+(Rotation around L-R axis: F $\to$ T, T $\to$ Ba, Ba $\to$ Bo, Bo $\to$ F)
+- T: yellow
+- Bo: brown
+- F: cyan
+- Ba: red
+- L: blue
+- R: indigo
+
+**2. Rotate to bring the front side (cyan) to the top:**
+(Rotation around L-R axis: F $\to$ T, T $\to$ Ba, Ba $\to$ Bo, Bo $\to$ F)
+- T: cyan
+- Bo: red
+- F: brown
+- Ba: yellow
+- L: blue
+- R: indigo
+
+**3. Rotate to place the right side (indigo) …</pre><span class='no'>✗</span></td><td><pre>The initial state is:
+Top: red, Right: indigo, Front: yellow, Left: blue, Back: brown, Bottom: cyan.
+
+1. **Rotate so front is top:**
+   New Top: yellow, New Bottom: brown, New Front: cyan, New Back: red, New Left: blue, New Right: indigo.
+   (Rotation axis: Left-Right)
+
+2. **Rotate front to top:**
+   New Top: cyan, New Bottom: red, New Front: brown, New Back: yellow, New Left: blue, New Right: indigo.
+   (Rotation axis: Left-Right)
+
+3. **Rotate right to top:**
+   New Top: indigo, New Bottom: blue, New Front: brown, New Back: yellow, New Left: cyan, New Right: red.
+   (Rotation axis: Front-Back)
+
+4. **Rotate front to top:**
+   New Top: brown, New Bottom: yellow, New Front: blue, New Back: indigo, New Left: cyan, New Right: red.
+   (Rotation axis: Left-Right)
+
+5. **Rotate left to top:**
+   New Top: cyan, New Bottom: red, …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a orange top side
+- a cyan right side
+- a pink front side
+- a magenta left side
+- a purple back side
+- a brown bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>cyan</pre></td><td><pre>pink</pre><span class='no'>✗</span></td><td><pre>pink</pre><span class='no'>✗</span></td><td class=own><pre>orange</pre><span class='no'>✗</span></td><td><pre>cyan</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A cube has:
+- a cyan top side
+- a magenta right side
+- a blue front side
+- a violet left side
+- a gray back side
+- a yellow bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Now the cube is rotated to place its right side at the top.
+
+Next, the front side is rotated to become the top face.
+
+Now the cube is rotated to place its back side at the top.
+
+After that the cube is turned to make the back face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+After that the cube is turned to make the right face the top.
+
+Next, the back side is rotated to become the top face.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>cyan</pre></td><td><pre>To solve this, we track the orientation of the cube through each rotation. Let the faces be (Top, Bottom, Front, Back, Left, Right).
+
+**Initial State:**
+Top: cyan
+Bottom: yellow
+Front: blue
+Back: gray
+Left: violet
+Right: magenta
+(T: cyan, Bo: yellow, F: blue, Ba: gray, L: violet, R: magenta)
+
+**1. Back side becomes top:**
+(The rotation is around the Left-Right axis. Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+New Top: gray
+New Bottom: blue
+New Front: cyan
+New Back: yellow
+New Left: violet
+New Right: magenta
+
+**2. Right side becomes top:**
+(The rotation is around the Front-Back axis. Right moves to Top, Top moves to Left, Left moves to Bottom, Bottom moves to Right)
+New Top: magenta
+New Bottom: violet
+New Front: cyan
+New Back: yellow
+New Left: gray
+New Right: blue
+
+**3. Front side becomes top:**
+(Rotation around Left-Right axis. Front moves to Top, Top moves to Back …</pre><span class='no'>✗</span></td><td><pre>The color of the top side of the cube is magenta.</pre><span class='no'>✗</span></td><td class=own><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: Cyan
+- Bottom: Yellow
+- Front: Blue
+- Back: Gray
+- Left: Violet
+- Right: Magenta
+
+**1. Rotate so the back side (Gray) becomes the top:**
+(Rotation around the Left-Right axis: Back $\to$ Top, Top $\to$ Front, Front $\to$ Bottom, Bottom $\to$ Back)
+- New Top: Gray
+- New Bottom: Blue
+- New Front: Cyan
+- New Back: Yellow
+- Left: Violet (unchanged)
+- Right: Magenta (unchanged)
+
+**2. Rotate so the right side (Magenta) becomes the top:**
+(Rotation around the Front-Back axis: Right $\to$ Top, Top $\to$ Left, Left $\to$ Bottom, Bottom $\to$ Right)
+- New Top: Magenta
+- New Bottom: Violet
+- New Left: Gray
+- New Right: Blue
+- Front: Cyan (unchanged)
+- Back: Yellow (unchanged)
+
+**3. Rotate so the front side (Cyan) becomes the top:**
+(Rotation around the …</pre><span class='no'>✗</span></td><td><pre>The color of the top side of the cube is magenta.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a yellow top side
+- a green right side
+- a blue front side
+- a pink left side
+- a magenta back side
+- a gray bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the back side is rotated to become the top face.
+
+Next, the back side is rotated to become the top face.
+
+Now the cube is rotated to place its right side at the top.
+
+After that the cube is turned to make the right face the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the back side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>magenta</pre></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation. Let the initial state be:
+Top (T): yellow, Bottom (Bo): gray, Front (F): blue, Back (Ba): magenta, Left (L): pink, Right (R): green.
+
+1. **Initial State:**
+   T: yellow, Bo: gray, F: blue, Ba: magenta, L: pink, R: green
+
+2. **Rotate back to top:** (Back becomes Top, Top becomes Front, Front becomes Bottom, Bottom becomes Back)
+   T: magenta, Bo: blue, F: yellow, Ba: gray, L: pink, R: green
+
+3. **Rotate bottom to top:** (Bottom becomes Top, Top becomes Back, Back becomes Bottom, Front becomes Front - wait, rotation around L-R axis: Bottom to Top means Top moves to Back, Back to Bottom, Bottom to Top, Front to Front is incorrect. Standard rotation: Bottom to Top means Top moves to Front, Front to Bottom, Bottom to Top, Back to Back is incorrect. Let&#x27;s use axis: Bottom to Top is a 180-degree rotation around L-R axis or a 90-degree …</pre><span class='no'>✗</span></td><td><pre>blue</pre><span class='no'>✗</span></td><td class=own><pre>To solve this problem, we track the orientation of the cube through each rotation. We define the faces as: Top (T), Bottom (Bo), Front (F), Back (Ba), Left (L), and Right (R).
+
+**Initial State:**
+- T: yellow
+- Bo: gray
+- F: blue
+- Ba: magenta
+- L: pink
+- R: green
+
+**1. Rotate so the back side (magenta) becomes the top:**
+(Rotation around the Left-Right axis: Ba $\to$ T, T $\to$ F, F $\to$ Bo, Bo $\to$ Ba)
+- T: magenta
+- Bo: blue
+- F: yellow
+- Ba: gray
+- L: pink
+- R: green
+
+**2. Rotate so the bottom side (blue) becomes the top:**
+(Rotation around the Left-Right axis: Bo $\to$ T, T $\to$ Ba, Ba $\to$ Bo, F $\to$ F - wait, standard rotation: Bo $\to$ T, T $\to$ Ba, Ba $\to$ Bo, F $\to$ F is incorrect. If Bo becomes T, then T becomes F, F becomes Ba …</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation. Let the faces be represented as (Top, Bottom, Front, Back, Left, Right).
+
+**Initial State:**
+Top: yellow, Bottom: gray, Front: blue, Back: magenta, Left: pink, Right: green
+State: (yellow, gray, blue, magenta, pink, green)
+
+**1. The cube is rotated so that the side which was before at the back is now at the top.**
+The back (magenta) moves to Top. The top (yellow) moves to Front. The front (blue) moves to Bottom. The bottom (gray) moves to Back. Left and Right remain the same.
+State: (magenta, blue, yellow, gray, pink, green)
+
+**2. Next, the bottom side is rotated to become the top face.**
+The bottom (blue) moves to Top. The top (magenta) moves to Bottom. The front (yellow) moves to Back. The back (gray) moves to Front. Left and Right remain the same.
+State: (blue, magenta, gray, yellow, pink, green)
+
+**3. Then the cube is rotated to bring the front side to …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a gold top side
+- a brown right side
+- a gray front side
+- a silver left side
+- a green back side
+- a purple bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>green</pre></td><td><pre>green</pre><span class='ok'>✓</span></td><td><pre>green</pre><span class='ok'>✓</span></td><td class=own><pre>green</pre><span class='ok'>✓</span></td><td><pre>green</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>A cube has:
+- a magenta top side
+- a purple right side
+- a cyan front side
+- a green left side
+- a red back side
+- a white bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>purple</pre></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: magenta
+- Bottom: white
+- Front: cyan
+- Back: red
+- Left: green
+- Right: purple
+
+**Step 1: The cube is rotated so that the side which was before at the bottom is now at the top.**
+- The bottom (white) moves to the top.
+- The top (magenta) moves to the back.
+- The back (red) moves to the bottom.
+- The front (cyan) moves to the top? No, let&#x27;s use standard axes:
+  - New Top = Old Bottom (white)
+  - New Bottom = Old Top (magenta)
+  - New Front = Old Back (red)
+  - New Back = Old Front (cyan)
+  - Left and Right remain the same (green, purple).
+*Current State:* Top: white, Bottom: magenta, Front: red, Back: cyan, Left: green, Right: purple.
+
+**Step 2: Then the cube is rotated to bring the front side to the top.**
+- The current front (red) moves to the top.
+- …</pre><span class='no'>✗</span></td><td><pre>The color of the right side of the cube is magenta.</pre><span class='no'>✗</span></td><td class=own><pre>magenta</pre><span class='no'>✗</span></td><td><pre>The color of the right side of the cube is red.</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a indigo top side
+- a orange right side
+- a white front side
+- a purple left side
+- a violet back side
+- a cyan bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the right face the top.
+
+Next, the left side is rotated to become the top face.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>cyan</pre></td><td><pre>To solve this, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: indigo
+- Bottom: cyan
+- Front: white
+- Back: violet
+- Left: purple
+- Right: orange
+
+**1. Rotate so the side which was before at the left is now at the top:**
+(Left moves to Top, Top moves to Right, Right moves to Bottom, Bottom moves to Left)
+- Top: purple
+- Bottom: orange
+- Front: white
+- Back: violet
+- Left: cyan
+- Right: indigo
+
+**2. Turn to make the back face the top:**
+(Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+- Top: violet
+- Bottom: white
+- Front: purple
+- Back: orange
+- Left: cyan
+- Right: indigo
+
+**3. Turn to make the right face the top:**
+(Right moves to Top, Top moves to Left, Left moves to Bottom, Bottom moves to Right)
+- Top: indigo
+- Bottom: cyan
+- Front: purple
+- Back: orange
+- Left: violet
+- Right: white
+
+**4. …</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: indigo
+- Right: orange
+- Front: white
+- Left: purple
+- Back: violet
+- Bottom: cyan
+
+**1. The cube is rotated so that the side which was before at the left is now at the top.**
+(Left moves to Top, Top moves to Right, Right moves to Bottom, Bottom moves to Left)
+- Top: purple
+- Right: indigo
+- Front: white
+- Left: cyan
+- Back: violet
+- Bottom: orange
+
+**2. After that the cube is turned to make the back face the top.**
+(Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+- Top: violet
+- Right: indigo
+- Front: purple
+- Left: cyan
+- Back: orange
+- Bottom: white
+
+**3. After that the cube is turned to make the right face the top.**
+(Right moves to Top, Top moves to Left, Left moves to Bottom, Bottom moves to Right)
+- Top: indigo
+- Right: white
+- Front: purple
+- Left: …</pre><span class='no'>✗</span></td><td class=own><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: indigo
+- Bottom: cyan
+- Front: white
+- Back: violet
+- Left: purple
+- Right: orange
+
+**1. Rotate so the side which was before at the left is now at the top:**
+(The &quot;left&quot; side was purple. To bring the left side to the top, we rotate around the Front-Back axis: Left $\to$ Top, Top $\to$ Right, Right $\to$ Bottom, Bottom $\to$ Left.)
+- New Top: purple (was Left)
+- New Bottom: orange (was Right)
+- New Right: indigo (was Top)
+- New Left: cyan (was Bottom)
+- New Front: white (unchanged)
+- New Back: violet (unchanged)
+
+**2. Rotate to make the back face the top:**
+(The current &quot;back&quot; side is violet. To bring the back side to the top, we rotate around the Left-Right axis: Back $\to$ Top, Top $\to$ Front, Front $\to$ Bottom, Bottom $\to$ Back.)
+- New Top: violet ( …</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: indigo
+- Right: orange
+- Front: white
+- Left: purple
+- Back: violet
+- Bottom: cyan
+
+**1. The cube is rotated so that the side which was before at the left is now at the top.**
+(Left moves to Top, Top moves to Right, Right moves to Bottom, Bottom moves to Left)
+- Top: purple
+- Right: indigo
+- Front: white
+- Left: cyan
+- Back: violet
+- Bottom: orange
+
+**2. After that the cube is turned to make the back face the top.**
+(Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+- Top: violet
+- Right: indigo
+- Front: purple
+- Left: cyan
+- Back: orange
+- Bottom: white
+
+**3. After that the cube is turned to make the right face the top.**
+(Right moves to Top, Top moves to Left, Left moves to Bottom, Bottom moves to Right)
+- Top: indigo
+- Right: white
+- Front: purple
+- Left: …</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>A cube has:
+- a pink top side
+- a yellow right side
+- a brown front side
+- a gray left side
+- a red back side
+- a orange bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+After that the cube is turned to make the right face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Now the cube is rotated to place its left side at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its front side at the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.</pre></td><td><pre>gray</pre></td><td><pre>To solve this, we track the orientation of the cube through each rotation. Let the faces be (Top, Bottom, Front, Back, Left, Right).
+
+**Initial State:**
+Top: pink, Bottom: orange, Front: brown, Back: red, Left: gray, Right: yellow
+(T: pink, Bo: orange, F: brown, Ba: red, L: gray, R: yellow)
+
+1. **Rotate so the back side is at the top:**
+   (Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+   New State: T: red, Bo: brown, F: pink, Ba: orange, L: gray, R: yellow
+
+2. **Turn to make the right face the top:**
+   (Right moves to Top, Top moves to Left, Left moves to Bottom, Bottom moves to Right)
+   New State: T: yellow, Bo: gray, F: pink, Ba: orange, L: red, R: brown
+
+3. **Rotate to place its back side at the top:**
+   (Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back)
+   New …</pre><span class='no'>✗</span></td><td><pre>The color of the front side of the cube is yellow.</pre><span class='no'>✗</span></td><td class=own><pre>To solve this problem, we track the orientation of the cube through each rotation. We define the faces as: Top (T), Bottom (Bo), Front (F), Back (Ba), Left (L), and Right (R).
+
+**Initial State:**
+- T: pink
+- Bo: orange
+- F: brown
+- Ba: red
+- L: gray
+- R: yellow
+
+**1. Rotate so the back side (red) becomes the top:**
+(Rotation around the Left-Right axis: Ba $\to$ T, T $\to$ F, F $\to$ Bo, Bo $\to$ Ba)
+- T: red
+- Bo: brown
+- F: pink
+- Ba: orange
+- L: gray
+- R: yellow
+
+**2. Rotate to make the right face (yellow) the top:**
+(Rotation around the Front-Back axis: R $\to$ T, T $\to$ L, L $\to$ Bo, Bo $\to$ R)
+- T: yellow
+- Bo: gray
+- F: pink
+- Ba: orange
+- L: red
+- R: brown
+
+**3. Rotate to place its back side (orange) at …</pre><span class='no'>✗</span></td><td><pre>To solve this problem, we track the orientation of the cube through each rotation.
+
+**Initial State:**
+- Top: pink
+- Right: yellow
+- Front: brown
+- Left: gray
+- Back: red
+- Bottom: orange
+
+**1. Rotate so the back side is at the top:**
+(Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back. Left and Right stay the same.)
+- Top: red
+- Right: yellow
+- Front: pink
+- Left: gray
+- Back: orange
+- Bottom: brown
+
+**2. Turn to make the right face the top:**
+(Right moves to Top, Top moves to Left, Left moves to Bottom, Bottom moves to Right. Front and Back stay the same.)
+- Top: yellow
+- Right: brown
+- Front: pink
+- Left: red
+- Back: orange
+- Bottom: gray
+
+**3. Rotate to place its back side at the top:**
+(Back moves to Top, Top moves to Front, Front moves to Bottom, Bottom moves to Back. Left and Right stay the same.)
+- Top: orange
+- Right: brown
+- Front: yellow
+- …</pre><span class='no'>✗</span></td></tr>
+</tbody></table></div>
+<details><summary>Exact prompts</summary><p><strong>Offline generation prompt</strong> (rehearsal 0):</p><pre>Problem family: color_cube_rotation.
+Examples:
+Problem: A cube has:
+- a pink top side
+- a orange right side
+- a gold front side
+- a green left side
+- a cyan back side
+- a purple bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Next, the front side is rotated to become the top face.
+
+After that the cube is turned to make the left face the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the bottom face the top.
+
+After that the cube is turned to make the bottom face the top.
+
+After that the cube is turned to make the right face the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer: gold
+
+Problem: A cube has:
+- a brown top side
+- a blue right side
+- a pink front side
+- a purple left side
+- a yellow back side
+- a red bottom side
+
+The cube is rotated so that the side which was before at the right is now at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Then the cube is rotated to bring the back side to the top.
+
+After that the cube is turned to make the left face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.
+Answer: blue
+
+Problem: A cube has:
+- a red top side
+- a pink right side
+- a brown front side
+- a white left side
+- a gray back side
+- a purple bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Next, the back side is rotated to become the top face.
+
+Then the cube is rotated to bring the back side to the top.
+
+Next, the left side is rotated to become the top face.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.
+Answer: purple
+
+Problem: A cube has:
+- a yellow top side
+- a indigo right side
+- a red front side
+- a purple left side
+- a brown back side
+- a green bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the right face the top.
+
+After that the cube is turned to make the front face the top.
+
+Next, the back side is rotated to become the top face.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Next, the right side is rotated to become the top face.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.
+Answer: brown
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: A cube has:
+- a violet top side
+- a cyan right side
+- a brown front side
+- a orange left side
+- a white back side
+- a magenta bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the front face the top.
+
+Now the cube is rotated to place its front side at the top.
+
+Next, the back side is rotated to become the top face.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.
+Answer:</pre><p><strong>Final prompt with Qwen source</strong>, test 0, N = 16; other sources change only the answer strings:</p><pre>Problem family: color_cube_rotation.
+Examples:
+Problem: A cube has:
+- a pink top side
+- a orange right side
+- a gold front side
+- a green left side
+- a cyan back side
+- a purple bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Next, the front side is rotated to become the top face.
+
+After that the cube is turned to make the left face the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the bottom face the top.
+
+After that the cube is turned to make the bottom face the top.
+
+After that the cube is turned to make the right face the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer: gold
+
+Problem: A cube has:
+- a brown top side
+- a blue right side
+- a pink front side
+- a purple left side
+- a yellow back side
+- a red bottom side
+
+The cube is rotated so that the side which was before at the right is now at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Then the cube is rotated to bring the back side to the top.
+
+After that the cube is turned to make the left face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.
+Answer: blue
+
+Problem: A cube has:
+- a red top side
+- a pink right side
+- a brown front side
+- a white left side
+- a gray back side
+- a purple bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Next, the back side is rotated to become the top face.
+
+Then the cube is rotated to bring the back side to the top.
+
+Next, the left side is rotated to become the top face.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.
+Answer: purple
+
+Problem: A cube has:
+- a yellow top side
+- a indigo right side
+- a red front side
+- a purple left side
+- a brown back side
+- a green bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the right face the top.
+
+After that the cube is turned to make the front face the top.
+
+Next, the back side is rotated to become the top face.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Next, the right side is rotated to become the top face.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.
+Answer: brown
+
+Additional examples:
+Problem: A cube has:
+- a violet top side
+- a cyan right side
+- a brown front side
+- a orange left side
+- a white back side
+- a magenta bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the front face the top.
+
+Now the cube is rotated to place its front side at the top.
+
+Next, the back side is rotated to become the top face.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.
+Answer: cyan
+
+Problem: A cube has:
+- a gray top side
+- a red right side
+- a blue front side
+- a magenta left side
+- a pink back side
+- a yellow bottom side
+
+The cube is rotated so that the side which was before at the right is now at the top.
+
+After that the cube is turned to make the left face the top.
+
+Now the cube is rotated to place its front side at the top.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.
+Answer: pink
+
+Problem: A cube has:
+- a yellow top side
+- a white right side
+- a gold front side
+- a purple left side
+- a indigo back side
+- a pink bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Next, the front side is rotated to become the top face.
+
+Then the cube is rotated to bring the left side to the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.
+Answer: purple
+
+Problem: A cube has:
+- a gray top side
+- a gold right side
+- a pink front side
+- a purple left side
+- a yellow back side
+- a silver bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Next, the front side is rotated to become the top face.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the bottom face the top.
+
+Now the cube is rotated to place its bottom side at the top.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.
+Answer: pink
+
+Problem: A cube has:
+- a violet top side
+- a gray right side
+- a brown front side
+- a silver left side
+- a pink back side
+- a orange bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the back side to the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Now the cube is rotated to place its left side at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+What is now the color of the left side of the cube?
+Provide only the color as your final answer.
+Answer: brown
+
+Problem: A cube has:
+- a silver top side
+- a green right side
+- a white front side
+- a indigo left side
+- a pink back side
+- a orange bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+After that the cube is turned to make the front face the top.
+
+After that the cube is turned to make the left face the top.
+
+After that the cube is turned to make the left face the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the right face the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer: pink
+
+Problem: A cube has:
+- a cyan top side
+- a purple right side
+- a gray front side
+- a orange left side
+- a pink back side
+- a blue bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+After that the cube is turned to make the right face the top.
+
+Next, the front side is rotated to become the top face.
+
+Then the cube is rotated to bring the left side to the top.
+
+After that the cube is turned to make the back face the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+After that the cube is turned to make the right face the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.
+Answer: gray
+
+Problem: A cube has:
+- a gold top side
+- a cyan right side
+- a brown front side
+- a white left side
+- a yellow back side
+- a red bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+What is now the color of the back side of the cube?
+Provide only the color as your final answer.
+Answer: brown
+
+Problem: A cube has:
+- a pink top side
+- a brown right side
+- a violet front side
+- a white left side
+- a magenta back side
+- a yellow bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Now the cube is rotated to place its right side at the top.
+
+After that the cube is turned to make the left face the top.
+
+Now the cube is rotated to place its left side at the top.
+
+Next, the left side is rotated to become the top face.
+
+Now the cube is rotated to place its front side at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+Then the cube is rotated to bring the back side to the top.
+
+Now the cube is rotated to place its bottom side at the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer: magenta
+
+Problem: A cube has:
+- a cyan top side
+- a gold right side
+- a brown front side
+- a orange left side
+- a yellow back side
+- a red bottom side
+
+The cube is rotated so that the side which was before at the bottom is now at the top.
+
+Then the cube is rotated to bring the back side to the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Now the cube is rotated to place its back side at the top.
+
+After that the cube is turned to make the right face the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+After that the cube is turned to make the right face the top.
+
+After that the cube is turned to make the back face the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer: gold
+
+Problem: A cube has:
+- a pink top side
+- a brown right side
+- a red front side
+- a violet left side
+- a silver back side
+- a blue bottom side
+
+The cube is rotated so that the side which was before at the left is now at the top.
+
+Next, the left side is rotated to become the top face.
+
+Then the cube is rotated to bring the back side to the top.
+
+Next, the right side is rotated to become the top face.
+
+Next, the right side is rotated to become the top face.
+
+Now the cube is rotated to place its right side at the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.
+Answer: red
+
+Problem: A cube has:
+- a magenta top side
+- a red right side
+- a purple front side
+- a gray left side
+- a violet back side
+- a gold bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Then the cube is rotated to bring the back side to the top.
+
+What is now the color of the front side of the cube?
+Provide only the color as your final answer.
+Answer: magenta
+
+Problem: A cube has:
+- a magenta top side
+- a cyan right side
+- a gray front side
+- a silver left side
+- a violet back side
+- a yellow bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Now the cube is rotated to place its back side at the top.
+
+Then the cube is rotated to bring the right side to the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.
+Answer: gray
+
+Problem: A cube has:
+- a indigo top side
+- a gray right side
+- a brown front side
+- a yellow left side
+- a green back side
+- a violet bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+After that the cube is turned to make the bottom face the top.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the bottom side to the top.
+
+Now the cube is rotated to place its bottom side at the top.
+
+Now the cube is rotated to place its bottom side at the top.
+
+Next, the front side is rotated to become the top face.
+
+Next, the back side is rotated to become the top face.
+
+After that the cube is turned to make the left face the top.
+
+What is now the color of the right side of the cube?
+Provide only the color as your final answer.
+Answer: gray
+
+Problem: A cube has:
+- a green top side
+- a orange right side
+- a gold front side
+- a cyan left side
+- a blue back side
+- a indigo bottom side
+
+The cube is rotated so that the side which was before at the back is now at the top.
+
+Next, the right side is rotated to become the top face.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the left side to the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its front side at the top.
+
+Next, the left side is rotated to become the top face.
+
+After that the cube is turned to make the front face the top.
+
+After that the cube is turned to make the right face the top.
+
+Now the cube is rotated to place its right side at the top.
+
+What is now the color of the bottom side of the cube?
+Provide only the color as your final answer.
+Answer: gold
+
+Problem: A cube has:
+- a pink top side
+- a green right side
+- a red front side
+- a silver left side
+- a magenta back side
+- a cyan bottom side
+
+The cube is rotated so that the side which was before at the right is now at the top.
+
+Next, the bottom side is rotated to become the top face.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer: cyan
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: A cube has:
+- a red top side
+- a indigo right side
+- a yellow front side
+- a blue left side
+- a brown back side
+- a cyan bottom side
+
+The cube is rotated so that the side which was before at the front is now at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Now the cube is rotated to place its right side at the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Then the cube is rotated to bring the left side to the top.
+
+Then the cube is rotated to bring the front side to the top.
+
+Next, the bottom side is rotated to become the top face.
+
+After that the cube is turned to make the back face the top.
+
+After that the cube is turned to make the back face the top.
+
+Now the cube is rotated to place its left side at the top.
+
+What is now the color of the top side of the cube?
+Provide only the color as your final answer.
+Answer:</pre></details></details><details><summary>largest_island  · K=4: episode 0, first 8 rehearsals and first 8 tests (complete text)</summary>
+<p class='small'>Rehearsal answers in original order; all were replayed. ✓/✗ added for this report only. “…” marks the 256-token output cap.</p>
+<div class='scroll'><table class='ex'><thead><tr><th style='width:34%'>Rehearsal question</th><th>Teacher</th><th>Qwen generation</th><th>Gemma generation</th></tr></thead><tbody>
+<tr><td><pre>You are given the following 6 x 5 binary matrix grid:
+0 1 1 1 0
+1 1 1 1 0
+1 0 1 1 1
+1 1 0 0 0
+1 1 1 0 0
+1 1 1 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>19</pre></td><td><pre>23</pre><span class='no'>✗</span></td><td><pre>20</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>You are given the following 6 x 5 binary matrix grid:
+0 0 0 0 0
+0 0 0 0 0
+1 0 0 0 0
+1 1 1 1 0
+1 1 1 1 1
+0 0 1 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>13</pre></td><td><pre>16</pre><span class='no'>✗</span></td><td><pre>13</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 8 x 6 binary matrix grid:
+0 0 0 1 1 0
+0 0 0 1 1 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 1 1 0 0
+0 0 1 0 0 0
+0 0 1 0 0 0
+0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>4</pre></td><td><pre>6</pre><span class='no'>✗</span></td><td><pre>4</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 9 x 10 binary matrix grid:
+0 1 1 1 1 1 0 0 1 1
+1 1 0 0 0 1 1 0 0 1
+1 1 1 1 0 0 0 0 0 0
+0 0 0 1 1 1 0 0 0 0
+0 0 0 1 0 0 0 0 0 0
+0 0 0 1 1 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 1 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>19</pre></td><td><pre>15</pre><span class='no'>✗</span></td><td><pre>16</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>You are given the following 5 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 8 x 6 binary matrix grid:
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 1 1
+0 0 0 0 1 1
+0 0 0 0 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>6</pre></td><td><pre>9</pre><span class='no'>✗</span></td><td><pre>6</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 5 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 1
+0 0 0 0 0 0 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>6</pre></td><td><pre>6</pre><span class='ok'>✓</span></td><td><pre>6</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 6 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+</tbody></table></div>
+<h3>Qwen reads (N = 16)</h3><div class='scroll'><table class='ex'><thead><tr><th style='width:26%'>Test question</th><th>Truth</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody>
+<tr><td><pre>You are given the following 5 x 5 binary matrix grid:
+1 1 0 0 0
+1 1 1 0 0
+1 1 0 0 0
+1 1 1 0 0
+1 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>14</pre></td><td><pre>17</pre><span class='no'>✗</span></td><td class=own><pre>15</pre><span class='no'>✗</span></td><td><pre>15</pre><span class='no'>✗</span></td><td><pre>15</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>You are given the following 7 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 9 x 5 binary matrix grid:
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 10 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 5 x 5 binary matrix grid:
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 10 x 10 binary matrix grid:
+0 0 0 0 1 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 1 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>6</pre></td><td><pre>1</pre><span class='no'>✗</span></td><td class=own><pre>6</pre><span class='ok'>✓</span></td><td><pre>6</pre><span class='ok'>✓</span></td><td><pre>6</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 10 x 6 binary matrix grid:
+1 1 1 0 0 0
+1 0 1 0 0 0
+1 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 1 1 1
+0 1 1 1 1 0
+0 1 1 1 1 0
+0 1 1 1 0 0
+0 1 1 1 1 1
+0 0 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>22</pre></td><td><pre>19</pre><span class='no'>✗</span></td><td class=own><pre>19</pre><span class='no'>✗</span></td><td><pre>19</pre><span class='no'>✗</span></td><td><pre>19</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>You are given the following 9 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 1 1 0
+1 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>5</pre></td><td><pre>6</pre><span class='no'>✗</span></td><td class=own><pre>6</pre><span class='no'>✗</span></td><td><pre>3</pre><span class='no'>✗</span></td><td><pre>6</pre><span class='no'>✗</span></td></tr>
+</tbody></table></div>
+<h3>Gemma reads (N = 16)</h3><div class='scroll'><table class='ex'><thead><tr><th style='width:26%'>Test question</th><th>Truth</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody>
+<tr><td><pre>You are given the following 5 x 5 binary matrix grid:
+1 1 0 0 0
+1 1 1 0 0
+1 1 0 0 0
+1 1 1 0 0
+1 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>14</pre></td><td><pre>14</pre><span class='ok'>✓</span></td><td><pre>15</pre><span class='no'>✗</span></td><td class=own><pre>14</pre><span class='ok'>✓</span></td><td><pre>15</pre><span class='no'>✗</span></td></tr>
+<tr><td><pre>You are given the following 7 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 9 x 5 binary matrix grid:
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 10 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 5 x 5 binary matrix grid:
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>0</pre></td><td><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td><td class=own><pre>0</pre><span class='ok'>✓</span></td><td><pre>0</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 10 x 10 binary matrix grid:
+0 0 0 0 1 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 1 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>6</pre></td><td><pre>6</pre><span class='ok'>✓</span></td><td><pre>6</pre><span class='ok'>✓</span></td><td class=own><pre>6</pre><span class='ok'>✓</span></td><td><pre>6</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 10 x 6 binary matrix grid:
+1 1 1 0 0 0
+1 0 1 0 0 0
+1 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 1 1 1
+0 1 1 1 1 0
+0 1 1 1 1 0
+0 1 1 1 0 0
+0 1 1 1 1 1
+0 0 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>22</pre></td><td><pre>21</pre><span class='no'>✗</span></td><td><pre>22</pre><span class='ok'>✓</span></td><td class=own><pre>22</pre><span class='ok'>✓</span></td><td><pre>22</pre><span class='ok'>✓</span></td></tr>
+<tr><td><pre>You are given the following 9 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 1 1 0
+1 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+</pre></td><td><pre>5</pre></td><td><pre>4</pre><span class='no'>✗</span></td><td><pre>5</pre><span class='ok'>✓</span></td><td class=own><pre>5</pre><span class='ok'>✓</span></td><td><pre>5</pre><span class='ok'>✓</span></td></tr>
+</tbody></table></div>
+<details><summary>Exact prompts</summary><p><strong>Offline generation prompt</strong> (rehearsal 0):</p><pre>Problem family: largest_island.
+Examples:
+Problem: You are given the following 5 x 5 binary matrix grid:
+0 0 0 0 0
+0 1 0 0 1
+1 1 1 1 1
+1 0 1 1 1
+1 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 15
+
+Problem: You are given the following 7 x 6 binary matrix grid:
+1 1 1 0 0 0
+1 1 1 0 0 0
+1 0 0 0 0 0
+1 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 8
+
+Problem: You are given the following 8 x 7 binary matrix grid:
+0 0 0 0 0 0 0
+0 1 0 0 0 0 0
+1 1 0 0 0 0 0
+1 1 1 0 0 0 0
+1 1 1 0 0 0 0
+1 1 0 0 0 0 0
+1 1 0 0 0 0 0
+1 1 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 15
+
+Problem: You are given the following 8 x 5 binary matrix grid:
+0 0 1 1 1
+0 0 0 1 1
+0 0 1 1 0
+0 1 1 1 0
+0 0 0 1 1
+0 0 0 1 1
+0 0 0 1 1
+0 0 1 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 19
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: You are given the following 6 x 5 binary matrix grid:
+0 1 1 1 0
+1 1 1 1 0
+1 0 1 1 1
+1 1 0 0 0
+1 1 1 0 0
+1 1 1 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer:</pre><p><strong>Final prompt with Qwen source</strong>, test 0, N = 16; other sources change only the answer strings:</p><pre>Problem family: largest_island.
+Examples:
+Problem: You are given the following 5 x 5 binary matrix grid:
+0 0 0 0 0
+0 1 0 0 1
+1 1 1 1 1
+1 0 1 1 1
+1 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 15
+
+Problem: You are given the following 7 x 6 binary matrix grid:
+1 1 1 0 0 0
+1 1 1 0 0 0
+1 0 0 0 0 0
+1 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 8
+
+Problem: You are given the following 8 x 7 binary matrix grid:
+0 0 0 0 0 0 0
+0 1 0 0 0 0 0
+1 1 0 0 0 0 0
+1 1 1 0 0 0 0
+1 1 1 0 0 0 0
+1 1 0 0 0 0 0
+1 1 0 0 0 0 0
+1 1 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 15
+
+Problem: You are given the following 8 x 5 binary matrix grid:
+0 0 1 1 1
+0 0 0 1 1
+0 0 1 1 0
+0 1 1 1 0
+0 0 0 1 1
+0 0 0 1 1
+0 0 0 1 1
+0 0 1 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 19
+
+Additional examples:
+Problem: You are given the following 6 x 5 binary matrix grid:
+0 1 1 1 0
+1 1 1 1 0
+1 0 1 1 1
+1 1 0 0 0
+1 1 1 0 0
+1 1 1 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 23
+
+Problem: You are given the following 6 x 5 binary matrix grid:
+0 0 0 0 0
+0 0 0 0 0
+1 0 0 0 0
+1 1 1 1 0
+1 1 1 1 1
+0 0 1 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 16
+
+Problem: You are given the following 8 x 6 binary matrix grid:
+0 0 0 1 1 0
+0 0 0 1 1 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 1 1 0 0
+0 0 1 0 0 0
+0 0 1 0 0 0
+0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 6
+
+Problem: You are given the following 9 x 10 binary matrix grid:
+0 1 1 1 1 1 0 0 1 1
+1 1 0 0 0 1 1 0 0 1
+1 1 1 1 0 0 0 0 0 0
+0 0 0 1 1 1 0 0 0 0
+0 0 0 1 0 0 0 0 0 0
+0 0 0 1 1 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 1 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 15
+
+Problem: You are given the following 5 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 0
+
+Problem: You are given the following 8 x 6 binary matrix grid:
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 0 0
+0 0 0 0 1 1
+0 0 0 0 1 1
+0 0 0 0 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 9
+
+Problem: You are given the following 5 x 8 binary matrix grid:
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 0
+0 0 0 0 0 0 1 1
+0 0 0 0 0 0 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 6
+
+Problem: You are given the following 6 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 0
+
+Problem: You are given the following 6 x 6 binary matrix grid:
+0 1 1 0 1 1
+0 1 1 0 1 1
+0 0 0 0 0 0
+0 0 0 1 1 1
+0 0 0 1 1 1
+0 0 0 1 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 10
+
+Problem: You are given the following 8 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 1 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 1 1 0
+0 0 0 1 0 0 0 1 1 1
+0 0 0 1 0 0 0 0 0 1
+0 0 0 1 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 10
+
+Problem: You are given the following 6 x 5 binary matrix grid:
+0 0 0 0 0
+1 0 1 1 1
+1 1 1 1 1
+1 1 0 1 1
+0 0 0 1 1
+0 0 0 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 13
+
+Problem: You are given the following 9 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 0
+
+Problem: You are given the following 7 x 10 binary matrix grid:
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 1 1 0 0 0 0
+0 0 0 0 1 1 1 0 1 1
+0 0 0 0 0 0 1 1 1 1
+0 0 0 0 0 0 0 0 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 11
+
+Problem: You are given the following 7 x 10 binary matrix grid:
+1 1 0 0 0 0 0 0 0 0
+1 1 0 0 0 0 0 0 0 0
+1 1 0 0 1 1 1 0 0 0
+1 0 0 0 1 1 1 0 0 0
+1 1 0 0 0 1 1 1 0 0
+1 1 0 0 0 1 1 1 1 0
+1 0 0 0 0 1 1 0 1 1
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 20
+
+Problem: You are given the following 5 x 9 binary matrix grid:
+0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 1 1
+0 0 0 0 0 0 0 1 1
+0 0 1 0 0 0 0 1 1
+0 0 1 1 0 0 0 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 9
+
+Problem: You are given the following 5 x 8 binary matrix grid:
+0 0 0 1 1 0 0 0
+0 0 0 1 1 1 0 0
+0 0 0 1 0 0 0 0
+0 0 0 1 1 0 0 0
+0 0 0 0 1 1 0 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer: 12
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: You are given the following 5 x 5 binary matrix grid:
+1 1 0 0 0
+1 1 1 0 0
+1 1 0 0 0
+1 1 1 0 0
+1 1 1 1 0
+
+An island is a group of 1&#x27;s (representing land) connected 4-directionally (horizontal or vertical).
+You may assume all four edges of the grid are surrounded by water.
+
+The area of an island is the number of cells with a value 1 in the island.
+
+Return the maximum area of an island in grid. If there is no island, return 0.
+
+Answer:</pre></details></details><h2 id='screen'>Screen: 76 settings, 4 episodes × 8 tests, N = 16</h2>
+<p>Each point is one task setting. The upper-right quadrant is the pattern we are looking for: <strong>each reader does better with its own rehearsal answers than with the other model's</strong> (same questions, no feedback). Screen numbers only select candidates; with 32 tests per cell, single points are noisy (one test = 3.1 pp).</p>
+<figure><img src='xspec-screen-preferences.png' alt='Screen own-source preferences'><figcaption>Jittered by ±0.6 pp for visibility. Ringed: both preferences ≥ 2/32 (orange); advanced to confirmation (red, labelled).</figcaption></figure>
+<p><strong>3 settings</strong> met the frozen criterion (both preferences ≥ 6.25 pp); advanced (≤ 1 per family, top 6 by H): knights_knaves  · K=4, color_cube_rotation · 1  · K=4, largest_island  · K=4.</p>
+<details><summary>All screened settings, sorted by mean own-source preference H</summary><div class='scroll'><table><thead><tr><th>Setting</th><th class='num'>Calib. Q / G</th><th class='num'>Q: init</th><th class='num'>Q: Q-src</th><th class='num'>Q: G-src</th><th class='num'>Q: teach</th><th class='num'>G: init</th><th class='num'>G: G-src</th><th class='num'>G: Q-src</th><th class='num'>G: teach</th><th class='num'>P<sub>Q</sub></th><th class='num'>P<sub>G</sub></th><th class='num'>H</th><th class='num'>Rehearsal correct Q / G</th><th class='num'>Mean chars Q / G</th></tr></thead><tbody>
+<tr class=''><td>mini_sudoku · 3  · K=0</td><td class='num'>25.0% / 75.0%</td><td class='num'>34.4%</td><td class='num own'>50.0%</td><td class='num'>34.4%</td><td class='num'>37.5%</td><td class='num'>78.1%</td><td class='num own'>71.9%</td><td class='num'>68.8%</td><td class='num'>71.9%</td><td class='num'>+15.6</td><td class='num'>+3.1</td><td class='num'><strong>+9.4</strong></td><td class='num'>39.1% / 85.9%</td><td class='num'>31 / 67</td></tr>
+<tr class='sel'><td>color_cube_rotation · 1  · K=4</td><td class='num'>50.0% / 25.0%</td><td class='num'>9.4%</td><td class='num own'>25.0%</td><td class='num'>15.6%</td><td class='num'>15.6%</td><td class='num'>3.1%</td><td class='num own'>9.4%</td><td class='num'>3.1%</td><td class='num'>3.1%</td><td class='num'>+9.4</td><td class='num'>+6.2</td><td class='num'><strong>+7.8</strong></td><td class='num'>20.3% / 12.5%</td><td class='num'>5 / 537</td></tr>
+<tr class='sel'><td>knights_knaves  · K=4</td><td class='num'>25.0% / 62.5%</td><td class='num'>56.2%</td><td class='num own'>68.8%</td><td class='num'>59.4%</td><td class='num'>65.6%</td><td class='num'>68.8%</td><td class='num own'>81.2%</td><td class='num'>75.0%</td><td class='num'>78.1%</td><td class='num'>+9.4</td><td class='num'>+6.2</td><td class='num'><strong>+7.8</strong></td><td class='num'>46.9% / 60.9%</td><td class='num'>42 / 42</td></tr>
+<tr class=''><td>simple_integration  · K=0</td><td class='num'>50.0% / 62.5%</td><td class='num'>46.9%</td><td class='num own'>68.8%</td><td class='num'>28.1%</td><td class='num'>40.6%</td><td class='num'>59.4%</td><td class='num own'>65.6%</td><td class='num'>90.6%</td><td class='num'>68.8%</td><td class='num'>+40.6</td><td class='num'>-25.0</td><td class='num'><strong>+7.8</strong></td><td class='num'>45.3% / 51.6%</td><td class='num'>34 / 80</td></tr>
+<tr class=''><td>course_schedule · 1  · K=0</td><td class='num'>37.5% / 12.5%</td><td class='num'>59.4%</td><td class='num own'>56.2%</td><td class='num'>56.2%</td><td class='num'>56.2%</td><td class='num'>6.2%</td><td class='num own'>62.5%</td><td class='num'>50.0%</td><td class='num'>53.1%</td><td class='num'>+0.0</td><td class='num'>+12.5</td><td class='num'><strong>+6.2</strong></td><td class='num'>62.5% / 17.2%</td><td class='num'>5 / 408</td></tr>
+<tr class=''><td>largest_island  · K=0</td><td class='num'>50.0% / 62.5%</td><td class='num'>28.1%</td><td class='num own'>37.5%</td><td class='num'>34.4%</td><td class='num'>34.4%</td><td class='num'>40.6%</td><td class='num own'>56.2%</td><td class='num'>46.9%</td><td class='num'>46.9%</td><td class='num'>+3.1</td><td class='num'>+9.4</td><td class='num'><strong>+6.2</strong></td><td class='num'>29.7% / 42.2%</td><td class='num'>1 / 26</td></tr>
+<tr class='sel'><td>largest_island  · K=4</td><td class='num'>62.5% / 62.5%</td><td class='num'>34.4%</td><td class='num own'>37.5%</td><td class='num'>31.2%</td><td class='num'>34.4%</td><td class='num'>46.9%</td><td class='num own'>46.9%</td><td class='num'>40.6%</td><td class='num'>50.0%</td><td class='num'>+6.2</td><td class='num'>+6.2</td><td class='num'><strong>+6.2</strong></td><td class='num'>35.9% / 53.1%</td><td class='num'>2 / 1</td></tr>
+<tr class=''><td>ransom_note  · K=4</td><td class='num'>37.5% / 75.0%</td><td class='num'>65.6%</td><td class='num own'>71.9%</td><td class='num'>56.2%</td><td class='num'>68.8%</td><td class='num'>56.2%</td><td class='num own'>43.8%</td><td class='num'>46.9%</td><td class='num'>43.8%</td><td class='num'>+15.6</td><td class='num'>-3.1</td><td class='num'><strong>+6.2</strong></td><td class='num'>67.2% / 60.9%</td><td class='num'>4 / 4</td></tr>
+<tr class=''><td>letter_counting · 1  · K=4</td><td class='num'>25.0% / 37.5%</td><td class='num'>12.5%</td><td class='num own'>12.5%</td><td class='num'>15.6%</td><td class='num'>15.6%</td><td class='num'>59.4%</td><td class='num own'>65.6%</td><td class='num'>53.1%</td><td class='num'>62.5%</td><td class='num'>-3.1</td><td class='num'>+12.5</td><td class='num'><strong>+4.7</strong></td><td class='num'>20.3% / 67.2%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>power_function  · K=4</td><td class='num'>25.0% / 37.5%</td><td class='num'>34.4%</td><td class='num own'>28.1%</td><td class='num'>25.0%</td><td class='num'>31.2%</td><td class='num'>50.0%</td><td class='num own'>50.0%</td><td class='num'>43.8%</td><td class='num'>53.1%</td><td class='num'>+3.1</td><td class='num'>+6.2</td><td class='num'><strong>+4.7</strong></td><td class='num'>23.4% / 43.8%</td><td class='num'>10 / 8</td></tr>
+<tr class=''><td>propositional_logic  · K=0</td><td class='num'>50.0% / 50.0%</td><td class='num'>40.6%</td><td class='num own'>46.9%</td><td class='num'>50.0%</td><td class='num'>93.8%</td><td class='num'>31.2%</td><td class='num own'>62.5%</td><td class='num'>50.0%</td><td class='num'>90.6%</td><td class='num'>-3.1</td><td class='num'>+12.5</td><td class='num'><strong>+4.7</strong></td><td class='num'>37.5% / 43.8%</td><td class='num'>3 / 147</td></tr>
+<tr class=''><td>puzzle24 · 1  · K=4</td><td class='num'>37.5% / 50.0%</td><td class='num'>34.4%</td><td class='num own'>28.1%</td><td class='num'>25.0%</td><td class='num'>40.6%</td><td class='num'>25.0%</td><td class='num own'>40.6%</td><td class='num'>34.4%</td><td class='num'>43.8%</td><td class='num'>+3.1</td><td class='num'>+6.2</td><td class='num'><strong>+4.7</strong></td><td class='num'>18.8% / 31.2%</td><td class='num'>8 / 206</td></tr>
+<tr class=''><td>ransom_note  · K=0</td><td class='num'>75.0% / 75.0%</td><td class='num'>46.9%</td><td class='num own'>59.4%</td><td class='num'>53.1%</td><td class='num'>65.6%</td><td class='num'>50.0%</td><td class='num own'>46.9%</td><td class='num'>43.8%</td><td class='num'>50.0%</td><td class='num'>+6.2</td><td class='num'>+3.1</td><td class='num'><strong>+4.7</strong></td><td class='num'>65.6% / 64.1%</td><td class='num'>4 / 4</td></tr>
+<tr class=''><td>string_insertion · 1  · K=4</td><td class='num'>62.5% / 75.0%</td><td class='num'>78.1%</td><td class='num own'>78.1%</td><td class='num'>71.9%</td><td class='num'>71.9%</td><td class='num'>75.0%</td><td class='num own'>81.2%</td><td class='num'>78.1%</td><td class='num'>81.2%</td><td class='num'>+6.2</td><td class='num'>+3.1</td><td class='num'><strong>+4.7</strong></td><td class='num'>67.2% / 65.6%</td><td class='num'>53 / 53</td></tr>
+<tr class=''><td>path_star · 1  · K=4</td><td class='num'>50.0% / 50.0%</td><td class='num'>40.6%</td><td class='num own'>34.4%</td><td class='num'>34.4%</td><td class='num'>28.1%</td><td class='num'>68.8%</td><td class='num own'>71.9%</td><td class='num'>65.6%</td><td class='num'>68.8%</td><td class='num'>+0.0</td><td class='num'>+6.2</td><td class='num'><strong>+3.1</strong></td><td class='num'>34.4% / 51.6%</td><td class='num'>52 / 169</td></tr>
+<tr class=''><td>time_intervals · 1  · K=4</td><td class='num'>37.5% / 50.0%</td><td class='num'>56.2%</td><td class='num own'>62.5%</td><td class='num'>59.4%</td><td class='num'>59.4%</td><td class='num'>65.6%</td><td class='num own'>65.6%</td><td class='num'>62.5%</td><td class='num'>65.6%</td><td class='num'>+3.1</td><td class='num'>+3.1</td><td class='num'><strong>+3.1</strong></td><td class='num'>64.1% / 81.2%</td><td class='num'>11 / 10</td></tr>
+<tr class=''><td>basic_arithmetic · 3  · K=4</td><td class='num'>37.5% / 50.0%</td><td class='num'>43.8%</td><td class='num own'>43.8%</td><td class='num'>40.6%</td><td class='num'>40.6%</td><td class='num'>53.1%</td><td class='num own'>56.2%</td><td class='num'>56.2%</td><td class='num'>53.1%</td><td class='num'>+3.1</td><td class='num'>+0.0</td><td class='num'><strong>+1.6</strong></td><td class='num'>43.8% / 60.9%</td><td class='num'>4 / 5</td></tr>
+<tr class=''><td>complex_arithmetic  · K=0</td><td class='num'>25.0% / 62.5%</td><td class='num'>75.0%</td><td class='num own'>84.4%</td><td class='num'>81.2%</td><td class='num'>84.4%</td><td class='num'>78.1%</td><td class='num own'>84.4%</td><td class='num'>84.4%</td><td class='num'>84.4%</td><td class='num'>+3.1</td><td class='num'>+0.0</td><td class='num'><strong>+1.6</strong></td><td class='num'>68.8% / 79.7%</td><td class='num'>12 / 15</td></tr>
+<tr class=''><td>gcd · 1  · K=0</td><td class='num'>75.0% / 50.0%</td><td class='num'>87.5%</td><td class='num own'>90.6%</td><td class='num'>84.4%</td><td class='num'>90.6%</td><td class='num'>71.9%</td><td class='num own'>84.4%</td><td class='num'>87.5%</td><td class='num'>90.6%</td><td class='num'>+6.2</td><td class='num'>-3.1</td><td class='num'><strong>+1.6</strong></td><td class='num'>87.5% / 71.9%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>gsm_symbolic  · K=0</td><td class='num'>25.0% / 37.5%</td><td class='num'>12.5%</td><td class='num own'>18.8%</td><td class='num'>15.6%</td><td class='num'>15.6%</td><td class='num'>40.6%</td><td class='num own'>40.6%</td><td class='num'>40.6%</td><td class='num'>46.9%</td><td class='num'>+3.1</td><td class='num'>+0.0</td><td class='num'><strong>+1.6</strong></td><td class='num'>15.6% / 29.7%</td><td class='num'>3 / 29</td></tr>
+<tr class=''><td>isomorphic_strings · 1  · K=4</td><td class='num'>50.0% / 62.5%</td><td class='num'>40.6%</td><td class='num own'>43.8%</td><td class='num'>43.8%</td><td class='num'>43.8%</td><td class='num'>37.5%</td><td class='num own'>43.8%</td><td class='num'>40.6%</td><td class='num'>43.8%</td><td class='num'>+0.0</td><td class='num'>+3.1</td><td class='num'><strong>+1.6</strong></td><td class='num'>56.2% / 54.7%</td><td class='num'>5 / 5</td></tr>
+<tr class=''><td>knights_knaves  · K=0</td><td class='num'>25.0% / 62.5%</td><td class='num'>46.9%</td><td class='num own'>59.4%</td><td class='num'>56.2%</td><td class='num'>68.8%</td><td class='num'>71.9%</td><td class='num own'>78.1%</td><td class='num'>78.1%</td><td class='num'>78.1%</td><td class='num'>+3.1</td><td class='num'>+0.0</td><td class='num'><strong>+1.6</strong></td><td class='num'>48.4% / 56.2%</td><td class='num'>41 / 41</td></tr>
+<tr class=''><td>simple_equations  · K=4</td><td class='num'>62.5% / 75.0%</td><td class='num'>40.6%</td><td class='num own'>65.6%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num'>96.9%</td><td class='num own'>96.9%</td><td class='num'>93.8%</td><td class='num'>93.8%</td><td class='num'>+0.0</td><td class='num'>+3.1</td><td class='num'><strong>+1.6</strong></td><td class='num'>56.2% / 90.6%</td><td class='num'>2 / 2</td></tr>
+<tr class=''><td>spiral_matrix  · K=4</td><td class='num'>25.0% / 37.5%</td><td class='num'>6.2%</td><td class='num own'>9.4%</td><td class='num'>9.4%</td><td class='num'>9.4%</td><td class='num'>18.8%</td><td class='num own'>18.8%</td><td class='num'>15.6%</td><td class='num'>18.8%</td><td class='num'>+0.0</td><td class='num'>+3.1</td><td class='num'><strong>+1.6</strong></td><td class='num'>20.3% / 23.4%</td><td class='num'>89 / 113</td></tr>
+<tr class=''><td>time_intervals · 1  · K=0</td><td class='num'>25.0% / 37.5%</td><td class='num'>46.9%</td><td class='num own'>50.0%</td><td class='num'>59.4%</td><td class='num'>59.4%</td><td class='num'>65.6%</td><td class='num own'>65.6%</td><td class='num'>53.1%</td><td class='num'>62.5%</td><td class='num'>-9.4</td><td class='num'>+12.5</td><td class='num'><strong>+1.6</strong></td><td class='num'>46.9% / 79.7%</td><td class='num'>7 / 10</td></tr>
+<tr class=''><td>word_sorting  · K=0</td><td class='num'>12.5% / 50.0%</td><td class='num'>31.2%</td><td class='num own'>25.0%</td><td class='num'>25.0%</td><td class='num'>28.1%</td><td class='num'>75.0%</td><td class='num own'>65.6%</td><td class='num'>62.5%</td><td class='num'>68.8%</td><td class='num'>+0.0</td><td class='num'>+3.1</td><td class='num'><strong>+1.6</strong></td><td class='num'>45.3% / 60.9%</td><td class='num'>65 / 56</td></tr>
+<tr class=''><td>acre  · K=0</td><td class='num'>62.5% / 37.5%</td><td class='num'>43.8%</td><td class='num own'>34.4%</td><td class='num'>37.5%</td><td class='num'>34.4%</td><td class='num'>56.2%</td><td class='num own'>62.5%</td><td class='num'>59.4%</td><td class='num'>62.5%</td><td class='num'>-3.1</td><td class='num'>+3.1</td><td class='num'><strong>+0.0</strong></td><td class='num'>53.1% / 70.3%</td><td class='num'>5 / 5</td></tr>
+<tr class=''><td>acre  · K=4</td><td class='num'>37.5% / 25.0%</td><td class='num'>37.5%</td><td class='num own'>37.5%</td><td class='num'>34.4%</td><td class='num'>34.4%</td><td class='num'>56.2%</td><td class='num own'>53.1%</td><td class='num'>56.2%</td><td class='num'>59.4%</td><td class='num'>+3.1</td><td class='num'>-3.1</td><td class='num'><strong>+0.0</strong></td><td class='num'>57.8% / 65.6%</td><td class='num'>7 / 7</td></tr>
+<tr class=''><td>calendar_arithmetic  · K=0</td><td class='num'>25.0% / 62.5%</td><td class='num'>31.2%</td><td class='num own'>28.1%</td><td class='num'>21.9%</td><td class='num'>21.9%</td><td class='num'>62.5%</td><td class='num own'>53.1%</td><td class='num'>59.4%</td><td class='num'>56.2%</td><td class='num'>+6.2</td><td class='num'>-6.2</td><td class='num'><strong>+0.0</strong></td><td class='num'>28.1% / 62.5%</td><td class='num'>4 / 4</td></tr>
+<tr class=''><td>complex_arithmetic  · K=4</td><td class='num'>50.0% / 62.5%</td><td class='num'>75.0%</td><td class='num own'>78.1%</td><td class='num'>78.1%</td><td class='num'>78.1%</td><td class='num'>87.5%</td><td class='num own'>84.4%</td><td class='num'>84.4%</td><td class='num'>84.4%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>73.4% / 84.4%</td><td class='num'>11 / 11</td></tr>
+<tr class=''><td>decimal_chain_sum  · K=0</td><td class='num'>37.5% / 62.5%</td><td class='num'>37.5%</td><td class='num own'>53.1%</td><td class='num'>53.1%</td><td class='num'>53.1%</td><td class='num'>62.5%</td><td class='num own'>78.1%</td><td class='num'>78.1%</td><td class='num'>78.1%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>51.6% / 67.2%</td><td class='num'>8 / 8</td></tr>
+<tr class=''><td>family_relationships  · K=4</td><td class='num'>62.5% / 75.0%</td><td class='num'>87.5%</td><td class='num own'>87.5%</td><td class='num'>87.5%</td><td class='num'>84.4%</td><td class='num'>90.6%</td><td class='num own'>87.5%</td><td class='num'>87.5%</td><td class='num'>87.5%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>76.6% / 84.4%</td><td class='num'>8 / 8</td></tr>
+<tr class=''><td>intermediate_integration · 1  · K=0</td><td class='num'>62.5% / 25.0%</td><td class='num'>15.6%</td><td class='num own'>31.2%</td><td class='num'>43.8%</td><td class='num'>50.0%</td><td class='num'>21.9%</td><td class='num own'>71.9%</td><td class='num'>59.4%</td><td class='num'>81.2%</td><td class='num'>-12.5</td><td class='num'>+12.5</td><td class='num'><strong>+0.0</strong></td><td class='num'>15.6% / 28.1%</td><td class='num'>27 / 119</td></tr>
+<tr class=''><td>letter_jumble  · K=4</td><td class='num'>25.0% / 50.0%</td><td class='num'>15.6%</td><td class='num own'>12.5%</td><td class='num'>15.6%</td><td class='num'>15.6%</td><td class='num'>43.8%</td><td class='num own'>43.8%</td><td class='num'>40.6%</td><td class='num'>37.5%</td><td class='num'>-3.1</td><td class='num'>+3.1</td><td class='num'><strong>+0.0</strong></td><td class='num'>6.2% / 40.6%</td><td class='num'>67 / 67</td></tr>
+<tr class=''><td>prime_factorization · 3  · K=4</td><td class='num'>37.5% / 37.5%</td><td class='num'>68.8%</td><td class='num own'>65.6%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num own'>65.6%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>46.9% / 51.6%</td><td class='num'>14 / 81</td></tr>
+<tr class=''><td>products · 3  · K=0</td><td class='num'>37.5% / 50.0%</td><td class='num'>34.4%</td><td class='num own'>34.4%</td><td class='num'>34.4%</td><td class='num'>34.4%</td><td class='num'>46.9%</td><td class='num own'>46.9%</td><td class='num'>46.9%</td><td class='num'>50.0%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>56.2% / 51.6%</td><td class='num'>7 / 7</td></tr>
+<tr class=''><td>products · 3  · K=4</td><td class='num'>37.5% / 50.0%</td><td class='num'>34.4%</td><td class='num own'>34.4%</td><td class='num'>34.4%</td><td class='num'>34.4%</td><td class='num'>53.1%</td><td class='num own'>46.9%</td><td class='num'>46.9%</td><td class='num'>46.9%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>54.7% / 53.1%</td><td class='num'>7 / 7</td></tr>
+<tr class=''><td>word_sorting  · K=4</td><td class='num'>25.0% / 62.5%</td><td class='num'>34.4%</td><td class='num own'>25.0%</td><td class='num'>25.0%</td><td class='num'>25.0%</td><td class='num'>75.0%</td><td class='num own'>68.8%</td><td class='num'>68.8%</td><td class='num'>68.8%</td><td class='num'>+0.0</td><td class='num'>+0.0</td><td class='num'><strong>+0.0</strong></td><td class='num'>35.9% / 62.5%</td><td class='num'>56 / 56</td></tr>
+<tr class=''><td>basic_arithmetic · 3  · K=0</td><td class='num'>37.5% / 50.0%</td><td class='num'>37.5%</td><td class='num own'>43.8%</td><td class='num'>46.9%</td><td class='num'>46.9%</td><td class='num'>59.4%</td><td class='num own'>50.0%</td><td class='num'>50.0%</td><td class='num'>50.0%</td><td class='num'>-3.1</td><td class='num'>+0.0</td><td class='num'><strong>-1.6</strong></td><td class='num'>40.6% / 60.9%</td><td class='num'>4 / 5</td></tr>
+<tr class=''><td>calendar_arithmetic  · K=4</td><td class='num'>37.5% / 62.5%</td><td class='num'>25.0%</td><td class='num own'>21.9%</td><td class='num'>28.1%</td><td class='num'>25.0%</td><td class='num'>43.8%</td><td class='num own'>53.1%</td><td class='num'>50.0%</td><td class='num'>59.4%</td><td class='num'>-6.2</td><td class='num'>+3.1</td><td class='num'><strong>-1.6</strong></td><td class='num'>34.4% / 70.3%</td><td class='num'>4 / 4</td></tr>
+<tr class=''><td>gsm_symbolic  · K=4</td><td class='num'>37.5% / 50.0%</td><td class='num'>9.4%</td><td class='num own'>15.6%</td><td class='num'>15.6%</td><td class='num'>12.5%</td><td class='num'>43.8%</td><td class='num own'>40.6%</td><td class='num'>43.8%</td><td class='num'>37.5%</td><td class='num'>+0.0</td><td class='num'>-3.1</td><td class='num'><strong>-1.6</strong></td><td class='num'>15.6% / 35.9%</td><td class='num'>3 / 3</td></tr>
+<tr class=''><td>letter_counting · 1  · K=0</td><td class='num'>37.5% / 37.5%</td><td class='num'>21.9%</td><td class='num own'>6.2%</td><td class='num'>12.5%</td><td class='num'>9.4%</td><td class='num'>59.4%</td><td class='num own'>56.2%</td><td class='num'>53.1%</td><td class='num'>62.5%</td><td class='num'>-6.2</td><td class='num'>+3.1</td><td class='num'><strong>-1.6</strong></td><td class='num'>23.4% / 64.1%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>manipulate_matrix  · K=0</td><td class='num'>25.0% / 25.0%</td><td class='num'>9.4%</td><td class='num own'>12.5%</td><td class='num'>6.2%</td><td class='num'>12.5%</td><td class='num'>6.2%</td><td class='num own'>15.6%</td><td class='num'>25.0%</td><td class='num'>28.1%</td><td class='num'>+6.2</td><td class='num'>-9.4</td><td class='num'><strong>-1.6</strong></td><td class='num'>10.9% / 3.1%</td><td class='num'>34 / 226</td></tr>
+<tr class=''><td>polynomial_equations  · K=4</td><td class='num'>12.5% / 50.0%</td><td class='num'>62.5%</td><td class='num own'>65.6%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num'>75.0%</td><td class='num own'>75.0%</td><td class='num'>78.1%</td><td class='num'>75.0%</td><td class='num'>+0.0</td><td class='num'>-3.1</td><td class='num'><strong>-1.6</strong></td><td class='num'>50.0% / 67.2%</td><td class='num'>10 / 9</td></tr>
+<tr class=''><td>pool_matrix  · K=4</td><td class='num'>25.0% / 37.5%</td><td class='num'>25.0%</td><td class='num own'>25.0%</td><td class='num'>25.0%</td><td class='num'>25.0%</td><td class='num'>31.2%</td><td class='num own'>25.0%</td><td class='num'>28.1%</td><td class='num'>28.1%</td><td class='num'>+0.0</td><td class='num'>-3.1</td><td class='num'><strong>-1.6</strong></td><td class='num'>29.7% / 29.7%</td><td class='num'>78 / 62</td></tr>
+<tr class=''><td>self_reference · 1  · K=4</td><td class='num'>37.5% / 37.5%</td><td class='num'>37.5%</td><td class='num own'>40.6%</td><td class='num'>43.8%</td><td class='num'>37.5%</td><td class='num'>28.1%</td><td class='num own'>18.8%</td><td class='num'>18.8%</td><td class='num'>31.2%</td><td class='num'>-3.1</td><td class='num'>+0.0</td><td class='num'><strong>-1.6</strong></td><td class='num'>40.6% / 40.6%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>simple_geometry  · K=4</td><td class='num'>25.0% / 75.0%</td><td class='num'>21.9%</td><td class='num own'>25.0%</td><td class='num'>28.1%</td><td class='num'>28.1%</td><td class='num'>65.6%</td><td class='num own'>62.5%</td><td class='num'>62.5%</td><td class='num'>62.5%</td><td class='num'>-3.1</td><td class='num'>+0.0</td><td class='num'><strong>-1.6</strong></td><td class='num'>20.3% / 54.7%</td><td class='num'>2 / 3</td></tr>
+<tr class=''><td>spell_backward · 1  · K=0</td><td class='num'>50.0% / 75.0%</td><td class='num'>68.8%</td><td class='num own'>68.8%</td><td class='num'>71.9%</td><td class='num'>71.9%</td><td class='num'>90.6%</td><td class='num own'>90.6%</td><td class='num'>90.6%</td><td class='num'>87.5%</td><td class='num'>-3.1</td><td class='num'>+0.0</td><td class='num'><strong>-1.6</strong></td><td class='num'>53.1% / 95.3%</td><td class='num'>5 / 5</td></tr>
+<tr class=''><td>spiral_matrix  · K=0</td><td class='num'>25.0% / 37.5%</td><td class='num'>6.2%</td><td class='num own'>9.4%</td><td class='num'>9.4%</td><td class='num'>9.4%</td><td class='num'>25.0%</td><td class='num own'>18.8%</td><td class='num'>21.9%</td><td class='num'>25.0%</td><td class='num'>+0.0</td><td class='num'>-3.1</td><td class='num'><strong>-1.6</strong></td><td class='num'>15.6% / 29.7%</td><td class='num'>75 / 119</td></tr>
+<tr class=''><td>word_sequence_reversal · 1  · K=4</td><td class='num'>37.5% / 75.0%</td><td class='num'>50.0%</td><td class='num own'>46.9%</td><td class='num'>50.0%</td><td class='num'>50.0%</td><td class='num'>100.0%</td><td class='num own'>96.9%</td><td class='num'>96.9%</td><td class='num'>96.9%</td><td class='num'>-3.1</td><td class='num'>+0.0</td><td class='num'><strong>-1.6</strong></td><td class='num'>39.1% / 93.8%</td><td class='num'>208 / 213</td></tr>
+<tr class=''><td>decimal_chain_sum  · K=4</td><td class='num'>37.5% / 75.0%</td><td class='num'>43.8%</td><td class='num own'>50.0%</td><td class='num'>53.1%</td><td class='num'>50.0%</td><td class='num'>81.2%</td><td class='num own'>81.2%</td><td class='num'>84.4%</td><td class='num'>84.4%</td><td class='num'>-3.1</td><td class='num'>-3.1</td><td class='num'><strong>-3.1</strong></td><td class='num'>57.8% / 79.7%</td><td class='num'>8 / 8</td></tr>
+<tr class=''><td>family_relationships  · K=0</td><td class='num'>50.0% / 75.0%</td><td class='num'>68.8%</td><td class='num own'>65.6%</td><td class='num'>81.2%</td><td class='num'>81.2%</td><td class='num'>90.6%</td><td class='num own'>84.4%</td><td class='num'>75.0%</td><td class='num'>90.6%</td><td class='num'>-15.6</td><td class='num'>+9.4</td><td class='num'><strong>-3.1</strong></td><td class='num'>53.1% / 71.9%</td><td class='num'>9 / 8</td></tr>
+<tr class=''><td>graph_color · 3  · K=0</td><td class='num'>25.0% / 37.5%</td><td class='num'>25.0%</td><td class='num own'>65.6%</td><td class='num'>34.4%</td><td class='num'>46.9%</td><td class='num'>37.5%</td><td class='num own'>0.0%</td><td class='num'>37.5%</td><td class='num'>68.8%</td><td class='num'>+31.2</td><td class='num'>-37.5</td><td class='num'><strong>-3.1</strong></td><td class='num'>20.3% / 32.8%</td><td class='num'>134 / 141</td></tr>
+<tr class=''><td>isomorphic_strings  · K=0</td><td class='num'>37.5% / 62.5%</td><td class='num'>46.9%</td><td class='num own'>53.1%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num'>59.4%</td><td class='num own'>65.6%</td><td class='num'>59.4%</td><td class='num'>65.6%</td><td class='num'>-12.5</td><td class='num'>+6.2</td><td class='num'><strong>-3.1</strong></td><td class='num'>50.0% / 65.6%</td><td class='num'>5 / 4</td></tr>
+<tr class=''><td>list_functions  · K=0</td><td class='num'>62.5% / 62.5%</td><td class='num'>46.9%</td><td class='num own'>28.1%</td><td class='num'>34.4%</td><td class='num'>40.6%</td><td class='num'>43.8%</td><td class='num own'>43.8%</td><td class='num'>43.8%</td><td class='num'>37.5%</td><td class='num'>-6.2</td><td class='num'>+0.0</td><td class='num'><strong>-3.1</strong></td><td class='num'>53.1% / 62.5%</td><td class='num'>12 / 18</td></tr>
+<tr class=''><td>number_format  · K=0</td><td class='num'>50.0% / 87.5%</td><td class='num'>78.1%</td><td class='num own'>90.6%</td><td class='num'>93.8%</td><td class='num'>96.9%</td><td class='num'>90.6%</td><td class='num own'>84.4%</td><td class='num'>87.5%</td><td class='num'>93.8%</td><td class='num'>-3.1</td><td class='num'>-3.1</td><td class='num'><strong>-3.1</strong></td><td class='num'>64.1% / 82.8%</td><td class='num'>18 / 17</td></tr>
+<tr class=''><td>palindrome_generation  · K=0</td><td class='num'>50.0% / 62.5%</td><td class='num'>12.5%</td><td class='num own'>28.1%</td><td class='num'>25.0%</td><td class='num'>28.1%</td><td class='num'>56.2%</td><td class='num own'>56.2%</td><td class='num'>65.6%</td><td class='num'>65.6%</td><td class='num'>+3.1</td><td class='num'>-9.4</td><td class='num'><strong>-3.1</strong></td><td class='num'>12.5% / 50.0%</td><td class='num'>7 / 9</td></tr>
+<tr class=''><td>palindrome_generation  · K=4</td><td class='num'>25.0% / 75.0%</td><td class='num'>18.8%</td><td class='num own'>25.0%</td><td class='num'>31.2%</td><td class='num'>31.2%</td><td class='num'>56.2%</td><td class='num own'>59.4%</td><td class='num'>59.4%</td><td class='num'>59.4%</td><td class='num'>-6.2</td><td class='num'>+0.0</td><td class='num'><strong>-3.1</strong></td><td class='num'>23.4% / 50.0%</td><td class='num'>11 / 12</td></tr>
+<tr class=''><td>polynomial_equations · 1  · K=0</td><td class='num'>75.0% / 75.0%</td><td class='num'>53.1%</td><td class='num own'>59.4%</td><td class='num'>62.5%</td><td class='num'>56.2%</td><td class='num'>62.5%</td><td class='num own'>68.8%</td><td class='num'>71.9%</td><td class='num'>68.8%</td><td class='num'>-3.1</td><td class='num'>-3.1</td><td class='num'><strong>-3.1</strong></td><td class='num'>70.3% / 67.2%</td><td class='num'>8 / 104</td></tr>
+<tr class=''><td>simple_equations  · K=0</td><td class='num'>50.0% / 37.5%</td><td class='num'>43.8%</td><td class='num own'>59.4%</td><td class='num'>75.0%</td><td class='num'>71.9%</td><td class='num'>78.1%</td><td class='num own'>96.9%</td><td class='num'>87.5%</td><td class='num'>93.8%</td><td class='num'>-15.6</td><td class='num'>+9.4</td><td class='num'><strong>-3.1</strong></td><td class='num'>25.0% / 68.8%</td><td class='num'>3 / 18</td></tr>
+<tr class=''><td>simple_integration  · K=4</td><td class='num'>62.5% / 62.5%</td><td class='num'>50.0%</td><td class='num own'>46.9%</td><td class='num'>43.8%</td><td class='num'>43.8%</td><td class='num'>87.5%</td><td class='num own'>78.1%</td><td class='num'>87.5%</td><td class='num'>75.0%</td><td class='num'>+3.1</td><td class='num'>-9.4</td><td class='num'><strong>-3.1</strong></td><td class='num'>37.5% / 87.5%</td><td class='num'>34 / 44</td></tr>
+<tr class=''><td>spell_backward · 1  · K=4</td><td class='num'>37.5% / 75.0%</td><td class='num'>68.8%</td><td class='num own'>65.6%</td><td class='num'>68.8%</td><td class='num'>68.8%</td><td class='num'>90.6%</td><td class='num own'>87.5%</td><td class='num'>90.6%</td><td class='num'>87.5%</td><td class='num'>-3.1</td><td class='num'>-3.1</td><td class='num'><strong>-3.1</strong></td><td class='num'>51.6% / 95.3%</td><td class='num'>5 / 5</td></tr>
+<tr class=''><td>survo  · K=4</td><td class='num'>12.5% / 50.0%</td><td class='num'>25.0%</td><td class='num own'>18.8%</td><td class='num'>21.9%</td><td class='num'>18.8%</td><td class='num'>46.9%</td><td class='num own'>46.9%</td><td class='num'>50.0%</td><td class='num'>53.1%</td><td class='num'>-3.1</td><td class='num'>-3.1</td><td class='num'><strong>-3.1</strong></td><td class='num'>12.5% / 31.2%</td><td class='num'>50 / 171</td></tr>
+<tr class=''><td>zebra_puzzles · 1  · K=0</td><td class='num'>50.0% / 25.0%</td><td class='num'>50.0%</td><td class='num own'>40.6%</td><td class='num'>43.8%</td><td class='num'>37.5%</td><td class='num'>15.6%</td><td class='num own'>71.9%</td><td class='num'>75.0%</td><td class='num'>75.0%</td><td class='num'>-3.1</td><td class='num'>-3.1</td><td class='num'><strong>-3.1</strong></td><td class='num'>53.1% / 20.3%</td><td class='num'>4 / 583</td></tr>
+<tr class=''><td>aiw  · K=4</td><td class='num'>37.5% / 50.0%</td><td class='num'>59.4%</td><td class='num own'>59.4%</td><td class='num'>53.1%</td><td class='num'>62.5%</td><td class='num'>25.0%</td><td class='num own'>31.2%</td><td class='num'>46.9%</td><td class='num'>59.4%</td><td class='num'>+6.2</td><td class='num'>-15.6</td><td class='num'><strong>-4.7</strong></td><td class='num'>68.8% / 39.1%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>coin_flip  · K=0</td><td class='num'>37.5% / 37.5%</td><td class='num'>31.2%</td><td class='num own'>43.8%</td><td class='num'>46.9%</td><td class='num'>46.9%</td><td class='num'>50.0%</td><td class='num own'>59.4%</td><td class='num'>65.6%</td><td class='num'>62.5%</td><td class='num'>-3.1</td><td class='num'>-6.2</td><td class='num'><strong>-4.7</strong></td><td class='num'>25.0% / 42.2%</td><td class='num'>6 / 13</td></tr>
+<tr class=''><td>coin_flip  · K=4</td><td class='num'>50.0% / 50.0%</td><td class='num'>46.9%</td><td class='num own'>43.8%</td><td class='num'>50.0%</td><td class='num'>46.9%</td><td class='num'>68.8%</td><td class='num own'>62.5%</td><td class='num'>65.6%</td><td class='num'>68.8%</td><td class='num'>-6.2</td><td class='num'>-3.1</td><td class='num'><strong>-4.7</strong></td><td class='num'>28.1% / 60.9%</td><td class='num'>10 / 10</td></tr>
+<tr class=''><td>list_functions  · K=4</td><td class='num'>50.0% / 75.0%</td><td class='num'>40.6%</td><td class='num own'>25.0%</td><td class='num'>34.4%</td><td class='num'>31.2%</td><td class='num'>53.1%</td><td class='num own'>46.9%</td><td class='num'>46.9%</td><td class='num'>50.0%</td><td class='num'>-9.4</td><td class='num'>+0.0</td><td class='num'><strong>-4.7</strong></td><td class='num'>48.4% / 65.6%</td><td class='num'>14 / 20</td></tr>
+<tr class=''><td>path_star · 1  · K=0</td><td class='num'>50.0% / 50.0%</td><td class='num'>37.5%</td><td class='num own'>28.1%</td><td class='num'>25.0%</td><td class='num'>25.0%</td><td class='num'>59.4%</td><td class='num own'>62.5%</td><td class='num'>75.0%</td><td class='num'>59.4%</td><td class='num'>+3.1</td><td class='num'>-12.5</td><td class='num'><strong>-4.7</strong></td><td class='num'>23.4% / 40.6%</td><td class='num'>35 / 222</td></tr>
+<tr class=''><td>self_reference  · K=0</td><td class='num'>25.0% / 25.0%</td><td class='num'>6.2%</td><td class='num own'>3.1%</td><td class='num'>3.1%</td><td class='num'>43.8%</td><td class='num'>9.4%</td><td class='num own'>6.2%</td><td class='num'>15.6%</td><td class='num'>21.9%</td><td class='num'>+0.0</td><td class='num'>-9.4</td><td class='num'><strong>-4.7</strong></td><td class='num'>10.9% / 7.8%</td><td class='num'>1 / 159</td></tr>
+<tr class=''><td>zebra_puzzles  · K=4</td><td class='num'>25.0% / 50.0%</td><td class='num'>25.0%</td><td class='num own'>21.9%</td><td class='num'>28.1%</td><td class='num'>31.2%</td><td class='num'>43.8%</td><td class='num own'>46.9%</td><td class='num'>50.0%</td><td class='num'>40.6%</td><td class='num'>-6.2</td><td class='num'>-3.1</td><td class='num'><strong>-4.7</strong></td><td class='num'>32.8% / 54.7%</td><td class='num'>4 / 5</td></tr>
+<tr class=''><td>binary_alternation  · K=4</td><td class='num'>37.5% / 62.5%</td><td class='num'>6.2%</td><td class='num own'>6.2%</td><td class='num'>18.8%</td><td class='num'>12.5%</td><td class='num'>18.8%</td><td class='num own'>18.8%</td><td class='num'>31.2%</td><td class='num'>21.9%</td><td class='num'>-12.5</td><td class='num'>-12.5</td><td class='num'><strong>-12.5</strong></td><td class='num'>26.6% / 23.4%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>string_insertion  · K=0</td><td class='num'>75.0% / 62.5%</td><td class='num'>65.6%</td><td class='num own'>62.5%</td><td class='num'>90.6%</td><td class='num'>90.6%</td><td class='num'>90.6%</td><td class='num own'>75.0%</td><td class='num'>75.0%</td><td class='num'>75.0%</td><td class='num'>-28.1</td><td class='num'>+0.0</td><td class='num'><strong>-14.1</strong></td><td class='num'>35.9% / 73.4%</td><td class='num'>22 / 22</td></tr>
+<tr class=''><td>aiw · 1  · K=0</td><td class='num'>50.0% / 50.0%</td><td class='num'>56.2%</td><td class='num own'>71.9%</td><td class='num'>90.6%</td><td class='num'>90.6%</td><td class='num'>56.2%</td><td class='num own'>78.1%</td><td class='num'>90.6%</td><td class='num'>84.4%</td><td class='num'>-18.8</td><td class='num'>-12.5</td><td class='num'><strong>-15.6</strong></td><td class='num'>54.7% / 46.9%</td><td class='num'>1 / 1</td></tr>
+<tr class=''><td>intermediate_integration · 1  · K=4</td><td class='num'>50.0% / 50.0%</td><td class='num'>28.1%</td><td class='num own'>21.9%</td><td class='num'>50.0%</td><td class='num'>62.5%</td><td class='num'>56.2%</td><td class='num own'>59.4%</td><td class='num'>68.8%</td><td class='num'>71.9%</td><td class='num'>-28.1</td><td class='num'>-9.4</td><td class='num'><strong>-18.8</strong></td><td class='num'>21.9% / 42.2%</td><td class='num'>28 / 63</td></tr>
+<tr class=''><td>graph_color · 3  · K=4</td><td class='num'>50.0% / 62.5%</td><td class='num'>59.4%</td><td class='num own'>62.5%</td><td class='num'>56.2%</td><td class='num'>59.4%</td><td class='num'>65.6%</td><td class='num own'>3.1%</td><td class='num'>68.8%</td><td class='num'>65.6%</td><td class='num'>+6.2</td><td class='num'>-65.6</td><td class='num'><strong>-29.7</strong></td><td class='num'>45.3% / 67.2%</td><td class='num'>130 / 135</td></tr>
+</tbody></table></div><p class='small'>Q = Qwen reads, G = Gemma reads; “Q-src” = rehearsal answers written by Qwen. Own-source cells in bold. P<sub>Q</sub> = Q:Q-src − Q:G-src, P<sub>G</sub> = G:G-src − G:Q-src, H = mean. Calibration: N = 0, 8 tests, separate world.</p></details><h2 id='design'>Design</h2>
+<p>Same inference as the 12 September comparison: pinned local Qwen3.5-9B and Gemma 4 26B A4B via OpenRouter (BF16; DekaLLM for calibration and screen; in the confirmation each episode is pinned to one of DekaLLM / NextBit / Novita for throughput, so all own-versus-other comparisons stay within one provider), thinking off, one problem per call, 256-token cap. Each model answers every rehearsal question offline (T = 0.7, conditioned only on the K initial teacher examples); every saved answer, right or wrong, truncated or not, is replayed verbatim. Readers evaluate at T = 0 with N rehearsal examples from one source. No author labels, no feedback, no filtering.</p>
+<p><strong>Funnel.</strong> All 408 length-feasible reasoning_gym settings (spec × K ∈ {0, 4}) were calibrated at N = 0 → 217 not at both-floor/both-ceiling → best variant per family × K, capped at 80 by baseline spread → 76 screened after 4 construction failures → 3 met the screen rule (≤ 6 allowed) and were confirmed. Selection used only baselines (screen) or screen outcomes (confirmation); confirmations are fresh.</p>
+<p class='small'>Protocol: <code>experiments/XSPEC_PROTOCOL.md</code> (frozen before inference). OpenRouter spend for this study: $3.91.</p>
+<footer>Data: results/task_search/xspec (= /var/tmp/jbauer/generative_task_search_20260910/xspec). Code: experiments/xspec_*.py.</footer></main></body></html>

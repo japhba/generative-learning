@@ -1,0 +1,21 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/per_size_rate_confirmation",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.001,
+    "batch": 128,
+    "sampled": false,
+    "budget": 65536,
+    "eval_points": 52,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "accuracy_stop": 0.03
+  },
+  "cases": [],
+  "notes": "Only cells whose rate changes under the independent per-size rate search are rerun. Unchanged cells reuse the original 16-seed replication. This is a follow-up audit; the same confirmation seeds are retained."
+}

@@ -1,0 +1,114 @@
+Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72316800. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [972, 200, 372]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 59146008. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [339, 226, 772]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 225875454. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [382, 777, 761]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19171170. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [277, 769, 90]
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8611528. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [861, 10, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 103991448. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [124, 231, 3690]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 75595107. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [379, 73, 2731]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 871080. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [120, 143, 51]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18846135. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1047, 163, 11]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41337540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [30, 101, 13645]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 494785924. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [323, 884, 1711]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 255597320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [105, 176, 13976]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 75862710. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [319, 390, 610]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 250685280. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [120, 143, 14560]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 20088288. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [128, 105, 150]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 218484552. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [236, 651, 1464]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 317636011. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 317636011, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 206413845. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [123, 459, 3725]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 151207928. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [196, 108, 7021]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72819615. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [377, 105, 187]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 58218160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [245, 329, 706]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 240108560. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [340, 461, 1528]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 123924975. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [5, 15, 1638466]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 671323905. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [123, 456, 11635]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 13818601. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 13818601]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 21431088. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [231, 128, 736]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4739175. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [315, 79, 191]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 1989255. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [33, 115, 529]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 131768845. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1181, 149, 761]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 108330321. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 108330321]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 10009048. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [872, 149, 79]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 93807396. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [379, 276, 900]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 219454515. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [305, 731, 999]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 609969510. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [303, 141, 14470]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 54625981. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [54625981, 1, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 176802318. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1001, 129, 1386]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7469462. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:

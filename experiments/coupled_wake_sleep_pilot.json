@@ -1,0 +1,92 @@
+{
+  "stage": "exploratory learning-rate pilot",
+  "base": {
+    "bits": 6,
+    "dim": 8,
+    "sigma": 0.7,
+    "init_noise": 0.15,
+    "batch": 128,
+    "eval_samples": 2048,
+    "eval_points": 17,
+    "equivalent_steps": 2048,
+    "lr_w": 0.003,
+    "output": "results/coupled_wake_sleep/pilot",
+    "family": "categorical",
+    "eval_seed_offset": 300000,
+    "decay_scale": 1e+30
+  },
+  "cases": [
+    {
+      "seed": 9201,
+      "rho": 0.0,
+      "arm": "elbo",
+      "lr_r": 0.1
+    },
+    {
+      "seed": 9201,
+      "rho": 0.0,
+      "arm": "elbo",
+      "lr_r": 0.3
+    },
+    {
+      "seed": 9201,
+      "rho": 0.0,
+      "arm": "elbo",
+      "lr_r": 1.0
+    },
+    {
+      "seed": 9201,
+      "rho": 0.0,
+      "arm": "sleep",
+      "lr_r": 0.1
+    },
+    {
+      "seed": 9201,
+      "rho": 0.0,
+      "arm": "sleep",
+      "lr_r": 0.3
+    },
+    {
+      "seed": 9201,
+      "rho": 0.0,
+      "arm": "sleep",
+      "lr_r": 1.0
+    },
+    {
+      "seed": 9201,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 0.1
+    },
+    {
+      "seed": 9201,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 0.3
+    },
+    {
+      "seed": 9201,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0
+    },
+    {
+      "seed": 9201,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 0.1
+    },
+    {
+      "seed": 9201,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 0.3
+    },
+    {
+      "seed": 9201,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 1.0
+    }
+  ]
+}

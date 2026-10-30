@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An experimental report on exploration, corrective feedback, and learning, with two LLM families and an explicit-weight Gaussian model.">
+  <meta name="color-scheme" content="light">
+  <title>What generation can add · Generative Learning</title>
+  <style>
+    :root { --paper: #f7f6f2; --ink: #202d33; --muted: #52646b; --accent: #006958; --line: #d8dfdb; --tint: #e8f1ec; --warm: #f4ecd9; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.7 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: var(--accent); text-underline-offset: .2em; overflow-wrap: anywhere; }
+    a:hover { text-decoration-thickness: .15em; }
+    :focus-visible { outline: .2rem solid var(--accent); outline-offset: .2rem; }
+    .skip { position: absolute; top: -5rem; background: white; padding: .7rem; z-index: 10; }
+    .skip:focus { top: 0; }
+    .wrap { max-width: 70rem; margin: auto; padding-inline: clamp(1rem, 4vw, 3rem); }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 1.4rem; border-bottom: 1px solid var(--line); color: var(--muted); }
+    .brand, .eyebrow { font-size: .78rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 650; }
+    .hero { padding-block: clamp(2rem, 6vw, 4.5rem) 2.7rem; }
+    .eyebrow { color: var(--accent); margin: 0 0 1rem; }
+    h1, h2, h3 { line-height: 1.15; text-wrap: balance; }
+    h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(2.7rem, 6vw, 4.6rem); letter-spacing: -.035em; max-width: 15ch; margin: 0 0 1.4rem; }
+    h2 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 400; margin: .45rem 0 1.4rem; }
+    h3 { font-size: 1.2rem; margin: 1.7rem 0 .65rem; }
+    p { margin: 0 0 1.1rem; }
+    .lede { font-size: 1.18rem; max-width: 65ch; color: #354b53; }
+    .verdict { border-left: .25rem solid var(--accent); padding: 1.1rem 1.4rem; margin-top: 1.7rem; background: var(--tint); max-width: 75ch; }
+    .verdict p:last-child, .note p:last-child { margin-bottom: 0; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 2rem 0 0; gap: 1.5rem; }
+    .stats div { border-top: 1px solid var(--line); padding-top: .85rem; }
+    .stats dt { font-size: .83rem; color: var(--muted); }
+    .stats dd { margin: .2rem 0 0; font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+    nav { position: sticky; top: 0; z-index: 2; background: var(--paper); border-block: 1px solid var(--line); }
+    nav .wrap { display: flex; gap: 1.6rem; overflow-x: auto; padding-block: .85rem; }
+    nav a { color: var(--muted); text-decoration: none; white-space: nowrap; font-size: .88rem; }
+    section { padding-block: 3rem; border-bottom: 1px solid var(--line); }
+    .section-number { color: var(--accent); font-size: .8rem; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+    .prose { max-width: 77ch; }
+    .note { background: var(--warm); border-left: .2rem solid #a77527; padding: 1.1rem 1.3rem; margin: 1.4rem 0; }
+    .muted, figcaption, caption { color: var(--muted); }
+    .small { font-size: .87rem; }
+    .table-wrap { overflow-x: auto; margin-block: 1.4rem; background: white; border: 1px solid var(--line); border-radius: .4rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+    caption { text-align: left; padding: 1rem 1.2rem; font-size: .85rem; }
+    th, td { text-align: right; padding: .85rem 1.1rem; border-top: 1px solid var(--line); vertical-align: top; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { background: #f0f4f1; color: #3b5459; font-weight: 650; }
+    tbody th { font-weight: 500; }
+    .text-table td, .text-table th { text-align: left; }
+    .oracle { background: var(--tint); }
+    figure { margin: 1.7rem 0; background: white; border: 1px solid var(--line); border-radius: .4rem; padding: 1rem; break-inside: avoid; }
+    figure img { max-width: 100%; height: auto; display: block; margin-inline: auto; }
+    figcaption { max-width: 80ch; margin: .8rem auto 0; font-size: .86rem; }
+    .figure-number { color: var(--ink); font-weight: 650; }
+    .controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-block: 1.3rem; }
+    .controls label { display: flex; flex-direction: column; gap: .3rem; color: var(--muted); font-size: .85rem; flex: 1 1 11rem; }
+    select, button, .button { font: inherit; padding: .65rem .85rem; color: var(--ink); border: 1px solid #acbeb6; border-radius: .3rem; background: white; }
+    select { width: 100%; }
+    button, .button { cursor: pointer; font-size: .85rem; text-decoration: none; display: inline-block; }
+    button:hover, .button:hover { background: var(--tint); }
+    .downloads { display: flex; flex-wrap: wrap; gap: .7rem; margin-block: 1rem; }
+    code, pre { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    code { font-size: .92em; }
+    .formula { padding: 1.3rem; margin: 1.2rem 0; border-left: .2rem solid var(--accent); background: white; overflow-x: auto; font-size: 1rem; line-height: 1.9; }
+    .formula p:last-child { margin: 0; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .card { padding: 1.4rem; border: 1px solid var(--line); border-radius: .4rem; background: white; }
+    .card h3 { margin-top: 0; }
+    .card p:last-child { margin-bottom: 0; }
+    ul, ol { padding-left: 1.3rem; }
+    li { margin-bottom: .5rem; }
+    details { margin: 1rem 0; border-block: 1px solid var(--line); padding-block: 1rem; }
+    summary { cursor: pointer; font-weight: 650; }
+    details > :not(summary) { margin-top: 1rem; }
+    pre { background: white; padding: 1rem; border: 1px solid var(--line); overflow-x: auto; font-size: .83rem; }
+    footer { padding-block: 2rem; color: var(--muted); font-size: .85rem; }
+    [hidden] { display: none !important; }
+    @media (max-width: 42rem) { .stats { grid-template-columns: 1fr 1fr; } .two-col { grid-template-columns: 1fr; } .masthead { align-items: flex-start; } section { padding-block: 2.3rem; } th, td { padding: .7rem; } }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: black; font-size: 10pt; }
+      nav, .controls, .downloads, .skip, .no-print { display: none !important; }
+      .wrap { max-width: none; padding-inline: 0; }
+      .hero, section { padding-block: 1rem; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 23pt; }
+      h2, h3, summary { break-after: avoid; }
+      .table-wrap { overflow: visible; }
+      tr { break-inside: avoid; }
+      a { color: inherit; }
+      .stats { grid-template-columns: repeat(4, 1fr); }
+      figure img { max-height: 65vh; width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to report</a>
+  <header class="wrap">
+    <div class="masthead"><span class="brand">Generative Learning / Research</span><time datetime="2026-09-06">6 September 2026</time></div>
+    <div class="hero">
+      <p class="eyebrow">Exploration · Feedback · Identifiability</p>
+      <h1>What generation can add</h1>
+      <p class="lede">A controlled investigation of how exploratory trajectories expose corrective behavior that expert demonstrations leave unobserved.</p>
+      <div class="verdict"><p><strong>Exploration plus corrective feedback removes a persistent recovery-error floor.</strong> The effect replicates in two LLM families and has an exact, two-weight Gaussian counterpart. Random and frozen-model exploration reach the same endpoint, pointing to informative state coverage as the mechanism.</p></div>
+      <dl class="stats"><div><dt>Model families</dt><dd>2</dd></div><div><dt>Seeds per family</dt><dd>3</dd></div><div><dt>Fine-tuning arms completed</dt><dd>24</dd></div><div><dt>New labels per arm</dt><dd>8,192</dd></div></dl>
+    </div>
+  </header>
+  <nav aria-label="Report sections"><div class="wrap"><a href="#results">Results</a><a href="#task">Task &amp; training</a><a href="#mechanism">Weight mechanism</a><a href="#scope">What follows</a><a href="#audit">Methods &amp; audit</a><a href="#artifacts">Artifacts</a></div></nav>
+  <main class="wrap" id="main">
+    <section id="results">
+      <span class="section-number">01 / Experimental result</span>
+      <h2>The benefit survives a change of model</h2>
+      <p class="prose">We fully fine-tuned <strong>Qwen/Qwen3-0.6B-Base</strong> (596,049,920 parameters) and <strong>HuggingFaceTB/SmolLM2-135M</strong> (134,515,008 parameters), using three training seeds each. Models control a simple tracking system. Expert demonstrations show how to remain on track; exploratory actions expose errors and receive oracle corrections.</p>
+      <div class="table-wrap"><table><caption>Primary endpoint: mean absolute tracking error over 256 fresh, 16-step recovery episodes, averaged across three seeds, at 8,192 acquired labels. Lower is better.</caption><thead><tr><th scope="col">Training data acquisition</th><th scope="col">Qwen3-0.6B</th><th scope="col">SmolLM2-135M</th></tr></thead><tbody>@@ENDPOINT_ROWS@@</tbody></table></div>
+      <p class="prose">Every exploratory endpoint matches the oracle on the sampled episodes. The oracle has a small positive error because bounded actions sometimes require more than one step to recover. <strong>Every main arm retains perfect nominal tracking at every measured checkpoint.</strong></p>
+      <figure><img src="@@LEARNING_CURVES@@" alt="Recovery learning curves for Qwen and SmolLM2. Expert-only error remains around two to three; exploratory conditions initially fluctuate, then reach the oracle error by 8,192 labels."><figcaption><span class="figure-number">Figure 1.</span> All six checkpoints, including the shared warm start. Shading shows 95% intervals from resampling three training seeds. Error is on a logarithmic axis; label count uses a symmetric-log axis with a linear region through 512. No power law is fitted.</figcaption></figure>
+      <div class="note"><p><strong>The improvement is not immediate.</strong> At 512 labels, current-model exploration temporarily increases mean recovery error to 13.01 in Qwen and 3.68 in SmolLM2. Later improvement and saturation do not establish distinct scaling exponents.</p></div>
+      <h3>Inspect the measured checkpoints</h3>
+      <p class="small muted">All values below come directly from the saved analysis summaries. Budget zero is the shared warm model; subsequent budgets count newly acquired state labels.</p>
+      <div class="controls" id="explorer-controls" hidden>
+        <label>Model<select id="model"><option value="qwen">Qwen3-0.6B-Base</option><option value="smollm">SmolLM2-135M</option></select></label>
+        <label>Initial condition<select id="stratum"><option value="recovery">Recovery: error ±1…3</option><option value="nominal">Nominal: error 0</option><option value="large_shift">Larger shift: error ±4…8</option></select></label>
+        <label>Acquired labels<select id="budget"><option value="0">0 — warm start</option><option value="512">512</option><option value="1024">1,024</option><option value="2048">2,048</option><option value="4096">4,096</option><option value="8192" selected>8,192</option></select></label>
+      </div>
+      <noscript><p class="small">JavaScript is disabled. The table shows Qwen's recovery endpoint; all figures, methods, and endpoint results remain available.</p></noscript>
+      <div class="table-wrap"><table id="explorer-table"><caption id="explorer-caption" aria-live="polite">Qwen3-0.6B-Base · recovery · 8,192 labels · mean absolute error</caption><thead><tr><th scope="col">Acquisition</th><th scope="col">Mean</th><th scope="col">95% seed interval</th><th scope="col">Seeds 7520 / 7521 / 7522</th></tr></thead><tbody id="explorer-body">@@EXPLORER_ROWS@@</tbody></table></div>
+      <p class="small muted" id="oracle-readout" aria-live="polite">Oracle mean absolute error on the same recovery episodes: 0.01831.</p>
+      <p class="small muted">Intervals resample only three training seeds and condition on the common evaluation episodes. They have limited resolution and do not capture task-selection or cross-task uncertainty.</p>
+    </section>
+
+    <section id="task">
+      <span class="section-number">02 / Task and intervention</span>
+      <h2>Learning to stay on track, and to return</h2>
+      <p class="prose">Each step presents requested motion <code>u ∈ {−2, −1, 0, 1, 2}</code> and tracking error <code>e</code>. The LLM selects an action <code>a ∈ {−3, …, 3}</code>, encoded as one of seven legal tokens. The simulator performs the arithmetic.</p>
+      <div class="formula"><code>e<sub>next</sub> = e + a − u</code><br><code>a* = clip(u − e, −3, 3)</code></div>
+      <div class="two-col"><div class="card"><h3>Expert acquisition</h3><p>Every training episode starts at <code>e = 0</code>. The expert chooses <code>a = u</code>, so error stays zero. Only <strong>five distinct inputs</strong> appear, no matter how often those demonstrations are repeated.</p></div><div class="card"><h3>Exploratory acquisition</h3><p>Sampled actions generate nonzero errors. The oracle labels each visited state with its corrective action. Current-model exploration visits <strong>109–115 inputs in Qwen</strong> and <strong>124–142 in SmolLM2</strong>; random exploration visits 237–238.</p></div></div>
+      <p class="prose" style="margin-top:1.3rem">For example, with <code>u = 1</code> and <code>e = 2</code>, copying the requested motion gives <code>a = 1</code> and preserves the error. The corrective action <code>a = −1</code> returns error to zero. Zero-error demonstrations never supply this corrective example.</p>
+      <h3>What changes between training conditions?</h3>
+      <div class="table-wrap"><table class="text-table"><thead><tr><th scope="col">Acquisition policy</th><th scope="col">Executed action</th><th scope="col">Training target at the visited state</th></tr></thead><tbody>
+        <tr><th scope="row">Expert</th><td>Oracle action</td><td>Oracle correction</td></tr>
+        <tr><th scope="row">Current model</th><td>90% current-model sampling + 10% uniform</td><td>Oracle correction</td></tr>
+        <tr><th scope="row">Random</th><td>Uniform over seven actions</td><td>Oracle correction</td></tr>
+        <tr><th scope="row">Frozen model</th><td>90% fixed warm-model sampling + 10% uniform</td><td>Oracle correction</td></tr>
+      </tbody></table></div>
+      <p class="prose"><strong>Every arm uses supervised cross-entropy.</strong> Generation runs without gradients and determines which states receive labels. All visited states are labeled, including mistakes; there is no success filtering. This is constrained action generation with corrective supervision, rather than unrestricted text generation or policy-gradient RL.</p>
+      <p class="prose">Each round adds 512 new labels and 512 replay examples, then takes 16 updates of batch size 64. All arms share the same requested-motion stream, warm model, warm optimizer state, label counts, and update counts within a seed. Model-based sampling uses temperature 1. The task prompt explicitly supplies the dynamics, objective, and action mapping.</p>
+      <div class="note"><p><strong>The test deliberately perturbs initial state.</strong> Recovery begins at an error uniformly sampled from ±1 through ±3, outside expert demonstration coverage. Larger-shift evaluation uses ±4 through ±8. Fresh command sequences are disjoint from training sequences, but individual numeric state inputs can recur.</p></div>
+    </section>
+
+    <section id="mechanism">
+      <span class="section-number">03 / A mechanism with actual weights</span>
+      <h2>One linear layer is enough</h2>
+      <p class="prose">A conditional Gaussian learner makes the missing direction explicit. It has just two weights, no hidden layer, and no activation. Labels are noisy linear teacher outputs; the prior is standard Gaussian.</p>
+      <div class="formula"><code>x = (u, e), &nbsp; w* = (1, −1)</code><br><code>y = xᵀw* + ε, &nbsp; ε ∼ N(0, σ²), &nbsp; σ = 0.25</code><br><code>w ∼ N(0, I)</code><br><br><code>Σ<sub>n</sub> = [I + XᵀX / σ²]⁻¹</code><br><code>μ<sub>n</sub> = Σ<sub>n</sub> Xᵀy / σ²</code></div>
+      <p class="prose">With expert inputs <code>(u, 0)</code>, the corrective weight never enters the likelihood. Its posterior mean remains zero and its variance remains one. The same fact appears in a squared-loss gradient:</p>
+      <div class="formula"><code>∂L/∂w<sub>e</sub> ∝ (prediction − label) × e = 0</code></div>
+      <p class="prose">Supervised data still teach the motion coefficient. The obstruction is specifically the absent error direction. Exploration exposes that direction, makes the input Gram matrix full rank, and lets teacher feedback identify the corrective coefficient.</p>
+      <div class="table-wrap"><table><caption>Exact Gaussian posterior experiment: 256 paired repetitions, 1,024 labels. Weight error is the mean squared Euclidean distance to the true weights.</caption><thead><tr><th scope="col">Acquisition</th><th scope="col">Squared weight error</th><th scope="col">Corrective weight</th><th scope="col">Smallest Gram eigenvalue</th></tr></thead><tbody>@@LINEAR_ROWS@@</tbody></table></div>
+      <figure><img src="@@LINEAR_MSE@@" alt="Squared weight error remains near one under expert demonstrations and falls by orders of magnitude with learner or random exploration."><figcaption><span class="figure-number">Figure 2.</span> Actual parameter learning in a two-weight Gaussian model. The expert floor is caused by an unidentified input direction. Under independent standardized test inputs, this weight error equals prediction mean squared error.</figcaption></figure>
+      <details><summary>See the corrective weight itself</summary><figure><img src="@@LINEAR_WEIGHT@@" alt="The corrective coefficient stays at zero under expert demonstrations and approaches the true value minus one under exploration."><figcaption>The posterior mean of the corrective weight. The teacher value is −1; demonstrations at zero error leave it at its prior mean of zero.</figcaption></figure></details>
+      <h3>The corresponding LLM behavior</h3>
+      <p class="prose">For each warm and final LLM, a fixed 29-input probe fits decoded action to <code>intercept + b × u + c × e</code> where the ideal action is unsaturated. Warm and expert-only policies get 5/29 inputs correct. Every exploratory final policy gets 29/29 correct and has fitted coefficients <code>(0, 1, −1)</code>.</p>
+      <figure><img src="@@BEHAVIORAL_PROBE@@" alt="The effective response to error is close to zero or positive for warm and expert-only models, and equals minus one for all exploratory final policies in both model families."><figcaption><span class="figure-number">Figure 3.</span> Effective corrective response in the LLMs; points are training seeds. These are behavioral regression coefficients, not elements of a transformer weight matrix or evidence for a unique internal circuit.</figcaption></figure>
+      <h3>Weak excitation changes the floor</h3>
+      <p class="prose">Adding process noise with standard deviation 0.05 exposes small errors even under expert control. At 1,024 labels, expert weight error falls to 0.024403, versus 0.000336 for learner exploration. The missing direction becomes weakly observed rather than entirely absent.</p>
+      <figure><img src="@@NOISY_MSE@@" alt="With small process noise in all policies, expert weight error decreases too, while exploratory policies learn faster per label."><figcaption><span class="figure-number">Figure 4.</span> Sensitivity to a small shared process disturbance. Persistent excitation can give both learners inverse-sample posterior-variance rates with different constants. This does not establish different asymptotic exponents.</figcaption></figure>
+      <p class="small muted prose">The Gaussian simulation uses continuous actions, teacher-label noise 0.25, exploration noise 0.5, and 16-step resets. Posterior updates are exact and were checked against independent batch calculations. Its probabilistic grounding is conditional Gaussian regression; it is not an RBM training result or a claim of Bayesian optimality over all known physical facts.</p>
+    </section>
+
+    <section id="scope">
+      <span class="section-number">04 / Interpretation</span>
+      <h2>The evidence supports a coverage mechanism</h2>
+      <div class="two-col"><div class="card"><h3>Established in this experiment</h3><ul><li>Exploratory actions plus informative feedback teach recovery missing from expert trajectories.</li><li>The endpoint result replicates across two model families and all six training seeds.</li><li>A single linear layer exposes an exact connection between input coverage, posterior uncertainty, and weight error.</li><li>Nominal tracking remains intact in every main condition.</li></ul></div><div class="card"><h3>Still open</h3><ul><li>An advantage unique to adaptive self-generation: random and frozen-model exploration work too.</li><li>Different scaling exponents or an advantage at every finite budget.</li><li>A quantitative mapping from Gaussian weight-learning rates to transformer learning rates.</li><li>A corresponding human effect, or a general advantage over learning from the same information.</li></ul></div></div>
+      <p class="prose" style="margin-top:1.3rem">The useful claim is that <strong>generation can act as data augmentation by changing which informative states the learner encounters</strong>. Corrective feedback supplies the missing labels. Matching the acquired observations would remove this particular information difference.</p>
+      <p class="prose">The setup is related to <a href="https://arxiv.org/abs/1011.0686">DAgger (Ross, Gordon &amp; Bagnell, 2011)</a>, which labels learner-induced states, and <a href="https://arxiv.org/abs/2306.13649">on-policy language-model distillation (Agarwal et al.)</a>. This investigation isolates a small, interpretable instance of that mechanism.</p>
+      <h3>Compute is a separate axis</h3>
+      <p class="prose">The main comparison matches labels and optimizer updates. Current-model generation adds approximately 50% more counted training/acquisition tokens. Recorded training/generation phases average 44.47 versus 39.27 seconds in Qwen, and 21.78 versus 19.18 seconds in SmolLM2, for current-model versus expert acquisition. These timings exclude several overheads and were measured on a shared node; they are not total wall-clock or equal-compute comparisons.</p>
+    </section>
+
+    <section id="audit">
+      <span class="section-number">05 / Experimental record</span>
+      <h2>Methods, calibration, and checks</h2>
+      <p class="prose">Unsuccessful pilots are retained and excluded from the confirmation averages. The main design was frozen after a stability pilot; a separate SmolLM2 selection record was saved before its predictions. The final result is conditional on this deliberately selected tracking task.</p>
+      <div class="table-wrap"><table class="text-table"><thead><tr><th scope="col">Stage</th><th scope="col">Finding</th></tr></thead><tbody>
+        <tr><th scope="row">Modular-planning pilot · 7310</th><td>All four final policies repeated a constant action. Apparent differences did not demonstrate learned planning.</td></tr>
+        <tr><th scope="row">Tracking pilots · 7510, 7511</th><td>Nominal tracking was unstable during training. These runs did not provide a valid confirmation.</td></tr>
+        <tr><th scope="row">Stability pilot · 7512</th><td>Lower learning rate, label smoothing, and preserved warm optimizer moments retained nominal behavior. These changes were not individually ablated.</td></tr>
+        <tr><th scope="row">Confirmation · 7520–7522</th><td>Three seeds in each of two families, all four acquisition policies, fresh common evaluation episodes.</td></tr>
+      </tbody></table></div>
+      <details open><summary>Full-weight fine-tuning and evaluation settings</summary>
+        <div class="table-wrap"><table class="text-table"><tbody>
+          <tr><th scope="row">Models</th><td>Qwen/Qwen3-0.6B-Base; HuggingFaceTB/SmolLM2-135M</td></tr>
+          <tr><th scope="row">Training seeds</th><td>7520, 7521, 7522, paired across acquisition arms</td></tr>
+          <tr><th scope="row">Warm start</th><td>2,048 expert examples per epoch; stop after two consecutive epochs perfect on the five nominal training inputs; maximum 20 epochs. No test feedback.</td></tr>
+          <tr><th scope="row">Optimizer</th><td>AdamW; all model weights updated; learning rate 10⁻⁵; zero weight decay; gradient clipping at norm 1; warm optimizer moments preserved.</td></tr>
+          <tr><th scope="row">Precision</th><td>Float32 parameters and optimizer state; bfloat16 forward autocast.</td></tr>
+          <tr><th scope="row">Supervision</th><td>90% oracle one-hot target + 10% uniform label smoothing across seven legal actions. All visited states receive oracle labels.</td></tr>
+          <tr><th scope="row">Round</th><td>512 new labels + 512 uniform replay examples from accumulated data; shuffled; 16 updates of batch size 64.</td></tr>
+          <tr><th scope="row">Post-warm budget</th><td>8,192 acquired labels; 16,384 training presentations; 256 optimizer updates.</td></tr>
+          <tr><th scope="row">Checkpoints</th><td>0, 512, 1,024, 2,048, 4,096, 8,192 new labels.</td></tr>
+          <tr><th scope="row">Evaluation</th><td>Seed 94400; 256 fresh 16-step command sequences per initial-condition stratum. Primary metric: recovery mean absolute error at 8,192 labels.</td></tr>
+          <tr><th scope="row">Stable tracking</th><td>Every one of the final eight steps has zero tracking error.</td></tr>
+        </tbody></table></div>
+      </details>
+      <details><summary>Effect sizes and supplemental exact policy evaluation</summary>
+        <p>At the primary endpoint, the paired current-model-minus-expert difference is −2.19417 for Qwen (95% seed-bootstrap interval −2.48242 to −1.93872) and −2.58879 for SmolLM2 (−2.62939 to −2.52124). All six paired seed differences favor exploratory feedback.</p>
+        <p>A supplemental lookup evaluation integrates over the IID command distribution by dynamic programming. Its 85-input domain is verified closed under every final policy, and lookup actions match all 294,912 recorded final evaluation actions. Expected recovery error is 2.26379 for Qwen expert-only and 2.69925 for SmolLM2 expert-only. Every exploratory policy reaches the oracle's expected error of 0.01750.</p>
+        <p>The initial, overly broad lookup grid changed batch padding and flipped a near-tied SmolLM2 expert action. The strict agreement check caught this. Matching the original numerical convention on the closed domain resolved it, with all recorded actions verified. Failures and correction records are retained; original sampled-episode results remain primary.</p>
+      </details>
+      <details><summary>Verification and retained checkpoints</summary>
+        <ul><li>58 offline tests and three additional dynamic-programming tests passed.</li><li>Independent analysis regraded 110,592 trajectories and checked oracle labels, replay indices, matched command streams, and optimizer counts.</li><li>Fresh test command sequences have zero overlap with training sequences.</li><li>Gaussian posterior means and covariances passed 16,896 independent batch-formula checks.</li><li>420 archive files were verified by file list, byte count, and SHA-256: 24 final models, six warm models and their optimizer states, plus 144 parameter-probe files.</li></ul>
+        <p>The 62.96 GB archive resides at <code>/ceph/scratch/jbauer/generative-learning/tracking</code>. Final checkpoints preserve model weights; optimizer state is retained for shared warm starts.</p>
+      </details>
+    </section>
+
+    <section id="artifacts">
+      <span class="section-number">06 / Portable record</span>
+      <h2>Read, share, and reproduce</h2>
+      <p class="prose">This file embeds every displayed figure and the data used by the checkpoint explorer. It opens offline without external fonts, scripts, or image requests. The downloadable data include full LLM learning curves, endpoint comparisons, compact Gaussian results, and SHA-256 digests of source artifacts.</p>
+      <div class="downloads"><button id="download-data" hidden>Download report data (.json)</button><a class="button" href="@@NOTES_DOWNLOAD@@" download="FEEDBACK_INVESTIGATION_RESULTS.md">Investigation notes (.md)</a><a class="button" href="@@PROTOCOL_DOWNLOAD@@" download="TRACKING_PROTOCOL.md">Training protocol (.md)</a><a class="button" href="@@LINEAR_DOWNLOAD@@" download="LINEAR_FEEDBACK.md">Linear derivation (.md)</a><button id="print-report" hidden>Print report</button></div>
+      <details><summary>Rebuild this report from the workspace</summary><pre>"$VENV_LOCAL/generative-learning/bin/python" experiments/build_html_report.py</pre><p>The builder reads the completed artifacts and writes <code>reports/generation-and-learning.html</code>. It does not retrain models or call paid services. The downloadable investigation notes contain analysis and training reproduction commands.</p></details>
+      <p class="prose"><strong>Vast spending: $0 of the authorized $10.</strong> Both institutional <code>gpu_lowp</code> allocations were released. No new paid API calls were made during this investigation. The prior conservative OpenRouter total remains $0.37499892.</p>
+    </section>
+  </main>
+  <footer class="wrap">Generative Learning · Completed investigation, 6 September 2026 · Evidence for exploratory feedback and state coverage; no distinct scaling exponents established.</footer>
+  <script id="report-data" type="application/json">@@DATA@@</script>
+  <script>
+    "use strict";
+    const data = JSON.parse(document.getElementById("report-data").textContent);
+    const arms = {expert: "Expert demonstrations", on_policy: "Current-model rollouts + corrections", random: "Random actions + corrections", frozen_policy: "Frozen-model rollouts + corrections"};
+    const modelNames = {qwen: "Qwen3-0.6B-Base", smollm: "SmolLM2-135M"};
+    const stratumNames = {recovery: "recovery", nominal: "nominal", large_shift: "larger shift"};
+    const modelSelect = document.getElementById("model");
+    const stratumSelect = document.getElementById("stratum");
+    const budgetSelect = document.getElementById("budget");
+    function updateExplorer() {
+      const model = data.models[modelSelect.value];
+      const stratum = stratumSelect.value;
+      const budget = Number(budgetSelect.value);
+      const body = document.getElementById("explorer-body");
+      body.replaceChildren();
+      for (const [arm, label] of Object.entries(arms)) {
+        const checkpoint = model.curves[arm].find(row => row.budget === budget);
+        const metric = checkpoint.metrics[stratum].mean_absolute_error;
+        const values = [label, metric.mean.toFixed(5), metric.ci95.map(value => value.toFixed(5)).join("–"), metric.by_seed.map(value => value.toFixed(5)).join(" / ")];
+        const row = document.createElement("tr");
+        values.forEach((value, index) => {
+          const cell = document.createElement(index === 0 ? "th" : "td");
+          if (index === 0) cell.scope = "row";
+          cell.textContent = value;
+          row.append(cell);
+        });
+        body.append(row);
+      }
+      document.getElementById("explorer-caption").textContent = `${modelNames[modelSelect.value]} · ${stratumNames[stratum]} · ${budget.toLocaleString("en-US")} labels · mean absolute error`;
+      document.getElementById("oracle-readout").textContent = `Oracle mean absolute error on the same ${stratumNames[stratum]} episodes: ${model.oracle_metrics[stratum].mean_absolute_error.toFixed(5)}.`;
+    }
+    for (const select of [modelSelect, stratumSelect, budgetSelect]) select.addEventListener("change", updateExplorer);
+    updateExplorer();
+    document.getElementById("explorer-controls").hidden = false;
+    const downloadButton = document.getElementById("download-data");
+    downloadButton.hidden = false;
+    downloadButton.addEventListener("click", () => {
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type: "application/json"}));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "generation-and-learning-data.json";
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    const printButton = document.getElementById("print-report");
+    printButton.hidden = false;
+    printButton.addEventListener("click", () => window.print());
+    let closedBeforePrint = [];
+    window.addEventListener("beforeprint", () => {
+      closedBeforePrint = Array.from(document.querySelectorAll("details:not([open])"));
+      closedBeforePrint.forEach(detail => { detail.open = true; });
+    });
+    window.addEventListener("afterprint", () => closedBeforePrint.forEach(detail => { detail.open = false; }));
+  </script>
+</body>
+</html>

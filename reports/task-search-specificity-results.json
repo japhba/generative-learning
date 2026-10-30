@@ -1,0 +1,3108 @@
+{
+  "design": {
+    "time_uk": "2026-09-12T11:42:59.851676+01:00",
+    "phase": "specificity_20260912",
+    "models": [
+      "qwen",
+      "gemma"
+    ],
+    "gemma": {
+      "model": "google/gemma-4-26b-a4b-it",
+      "reasoning": {
+        "enabled": false
+      },
+      "provider": {
+        "only": [
+          "dekallm/bf16"
+        ],
+        "allow_fallbacks": false,
+        "require_parameters": true
+      }
+    },
+    "settings": [
+      "factor_k0",
+      "factor_k4",
+      "bezout_k0"
+    ],
+    "episodes": 16,
+    "tests_per_episode": 12,
+    "rehearsal_counts": [
+      0,
+      2,
+      8,
+      32
+    ],
+    "max_tokens": 256,
+    "generation_temperature": 0.7,
+    "evaluation_temperature": 0.0,
+    "source_sha256": {
+      "SPECIFICITY_PROTOCOL.md": "1999e760a8caa911175385910c78f141c0006b7078c00147bdd503a24f454ff0",
+      "specificity_api.py": "9deb71f748de0b38e456d4229a08bfd26d4076a5d09c63351fa0977497e828f5",
+      "specificity_experiment.py": "96757740d016544e5e3ad33280a9b324802fdd786393f505167e6be49dbc531d",
+      "task_search_api.py": "cc2727313c85e222b9f1cb86e82d978773e21699a514fbcde207dbb5d60d95fb",
+      "task_search_data.py": "4c6772466f53206c822b3f4b98f6ac946c2dca834c3ee4424ae558be1a9d927f",
+      "task_search_prompts.py": "3df34f2c504e73e9de344523f13e575394b0307490b8e228d47792bc1a313687",
+      "task_search_scoring.py": "a442df3caab066dc2d809099e283fa4c8d6d6ac24252b696f77cfd9c910407ab",
+      "decomposition_task_search.py": "fe0f857aad9b2455f0c50e556139bc591496aaf1bb8c61772c9447b5921aa3d2",
+      "nontrivial_task_runner.py": "613707dc7b6b154295ed086b07e557cb27e83a8853ad6498065bc2f2d0a11f20",
+      "witness_task_search.py": "0f2adfb4c3966c822c699a598be6696c07f6d6533f58366176471a460460bcc0"
+    },
+    "worlds": [
+      {
+        "name": "factor_k0__00.json",
+        "setting": "factor_k0",
+        "episode": 0,
+        "sha256": "b6861adf7c771c44b349fcc57b3505f81a50ba6654dd3383aec89eca5c7ffed5"
+      },
+      {
+        "name": "factor_k4__00.json",
+        "setting": "factor_k4",
+        "episode": 0,
+        "sha256": "706ecd8f9ea214eff14b766d003ff67b091b55420700ebfa54c5f7b5836997d6"
+      },
+      {
+        "name": "factor_k0__01.json",
+        "setting": "factor_k0",
+        "episode": 1,
+        "sha256": "16bd12653dc139126b87814b05f84a623394d786e3594f8261a9e66237dd8989"
+      },
+      {
+        "name": "factor_k4__01.json",
+        "setting": "factor_k4",
+        "episode": 1,
+        "sha256": "a838db52110caa93113461f7752ca1f284f7f55c83e4d3fce288522b89fede54"
+      },
+      {
+        "name": "factor_k0__02.json",
+        "setting": "factor_k0",
+        "episode": 2,
+        "sha256": "dcc8d3cf1766904b1ac8beaab5351a1487809aa3061840d7cd5f734b62c7a22c"
+      },
+      {
+        "name": "factor_k4__02.json",
+        "setting": "factor_k4",
+        "episode": 2,
+        "sha256": "5c08be137fd4270b1219f4823e60d101852fb63e13479b302cf37830159a31c5"
+      },
+      {
+        "name": "factor_k0__03.json",
+        "setting": "factor_k0",
+        "episode": 3,
+        "sha256": "6e2c17267eb6e9a371f4b2a97bac7035e2a61c4256e2a96fdc53e38ac703aa2d"
+      },
+      {
+        "name": "factor_k4__03.json",
+        "setting": "factor_k4",
+        "episode": 3,
+        "sha256": "a8a193530e9b63188771695f7e12617b11acb738028fb83b023ead11af3165af"
+      },
+      {
+        "name": "factor_k0__04.json",
+        "setting": "factor_k0",
+        "episode": 4,
+        "sha256": "662420dfc9f09e08dd6abd073571292cd2679034003c4b59735ef64f2539f9a2"
+      },
+      {
+        "name": "factor_k4__04.json",
+        "setting": "factor_k4",
+        "episode": 4,
+        "sha256": "70f8575c0106dc15c470e6a131d98c182086f0deecb6c0c55949028deee987db"
+      },
+      {
+        "name": "factor_k0__05.json",
+        "setting": "factor_k0",
+        "episode": 5,
+        "sha256": "d60b0eb2c6e63c39311f623e3709e7209820e7f4ef510808960fdcd8fcf02c0e"
+      },
+      {
+        "name": "factor_k4__05.json",
+        "setting": "factor_k4",
+        "episode": 5,
+        "sha256": "ff4ff9693ea58eef935cf90086b73cd7186955a6869f490d9e566dce64f269b6"
+      },
+      {
+        "name": "factor_k0__06.json",
+        "setting": "factor_k0",
+        "episode": 6,
+        "sha256": "c69f6f716b01c72443575b5d2b8e9c8b4cebc283041356e47884c65fa23b47cc"
+      },
+      {
+        "name": "factor_k4__06.json",
+        "setting": "factor_k4",
+        "episode": 6,
+        "sha256": "55a3a898a397d5eeadf792278e7044fb3d4161519bcf6d0a099544a8cbe14228"
+      },
+      {
+        "name": "factor_k0__07.json",
+        "setting": "factor_k0",
+        "episode": 7,
+        "sha256": "11f918f4f4dc63a19e1a2d108a2e6e820359feebd33096b5c0257676323454fc"
+      },
+      {
+        "name": "factor_k4__07.json",
+        "setting": "factor_k4",
+        "episode": 7,
+        "sha256": "f04d2abe5b39140308dda149c7a0cc188c71c6332e931ef0d8f079d19cc13752"
+      },
+      {
+        "name": "factor_k0__08.json",
+        "setting": "factor_k0",
+        "episode": 8,
+        "sha256": "12ff853dbec983713aefaeb2538a9b5a0dc1b72f8277b1d7bb1e11a4b45f8d4a"
+      },
+      {
+        "name": "factor_k4__08.json",
+        "setting": "factor_k4",
+        "episode": 8,
+        "sha256": "4ed8add35cb3a3e79d9e8e4cf55a216e8d3bea4659910a19d2cec420f3030bd4"
+      },
+      {
+        "name": "factor_k0__09.json",
+        "setting": "factor_k0",
+        "episode": 9,
+        "sha256": "51504b4a250c05928a87e2011cd7ec2c38fb7878866b4efffccfc9ecc2e1cb84"
+      },
+      {
+        "name": "factor_k4__09.json",
+        "setting": "factor_k4",
+        "episode": 9,
+        "sha256": "913c033c724b77e15a9c1724678ece7bb1981af148c5c730658d4a10d6fa8882"
+      },
+      {
+        "name": "factor_k0__10.json",
+        "setting": "factor_k0",
+        "episode": 10,
+        "sha256": "890535389de75a00712a9a00d7077aa2fb0acef7a75d3b8798b231214d7236c4"
+      },
+      {
+        "name": "factor_k4__10.json",
+        "setting": "factor_k4",
+        "episode": 10,
+        "sha256": "68e8ffc8bdf069bd47d5a43f3cff53f00add1e9895c460b36366db423a6382c6"
+      },
+      {
+        "name": "factor_k0__11.json",
+        "setting": "factor_k0",
+        "episode": 11,
+        "sha256": "2e9d84fe41446f220591f2317ebcef496a1873fa429377e3fe2a896abf959e4c"
+      },
+      {
+        "name": "factor_k4__11.json",
+        "setting": "factor_k4",
+        "episode": 11,
+        "sha256": "cd56357f8acf70f27458bc54436522aa2162093e8eef50e0286432ef12a48154"
+      },
+      {
+        "name": "factor_k0__12.json",
+        "setting": "factor_k0",
+        "episode": 12,
+        "sha256": "a80c13b513b32a16d1272c3c17d720975e3f9f2f158cea92bfbc3fa3f99c73bc"
+      },
+      {
+        "name": "factor_k4__12.json",
+        "setting": "factor_k4",
+        "episode": 12,
+        "sha256": "78e9c12635f8d781e715c711d56328892f593ae54a7e6c46f614ec2e589fa89b"
+      },
+      {
+        "name": "factor_k0__13.json",
+        "setting": "factor_k0",
+        "episode": 13,
+        "sha256": "a2d7926169f8df4a3b6ec27632d88c3f015415396722d4123049a3562a52ccca"
+      },
+      {
+        "name": "factor_k4__13.json",
+        "setting": "factor_k4",
+        "episode": 13,
+        "sha256": "c60d153b59c7aae4d000435c5183dd2ee537e9c49df78e5a17d2d2f1965d2795"
+      },
+      {
+        "name": "factor_k0__14.json",
+        "setting": "factor_k0",
+        "episode": 14,
+        "sha256": "77b9161a17dcb13220141a60cf4882bf39514e46322459c6e3ef5a1d250b818d"
+      },
+      {
+        "name": "factor_k4__14.json",
+        "setting": "factor_k4",
+        "episode": 14,
+        "sha256": "975553d38f797c3d293887cdbd7188eb3647a9c9a9765ba830b9ce99735dca40"
+      },
+      {
+        "name": "factor_k0__15.json",
+        "setting": "factor_k0",
+        "episode": 15,
+        "sha256": "0e488ea4ac73c7d4637cd6a3769ffd24ed581ebf966ad4e979b6f137e8cba140"
+      },
+      {
+        "name": "factor_k4__15.json",
+        "setting": "factor_k4",
+        "episode": 15,
+        "sha256": "11af5f14f2e3e11d7141e2e6fe3978ed74c0bd07a7992a9c9b76fa9067b25ebf"
+      },
+      {
+        "name": "bezout_k0__00.json",
+        "setting": "bezout_k0",
+        "episode": 0,
+        "sha256": "58c86ef2deb16b162fe5119085d34c942a7823e670f69be6e983b528b3837b5a"
+      },
+      {
+        "name": "bezout_k0__01.json",
+        "setting": "bezout_k0",
+        "episode": 1,
+        "sha256": "ae6d7f1120f476031af8a03bfe07a907e1b97f4c5ecf42ed32b49c8c9a2ef569"
+      },
+      {
+        "name": "bezout_k0__02.json",
+        "setting": "bezout_k0",
+        "episode": 2,
+        "sha256": "88629567b0cf42b8b98890a73ffb740d3a84d8fe473dec0b5769462e61554bb0"
+      },
+      {
+        "name": "bezout_k0__03.json",
+        "setting": "bezout_k0",
+        "episode": 3,
+        "sha256": "684db4a1b6781dccc6b2c9ce981702f24506fad70e748646e8de437c7fcdf99b"
+      },
+      {
+        "name": "bezout_k0__04.json",
+        "setting": "bezout_k0",
+        "episode": 4,
+        "sha256": "7f384d483f351b0193eaa7c010e6b3c11327ed8c598bc505d72dccb2d490a0fd"
+      },
+      {
+        "name": "bezout_k0__05.json",
+        "setting": "bezout_k0",
+        "episode": 5,
+        "sha256": "9c4098770b1ed9b449a99a87b887a3dbcdf419418ded53c731ade6f3fd945f43"
+      },
+      {
+        "name": "bezout_k0__06.json",
+        "setting": "bezout_k0",
+        "episode": 6,
+        "sha256": "3ffb63a061bef5eb0dcfa7e8db2f17708bd4b037e319bb169ba31db18588751c"
+      },
+      {
+        "name": "bezout_k0__07.json",
+        "setting": "bezout_k0",
+        "episode": 7,
+        "sha256": "19a571d9187043bfaba5d2b5c80305bd43b6e7e02ed36cf02cfe424e6cf53a66"
+      },
+      {
+        "name": "bezout_k0__08.json",
+        "setting": "bezout_k0",
+        "episode": 8,
+        "sha256": "f8a2512164734b418900f61c1a1ad8f91fc931565e305d6c0b99c538e4a9d66d"
+      },
+      {
+        "name": "bezout_k0__09.json",
+        "setting": "bezout_k0",
+        "episode": 9,
+        "sha256": "fc0edb3bddd1e3b02fe8aad017a77baa6f2389d3a7378935100e246434acf5d7"
+      },
+      {
+        "name": "bezout_k0__10.json",
+        "setting": "bezout_k0",
+        "episode": 10,
+        "sha256": "9fa43ddfb168d78f723e6d0d219de9897e034c2431df2b0216be3fd882d03e54"
+      },
+      {
+        "name": "bezout_k0__11.json",
+        "setting": "bezout_k0",
+        "episode": 11,
+        "sha256": "f001e00215e81c45bdaec5239f1d9c74a479fdfe1864695a6020aaf33e57bd5f"
+      },
+      {
+        "name": "bezout_k0__12.json",
+        "setting": "bezout_k0",
+        "episode": 12,
+        "sha256": "30d56210d6adbbeec52cfe00c2f5d7d62b98888e8a260c6fa318559c1ad895fe"
+      },
+      {
+        "name": "bezout_k0__13.json",
+        "setting": "bezout_k0",
+        "episode": 13,
+        "sha256": "9b2b7eec9ec8805922d05040e81ee489851fa9bf602847f452f68d2dbf9d7050"
+      },
+      {
+        "name": "bezout_k0__14.json",
+        "setting": "bezout_k0",
+        "episode": 14,
+        "sha256": "1f62fad33f6de5fd064c0784d71d4e5c081e6159ea794a778e3003f3ec8ea7c3"
+      },
+      {
+        "name": "bezout_k0__15.json",
+        "setting": "bezout_k0",
+        "episode": 15,
+        "sha256": "6d35f4467546de7d668ac14b6482a9e94649e8547d7a61fbcb1bfd08ae192f36"
+      }
+    ]
+  },
+  "cells": [
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "initial",
+      "n": 0,
+      "correct": 9,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.046875,
+        "ci95": [
+          0.026041666666666664,
+          0.07291666666666666
+        ],
+        "episode_values": [
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.046875
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 2,
+      "correct": 58,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.3020833333333333,
+        "ci95": [
+          0.13541666666666669,
+          0.48437499999999994
+        ],
+        "episode_values": [
+          0.3333333333333333,
+          0.0,
+          0.0,
+          0.6666666666666666,
+          0.0,
+          0.0,
+          0.6666666666666666,
+          0.08333333333333333,
+          0.0,
+          0.16666666666666666,
+          0.6666666666666666,
+          1.0,
+          0.0,
+          0.3333333333333333,
+          0.9166666666666666,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.3020833333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 2,
+      "correct": 28,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.14583333333333331,
+        "ci95": [
+          0.08854166666666666,
+          0.20833333333333331
+        ],
+        "episode_values": [
+          0.3333333333333333,
+          0.25,
+          0.0,
+          0.16666666666666666,
+          0.0,
+          0.3333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.4166666666666667,
+          0.08333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.14583333333333334
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 2,
+      "correct": 37,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.19270833333333331,
+        "ci95": [
+          0.109375,
+          0.29166666666666663
+        ],
+        "episode_values": [
+          0.16666666666666666,
+          0.08333333333333333,
+          0.75,
+          0.16666666666666666,
+          0.0,
+          0.25,
+          0.25,
+          0.0,
+          0.08333333333333333,
+          0.25,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.19270833333333334
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 8,
+      "correct": 46,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.23958333333333334,
+        "ci95": [
+          0.109375,
+          0.3854166666666667
+        ],
+        "episode_values": [
+          0.4166666666666667,
+          0.0,
+          0.0,
+          0.5833333333333334,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.3333333333333333,
+          0.25,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.8333333333333334,
+          0.25,
+          0.8333333333333334,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.23958333333333334
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 8,
+      "correct": 16,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.08333333333333333,
+        "ci95": [
+          0.041666666666666664,
+          0.125
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.25,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.0,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.08333333333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 8,
+      "correct": 11,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.057291666666666664,
+        "ci95": [
+          0.026041666666666664,
+          0.08854166666666666
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.057291666666666664
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 32,
+      "correct": 36,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.1875,
+        "ci95": [
+          0.07291666666666666,
+          0.31770833333333337
+        ],
+        "episode_values": [
+          0.75,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.25,
+          0.16666666666666666,
+          0.5833333333333334,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.6666666666666666,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.1875
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 32,
+      "correct": 7,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.036458333333333336,
+        "ci95": [
+          0.010416666666666666,
+          0.07291666666666666
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.25,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.036458333333333336
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 32,
+      "correct": 5,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.026041666666666664,
+        "ci95": [
+          0.010416666666666666,
+          0.046875
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.026041666666666668
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "initial",
+      "n": 0,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 2,
+      "correct": 77,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.40104166666666663,
+        "ci95": [
+          0.21875,
+          0.5885416666666667
+        ],
+        "episode_values": [
+          0.8333333333333334,
+          0.0,
+          0.16666666666666666,
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.9166666666666666,
+          0.08333333333333333,
+          0.0,
+          0.3333333333333333,
+          0.9166666666666666,
+          0.5,
+          0.6666666666666666,
+          1.0,
+          0.75
+        ]
+      },
+      "last_array_accuracy": 0.4114583333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 2,
+      "correct": 4,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.020833333333333332,
+        "ci95": [
+          0.005208333333333333,
+          0.041666666666666664
+        ],
+        "episode_values": [
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.026041666666666668
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 2,
+      "correct": 2,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.010416666666666666,
+        "ci95": [
+          0.0,
+          0.03125
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 8,
+      "correct": 78,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.40625,
+        "ci95": [
+          0.25520833333333337,
+          0.5625
+        ],
+        "episode_values": [
+          0.25,
+          0.0,
+          0.0,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.9166666666666666,
+          0.08333333333333333,
+          0.5833333333333334,
+          0.5833333333333334,
+          0.5833333333333334,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.4166666666666667,
+          0.5,
+          1.0,
+          0.8333333333333334
+        ]
+      },
+      "last_array_accuracy": 0.40625
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 8,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 8,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 32,
+      "correct": 115,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.5989583333333334,
+        "ci95": [
+          0.5052083333333334,
+          0.703125
+        ],
+        "episode_values": [
+          0.5833333333333334,
+          0.4166666666666667,
+          0.5,
+          0.4166666666666667,
+          0.4166666666666667,
+          1.0,
+          0.4166666666666667,
+          0.75,
+          0.8333333333333334,
+          0.4166666666666667,
+          0.4166666666666667,
+          0.75,
+          0.4166666666666667,
+          0.5833333333333334,
+          1.0,
+          0.6666666666666666
+        ]
+      },
+      "last_array_accuracy": 0.5989583333333334
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 32,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k0",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 32,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "initial",
+      "n": 0,
+      "correct": 8,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.041666666666666664,
+        "ci95": [
+          0.020833333333333332,
+          0.06770833333333333
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.041666666666666664
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 2,
+      "correct": 10,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.052083333333333336,
+        "ci95": [
+          0.020833333333333332,
+          0.08854166666666666
+        ],
+        "episode_values": [
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.25,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.052083333333333336
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 2,
+      "correct": 8,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.041666666666666664,
+        "ci95": [
+          0.015625,
+          0.07291666666666666
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.0,
+          0.16666666666666666,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.041666666666666664
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 2,
+      "correct": 5,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.026041666666666664,
+        "ci95": [
+          0.010416666666666666,
+          0.046875
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.026041666666666668
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 8,
+      "correct": 18,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.09375,
+        "ci95": [
+          0.046875,
+          0.15104166666666666
+        ],
+        "episode_values": [
+          0.3333333333333333,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.0,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.3333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.09375
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 8,
+      "correct": 8,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.041666666666666664,
+        "ci95": [
+          0.015625,
+          0.07291666666666666
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.041666666666666664
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 8,
+      "correct": 3,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.015625,
+        "ci95": [
+          0.0,
+          0.03125
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.015625
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 32,
+      "correct": 16,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.08333333333333333,
+        "ci95": [
+          0.041666666666666664,
+          0.13020833333333331
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.08333333333333333
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 32,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 32,
+      "correct": 7,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.03645833333333333,
+        "ci95": [
+          0.015625,
+          0.0625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.036458333333333336
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "initial",
+      "n": 0,
+      "correct": 3,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.015625,
+        "ci95": [
+          0.0,
+          0.03125
+        ],
+        "episode_values": [
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.015625
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 2,
+      "correct": 2,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.010416666666666666,
+        "ci95": [
+          0.0,
+          0.026041666666666664
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 2,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 2,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 8,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 8,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 8,
+      "correct": 1,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.005208333333333333,
+        "ci95": [
+          0.0,
+          0.015625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.005208333333333333
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 32,
+      "correct": 2,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.010416666666666666,
+        "ci95": [
+          0.0,
+          0.026041666666666664
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 32,
+      "correct": 2,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.010416666666666666,
+        "ci95": [
+          0.0,
+          0.026041666666666664
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "factor_k4",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 32,
+      "correct": 2,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.010416666666666666,
+        "ci95": [
+          0.0,
+          0.026041666666666664
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.0,
+          0.0
+        ]
+      },
+      "last_array_accuracy": 0.010416666666666666
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "initial",
+      "n": 0,
+      "correct": 53,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.27604166666666663,
+        "ci95": [
+          0.22916666666666666,
+          0.31770833333333337
+        ],
+        "episode_values": [
+          0.4166666666666667,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.25,
+          0.25,
+          0.08333333333333333,
+          0.25,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.25,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.4166666666666667
+        ]
+      },
+      "last_array_accuracy": 0.2760416666666667
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 2,
+      "correct": 64,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.33333333333333337,
+        "ci95": [
+          0.28125,
+          0.38020833333333337
+        ],
+        "episode_values": [
+          0.5,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.25,
+          0.16666666666666666,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.25,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.5,
+          0.25,
+          0.25,
+          0.4166666666666667
+        ]
+      },
+      "last_array_accuracy": 0.3333333333333333
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 2,
+      "correct": 63,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.328125,
+        "ci95": [
+          0.2708333333333333,
+          0.38541666666666663
+        ],
+        "episode_values": [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.16666666666666666,
+          0.25,
+          0.5,
+          0.4166666666666667,
+          0.5,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.25,
+          0.3333333333333333,
+          0.5
+        ]
+      },
+      "last_array_accuracy": 0.328125
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 2,
+      "correct": 68,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.35416666666666663,
+        "ci95": [
+          0.3020833333333333,
+          0.40625
+        ],
+        "episode_values": [
+          0.5,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.25,
+          0.25,
+          0.5,
+          0.4166666666666667,
+          0.25,
+          0.08333333333333333,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.5,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.4166666666666667
+        ]
+      },
+      "last_array_accuracy": 0.3541666666666667
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 8,
+      "correct": 55,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.2864583333333333,
+        "ci95": [
+          0.23437499999999997,
+          0.34375
+        ],
+        "episode_values": [
+          0.25,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.5,
+          0.25,
+          0.16666666666666666,
+          0.25,
+          0.5,
+          0.25,
+          0.25,
+          0.16666666666666666,
+          0.3333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.2864583333333333
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 8,
+      "correct": 65,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.33854166666666663,
+        "ci95": [
+          0.27604166666666663,
+          0.40625
+        ],
+        "episode_values": [
+          0.4166666666666667,
+          0.3333333333333333,
+          0.25,
+          0.25,
+          0.25,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.6666666666666666,
+          0.4166666666666667,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.3333333333333333,
+          0.5,
+          0.3333333333333333,
+          0.25,
+          0.4166666666666667
+        ]
+      },
+      "last_array_accuracy": 0.3385416666666667
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 8,
+      "correct": 63,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.328125,
+        "ci95": [
+          0.28645833333333337,
+          0.36979166666666663
+        ],
+        "episode_values": [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.25,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.4166666666666667,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.25,
+          0.5,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.25,
+          0.25
+        ]
+      },
+      "last_array_accuracy": 0.328125
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "qwen",
+      "n": 32,
+      "correct": 48,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.25,
+        "ci95": [
+          0.19791666666666663,
+          0.30729166666666663
+        ],
+        "episode_values": [
+          0.16666666666666666,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.3333333333333333,
+          0.25,
+          0.25,
+          0.5,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.08333333333333333,
+          0.25,
+          0.16666666666666666,
+          0.4166666666666667
+        ]
+      },
+      "last_array_accuracy": 0.25
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "gemma",
+      "n": 32,
+      "correct": 66,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.34375,
+        "ci95": [
+          0.28125,
+          0.40625
+        ],
+        "episode_values": [
+          0.25,
+          0.4166666666666667,
+          0.5,
+          0.16666666666666666,
+          0.4166666666666667,
+          0.3333333333333333,
+          0.5,
+          0.5833333333333334,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.08333333333333333,
+          0.25,
+          0.25,
+          0.3333333333333333,
+          0.25,
+          0.5
+        ]
+      },
+      "last_array_accuracy": 0.34375
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "qwen",
+      "source": "teacher",
+      "n": 32,
+      "correct": 55,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.2864583333333333,
+        "ci95": [
+          0.24479166666666663,
+          0.328125
+        ],
+        "episode_values": [
+          0.3333333333333333,
+          0.3333333333333333,
+          0.3333333333333333,
+          0.25,
+          0.3333333333333333,
+          0.25,
+          0.3333333333333333,
+          0.5,
+          0.3333333333333333,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.16666666666666666,
+          0.25,
+          0.3333333333333333,
+          0.3333333333333333
+        ]
+      },
+      "last_array_accuracy": 0.2864583333333333
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "initial",
+      "n": 0,
+      "correct": 143,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.7447916666666667,
+        "ci95": [
+          0.6875,
+          0.8072916666666667
+        ],
+        "episode_values": [
+          0.75,
+          0.9166666666666666,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.75,
+          0.5833333333333334,
+          0.5833333333333334,
+          0.75,
+          0.8333333333333334,
+          0.5833333333333334,
+          0.75,
+          0.75,
+          0.8333333333333334,
+          0.75,
+          1.0,
+          0.8333333333333334
+        ]
+      },
+      "last_array_accuracy": 0.765625
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 2,
+      "correct": 142,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.7395833333333334,
+        "ci95": [
+          0.6822916666666667,
+          0.796875
+        ],
+        "episode_values": [
+          0.75,
+          0.8333333333333334,
+          0.6666666666666666,
+          0.5833333333333334,
+          1.0,
+          0.75,
+          0.6666666666666666,
+          0.75,
+          0.75,
+          0.5833333333333334,
+          0.8333333333333334,
+          0.8333333333333334,
+          0.9166666666666666,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.6666666666666666
+        ]
+      },
+      "last_array_accuracy": 0.7552083333333334
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 2,
+      "correct": 146,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.7604166666666666,
+        "ci95": [
+          0.7135416666666666,
+          0.8072916666666666
+        ],
+        "episode_values": [
+          0.6666666666666666,
+          0.9166666666666666,
+          0.75,
+          0.75,
+          0.8333333333333334,
+          0.75,
+          0.6666666666666666,
+          0.75,
+          0.75,
+          0.5833333333333334,
+          0.8333333333333334,
+          0.9166666666666666,
+          0.8333333333333334,
+          0.5833333333333334,
+          0.8333333333333334,
+          0.75
+        ]
+      },
+      "last_array_accuracy": 0.7916666666666666
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 2,
+      "correct": 142,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.7395833333333333,
+        "ci95": [
+          0.6770833333333333,
+          0.8020833333333333
+        ],
+        "episode_values": [
+          0.5833333333333334,
+          0.9166666666666666,
+          0.75,
+          0.5833333333333334,
+          0.8333333333333334,
+          0.75,
+          0.6666666666666666,
+          0.9166666666666666,
+          0.6666666666666666,
+          0.5,
+          0.8333333333333334,
+          0.8333333333333334,
+          0.9166666666666666,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.5833333333333334
+        ]
+      },
+      "last_array_accuracy": 0.7604166666666666
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 8,
+      "correct": 135,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.703125,
+        "ci95": [
+          0.6614583333333333,
+          0.75
+        ],
+        "episode_values": [
+          0.5833333333333334,
+          0.75,
+          0.75,
+          0.75,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.5833333333333334,
+          0.75,
+          0.75,
+          0.5833333333333334,
+          0.8333333333333334,
+          0.75,
+          0.9166666666666666,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.6666666666666666
+        ]
+      },
+      "last_array_accuracy": 0.703125
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 8,
+      "correct": 141,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.734375,
+        "ci95": [
+          0.671875,
+          0.7916666666666666
+        ],
+        "episode_values": [
+          0.75,
+          0.75,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.75,
+          0.5,
+          0.75,
+          0.75,
+          0.5,
+          0.75,
+          0.8333333333333334,
+          0.9166666666666666,
+          0.5833333333333334,
+          0.8333333333333334,
+          0.9166666666666666
+        ]
+      },
+      "last_array_accuracy": 0.7552083333333334
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 8,
+      "correct": 131,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.6822916666666667,
+        "ci95": [
+          0.6197916666666666,
+          0.7447916666666666
+        ],
+        "episode_values": [
+          0.5,
+          0.75,
+          0.75,
+          0.75,
+          0.8333333333333334,
+          0.5,
+          0.6666666666666666,
+          0.75,
+          0.6666666666666666,
+          0.4166666666666667,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.9166666666666666,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.8333333333333334
+        ]
+      },
+      "last_array_accuracy": 0.7135416666666666
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "qwen",
+      "n": 32,
+      "correct": 137,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.7135416666666667,
+        "ci95": [
+          0.6614583333333334,
+          0.7708333333333334
+        ],
+        "episode_values": [
+          0.5833333333333334,
+          0.8333333333333334,
+          0.6666666666666666,
+          0.75,
+          0.75,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.75,
+          0.75,
+          0.5833333333333334,
+          0.75,
+          0.8333333333333334,
+          1.0,
+          0.5833333333333334,
+          0.75,
+          0.5833333333333334
+        ]
+      },
+      "last_array_accuracy": 0.71875
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "gemma",
+      "n": 32,
+      "correct": 131,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.6822916666666666,
+        "ci95": [
+          0.609375,
+          0.75
+        ],
+        "episode_values": [
+          0.6666666666666666,
+          0.8333333333333334,
+          0.6666666666666666,
+          0.6666666666666666,
+          1.0,
+          0.6666666666666666,
+          0.3333333333333333,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.8333333333333334,
+          0.6666666666666666,
+          0.5833333333333334,
+          0.5
+        ]
+      },
+      "last_array_accuracy": 0.71875
+    },
+    {
+      "setting": "bezout_k0",
+      "reader": "gemma",
+      "source": "teacher",
+      "n": 32,
+      "correct": 125,
+      "total": 192,
+      "accuracy": {
+        "mean": 0.6510416666666667,
+        "ci95": [
+          0.5833333333333333,
+          0.71875
+        ],
+        "episode_values": [
+          0.5833333333333334,
+          0.8333333333333334,
+          0.6666666666666666,
+          0.5833333333333334,
+          0.75,
+          0.5833333333333334,
+          0.3333333333333333,
+          0.5833333333333334,
+          0.75,
+          0.5833333333333334,
+          0.6666666666666666,
+          0.8333333333333334,
+          0.9166666666666666,
+          0.5,
+          0.6666666666666666,
+          0.5833333333333334
+        ]
+      },
+      "last_array_accuracy": 0.65625
+    }
+  ],
+  "endpoints": [
+    {
+      "setting": "factor_k0",
+      "own_preference": {
+        "qwen": {
+          "mean": 0.15104166666666666,
+          "ci95": [
+            0.031249999999999997,
+            0.29166666666666663
+          ],
+          "episode_values": [
+            0.75,
+            0.0,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            0.08333333333333333,
+            -0.08333333333333333,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.08333333333333333,
+            0.5833333333333334,
+            0.3333333333333333,
+            0.16666666666666666,
+            0.6666666666666666,
+            0.0
+          ]
+        },
+        "gemma": {
+          "mean": -0.59375,
+          "ci95": [
+            -0.6979166666666666,
+            -0.5
+          ],
+          "episode_values": [
+            -0.5833333333333334,
+            -0.4166666666666667,
+            -0.5,
+            -0.4166666666666667,
+            -0.4166666666666667,
+            -1.0,
+            -0.4166666666666667,
+            -0.75,
+            -0.75,
+            -0.4166666666666667,
+            -0.4166666666666667,
+            -0.75,
+            -0.4166666666666667,
+            -0.5833333333333334,
+            -1.0,
+            -0.6666666666666666
+          ]
+        }
+      },
+      "own_minus_initial": {
+        "qwen": {
+          "mean": 0.140625,
+          "ci95": [
+            0.015625,
+            0.28125
+          ],
+          "episode_values": [
+            0.75,
+            -0.08333333333333333,
+            0.0,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.5833333333333334,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.6666666666666666,
+            0.0
+          ]
+        },
+        "gemma": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "own_minus_teacher": {
+        "qwen": {
+          "mean": 0.16145833333333334,
+          "ci95": [
+            0.04166666666666666,
+            0.3020833333333333
+          ],
+          "episode_values": [
+            0.75,
+            0.0,
+            0.0,
+            0.0,
+            0.08333333333333333,
+            0.0,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            0.25,
+            0.08333333333333333,
+            0.5833333333333334,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.6666666666666666,
+            0.0
+          ]
+        },
+        "gemma": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "interaction_half": {
+        "mean": -0.22135416666666666,
+        "ci95": [
+          -0.29166666666666663,
+          -0.15364583333333331
+        ],
+        "episode_values": [
+          0.08333333333333333,
+          -0.20833333333333334,
+          -0.2916666666666667,
+          -0.25,
+          -0.16666666666666666,
+          -0.5416666666666666,
+          -0.20833333333333334,
+          -0.375,
+          -0.375,
+          -0.20833333333333334,
+          -0.16666666666666666,
+          -0.08333333333333333,
+          -0.041666666666666664,
+          -0.20833333333333334,
+          -0.16666666666666666,
+          -0.3333333333333333
+        ]
+      },
+      "p_one_sided": 0.999969482421875,
+      "identical_answer_fraction": 0.001953125,
+      "p_holm": 1.0
+    },
+    {
+      "setting": "factor_k4",
+      "own_preference": {
+        "qwen": {
+          "mean": 0.078125,
+          "ci95": [
+            0.03645833333333333,
+            0.125
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.16666666666666666,
+            0.16666666666666666,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "gemma": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "own_minus_initial": {
+        "qwen": {
+          "mean": 0.041666666666666664,
+          "ci95": [
+            -0.010416666666666664,
+            0.09895833333333333
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.3333333333333333,
+            0.16666666666666666,
+            0.0,
+            -0.08333333333333333,
+            0.16666666666666666,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.08333333333333333
+          ]
+        },
+        "gemma": {
+          "mean": -0.005208333333333333,
+          "ci95": [
+            -0.020833333333333332,
+            0.010416666666666666
+          ],
+          "episode_values": [
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            0.0,
+            0.08333333333333333,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "own_minus_teacher": {
+        "qwen": {
+          "mean": 0.046875,
+          "ci95": [
+            0.010416666666666666,
+            0.08333333333333333
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.16666666666666666,
+            0.16666666666666666,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.0,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.08333333333333333,
+            -0.08333333333333333,
+            0.0,
+            -0.08333333333333333
+          ]
+        },
+        "gemma": {
+          "mean": 0.0,
+          "ci95": [
+            -0.015625,
+            0.015625
+          ],
+          "episode_values": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.08333333333333333,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "interaction_half": {
+        "mean": 0.0390625,
+        "ci95": [
+          0.018229166666666664,
+          0.0625
+        ],
+        "episode_values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.08333333333333333,
+          0.08333333333333333,
+          0.16666666666666666,
+          0.041666666666666664,
+          0.041666666666666664,
+          0.041666666666666664,
+          0.08333333333333333,
+          0.041666666666666664,
+          0.041666666666666664,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "p_one_sided": 0.001953125,
+      "identical_answer_fraction": 0.0,
+      "p_holm": 0.005859375
+    },
+    {
+      "setting": "bezout_k0",
+      "own_preference": {
+        "qwen": {
+          "mean": -0.09375,
+          "ci95": [
+            -0.125,
+            -0.0625
+          ],
+          "episode_values": [
+            -0.08333333333333333,
+            -0.08333333333333333,
+            -0.16666666666666666,
+            0.0,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            -0.25,
+            -0.08333333333333333,
+            0.0,
+            -0.16666666666666666,
+            0.0,
+            -0.08333333333333333,
+            -0.16666666666666666,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            -0.08333333333333333
+          ]
+        },
+        "gemma": {
+          "mean": -0.031249999999999997,
+          "ci95": [
+            -0.09375,
+            0.03125
+          ],
+          "episode_values": [
+            0.08333333333333333,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.25,
+            0.08333333333333333,
+            -0.3333333333333333,
+            -0.08333333333333333,
+            -0.08333333333333333,
+            0.08333333333333333,
+            -0.08333333333333333,
+            0.0,
+            -0.16666666666666666,
+            0.08333333333333333,
+            -0.16666666666666666,
+            -0.08333333333333333
+          ]
+        }
+      },
+      "own_minus_initial": {
+        "qwen": {
+          "mean": -0.026041666666666664,
+          "ci95": [
+            -0.08854166666666666,
+            0.04166666666666667
+          ],
+          "episode_values": [
+            -0.25,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            0.25,
+            0.25,
+            -0.08333333333333333,
+            -0.25,
+            0.0,
+            -0.16666666666666666,
+            -0.08333333333333333,
+            0.0,
+            0.0
+          ]
+        },
+        "gemma": {
+          "mean": -0.06250000000000001,
+          "ci95": [
+            -0.14583333333333331,
+            0.015625
+          ],
+          "episode_values": [
+            -0.08333333333333333,
+            -0.08333333333333333,
+            0.08333333333333333,
+            0.0,
+            0.25,
+            0.08333333333333333,
+            -0.25,
+            -0.08333333333333333,
+            -0.16666666666666666,
+            0.08333333333333333,
+            -0.08333333333333333,
+            0.08333333333333333,
+            0.0,
+            -0.08333333333333333,
+            -0.4166666666666667,
+            -0.3333333333333333
+          ]
+        }
+      },
+      "own_minus_teacher": {
+        "qwen": {
+          "mean": -0.03645833333333333,
+          "ci95": [
+            -0.06770833333333333,
+            -0.005208333333333333
+          ],
+          "episode_values": [
+            -0.16666666666666666,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            -0.08333333333333333,
+            0.0,
+            -0.16666666666666666,
+            0.08333333333333333
+          ]
+        },
+        "gemma": {
+          "mean": 0.03125,
+          "ci95": [
+            -0.015624999999999997,
+            0.078125
+          ],
+          "episode_values": [
+            0.08333333333333333,
+            0.0,
+            0.0,
+            0.08333333333333333,
+            0.25,
+            0.08333333333333333,
+            0.0,
+            0.08333333333333333,
+            -0.08333333333333333,
+            0.08333333333333333,
+            0.0,
+            0.0,
+            -0.08333333333333333,
+            0.16666666666666666,
+            -0.08333333333333333,
+            -0.08333333333333333
+          ]
+        }
+      },
+      "interaction_half": {
+        "mean": -0.0625,
+        "ci95": [
+          -0.10416666666666667,
+          -0.026041666666666664
+        ],
+        "episode_values": [
+          0.0,
+          -0.041666666666666664,
+          -0.08333333333333333,
+          -0.041666666666666664,
+          0.08333333333333333,
+          0.0,
+          -0.2916666666666667,
+          -0.08333333333333333,
+          -0.041666666666666664,
+          -0.041666666666666664,
+          -0.041666666666666664,
+          -0.041666666666666664,
+          -0.16666666666666666,
+          0.0,
+          -0.125,
+          -0.08333333333333333
+        ]
+      },
+      "p_one_sided": 0.9991455078125,
+      "identical_answer_fraction": 0.169921875,
+      "p_holm": 1.0
+    }
+  ],
+  "generation_quality": [
+    {
+      "setting": "factor_k0",
+      "source": "qwen",
+      "n": 512,
+      "valid": 86,
+      "accuracy": 0.16796875,
+      "mean_characters": 16.07421875,
+      "mean_completion_tokens": 17.07421875,
+      "strategies": {
+        "integer_array": 506,
+        "two_or_more_ones": 288,
+        "valid_one_one": 72,
+        "valid_no_ones": 14
+      }
+    },
+    {
+      "setting": "factor_k0",
+      "source": "gemma",
+      "n": 512,
+      "valid": 4,
+      "accuracy": 0.0078125,
+      "mean_characters": 355.48828125,
+      "mean_completion_tokens": 190.50390625,
+      "strategies": {
+        "malformed_json": 374,
+        "integer_array": 137,
+        "two_or_more_ones": 0,
+        "valid_one_one": 0,
+        "valid_no_ones": 4
+      }
+    },
+    {
+      "setting": "factor_k0",
+      "source": "teacher",
+      "n": 512,
+      "valid": 512,
+      "accuracy": 1.0,
+      "mean_characters": 14.685546875,
+      "mean_completion_tokens": null,
+      "strategies": {
+        "integer_array": 512,
+        "two_or_more_ones": 0,
+        "valid_one_one": 3,
+        "valid_no_ones": 509
+      }
+    },
+    {
+      "setting": "factor_k4",
+      "source": "qwen",
+      "n": 512,
+      "valid": 13,
+      "accuracy": 0.025390625,
+      "mean_characters": 17.900390625,
+      "mean_completion_tokens": 18.01171875,
+      "strategies": {
+        "integer_array": 507,
+        "two_or_more_ones": 12,
+        "valid_one_one": 8,
+        "valid_no_ones": 5,
+        "malformed_json": 3
+      }
+    },
+    {
+      "setting": "factor_k4",
+      "source": "gemma",
+      "n": 512,
+      "valid": 6,
+      "accuracy": 0.01171875,
+      "mean_characters": 44.109375,
+      "mean_completion_tokens": 36.080078125,
+      "strategies": {
+        "integer_array": 469,
+        "two_or_more_ones": 0,
+        "valid_one_one": 0,
+        "valid_no_ones": 6,
+        "malformed_json": 43
+      }
+    },
+    {
+      "setting": "factor_k4",
+      "source": "teacher",
+      "n": 512,
+      "valid": 512,
+      "accuracy": 1.0,
+      "mean_characters": 14.685546875,
+      "mean_completion_tokens": null,
+      "strategies": {
+        "integer_array": 512,
+        "two_or_more_ones": 0,
+        "valid_one_one": 3,
+        "valid_no_ones": 509
+      }
+    },
+    {
+      "setting": "bezout_k0",
+      "source": "qwen",
+      "n": 512,
+      "valid": 137,
+      "accuracy": 0.267578125,
+      "mean_characters": 7.044921875,
+      "mean_completion_tokens": 7.076171875,
+      "strategies": {
+        "integer_array": 512,
+        "first_coordinate_nonnegative": 420
+      }
+    },
+    {
+      "setting": "bezout_k0",
+      "source": "gemma",
+      "n": 512,
+      "valid": 359,
+      "accuracy": 0.701171875,
+      "mean_characters": 20.3125,
+      "mean_completion_tokens": 15.4296875,
+      "strategies": {
+        "integer_array": 483,
+        "first_coordinate_nonnegative": 341,
+        "malformed_json": 29
+      }
+    },
+    {
+      "setting": "bezout_k0",
+      "source": "teacher",
+      "n": 512,
+      "valid": 512,
+      "accuracy": 1.0,
+      "mean_characters": 7.0,
+      "mean_completion_tokens": null,
+      "strategies": {
+        "integer_array": 512,
+        "first_coordinate_nonnegative": 248
+      }
+    }
+  ],
+  "audit": {
+    "request_uses": 14592,
+    "unique_requests": 14400,
+    "providers": {
+      "DekaLLM": 7200
+    },
+    "cost_usd": 0.5848651799999981,
+    "tokens": {
+      "qwen|prompt": 7819247,
+      "qwen|completion": 109328,
+      "gemma|prompt": 7907343,
+      "gemma|completion": 334620
+    },
+    "statuses": {
+      "qwen|generation|ok": 1533,
+      "gemma|generation|truncated": 415,
+      "gemma|generation|ok": 1121,
+      "qwen|generation|truncated": 3,
+      "qwen|evaluation|ok": 5719,
+      "qwen|evaluation|truncated": 41,
+      "gemma|evaluation|truncated": 541,
+      "gemma|evaluation|ok": 5219
+    },
+    "prompt_reconstruction": "every full request exactly matched; only saved rehearsal answers differ across sources",
+    "context_overflow": 0
+  },
+  "format_sensitivity": "Descriptive last complete JSON array, final truncations still incorrect; primary scores unchanged."
+}

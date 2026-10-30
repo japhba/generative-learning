@@ -1,0 +1,17 @@
+Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72316800. The order of the integers does not matter.
+Answer: [972, 200, 372]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 59146008. The order of the integers does not matter.
+Answer: [339, 226, 772]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 225875454. The order of the integers does not matter.
+Answer: [382, 777, 761]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19171170. The order of the integers does not matter.
+Answer: [277, 769, 90]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8611528. The order of the integers does not matter.
+Answer:

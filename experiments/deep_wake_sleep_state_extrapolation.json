@@ -1,0 +1,82 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/state_extrapolation",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.001,
+    "batch": 128,
+    "sampled": false,
+    "budget": 65536,
+    "eval_points": 52,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "accuracy_stop": 0.03
+  },
+  "cases": [
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b12_g2_elbo_s9530"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b12_g2_elbo_s9531"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b12_g2_elbo_s9532"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b12_g2_sleep_s9530"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b12_g2_sleep_s9531"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b12_g2_sleep_s9532"
+    }
+  ],
+  "notes": "Prospective 4096-state extrapolation. Forecast saved before launch. Stop below KL .03; primary target .1; no refit before checking predictions."
+}

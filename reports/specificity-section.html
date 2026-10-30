@@ -1,0 +1,1538 @@
+<section id="specificity"><h2>Does each model benefit especially from its own examples?</h2><p class="lead"><strong>No tested setting shows both models preferring their own samples at N=32. The clearest benefit transfers from Qwen to Gemma.</strong></p><p>Qwen3.5-9B and Gemma 4 26B A4B each read both models’ saved answers, plus exact teacher answers, to the <strong>same rehearsal questions</strong>. Only those answer strings change across sources within a reader. No author labels, correctness feedback, filtering, or weight updates.</p><p><strong>Factorization:</strong> return three positive integers with the requested product; every prompt forbids two or more 1s. <strong>Bézout:</strong> given coprime a,b ∈ [3,19], return integers [x,y] with ax+by=1. K is the initial exact-example count.</p><table><thead><tr><th>Reader / setting</th><th>Initial only<br>N = 0</th><th>Qwen source<br>N = 32</th><th>Gemma source<br>N = 32</th><th>Teacher source<br>N = 32</th></tr></thead><tbody><tr><td>Factorization · K = 0<br>Qwen reads</td><td>4.7% <span class="small">(9/192)</span></td><td><strong>18.8% <span class="small">(36/192)</span></strong></td><td>3.6% <span class="small">(7/192)</span></td><td>2.6% <span class="small">(5/192)</span></td></tr><tr><td>Factorization · K = 0<br>Gemma reads</td><td>0.5% <span class="small">(1/192)</span></td><td>59.9% <span class="small">(115/192)</span></td><td><strong>0.5% <span class="small">(1/192)</span></strong></td><td>0.5% <span class="small">(1/192)</span></td></tr><tr><td>Factorization · K = 4<br>Qwen reads</td><td>4.2% <span class="small">(8/192)</span></td><td><strong>8.3% <span class="small">(16/192)</span></strong></td><td>0.5% <span class="small">(1/192)</span></td><td>3.6% <span class="small">(7/192)</span></td></tr><tr><td>Factorization · K = 4<br>Gemma reads</td><td>1.6% <span class="small">(3/192)</span></td><td>1.0% <span class="small">(2/192)</span></td><td><strong>1.0% <span class="small">(2/192)</span></strong></td><td>1.0% <span class="small">(2/192)</span></td></tr><tr><td>Bézout · K = 0<br>Qwen reads</td><td>27.6% <span class="small">(53/192)</span></td><td><strong>25.0% <span class="small">(48/192)</span></strong></td><td>34.4% <span class="small">(66/192)</span></td><td>28.6% <span class="small">(55/192)</span></td></tr><tr><td>Bézout · K = 0<br>Gemma reads</td><td>74.5% <span class="small">(143/192)</span></td><td>71.4% <span class="small">(137/192)</span></td><td><strong>68.2% <span class="small">(131/192)</span></strong></td><td>65.1% <span class="small">(125/192)</span></td></tr></tbody></table><p class="small">Fresh fixed cohort: 16 episodes × 12 tests per setting/reader. Bold marks own source. All 32 rehearsal slots, including truncated prefixes, are replayed. Thinking disabled; generation temperature 0.7, evaluation 0; 256-token output cap in both roles.</p><table><thead><tr><th>Own − other source<br>percentage points</th><th>Qwen reads</th><th>Gemma reads</th><th>Mean preference H</th><th>Holm p</th></tr></thead><tbody><tr><td>Factorization · K = 0</td><td>+15.1 [+3.1, +29.2]</td><td>-59.4 [-69.8, -50.0]</td><td>-22.1 [-29.2, -15.4]</td><td>1.000</td></tr><tr><td>Factorization · K = 4</td><td>+7.8 [+3.6, +12.5]</td><td>+0.0 [+0.0, +0.0]</td><td>+3.9 [+1.8, +6.2]</td><td>0.006</td></tr><tr><td>Bézout · K = 0</td><td>-9.4 [-12.5, -6.2]</td><td>-3.1 [-9.4, +3.1]</td><td>-6.2 [-10.4, -2.6]</td><td>1.000</td></tr></tbody></table><p class="small">Brackets: 95% paired episode-bootstrap intervals. H is half the reader × source interaction; a universal source main effect cancels. N=32 was fixed in advance; three tests are Holm-corrected. Sign-flip inference assumes symmetric episode contrasts. The positive H at K=4 comes entirely from Qwen: Gemma is near the floor and has no own-source preference.</p><p><strong>What transfers:</strong> 108/115 correct Gemma answers with Qwen rehearsal use one 1, which remains valid. <strong>Limit:</strong> Gemma often produces visible working despite the disabled reasoning channel; 150/192 initial-only factorization responses hit the 256-token cap. Source correctness, length and truncation are not matched.</p><p><strong>Mechanistic control:</strong> a separate toy has two equally correct generators and two restricted recognizers. One shared squared-error sleep update learns a native latent branch but averages conflicting branches from the other source. Giving both readers both features removes the asymptotic specificity. This illustrates the hypothesis; it does not identify the LLM mechanism.</p><details><summary>All learning curves, source diagnostics, and 10 rehearsal + 10 eval examples per setting</summary><p>Settings were selected from earlier results before this fresh cohort. They cover two task families. All N=0,2,8,32 are shown; no power-law exponent is fitted.</p><img src="task-search-specificity-preferences.png" alt="Own-source preferences for both readers"><h2>Factorization · K = 0</h2><div class="columns"><img src="task-search-specificity-factor_k0-matrix.png" alt="Reader by source accuracy matrix"><img src="task-search-specificity-factor_k0-curves.png" alt="Learning curves for both readers and all sources"></div><p>Own − initial: Qwen +14.1 [+1.6, +28.1]; Gemma +0.0 [+0.0, +0.0]. Own − teacher: Qwen +16.1 [+4.2, +30.2]; Gemma +0.0 [+0.0, +0.0]. Identical Qwen/Gemma rehearsal strings: 0.2%.</p><table><thead><tr><th>Rehearsal source</th><th>Correct / total</th><th>Mean characters</th><th>Format / strategy counts</th></tr></thead><tbody><tr><td>Qwen</td><td>86/512 (16.8%)</td><td>16.1</td><td>{&quot;integer_array&quot;: 506, &quot;two_or_more_ones&quot;: 288, &quot;valid_one_one&quot;: 72, &quot;valid_no_ones&quot;: 14}</td></tr><tr><td>Gemma</td><td>4/512 (0.8%)</td><td>355.5</td><td>{&quot;malformed_json&quot;: 374, &quot;integer_array&quot;: 137, &quot;two_or_more_ones&quot;: 0, &quot;valid_one_one&quot;: 0, &quot;valid_no_ones&quot;: 4}</td></tr><tr><td>Teacher</td><td>512/512 (100.0%)</td><td>14.7</td><td>{&quot;integer_array&quot;: 512, &quot;two_or_more_ones&quot;: 0, &quot;valid_one_one&quot;: 3, &quot;valid_no_ones&quot;: 509}</td></tr></tbody></table><p class="small">Validity and representation were checked only after inference. They never affected which samples the readers saw. Correctness and length are not matched between generated sources.</p><details><summary>First episode: first 10 rehearsals, complete saved text</summary><p>Original order; all 32 were replayed. Correctness annotations are for this report only.</p><table><thead><tr><th>Assigned question</th><th>Teacher</th><th>Qwen generation</th><th>Gemma generation</th></tr></thead><tbody><tr><td>Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[748, 563, 46]</pre><span class="small">Correct</span></td><td><pre>[1, 2, 9685852]</pre><span class="small">Correct</span></td><td><pre>To find three positive integers whose product is 19371704, we first perform the prime factorization of 19371704.
+
+1.  $19371704$ is even: $19371704 = 2 \times 9685852$
+2.  $9685852 = 2 \times 4842926$
+3.  $4842926 = 2 \times 2421463$
+4.  Now we check $2421463$ for primality or further factors. 
+    Testing small primes:
+    - $2421463 / 7 \approx 345923.28$
+    - $2421463 / 11 \approx 220133$ (Yes! $2421463 = 11 \times 220133$)
+5.  Check $220133$:
+    - $22013</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[338, 183, 302]</pre><span class="small">Correct</span></td><td><pre>[1, 1, 18679908]</pre><span class="small">Incorrect</span></td><td><pre>To find three positive integers whose product is 18,679,908, we first find the prime factorization of the number.
+
+1.  **Prime Factorization of 18,679,908:**
+    *   The number is even: $18,679,908 = 2 \times 9,339,954$
+    *   $9,339,954 = 2 \times 4,669,977$
+    *   Sum of digits of $4,669,977$ is $4+6+6+9+9+7+7 = 48$, which is divisible by 3.
+    *   $4,669,977 = 3 \times 1,556,659$
+    *   Sum of digits of $1,556,659$ is $1+5+5+6+6+5+9 = 37$ (not divisible by 3).
+    *   Check for other primes:
+        *   $1,5</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[648, 182, 782]</pre><span class="small">Correct</span></td><td><pre>[1, 1, 92225952]</pre><span class="small">Incorrect</span></td><td><pre>[342, 512, 525] (Wait, checking product: 342 * 512 * 525 = 92275200. Incorrect.)
+
+Let&#x27;s re-calculate:
+92225952 / 4 = 23056488
+23056488 / 4 = 5764122
+5764122 / 2 = 2882061
+2882061 / 3 = 960687
+960687 / 3 = 320229
+320229 / 3 = 106743
+106743 / 3 = 35581
+35581 is 187 * 191 (approx) or prime? 
+35581 / 7 = 5083
+5083 / 7 = 726.14
+35581 / 13 =</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[101, 821, 524]</pre><span class="small">Correct</span></td><td><pre>[2020, 2149, 101]</pre><span class="small">Incorrect</span></td><td><pre>To find three positive integers whose product is 43,450,604, we first find the prime factorization of the number.
+
+1.  **Divide by 2:** $43,450,604 / 2 = 21,725,302$
+2.  **Divide by 2 again:** $21,725,302 / 2 = 10,862,651$
+3.  **Check for other small primes:**
+    *   Sum of digits of $10,862,651$ is $1+0+8+6+2+6+5+1 = 29$ (not divisible by 3).
+    *   Ends in 1 (not divisible by 2 or 5).
+    *   $10,862,651 / 7 = 1,551,807.28...$ (No)
+    *   $10,862,651 / 11 = 987,513.72...$ (No)</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[865, 448, 358]</pre><span class="small">Correct</span></td><td><pre>[320, 215, 2011]</pre><span class="small">Incorrect</span></td><td><pre>[448, 532, 575]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[455, 898, 211]</pre><span class="small">Correct</span></td><td><pre>[1, 1, 86212490]</pre><span class="small">Incorrect</span></td><td><pre>To solve for three positive integers whose product is 86,212,490, we first perform prime factorization on the target number.
+
+1.  **Factorization of 86,212,490:**
+    *   The number ends in 0, so it is divisible by 10 ($2 \times 5$).
+    *   $86,212,490 / 10 = 8,621,249$.
+    *   We test for small primes for $8,621,249$.
+    *   Sum of digits: $8+6+2+1+2+4+9 = 32$ (not divisible by 3).
+    *   Testing 7: $8,621,249 / 7 = 1,231,607$.
+    *   Testing 7 again: $1,231,607 / 7 = 175,943.8...$ (no).
+    *   Testing 11: $1-2+3-1+6-0+</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[506, 747, 206]</pre><span class="small">Correct</span></td><td><pre>[1, 1, 77864292]</pre><span class="small">Incorrect</span></td><td><pre>[284, 276, 991]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[615, 70, 218]</pre><span class="small">Correct</span></td><td><pre>[1, 2, 4692450]</pre><span class="small">Correct</span></td><td><pre>[190, 210, 237]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[894, 993, 8]</pre><span class="small">Correct</span></td><td><pre>[1, 1, 7101936]</pre><span class="small">Incorrect</span></td><td><pre>[1728, 4116, 1]
+
+Wait, the instructions say &quot;At most one of the three integers may equal 1&quot;. My previous mental check was wrong. Let me re-calculate.
+
+7101936 / 1 = 7101936.
+7101936 = 2^12 * 3^6 * 7^2 (No, let&#x27;s factorize properly).
+7101936 / 2 = 3550968
+/ 2 = 1775484
+/ 2 = 887742
+/ 2 = 443871
+443871 / 3 = 147957
+/ 3 = 49319
+49319 / 7 = 7045.57 (No)
+Let&#x27;s try a different approach.
+7101936 = 18144 * 391.4... No.
+
+Let&#x27;s find factors of 71019</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[412, 884, 940]</pre><span class="small">Correct</span></td><td><pre>[128, 135, 19705]</pre><span class="small">Incorrect</span></td><td><pre>To solve the problem of finding three positive integers whose product is 342355520, we first perform a prime factorization of the number.
+
+1.  **Prime Factorization of 342355520:**
+    *   342355520 is even: $342355520 = 2 \times 171177760$
+    *   $171177760 = 2 \times 85588880$
+    *   $85588880 = 2 \times 42794440$
+    *   $42794440 = 2 \times 21397220$
+    *   $21397220 = 2 \times 10698610$
+    *   $10698610 = 2 \times 5349305$
+    *   $5349305$ ends in 5: $53</pre><span class="small">Incorrect · output limit reached</span></td></tr></tbody></table></details><details><summary>First episode: first 10 tests, all final responses side by side</summary><h2>Qwen reads</h2><table><thead><tr><th>Held-out question</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody><tr><td>Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 78379320]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 39189660]</pre><span class="small">Correct</span></td><td><pre>[120, 102, 6364]</pre><span class="small">Incorrect</span></td><td><pre>[130, 612, 1005]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 116798080. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 116798080]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 58399040]</pre><span class="small">Correct</span></td><td><pre>[140, 128, 6575]</pre><span class="small">Incorrect</span></td><td><pre>[146, 80, 10000]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 718680795. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 718680795]</pre><span class="small">Incorrect</span></td><td><pre>[1, 1, 718680795]</pre><span class="small">Incorrect</span></td><td><pre>[153, 1045, 4480]</pre><span class="small">Incorrect</span></td><td><pre>[153, 101, 46339]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 8625606. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 8625606]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 4312803]</pre><span class="small">Correct</span></td><td><pre>[14376, 601, 23]</pre><span class="small">Incorrect</span></td><td><pre>[143, 12, 499]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 16947504. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 16947504]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 8473752]</pre><span class="small">Correct</span></td><td><pre>[144, 1225, 98]</pre><span class="small">Incorrect</span></td><td><pre>[12, 107, 1294]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 211676475. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 211676475]</pre><span class="small">Incorrect</span></td><td><pre>[1, 1, 211676475]</pre><span class="small">Incorrect</span></td><td><pre>[15, 1075, 13050]</pre><span class="small">Incorrect</span></td><td><pre>[1341, 155, 1025]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 47030016. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 47030016]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 23515008]</pre><span class="small">Correct</span></td><td><pre>[128, 108, 3465]</pre><span class="small">Incorrect</span></td><td><pre>[128, 192, 1962]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 20479390. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 20479390]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 10239695]</pre><span class="small">Correct</span></td><td><pre>[10, 10239695, 1]</pre><span class="small">Incorrect</span></td><td><pre>[10, 13, 157571]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 15067312. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 15067312]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 7533656]</pre><span class="small">Correct</span></td><td><pre>[196, 288, 221]</pre><span class="small">Incorrect</span></td><td><pre>[194, 139, 530]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 497125158. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1, 1, 497125158]</pre><span class="small">Incorrect</span></td><td><pre>[1, 1, 497125158]</pre><span class="small">Incorrect</span></td><td><pre>[129, 1084, 3593]</pre><span class="small">Incorrect</span></td><td><pre>[1657, 103, 291]</pre><span class="small">Incorrect</span></td></tr></tbody></table><h2>Gemma reads</h2><table><thead><tr><th>Held-out question</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody><tr><td>Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 78,379,320, we first perform a prime factorization of the number.
+
+1.  **Prime Factorization of 78,379,320:**
+    *   $78,379,320 = 10 \times 7,837,932$
+    *   $7,837,932 = 2 \times 3,918,966$
+    *   $3,918,966 = 2 \times 1,959,483$
+    *   $1,959,483$ is divisible by 3 (sum of digits: $1+9+5+9+4+8+3 = 39$): $1,959,483 = 3 \times 653,161$
+    *   $653,161$ is divisible by 7: $653,161 = 7 \times 93,308.7...$ (</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[340, 350, 658]</pre><span class="small">Incorrect</span></td><td><pre>[340, 456, 501]</pre><span class="small">Incorrect</span></td><td><pre>[420, 434, 435]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 116798080. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[456, 512, 500]
+
+Wait, let me re-calculate.
+$456 \times 512 \times 500 = 116736000$ (Incorrect)
+
+Let&#x27;s find the prime factorization of $116798080$:
+$116798080 = 10 \times 11679808 = 10 \times 2 \times 5839904 = 20 \times 2 \times 2919952 = 40 \times 2 \times 1459976 = 80 \times 2 \times 729988 = 160 \times 2 \times 364994 = 320 \times 2 \times 182497 = 640 \times 182497$.
+$182497$ is not easily divisible. Let&#x27;s try another way.
+
+$116798080</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[320, 365, 1000]</pre><span class="small">Incorrect</span></td><td><pre>[440, 512, 515]</pre><span class="small">Incorrect</span></td><td><pre>[520, 464, 475]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 718680795. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 718680795, we first find the prime factorization of the number.
+
+1.  **Check for divisibility:**
+    *   The number ends in 5, so it is divisible by 5.
+    *   $718680795 / 5 = 143736159$
+    *   Sum of digits of $143736159$: $1+4+3+7+3+6+1+5+9 = 39$. Since 39 is divisible by 3, the number is divisible by 3.
+    *   $143736159 / 3 = 47912053$
+    *   Sum of digits of $47912053$: $4+7+9+1+2+0+5+3 = 31$. Not divisible by 3.
+    *   Check for other primes:
+        *   $47912053 / 7 = 6844579$</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[845, 849, 1001]</pre><span class="small">Incorrect</span></td><td><pre>[845, 883, 967]</pre><span class="small">Incorrect</span></td><td><pre>[845, 913, 931]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 8625606. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 8,625,606, we first find the prime factorization of the number.
+
+1.  **Check for divisibility:**
+    *   The number ends in 6, so it is even.
+    *   $8,625,606 / 2 = 4,312,803$
+    *   Sum of digits of $4,312,803$: $4+3+1+2+8+0+3 = 21$. Since 21 is divisible by 3, the number is divisible by 3.
+    *   $4,312,803 / 3 = 1,437,601$
+    *   Sum of digits of $1,437,601$: $1+4+3+7+6+0+1 = 22$. Not divisible by 3.
+    *   Check for other primes for $1,437,601$:
+        *   $1,437,601 / 7 = 205,</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[1, 2, 4312803]</pre><span class="small">Correct</span></td><td><pre>[186, 211, 214]</pre><span class="small">Incorrect</span></td><td><pre>[154, 211, 266]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 16947504. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[252, 252, 263]</pre><span class="small">Incorrect</span></td><td><pre>[1, 2, 8473752]</pre><span class="small">Correct</span></td><td><pre>[252, 256, 263]</pre><span class="small">Incorrect</span></td><td><pre>[252, 264, 253]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 211676475. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 211676475, we first find the prime factorization of the number.
+
+1.  **Check for divisibility by small primes:**
+    *   The number ends in 5, so it is divisible by 5.
+    *   $211676475 / 5 = 42335295$
+    *   $42335295 / 5 = 8467059$
+    *   Sum of digits of $8467059$: $8+4+6+7+0+5+9 = 39$. Since 39 is divisible by 3, the number is divisible by 3.
+    *   $8467059 / 3 = 2822353$
+    *   Sum of digits of $2822353$: $2+8+2+2+3+5+3 = 25$. Not divisible by 3.
+    *   Check for 7: $2822353 / 7</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[435, 455, 1073]</pre><span class="small">Incorrect</span></td><td><pre>[525, 585, 715]</pre><span class="small">Incorrect</span></td><td><pre>[525, 533, 753]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 47030016. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To solve the problem, we need to find three positive integers whose product is 47,030,016.
+
+1.  **Factorize the target number:**
+    $47,030,016$
+    It is even: $47,030,016 = 2 \times 23,515,008$
+    $23,515,008 = 2 \times 11,757,504$
+    $11,757,504 = 2 \times 5,878,752$
+    $5,878,752 = 2 \times 2,939,376$
+    $2,939,376 = 2 \times 1,469,688$
+    $1,469,688 = 2 \times 734,844$
+    $734,844 = 2 \times 367,422$
+    $36</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[1, 2, 23515008]</pre><span class="small">Correct</span></td><td><pre>[336, 364, 378]</pre><span class="small">Incorrect</span></td><td><pre>[312, 384, 394]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 20479390. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 20479390, we first perform the prime factorization of the number.
+
+1.  **Check for divisibility by small primes:**
+    *   The number ends in 0, so it is divisible by 10 (2 and 5).
+    *   $20479390 = 10 \times 2047939 = 2 \times 5 \times 2047939$.
+
+2.  **Factorize 2047939:**
+    *   Check for divisibility by 3: $2+0+4+7+9+3+9 = 34$ (not divisible by 3).
+    *   Check for divisibility by 7: $2047939 / 7 = 292562.7...$ (no).
+    *   Check for divisibility by 11: $2-0+4-7+9-3+9 = 14$ (no).
+    *   Check for divisibility by 13: $2047</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[1, 10, 2047939]</pre><span class="small">Correct</span></td><td><pre>[230, 283, 310]</pre><span class="small">Incorrect</span></td><td><pre>[230, 310, 291]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 15067312. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 15067312, we first find the prime factorization of the number.
+
+1.  $15067312$ is even.
+    $15067312 = 2 \times 7533656$
+    $7533656 = 2 \times 3766828$
+    $3766828 = 2 \times 1883414$
+    $1883414 = 2 \times 941707$
+
+2.  Now we check $941707$ for primality or further factors.
+    Sum of digits: $9+4+1+7+0+7 = 28$ (not divisible by 3).
+    Ends in 7 (not divisible by 2 or 5).
+    $941707 / 7 = 134529.57...$
+    $941707 / 11 = 85609.7</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[1, 2, 7533656]</pre><span class="small">Correct</span></td><td><pre>[232, 256, 257]</pre><span class="small">Incorrect</span></td><td><pre>[232, 256, 254]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 497125158. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>To find three positive integers whose product is 497125158, we first perform the prime factorization of the number.
+
+1.  **Check for divisibility by small primes:**
+    *   The number ends in 8, so it is divisible by 2.
+    *   $497125158 / 2 = 248562579$
+    *   Sum of digits of $248562579$: $2+4+8+5+6+2+5+7+9 = 48$. Since 48 is divisible by 3, the number is divisible by 3.
+    *   $248562579 / 3 = 82854193$
+    *   Sum of digits of $82854193$: $8+2+8+5+4+1+9+3 = 40$. Not divisible by 3.
+    *   Check for 7: $82854193 / 7 = 11836313.2</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[1, 2, 248562579]</pre><span class="small">Correct</span></td><td><pre>[634, 741, 1067]</pre><span class="small">Incorrect</span></td><td><pre>[634, 823, 963]</pre><span class="small">Incorrect</span></td></tr></tbody></table></details><details><summary>Exact generation and final prompt bodies</summary><p>Both readers receive these same user-message bodies. Provider chat templates and tokenization differ. Generation is a separate offline call with no additional examples.</p><details><summary>Offline generation prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k0-generation-prompt.txt">Full generation prompt text</a></p><details><summary>Qwen final prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 2, 9685852]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 18679908]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 92225952]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [2020, 2149, 101]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [320, 215, 2011]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 86212490]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 77864292]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 2, 4692450]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 7101936]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [128, 135, 19705]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68671602. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 68671602]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 192615984. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 192615984]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 144665040. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 144665040]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41749840. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 83, 503016]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166127250. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 166127250]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 343414512. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [12247, 279, 461]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 543942784. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [543942784, 1, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 14454990. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 14454990]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166163102. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 166163102]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 359052540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 359052540]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 514278744. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 514278744]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 36107568. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 2, 36107568]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 24737650. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 24737650]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 22465296. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [22465296, 1, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186095934. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 186095934]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68221398. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 2, 34110699]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4121208. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 2, 2060604]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186822272. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 2, 93411136]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 52398675. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [5, 15, 698649]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 290485. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 290485]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 440861408. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 440861408]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92857072. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 1, 92857072]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k0-qwen-prompt.txt">Full qwen prompt text</a></p><details><summary>Gemma final prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 19371704, we first perform the prime factorization of 19371704.
+
+1.  $19371704$ is even: $19371704 = 2 \times 9685852$
+2.  $9685852 = 2 \times 4842926$
+3.  $4842926 = 2 \times 2421463$
+4.  Now we check $2421463$ for primality or further factors. 
+    Testing small primes:
+    - $2421463 / 7 \approx 345923.28$
+    - $2421463 / 11 \approx 220133$ (Yes! $2421463 = 11 \times 220133$)
+5.  Check $220133$:
+    - $22013
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 18,679,908, we first find the prime factorization of the number.
+
+1.  **Prime Factorization of 18,679,908:**
+    *   The number is even: $18,679,908 = 2 \times 9,339,954$
+    *   $9,339,954 = 2 \times 4,669,977$
+    *   Sum of digits of $4,669,977$ is $4+6+6+9+9+7+7 = 48$, which is divisible by 3.
+    *   $4,669,977 = 3 \times 1,556,659$
+    *   Sum of digits of $1,556,659$ is $1+5+5+6+6+5+9 = 37$ (not divisible by 3).
+    *   Check for other primes:
+        *   $1,5
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [342, 512, 525] (Wait, checking product: 342 * 512 * 525 = 92275200. Incorrect.)
+
+Let&#x27;s re-calculate:
+92225952 / 4 = 23056488
+23056488 / 4 = 5764122
+5764122 / 2 = 2882061
+2882061 / 3 = 960687
+960687 / 3 = 320229
+320229 / 3 = 106743
+106743 / 3 = 35581
+35581 is 187 * 191 (approx) or prime? 
+35581 / 7 = 5083
+5083 / 7 = 726.14
+35581 / 13 =
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 43,450,604, we first find the prime factorization of the number.
+
+1.  **Divide by 2:** $43,450,604 / 2 = 21,725,302$
+2.  **Divide by 2 again:** $21,725,302 / 2 = 10,862,651$
+3.  **Check for other small primes:**
+    *   Sum of digits of $10,862,651$ is $1+0+8+6+2+6+5+1 = 29$ (not divisible by 3).
+    *   Ends in 1 (not divisible by 2 or 5).
+    *   $10,862,651 / 7 = 1,551,807.28...$ (No)
+    *   $10,862,651 / 11 = 987,513.72...$ (No)
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [448, 532, 575]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To solve for three positive integers whose product is 86,212,490, we first perform prime factorization on the target number.
+
+1.  **Factorization of 86,212,490:**
+    *   The number ends in 0, so it is divisible by 10 ($2 \times 5$).
+    *   $86,212,490 / 10 = 8,621,249$.
+    *   We test for small primes for $8,621,249$.
+    *   Sum of digits: $8+6+2+1+2+4+9 = 32$ (not divisible by 3).
+    *   Testing 7: $8,621,249 / 7 = 1,231,607$.
+    *   Testing 7 again: $1,231,607 / 7 = 175,943.8...$ (no).
+    *   Testing 11: $1-2+3-1+6-0+
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [284, 276, 991]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [190, 210, 237]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1728, 4116, 1]
+
+Wait, the instructions say &quot;At most one of the three integers may equal 1&quot;. My previous mental check was wrong. Let me re-calculate.
+
+7101936 / 1 = 7101936.
+7101936 = 2^12 * 3^6 * 7^2 (No, let&#x27;s factorize properly).
+7101936 / 2 = 3550968
+/ 2 = 1775484
+/ 2 = 887742
+/ 2 = 443871
+443871 / 3 = 147957
+/ 3 = 49319
+49319 / 7 = 7045.57 (No)
+Let&#x27;s try a different approach.
+7101936 = 18144 * 391.4... No.
+
+Let&#x27;s find factors of 71019
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To solve the problem of finding three positive integers whose product is 342355520, we first perform a prime factorization of the number.
+
+1.  **Prime Factorization of 342355520:**
+    *   342355520 is even: $342355520 = 2 \times 171177760$
+    *   $171177760 = 2 \times 85588880$
+    *   $85588880 = 2 \times 42794440$
+    *   $42794440 = 2 \times 21397220$
+    *   $21397220 = 2 \times 10698610$
+    *   $10698610 = 2 \times 5349305$
+    *   $5349305$ ends in 5: $53
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68671602. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 68671602, we first perform a prime factorization of the number.
+
+1.  **Check for divisibility:**
+    *   The number ends in 2, so it is divisible by 2.
+    *   $68671602 / 2 = 34335801$
+    *   Sum of digits of $34335801$: $3+4+3+3+5+8+0+1 = 27$. Since 27 is divisible by 9, the number is divisible by 9.
+    *   $34335801 / 9 = 3815089$
+    *   Check $3815089$ for small primes:
+        *   Not divisible by 2, 3, or 5.
+        *   $3815089 / 7 = 545012.7...$ (No)
+        *   $3815089 / 11 = 346826
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 192615984. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 192,615,984, we first look at the prime factorization of the number.
+
+1.  **Prime Factorization of 192,615,984:**
+    *   $192,615,984$ is even.
+    *   $192,615,984 / 2 = 96,307,992$
+    *   $96,307,992 / 2 = 48,153,996$
+    *   $48,153,996 / 2 = 24,076,998$
+    *   $24,076,998 / 2 = 12,038,499$
+    *   $12,038,499$ is divisible by 3 (sum of digits: $1+2+0+3+8+4+9+9 = 36$).
+    *   $12,03
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 144665040. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 144665040, we first find the prime factorization of the number.
+
+1.  $144665040 = 10 \times 14466504 = 2 \times 5 \times 14466504$
+2.  $14466504 / 8 = 1808313$
+3.  $1808313 / 3 = 602771$
+4.  $602771 / 7 = 86110.14$ (No)
+5.  Checking $602771$ for prime factors: $602771 / 11 = 54797.36$, $602771 / 13 = 46367$, $46367 / 13 = 3566.69$, $46367 / 17 = 2727.47$, $46
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41749840. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 41749840, we first find the prime factorization of the number.
+
+1.  **Factorize 41749840:**
+    *   $41749840 = 10 \times 4174984$
+    *   $4174984 = 2 \times 2087492$
+    *   $2087492 = 2 \times 1043746$
+    *   $1043746 = 2 \times 521873$
+    *   Check for small primes for $521873$:
+        *   It is not divisible by 3 (sum of digits $5+2+1+8+7+3 = 26$).
+        *   It is not divisible by 7 ($521873 = 7 \times 74553 + 2$).
+        *   It is not divisible by 11 ($5-2+1-8+7-3
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166127250. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [325, 714, 715] (Wait, let me recalculate a valid set)
+
+Let&#x27;s find the prime factorization of 166127250:
+166127250 = 10 * 16612725
+= 2 * 5 * 5 * 3322545
+= 2 * 5 * 5 * 5 * 664509
+= 2 * 5^3 * 3 * 221503
+= 2 * 5^3 * 3 * 7 * 31643.28 (No)
+
+Let&#x27;s try: 166127250 / 500 = 332254.5 (No)
+Let&#x27;s try: 166127250 / 450 = 369171.66 (No)
+
+Correct factorization:
+166127250 = 2 * 3^2 * 5^3 *
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 343414512. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 343414512, we first find the prime factorization of the number.
+
+1.  **Divide by 2:**
+    343414512 / 2 = 171707256
+    171707256 / 2 = 85853628
+    85853628 / 2 = 42926814
+    42926814 / 2 = 21463407
+    (Number of 2s: 4)
+
+2.  **Divide by 3:**
+    21463407 / 3 = 7154469
+    7154469 / 3 = 2384823
+    2384823 / 3 = 794941
+    (Number of 3s: 3)
+
+3.  **Check other primes for 794941:**
+    794941
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 543942784. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To solve the problem, we need to find three positive integers whose product is 543942784.
+
+First, let&#x27;s find the prime factorization of 543942784:
+543942784 is even.
+543942784 / 2 = 271971392
+271971392 / 2 = 135985696
+135985696 / 2 = 67992848
+67992848 / 2 = 33996424
+33996424 / 2 = 16998212
+16998212 / 2 = 8499106
+8499106 / 2 = 4249553
+
+Now we check 4249553 for factors.
+Is it divisible by 3? 4+2+4+9+5+5+3 =
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 14454990. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 14454990, we first perform the prime factorization of the number.
+
+1.  **Prime Factorization of 14454990:**
+    *   $14454990 = 10 \times 1445499$
+    *   $14454990 = 2 \times 5 \times 1445499$
+    *   Sum of digits of $1445499$ is $1+4+4+5+4+9+9 = 36$, which is divisible by 9.
+    *   $1445499 / 9 = 160611$
+    *   Sum of digits of $160611$ is $1+6+0+6+1+1 = 15$, which is divisible by 3.
+    *   $160611 / 3 = 53537$
+    *   Checking for prime factors of $53537$:
+        *
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166163102. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 166163102, we first perform the prime factorization of the number.
+
+1.  **Check for divisibility:**
+    *   The number ends in 2, so it is divisible by 2: $166163102 = 2 \times 83081551$.
+    *   Sum of digits of 83081551: $8+3+0+8+1+5+5+1 = 31$ (not divisible by 3).
+    *   Check for small primes:
+        *   $83081551 / 7 = 11868793$
+        *   $11868793 / 7 = 1695541.8...$ (no)
+        *   $11868793 / 11 = 1078981.1...$ (no)
+        *   $11868793 / 13 = 912984.
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 359052540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To solve the problem, we need to find three positive integers whose product is 359,052,540.
+
+1. **Prime Factorization of 359,052,540:**
+   - The number ends in 0, so it&#x27;s divisible by 10 (2 × 5).
+   - $359,052,540 / 10 = 35,905,254$
+   - $35,905,254$ is even: $35,905,254 / 2 = 17,952,627$
+   - Sum of digits of $17,952,627$: $1+7+9+5+2+6+2+7 = 39$. Since 39 is divisible by 3, the number is divisible by 3.
+   - $17,952,627 / 3 = 5,984,209$
+   - Check for further prime factors of $5,984,20
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 514278744. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [784, 823, 811]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 36107568. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [256, 351, 402]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 24737650. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 24737650, we first perform the prime factorization of the number.
+
+1.  $24737650$ ends in $0$, so it is divisible by $10$ ($2 \times 5$).
+    $24737650 = 10 \times 2473765 = 2 \times 5 \times 2473765$
+2.  $2473765$ ends in $5$, so it is divisible by $5$.
+    $2473765 = 5 \times 494753$
+3.  Now we check $494753$ for divisibility.
+    Sum of digits: $4+9+4+7+5+3 = 32$ (not divisible by 3).
+    Testing primes:
+    $494753 / 7 = 70679$
+    $70679 / 7 = 10097$
+    $10097
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 22465296. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To solve the problem of finding three positive integers whose product is 22465296, we first find the prime factorization of the number.
+
+1.  **Prime Factorization of 22465296:**
+    *   $22465296$ is even.
+    *   $22465296 / 2 = 11232648$
+    *   $11232648 / 2 = 5616324$
+    *   $5616324 / 2 = 2808162$
+    *   $2808162 / 2 = 1404081$
+    *   $1404081$ is divisible by $3$ (sum of digits $1+4+0+4+0+8+1 = 18$).
+    *   $1404081 / 3 = 468027$
+    *   $468027 / 3 = 156
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186095934. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 186095934, we first find the prime factorization of the number.
+
+1.  Check for small primes:
+    *   Ends in 4, so it&#x27;s even: $186095934 = 2 \times 93047967$
+    *   Sum of digits of 93047967: $9+3+0+4+7+9+6+7 = 45$. Since 45 is divisible by 9, the number is divisible by 9.
+    *   $93047967 / 9 = 10338663$
+    *   Sum of digits of 10338663: $1+0+3+3+8+6+6+3 = 30$. Divisible by 3.
+    *   $10338663 / 3 = 3446221$
+    *   Check $3446221$ for small primes:
+        *   Not
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68221398. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 68,221,398, we first perform the prime factorization of the number.
+
+1.  **Check for divisibility by small primes:**
+    *   The number ends in 8, so it is divisible by 2: $68,221,398 = 2 \times 34,110,699$.
+    *   Sum of digits of $34,110,699$ is $3+4+1+1+0+6+9+9 = 33$. Since 33 is divisible by 3, the number is divisible by 3: $34,110,699 = 3 \times 11,370,233$.
+    *   Sum of digits of $11,370,233$ is $1+1+3+7+0+2+3+3 = 20$. Not divisible by 3.
+    *   Check for 7: $11,370,233 / 7 = 1,624
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4121208. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 4,121,208, we first find the prime factorization of the number.
+
+1.  **Factorize 4,121,208:**
+    *   $4,121,208$ is even: $4,121,208 = 2 \times 2,060,604$
+    *   $2,060,604 = 2 \times 1,030,302$
+    *   $1,030,302 = 2 \times 515,151$
+    *   $515,151$ is divisible by 3 (sum of digits $5+1+5+1+5+1 = 18$): $515,151 = 3 \times 171,717$
+    *   $171,717 = 3 \times 57,239$
+    *   Check $57,239$ for divisibility:
+        *
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186822272. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [376, 584, 857]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 52398675. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 52398675, we first find the prime factorization of the number.
+
+1.  **Check for divisibility by small primes:**
+    *   The number ends in 5, so it is divisible by 5.
+    *   $52398675 / 5 = 10479735$
+    *   $10479735 / 5 = 2095947$
+    *   Sum of digits of $2095947$: $2+0+9+5+9+4+7 = 36$. Since 36 is divisible by 9, the number is divisible by 9.
+    *   $2095947 / 9 = 232883$
+    *   Now we test $232883$ for prime factors.
+    *   $\sqrt{232883} \approx 482.5$
+    *   Testing primes: 7 (No), 11 (No), 13 (No
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 290485. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 290485, we first find the prime factorization of 290485.
+
+1.  **Check for small prime factors:**
+    *   Ends in 5, so it is divisible by 5: $290485 / 5 = 58097$.
+2.  **Factorize 58097:**
+    *   Sum of digits: $5+8+0+9+7 = 29$ (not divisible by 3).
+    *   Check 7: $58097 / 7 = 8299.57...$ (no).
+    *   Check 11: $5-8+0-9+7 = -5$ (no).
+    *   Check 13: $58097 / 13 = 4469$.
+3.  **Factorize 4469:**
+    *   Check 13: $4469 / 13 = 343.76...$ (no).
+    *   Check 17
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 440861408. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [584, 792, 963]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92857072. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: To find three positive integers whose product is 92857072, we first perform the prime factorization of the number.
+
+1.  $92857072$ is even.
+    $92857072 / 2 = 46428536$
+    $46428536 / 2 = 23214268$
+    $23214268 / 2 = 11607134$
+    $11607134 / 2 = 5803567$
+
+2.  Now we factor $5803567$.
+    Testing small primes:
+    $5803567 / 7 = 829081$
+    $829081 / 7 = 118440.14...$ (No)
+    $829081 / 11 = 75371$
+    $75371 / 11 = 6851.
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k0-gemma-prompt.txt">Full gemma prompt text</a></p><details><summary>Teacher final prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [748, 563, 46]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [338, 183, 302]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [648, 182, 782]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [101, 821, 524]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [865, 448, 358]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [455, 898, 211]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [506, 747, 206]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [615, 70, 218]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [894, 993, 8]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [412, 884, 940]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68671602. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [289, 387, 614]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 192615984. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [272, 759, 933]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 144665040. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [233, 796, 780]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41749840. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [220, 454, 418]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166127250. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [617, 718, 375]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 343414512. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [756, 817, 556]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 543942784. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [916, 964, 616]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 14454990. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [990, 31, 471]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166163102. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [829, 721, 278]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 359052540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [759, 763, 620]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 514278744. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [788, 758, 861]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 36107568. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [48, 951, 791]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 24737650. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [70, 805, 439]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 22465296. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [621, 68, 532]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186095934. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [298, 909, 687]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68221398. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [609, 709, 158]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4121208. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [51, 156, 518]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186822272. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [688, 373, 728]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 52398675. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [525, 969, 103]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 290485. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [109, 5, 533]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 440861408. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [884, 772, 646]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92857072. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [638, 184, 791]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k0-teacher-prompt.txt">Full teacher prompt text</a></p></details><h2>Factorization · K = 4</h2><div class="columns"><img src="task-search-specificity-factor_k4-matrix.png" alt="Reader by source accuracy matrix"><img src="task-search-specificity-factor_k4-curves.png" alt="Learning curves for both readers and all sources"></div><p>Own − initial: Qwen +4.2 [-1.0, +9.9]; Gemma -0.5 [-2.1, +1.0]. Own − teacher: Qwen +4.7 [+1.0, +8.3]; Gemma +0.0 [-1.6, +1.6]. Identical Qwen/Gemma rehearsal strings: 0.0%.</p><table><thead><tr><th>Rehearsal source</th><th>Correct / total</th><th>Mean characters</th><th>Format / strategy counts</th></tr></thead><tbody><tr><td>Qwen</td><td>13/512 (2.5%)</td><td>17.9</td><td>{&quot;integer_array&quot;: 507, &quot;two_or_more_ones&quot;: 12, &quot;valid_one_one&quot;: 8, &quot;valid_no_ones&quot;: 5, &quot;malformed_json&quot;: 3}</td></tr><tr><td>Gemma</td><td>6/512 (1.2%)</td><td>44.1</td><td>{&quot;integer_array&quot;: 469, &quot;two_or_more_ones&quot;: 0, &quot;valid_one_one&quot;: 0, &quot;valid_no_ones&quot;: 6, &quot;malformed_json&quot;: 43}</td></tr><tr><td>Teacher</td><td>512/512 (100.0%)</td><td>14.7</td><td>{&quot;integer_array&quot;: 512, &quot;two_or_more_ones&quot;: 0, &quot;valid_one_one&quot;: 3, &quot;valid_no_ones&quot;: 509}</td></tr></tbody></table><p class="small">Validity and representation were checked only after inference. They never affected which samples the readers saw. Correctness and length are not matched between generated sources.</p><details><summary>First episode: first 10 rehearsals, complete saved text</summary><p>Original order; all 32 were replayed. Correctness annotations are for this report only.</p><table><thead><tr><th>Assigned question</th><th>Teacher</th><th>Qwen generation</th><th>Gemma generation</th></tr></thead><tbody><tr><td>Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[748, 563, 46]</pre><span class="small">Correct</span></td><td><pre>[1148, 136, 103]</pre><span class="small">Incorrect</span></td><td><pre>[248, 271, 286]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[338, 183, 302]</pre><span class="small">Correct</span></td><td><pre>[12453, 12, 124]</pre><span class="small">Incorrect</span></td><td><pre>[258, 267, 273]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[648, 182, 782]</pre><span class="small">Correct</span></td><td><pre>[48, 102, 19027]</pre><span class="small">Incorrect</span></td><td><pre>[432, 432, 494]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[101, 821, 524]</pre><span class="small">Correct</span></td><td><pre>[43450, 607, 1]</pre><span class="small">Incorrect</span></td><td><pre>[322, 341, 397]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[865, 448, 358]</pre><span class="small">Correct</span></td><td><pre>[288, 343, 1735]</pre><span class="small">Incorrect</span></td><td><pre>[520, 532, 500] (Wait, checking product: 520 * 532 * 500 = 138320000. Incorrect.)
+
+Let&#x27;s re-calculate:
+138732160 / 10 = 13873216
+13873216 / 2 = 6936608
+6936608 / 2 = 3468304
+3468304 / 2 = 1734152
+1734152 / 2 = 867076
+867076 / 2 = 433538
+433538 / 2 = 216769
+
+Prime factorization of 138732160:
+138732160 = 2^6 * 5 * 433538 (No, 433538 is 2 * 216</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[455, 898, 211]</pre><span class="small">Correct</span></td><td><pre>[2, 11, 392715]</pre><span class="small">Incorrect</span></td><td><pre>[410, 437, 487]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[506, 747, 206]</pre><span class="small">Correct</span></td><td><pre>[12, 11, 588251]</pre><span class="small">Incorrect</span></td><td><pre>[414, 421, 451]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[615, 70, 218]</pre><span class="small">Correct</span></td><td><pre>[30, 131, 2380]</pre><span class="small">Incorrect</span></td><td><pre>[210, 210, 212] (Wait, checking product: 210 * 210 * 212 = 9364200. Incorrect.)
+
+Let&#x27;s re-factor 9384900:
+9384900 = 93849 * 100
+93849 = 3 * 31283
+31283 = 13 * 2406.38 (No)
+9384900 / 100 = 93849
+93849 / 9 = 10427.66 (No)
+93849 / 3 = 31283
+31283 / 7 = 4469
+4469 / 7 = 638.4
+4469 / 13 = 343.7
+4469 / 17 = 262.8
+4469 / 19 = 235.</pre><span class="small">Incorrect · output limit reached</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[894, 993, 8]</pre><span class="small">Correct</span></td><td><pre>[28, 36, 7029]</pre><span class="small">Incorrect</span></td><td><pre>[184, 192, 202]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[412, 884, 940]</pre><span class="small">Correct</span></td><td><pre>[208, 320, 5125]</pre><span class="small">Incorrect</span></td><td><pre>[720, 682, 694]</pre><span class="small">Incorrect</span></td></tr></tbody></table></details><details><summary>First episode: first 10 tests, all final responses side by side</summary><h2>Qwen reads</h2><table><thead><tr><th>Held-out question</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody><tr><td>Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1306, 156, 390]</pre><span class="small">Incorrect</span></td><td><pre>[120, 137, 4775]</pre><span class="small">Incorrect</span></td><td><pre>[390, 418, 465]</pre><span class="small">Incorrect</span></td><td><pre>[120, 109, 5995]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 116798080. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1460, 80, 1000]</pre><span class="small">Incorrect</span></td><td><pre>[128, 145, 6350]</pre><span class="small">Incorrect</span></td><td><pre>[160, 448, 1615]</pre><span class="small">Incorrect</span></td><td><pre>[146, 80, 1000]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 718680795. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[123, 145, 39415]</pre><span class="small">Incorrect</span></td><td><pre>[123, 157, 37455]</pre><span class="small">Incorrect</span></td><td><pre>[153, 179, 27500]</pre><span class="small">Incorrect</span></td><td><pre>[153, 101, 46150]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 8625606. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1437, 120, 49]</pre><span class="small">Incorrect</span></td><td><pre>[12, 13, 54653]</pre><span class="small">Incorrect</span></td><td><pre>[123, 137, 526]</pre><span class="small">Incorrect</span></td><td><pre>[143, 124, 492]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 16947504. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[126, 143, 952]</pre><span class="small">Incorrect</span></td><td><pre>[12, 14, 100351]</pre><span class="small">Incorrect</span></td><td><pre>[126, 138, 952]</pre><span class="small">Incorrect</span></td><td><pre>[12, 107, 1294]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 211676475. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[15, 127, 109351]</pre><span class="small">Incorrect</span></td><td><pre>[125, 270, 6314]</pre><span class="small">Incorrect</span></td><td><pre>[1575, 1350, 97]</pre><span class="small">Incorrect</span></td><td><pre>[1575, 134, 990]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 47030016. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[128, 135, 2721]</pre><span class="small">Incorrect</span></td><td><pre>[128, 195, 1923]</pre><span class="small">Incorrect</span></td><td><pre>[240, 272, 723]</pre><span class="small">Incorrect</span></td><td><pre>[128, 189, 1980]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 20479390. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1463, 11, 1263]</pre><span class="small">Incorrect</span></td><td><pre>[10, 13, 157534]</pre><span class="small">Incorrect</span></td><td><pre>[205, 229, 442]</pre><span class="small">Incorrect</span></td><td><pre>[10, 13, 157571]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 15067312. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[122, 193, 631]</pre><span class="small">Incorrect</span></td><td><pre>[124, 137, 891]</pre><span class="small">Incorrect</span></td><td><pre>[1001, 1001, 15]</pre><span class="small">Incorrect</span></td><td><pre>[193, 277, 236]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 497125158. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[1523, 187, 1711]</pre><span class="small">Incorrect</span></td><td><pre>[123, 154, 26512]</pre><span class="small">Incorrect</span></td><td><pre>[231, 341, 634]</pre><span class="small">Incorrect</span></td><td><pre>[1657, 103, 2916]</pre><span class="small">Incorrect</span></td></tr></tbody></table><h2>Gemma reads</h2><table><thead><tr><th>Held-out question</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody><tr><td>Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[420, 434, 431]</pre><span class="small">Incorrect</span></td><td><pre>[340, 453, 508]</pre><span class="small">Incorrect</span></td><td><pre>[410, 420, 457]</pre><span class="small">Incorrect</span></td><td><pre>[420, 434, 431]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 116798080. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[520, 448, 503]</pre><span class="small">Incorrect</span></td><td><pre>[320, 341, 1067]</pre><span class="small">Incorrect</span></td><td><pre>[480, 492, 495] (Wait, checking product: 480 * 492 * 495 = 117,448,800. Incorrect.)
+
+Let&#x27;s re-factor 116798080:
+116798080 / 10 = 11679808
+11679808 / 16 = 729988
+729988 / 4 = 182497
+182497 / 431 = 423.4... (No)
+
+Let&#x27;s try:
+116798080 / 480 = 243329.33 (No)
+116798080 / 500 = 233596.16 (No)
+116798080 / 460 = 253908.8 (No)
+
+Let&#x27;s try dividing by 4</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[440, 520, 511]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 718680795. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[841, 853, 1001]</pre><span class="small">Incorrect</span></td><td><pre>[843, 851, 1001]</pre><span class="small">Incorrect</span></td><td><pre>[835, 897, 963]</pre><span class="small">Incorrect</span></td><td><pre>[843, 893, 955]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 8625606. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[211, 181, 223]</pre><span class="small">Incorrect</span></td><td><pre>[134, 157, 406]</pre><span class="small">Incorrect</span></td><td><pre>[194, 206, 214]</pre><span class="small">Incorrect</span></td><td><pre>[154, 211, 266]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 16947504. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[252, 264, 254]</pre><span class="small">Incorrect</span></td><td><pre>[252, 256, 263]</pre><span class="small">Incorrect</span></td><td><pre>[252, 256, 264]</pre><span class="small">Incorrect</span></td><td><pre>[252, 264, 253]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 211676475. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[435, 525, 923]</pre><span class="small">Incorrect</span></td><td><pre>[435, 485, 1005]</pre><span class="small">Incorrect</span></td><td><pre>[545, 585, 667]</pre><span class="small">Incorrect</span></td><td><pre>[545, 585, 675]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 47030016. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[324, 378, 384]</pre><span class="small">Incorrect</span></td><td><pre>[216, 342, 641]</pre><span class="small">Incorrect</span></td><td><pre>[352, 364, 366]</pre><span class="small">Incorrect</span></td><td><pre>[312, 384, 393]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 20479390. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[230, 283, 311]</pre><span class="small">Incorrect</span></td><td><pre>[130, 313, 500]</pre><span class="small">Incorrect</span></td><td><pre>[230, 283, 310]</pre><span class="small">Incorrect</span></td><td><pre>[230, 293, 302]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 15067312. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[256, 232, 257]</pre><span class="small">Incorrect</span></td><td><pre>[128, 232, 508]</pre><span class="small">Incorrect</span></td><td><pre>[242, 248, 250] (Wait, checking product: 242 * 248 * 250 = 15004000. Incorrect.)
+
+Let&#x27;s re-factor 15067312:
+15067312 / 2 = 7533656
+7533656 / 2 = 3766828
+3766828 / 2 = 1883414
+1883414 / 2 = 941707
+941707 / 241 = 3907.5 (No)
+941707 / 247 = 3812.5 (No)
+941707 / 251 = 3751.8 (No)
+941707 / 257 = 3664.2 (No)
+941707 / 239 = 3940.</pre><span class="small">Incorrect · output limit reached</span></td><td><pre>[256, 232, 257]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array of exactly 3 positive integers whose product is 497125158. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.</td><td><pre>[731, 823, 827]</pre><span class="small">Incorrect</span></td><td><pre>[726, 731, 937]</pre><span class="small">Incorrect</span></td><td><pre>[714, 783, 891]</pre><span class="small">Incorrect</span></td><td><pre>[642, 783, 997]</pre><span class="small">Incorrect</span></td></tr></tbody></table></details><details><summary>Exact generation and final prompt bodies</summary><p>Both readers receive these same user-message bodies. Provider chat templates and tokenization differ. Generation is a separate offline call with no additional examples.</p><details><summary>Offline generation prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 16022160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [168, 935, 102]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8795956. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [793, 188, 59]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 1555364. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [89, 257, 68]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72201600. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [545, 184, 720]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k4-generation-prompt.txt">Full generation prompt text</a></p><details><summary>Qwen final prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 16022160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [168, 935, 102]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8795956. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [793, 188, 59]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 1555364. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [89, 257, 68]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72201600. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [545, 184, 720]
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1148, 136, 103]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [12453, 12, 124]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [48, 102, 19027]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [43450, 607, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [288, 343, 1735]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [2, 11, 392715]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [12, 11, 588251]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [30, 131, 2380]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [28, 36, 7029]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [208, 320, 5125]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68671602. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1, 68671602, 1]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 192615984. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1224, 157, 1035]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 144665040. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [120, 117, 10260]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41749840. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [127, 236, 1450]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166127250. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [125, 270, 4914]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 343414512. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [124, 137, 20433]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 543942784. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [139, 1248, 3212]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 14454990. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [123, 467, 250]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166163102. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1205, 137, 1014]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 359052540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1260, 289, 915]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 514278744. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [123, 154, 27276]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 36107568. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [288, 197, 631]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 24737650. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [10, 1236882, 2]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 22465296. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1224, 136, 131]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186095934. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1234, 189, 828]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68221398. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [1203, 251, 226]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4121208. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [168, 245, 101]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186822272. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [124, 163, 9244]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 52398675. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [15, 121, 28893]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 290485. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [11, 13, 2053]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 440861408. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [136, 245, 14870]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92857072. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [28, 37, 87839]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k4-qwen-prompt.txt">Full qwen prompt text</a></p><details><summary>Gemma final prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 16022160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [168, 935, 102]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8795956. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [793, 188, 59]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 1555364. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [89, 257, 68]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72201600. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [545, 184, 720]
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [248, 271, 286]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [258, 267, 273]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [432, 432, 494]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [322, 341, 397]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [520, 532, 500] (Wait, checking product: 520 * 532 * 500 = 138320000. Incorrect.)
+
+Let&#x27;s re-calculate:
+138732160 / 10 = 13873216
+13873216 / 2 = 6936608
+6936608 / 2 = 3468304
+3468304 / 2 = 1734152
+1734152 / 2 = 867076
+867076 / 2 = 433538
+433538 / 2 = 216769
+
+Prime factorization of 138732160:
+138732160 = 2^6 * 5 * 433538 (No, 433538 is 2 * 216
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [410, 437, 487]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [414, 421, 451]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [210, 210, 212] (Wait, checking product: 210 * 210 * 212 = 9364200. Incorrect.)
+
+Let&#x27;s re-factor 9384900:
+9384900 = 93849 * 100
+93849 = 3 * 31283
+31283 = 13 * 2406.38 (No)
+9384900 / 100 = 93849
+93849 / 9 = 10427.66 (No)
+93849 / 3 = 31283
+31283 / 7 = 4469
+4469 / 7 = 638.4
+4469 / 13 = 343.7
+4469 / 17 = 262.8
+4469 / 19 = 235.
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [184, 192, 202]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [720, 682, 694]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68671602. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [334, 359, 573]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 192615984. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [564, 538, 634]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 144665040. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [420, 542, 635]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41749840. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [340, 358, 342]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166127250. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [450, 585, 630]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 343414512. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [724, 652, 722]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 543942784. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [812, 824, 817]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 14454990. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [210, 234, 293]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166163102. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [533, 541, 577]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 359052540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [654, 710, 773]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 514278744. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [722, 766, 934]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 36107568. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [336, 336, 322]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 24737650. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [250, 311, 318]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 22465296. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [252, 288, 312]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186095934. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [449, 541, 762]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68221398. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [341, 418, 481]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4121208. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [156, 162, 164]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186822272. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [436, 544, 792]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 52398675. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [315, 375, 445]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 290485. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [35, 73, 113]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 440861408. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [824, 652, 814]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92857072. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [454, 392, 520]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k4-gemma-prompt.txt">Full gemma prompt text</a></p><details><summary>Teacher final prompt</summary><pre>Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 16022160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [168, 935, 102]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8795956. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [793, 188, 59]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 1555364. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [89, 257, 68]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72201600. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [545, 184, 720]
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19371704. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [748, 563, 46]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18679908. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [338, 183, 302]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92225952. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [648, 182, 782]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 43450604. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [101, 821, 524]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 138732160. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [865, 448, 358]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 86212490. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [455, 898, 211]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 77864292. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [506, 747, 206]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 9384900. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [615, 70, 218]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7101936. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [894, 993, 8]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 342355520. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [412, 884, 940]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68671602. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [289, 387, 614]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 192615984. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [272, 759, 933]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 144665040. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [233, 796, 780]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41749840. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [220, 454, 418]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166127250. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [617, 718, 375]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 343414512. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [756, 817, 556]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 543942784. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [916, 964, 616]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 14454990. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [990, 31, 471]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 166163102. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [829, 721, 278]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 359052540. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [759, 763, 620]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 514278744. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [788, 758, 861]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 36107568. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [48, 951, 791]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 24737650. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [70, 805, 439]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 22465296. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [621, 68, 532]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186095934. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [298, 909, 687]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 68221398. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [609, 709, 158]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4121208. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [51, 156, 518]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 186822272. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [688, 373, 728]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 52398675. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [525, 969, 103]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 290485. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [109, 5, 533]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 440861408. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [884, 772, 646]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 92857072. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer: [638, 184, 791]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 78379320. The order of the integers does not matter. At most one of the three integers may equal 1. Answers containing two or more 1s are invalid.
+Answer:</pre></details><p><a href="task-search-specificity-factor_k4-teacher-prompt.txt">Full teacher prompt text</a></p></details><h2>Bézout · K = 0</h2><div class="columns"><img src="task-search-specificity-bezout_k0-matrix.png" alt="Reader by source accuracy matrix"><img src="task-search-specificity-bezout_k0-curves.png" alt="Learning curves for both readers and all sources"></div><p>Own − initial: Qwen -2.6 [-8.9, +4.2]; Gemma -6.3 [-14.6, +1.6]. Own − teacher: Qwen -3.6 [-6.8, -0.5]; Gemma +3.1 [-1.6, +7.8]. Identical Qwen/Gemma rehearsal strings: 17.0%.</p><table><thead><tr><th>Rehearsal source</th><th>Correct / total</th><th>Mean characters</th><th>Format / strategy counts</th></tr></thead><tbody><tr><td>Qwen</td><td>137/512 (26.8%)</td><td>7.0</td><td>{&quot;integer_array&quot;: 512, &quot;first_coordinate_nonnegative&quot;: 420}</td></tr><tr><td>Gemma</td><td>359/512 (70.1%)</td><td>20.3</td><td>{&quot;integer_array&quot;: 483, &quot;first_coordinate_nonnegative&quot;: 341, &quot;malformed_json&quot;: 29}</td></tr><tr><td>Teacher</td><td>512/512 (100.0%)</td><td>7.0</td><td>{&quot;integer_array&quot;: 512, &quot;first_coordinate_nonnegative&quot;: 248}</td></tr></tbody></table><p class="small">Validity and representation were checked only after inference. They never affected which samples the readers saw. Correctness and length are not matched between generated sources.</p><details><summary>First episode: first 10 rehearsals, complete saved text</summary><p>Original order; all 32 were replayed. Correctness annotations are for this report only.</p><table><thead><tr><th>Assigned question</th><th>Teacher</th><th>Qwen generation</th><th>Gemma generation</th></tr></thead><tbody><tr><td>Return a JSON array [x,y] of integers satisfying 16*x + 7*y = 1. Negative integers are allowed.</td><td><pre>[-3, 7]</pre><span class="small">Correct</span></td><td><pre>[4, -9]</pre><span class="small">Correct</span></td><td><pre>[2, -5]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 16*x + 3*y = 1. Negative integers are allowed.</td><td><pre>[1, -5]</pre><span class="small">Correct</span></td><td><pre>[0, 1]</pre><span class="small">Incorrect</span></td><td><pre>[-1, 17/3] is not an integer. Let&#x27;s find integers:
+16(1) + 3(y) = 1 =&gt; 3y = -15 =&gt; y = -5.
+Check: 16(1) + 3(-5) = 16 - 15 = 1.
+
+Answer: [1, -5]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 15*x + 4*y = 1. Negative integers are allowed.</td><td><pre>[-1, 4]</pre><span class="small">Correct</span></td><td><pre>[1, -5]</pre><span class="small">Incorrect</span></td><td><pre>[3, -11]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 11*x + 8*y = 1. Negative integers are allowed.</td><td><pre>[3, -4]</pre><span class="small">Correct</span></td><td><pre>[-7, 10]</pre><span class="small">Incorrect</span></td><td><pre>[-5, 7]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 15*x + 11*y = 1. Negative integers are allowed.</td><td><pre>[3, -4]</pre><span class="small">Correct</span></td><td><pre>[1, -2]</pre><span class="small">Incorrect</span></td><td><pre>[3, -4]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 7*x + 10*y = 1. Negative integers are allowed.</td><td><pre>[3, -2]</pre><span class="small">Correct</span></td><td><pre>[3, -2]</pre><span class="small">Correct</span></td><td><pre>[3, -2]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 17*x + 13*y = 1. Negative integers are allowed.</td><td><pre>[-3, 4]</pre><span class="small">Correct</span></td><td><pre>[6, -8]</pre><span class="small">Incorrect</span></td><td><pre>[4, -5]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 10*x + 7*y = 1. Negative integers are allowed.</td><td><pre>[-2, 3]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[5, -7]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 13*x + 15*y = 1. Negative integers are allowed.</td><td><pre>[7, -6]</pre><span class="small">Correct</span></td><td><pre>[2, -1]</pre><span class="small">Incorrect</span></td><td><pre>[7, -6]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 14*x + 15*y = 1. Negative integers are allowed.</td><td><pre>[-1, 1]</pre><span class="small">Correct</span></td><td><pre>[4, -4]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1] is incorrect because 14(1) + 15(-1) = -1.
+Let&#x27;s re-evaluate: 14x + 15y = 1.
+If x = -1, 14(-1) + 15y = 1 =&gt; -14 + 15y = 1 =&gt; 15y = 15 =&gt; y = 1.
+Check: 14(-1) + 15(1) = -14 + 15 = 1.
+
+Answer: [-1, 1]</pre><span class="small">Incorrect</span></td></tr></tbody></table></details><details><summary>First episode: first 10 tests, all final responses side by side</summary><h2>Qwen reads</h2><table><thead><tr><th>Held-out question</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody><tr><td>Return a JSON array [x,y] of integers satisfying 19*x + 3*y = 1. Negative integers are allowed.</td><td><pre>[0, 1]</pre><span class="small">Incorrect</span></td><td><pre>[2, -12]</pre><span class="small">Incorrect</span></td><td><pre>[2, -12]</pre><span class="small">Incorrect</span></td><td><pre>[-2, 1]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 18*x + 19*y = 1. Negative integers are allowed.</td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[-1, 1]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 4*x + 11*y = 1. Negative integers are allowed.</td><td><pre>[3, -1]</pre><span class="small">Correct</span></td><td><pre>[3, -1]</pre><span class="small">Correct</span></td><td><pre>[3, -1]</pre><span class="small">Correct</span></td><td><pre>[3, -1]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 13*x + 19*y = 1. Negative integers are allowed.</td><td><pre>[4, -3]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[13, -13]</pre><span class="small">Incorrect</span></td><td><pre>[10, -1]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 19*x + 17*y = 1. Negative integers are allowed.</td><td><pre>[1, -11]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 6*x + 5*y = 1. Negative integers are allowed.</td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[4, -4]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 6*x + 7*y = 1. Negative integers are allowed.</td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[3, -2]</pre><span class="small">Incorrect</span></td><td><pre>[-2, 3]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 11*x + 4*y = 1. Negative integers are allowed.</td><td><pre>[1, -2]</pre><span class="small">Incorrect</span></td><td><pre>[1, -3]</pre><span class="small">Incorrect</span></td><td><pre>[3, -8]</pre><span class="small">Correct</span></td><td><pre>[-3, 8]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 14*x + 13*y = 1. Negative integers are allowed.</td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[4, -4]</pre><span class="small">Incorrect</span></td><td><pre>[10, -11]</pre><span class="small">Incorrect</span></td><td><pre>[-6, 5]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 11*x + 5*y = 1. Negative integers are allowed.</td><td><pre>[1, -2]</pre><span class="small">Correct</span></td><td><pre>[2, -1]</pre><span class="small">Incorrect</span></td><td><pre>[2, -4]</pre><span class="small">Incorrect</span></td><td><pre>[2, -1]</pre><span class="small">Incorrect</span></td></tr></tbody></table><h2>Gemma reads</h2><table><thead><tr><th>Held-out question</th><th>Initial only</th><th>Qwen source</th><th>Gemma source</th><th>Teacher source</th></tr></thead><tbody><tr><td>Return a JSON array [x,y] of integers satisfying 19*x + 3*y = 1. Negative integers are allowed.</td><td><pre>[1, -6]</pre><span class="small">Correct</span></td><td><pre>[1, -6]</pre><span class="small">Correct</span></td><td><pre>[1, -6]</pre><span class="small">Correct</span></td><td><pre>[1, -6]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 18*x + 19*y = 1. Negative integers are allowed.</td><td><pre>[18, -17] is incorrect. Let&#x27;s re-calculate:
+18 * 18 = 324
+19 * (-17) = -323
+324 - 323 = 1.
+
+Wait, the calculation is:
+18 * (18) + 19 * (-17) = 324 - 323 = 1.
+
+Let&#x27;s check another simple one:
+18 * (-1) + 19 * (1) = -18 + 19 = 1.
+
+Answer: [-1, 1]</pre><span class="small">Incorrect</span></td><td><pre>[1, -1]</pre><span class="small">Incorrect</span></td><td><pre>[-1, 1]</pre><span class="small">Correct</span></td><td><pre>[17, -16]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 4*x + 11*y = 1. Negative integers are allowed.</td><td><pre>[3, -1]</pre><span class="small">Correct</span></td><td><pre>[3, -1]</pre><span class="small">Correct</span></td><td><pre>[3, -1]</pre><span class="small">Correct</span></td><td><pre>[3, -1]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 13*x + 19*y = 1. Negative integers are allowed.</td><td><pre>[3, -2]</pre><span class="small">Correct</span></td><td><pre>[3, -2]</pre><span class="small">Correct</span></td><td><pre>[3, -2]</pre><span class="small">Correct</span></td><td><pre>[3, -2]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 19*x + 17*y = 1. Negative integers are allowed.</td><td><pre>[9, -10]</pre><span class="small">Correct</span></td><td><pre>[4, -4]</pre><span class="small">Incorrect</span></td><td><pre>[6, -7]</pre><span class="small">Incorrect</span></td><td><pre>[8, -9]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 6*x + 5*y = 1. Negative integers are allowed.</td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 6*x + 7*y = 1. Negative integers are allowed.</td><td><pre>[6, -5]</pre><span class="small">Correct</span></td><td><pre>[6, -5]</pre><span class="small">Correct</span></td><td><pre>[6, -5]</pre><span class="small">Correct</span></td><td><pre>[-5, 4]</pre><span class="small">Incorrect</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 11*x + 4*y = 1. Negative integers are allowed.</td><td><pre>[-1, 3]</pre><span class="small">Correct</span></td><td><pre>[1, -2]</pre><span class="small">Incorrect</span></td><td><pre>[1, -2.5] is not an integer. Let&#x27;s find integers:
+11(1) + 4(y) = 1 =&gt; 4y = -10 (no)
+11(2) + 4(y) = 1 =&gt; 22 + 4y = 1 =&gt; 4y = -21 (no)
+11(3) + 4(y) = 1 =&gt; 33 + 4y = 1 =&gt; 4y = -32 =&gt; y = -8.
+Check: 11(3) + 4(-8) = 33 - 32 = 1.
+
+Answer: [3, -8]</pre><span class="small">Incorrect</span></td><td><pre>[-1, 3]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 14*x + 13*y = 1. Negative integers are allowed.</td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td><td><pre>[1, -1]</pre><span class="small">Correct</span></td></tr><tr><td>Return a JSON array [x,y] of integers satisfying 11*x + 5*y = 1. Negative integers are allowed.</td><td><pre>[-4, 9]</pre><span class="small">Correct</span></td><td><pre>[1, -2]</pre><span class="small">Correct</span></td><td><pre>[1, -2]</pre><span class="small">Correct</span></td><td><pre>[1, -2]</pre><span class="small">Correct</span></td></tr></tbody></table></details><details><summary>Exact generation and final prompt bodies</summary><p>Both readers receive these same user-message bodies. Provider chat templates and tokenization differ. Generation is a separate offline call with no additional examples.</p><details><summary>Offline generation prompt</summary><pre>Problem family: witness_bezout_l0.
+Examples:
+
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 7*y = 1. Negative integers are allowed.
+Answer:</pre></details><p><a href="task-search-specificity-bezout_k0-generation-prompt.txt">Full generation prompt text</a></p><details><summary>Qwen final prompt</summary><pre>Problem family: witness_bezout_l0.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 7*y = 1. Negative integers are allowed.
+Answer: [4, -9]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 3*y = 1. Negative integers are allowed.
+Answer: [0, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 4*y = 1. Negative integers are allowed.
+Answer: [1, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 8*y = 1. Negative integers are allowed.
+Answer: [-7, 10]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 11*y = 1. Negative integers are allowed.
+Answer: [1, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 10*y = 1. Negative integers are allowed.
+Answer: [3, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 13*y = 1. Negative integers are allowed.
+Answer: [6, -8]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 7*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 13*x + 15*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 15*y = 1. Negative integers are allowed.
+Answer: [4, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 11*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 19*y = 1. Negative integers are allowed.
+Answer: [-2, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 12*y = 1. Negative integers are allowed.
+Answer: [7, -11]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 13*y = 1. Negative integers are allowed.
+Answer: [1, -14]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 12*y = 1. Negative integers are allowed.
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 19*y = 1. Negative integers are allowed.
+Answer: [4, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 8*x + 5*y = 1. Negative integers are allowed.
+Answer: [-2, 3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 5*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 17*y = 1. Negative integers are allowed.
+Answer: [1, -6]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 5*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 9*x + 14*y = 1. Negative integers are allowed.
+Answer: [3, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 19*y = 1. Negative integers are allowed.
+Answer: [5, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 19*y = 1. Negative integers are allowed.
+Answer: [3, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 9*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 16*y = 1. Negative integers are allowed.
+Answer: [-3, 4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 9*y = 1. Negative integers are allowed.
+Answer: [2, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 3*y = 1. Negative integers are allowed.
+Answer: [2, -9]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 12*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 8*y = 1. Negative integers are allowed.
+Answer: [1, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 5*x + 9*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 6*x + 17*y = 1. Negative integers are allowed.
+Answer: [3, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 19*y = 1. Negative integers are allowed.
+Answer: [-2, 1]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 3*y = 1. Negative integers are allowed.
+Answer:</pre></details><p><a href="task-search-specificity-bezout_k0-qwen-prompt.txt">Full qwen prompt text</a></p><details><summary>Gemma final prompt</summary><pre>Problem family: witness_bezout_l0.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 7*y = 1. Negative integers are allowed.
+Answer: [2, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 3*y = 1. Negative integers are allowed.
+Answer: [-1, 17/3] is not an integer. Let&#x27;s find integers:
+16(1) + 3(y) = 1 =&gt; 3y = -15 =&gt; y = -5.
+Check: 16(1) + 3(-5) = 16 - 15 = 1.
+
+Answer: [1, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 4*y = 1. Negative integers are allowed.
+Answer: [3, -11]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 8*y = 1. Negative integers are allowed.
+Answer: [-5, 7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 11*y = 1. Negative integers are allowed.
+Answer: [3, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 10*y = 1. Negative integers are allowed.
+Answer: [3, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 13*y = 1. Negative integers are allowed.
+Answer: [4, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 7*y = 1. Negative integers are allowed.
+Answer: [5, -7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 13*x + 15*y = 1. Negative integers are allowed.
+Answer: [7, -6]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 15*y = 1. Negative integers are allowed.
+Answer: [1, -1] is incorrect because 14(1) + 15(-1) = -1.
+Let&#x27;s re-evaluate: 14x + 15y = 1.
+If x = -1, 14(-1) + 15y = 1 =&gt; -14 + 15y = 1 =&gt; 15y = 15 =&gt; y = 1.
+Check: 14(-1) + 15(1) = -14 + 15 = 1.
+
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 11*y = 1. Negative integers are allowed.
+Answer: [-10, 9]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 19*y = 1. Negative integers are allowed.
+Answer: [11, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 12*y = 1. Negative integers are allowed.
+Answer: [-5, 8]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 13*y = 1. Negative integers are allowed.
+Answer: [2, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 12*y = 1. Negative integers are allowed.
+Answer: [11, -10]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 19*y = 1. Negative integers are allowed.
+Answer: [6, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 8*x + 5*y = 1. Negative integers are allowed.
+Answer: [2, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 5*y = 1. Negative integers are allowed.
+Answer: [-3, 2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 17*y = 1. Negative integers are allowed.
+Answer: [14, -9]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 5*y = 1. Negative integers are allowed.
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 9*x + 14*y = 1. Negative integers are allowed.
+Answer: [11, -7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 19*y = 1. Negative integers are allowed.
+Answer: [5, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 19*y = 1. Negative integers are allowed.
+Answer: [13, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 9*y = 1. Negative integers are allowed.
+Answer: [7, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 16*y = 1. Negative integers are allowed.
+Answer: [-15, 18]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 9*y = 1. Negative integers are allowed.
+Answer: [5, -7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 3*y = 1. Negative integers are allowed.
+Answer: [1, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 12*y = 1. Negative integers are allowed.
+Answer: [-7, 4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 8*y = 1. Negative integers are allowed.
+Answer: [1, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 5*x + 9*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 6*x + 17*y = 1. Negative integers are allowed.
+Answer: [3, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 19*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 3*y = 1. Negative integers are allowed.
+Answer:</pre></details><p><a href="task-search-specificity-bezout_k0-gemma-prompt.txt">Full gemma prompt text</a></p><details><summary>Teacher final prompt</summary><pre>Problem family: witness_bezout_l0.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 7*y = 1. Negative integers are allowed.
+Answer: [-3, 7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 3*y = 1. Negative integers are allowed.
+Answer: [1, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 4*y = 1. Negative integers are allowed.
+Answer: [-1, 4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 8*y = 1. Negative integers are allowed.
+Answer: [3, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 11*y = 1. Negative integers are allowed.
+Answer: [3, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 10*y = 1. Negative integers are allowed.
+Answer: [3, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 13*y = 1. Negative integers are allowed.
+Answer: [-3, 4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 7*y = 1. Negative integers are allowed.
+Answer: [-2, 3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 13*x + 15*y = 1. Negative integers are allowed.
+Answer: [7, -6]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 15*y = 1. Negative integers are allowed.
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 11*y = 1. Negative integers are allowed.
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 19*y = 1. Negative integers are allowed.
+Answer: [-8, 3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 12*y = 1. Negative integers are allowed.
+Answer: [-5, 8]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 13*y = 1. Negative integers are allowed.
+Answer: [-2, 3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 12*y = 1. Negative integers are allowed.
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 19*y = 1. Negative integers are allowed.
+Answer: [6, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 8*x + 5*y = 1. Negative integers are allowed.
+Answer: [2, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 5*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 17*y = 1. Negative integers are allowed.
+Answer: [-3, 2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 5*y = 1. Negative integers are allowed.
+Answer: [-1, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 9*x + 14*y = 1. Negative integers are allowed.
+Answer: [-3, 2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 19*y = 1. Negative integers are allowed.
+Answer: [5, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 19*y = 1. Negative integers are allowed.
+Answer: [-6, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 9*y = 1. Negative integers are allowed.
+Answer: [-2, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 16*y = 1. Negative integers are allowed.
+Answer: [-5, 6]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 9*y = 1. Negative integers are allowed.
+Answer: [2, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 3*y = 1. Negative integers are allowed.
+Answer: [-1, 5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 12*y = 1. Negative integers are allowed.
+Answer: [-5, 3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 8*y = 1. Negative integers are allowed.
+Answer: [1, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 5*x + 9*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 6*x + 17*y = 1. Negative integers are allowed.
+Answer: [3, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 19*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array [x,y] of integers satisfying 19*x + 3*y = 1. Negative integers are allowed.
+Answer:</pre></details><p><a href="task-search-specificity-bezout_k0-teacher-prompt.txt">Full teacher prompt text</a></p></details><h2>Checks and limits</h2><p>14,592 request uses reconstructed exactly; no context overflow. Experimental Gemma calls billed USD 0.585. All came from DekaLLM with zero reported reasoning tokens.</p><pre>{
+  &quot;request_uses&quot;: 14592,
+  &quot;unique_requests&quot;: 14400,
+  &quot;providers&quot;: {
+    &quot;DekaLLM&quot;: 7200
+  },
+  &quot;cost_usd&quot;: 0.5848651799999981,
+  &quot;tokens&quot;: {
+    &quot;qwen|prompt&quot;: 7819247,
+    &quot;qwen|completion&quot;: 109328,
+    &quot;gemma|prompt&quot;: 7907343,
+    &quot;gemma|completion&quot;: 334620
+  },
+  &quot;statuses&quot;: {
+    &quot;qwen|generation|ok&quot;: 1533,
+    &quot;gemma|generation|truncated&quot;: 415,
+    &quot;gemma|generation|ok&quot;: 1121,
+    &quot;qwen|generation|truncated&quot;: 3,
+    &quot;qwen|evaluation|ok&quot;: 5719,
+    &quot;qwen|evaluation|truncated&quot;: 41,
+    &quot;gemma|evaluation|truncated&quot;: 541,
+    &quot;gemma|evaluation|ok&quot;: 5219
+  },
+  &quot;prompt_reconstruction&quot;: &quot;every full request exactly matched; only saved rehearsal answers differ across sources&quot;,
+  &quot;context_overflow&quot;: 0
+}</pre><p>The remote serving revision and kernels are not pinned. A source interaction could reflect correctness sensitivity, verbosity, formatting, or task difficulty as well as representation compatibility. Descriptive last-complete-JSON-array sensitivity scores are in <a href="task-search-specificity-results.json">the full results</a>.</p></details><details><summary>A one-weight sleep toy with symmetric specificity</summary><p>Input (m,c), m&gt;0 and c∈{0,1}. Any z with |z|=m is correct. Source A returns m; source B returns (−1)<sup>c</sup>m. Both are 100% correct on the same inputs. Reader A has φ=m; reader B has φ=(−1)<sup>c</sup>m. Each predicts ẑ=wφ, starting at w=0.25.</p><pre>Same loss: L = ½((wφ − z)/m)²
+Same update: w ← w + η[(φ/m)(z/m) − w]
+Own source: (φ/m)(z/m) = 1
+Other source: (φ/m)(z/m) = ±1 with mean 0</pre><p>Own examples drive w toward 1. Cross-source labels conflict in the restricted feature space and drive the mean toward 0. No source-specific bonus or correctness judgment appears in the update.</p><img src="task-search-specificity-sleep-toy.png" alt="Equal-quality sources; restricted readers favor their own source; rich readers fit either source"><p>Both features [m,(−1)<sup>c</sup>m] let either reader fit either source. The original feature alignment is assumed, not learned. This is a sleep-phase recognition loss with fixed generators, not a complete wake–sleep model. Native error is (1−w₀)²(1−η)<sup>2N</sup>, checked against 4,096 simulations: exponential relaxation, not a power law.</p><p>The generator knows the latent it sampled, providing a sleep target without external feedback, as in <a href="https://www.cs.toronto.edu/~hinton/absps/ws.pdf">Hinton et al.’s wake–sleep algorithm</a>. <a href="https://aclanthology.org/2023.emnlp-main.968/">Self-ICL</a> replays pseudo-examples in a frozen model; it does not establish this weight-space mechanism or reader × source specificity.</p></details></section>

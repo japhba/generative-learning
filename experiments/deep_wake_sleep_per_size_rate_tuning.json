@@ -1,0 +1,662 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/per_size_rate_tuning",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.001,
+    "batch": 128,
+    "sampled": false,
+    "budget": 16384,
+    "eval_points": 64,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "accuracy_stop": 0.1
+  },
+  "cases": [
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b4_elbo_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b4_elbo_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b4_elbo_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b4_elbo_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b4_elbo_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b4_elbo_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b4_elbo_lr1_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b4_elbo_lr1_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b4_sleep_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b4_sleep_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b4_sleep_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b4_sleep_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b4_sleep_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b4_sleep_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b4_sleep_lr1_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b4_sleep_lr1_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b6_elbo_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b6_elbo_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b6_elbo_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b6_elbo_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b6_elbo_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b6_elbo_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b6_elbo_lr1_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b6_elbo_lr1_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b6_sleep_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b6_sleep_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b6_sleep_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b6_sleep_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b6_sleep_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b6_sleep_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b6_sleep_lr1_s9502"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b6_sleep_lr1_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b8_elbo_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b8_elbo_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b8_elbo_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b8_elbo_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b8_elbo_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b8_elbo_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b8_elbo_lr1_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b8_elbo_lr1_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b8_sleep_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b8_sleep_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b8_sleep_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b8_sleep_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b8_sleep_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b8_sleep_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b8_sleep_lr1_s9502"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b8_sleep_lr1_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b10_elbo_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b10_elbo_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b10_elbo_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b10_elbo_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b10_elbo_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b10_elbo_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b10_elbo_lr1_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b10_elbo_lr1_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.03,
+      "name": "b10_sleep_lr0.03_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.03,
+      "name": "b10_sleep_lr0.03_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.1,
+      "name": "b10_sleep_lr0.1_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.1,
+      "name": "b10_sleep_lr0.1_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 0.3,
+      "name": "b10_sleep_lr0.3_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 0.3,
+      "name": "b10_sleep_lr0.3_s9503"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9502,
+      "lr_r": 1.0,
+      "name": "b10_sleep_lr1_s9502"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9503,
+      "lr_r": 1.0,
+      "name": "b10_sleep_lr1_s9503"
+    }
+  ],
+  "notes": "Final fairness audit: equal rate grids separately at each size, two tuning seeds disjoint from 16 replication seeds. Select minimum restricted mean first-passage cost to posterior KL .1, with nonattainments censored at the common budget. No confirmation-seed values enter selection."
+}

@@ -1,0 +1,1344 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/million_anchors",
+    "visible": 6,
+    "strength": 2.0,
+    "coupled": false,
+    "sampled": false,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 3.0,
+    "budget": 1048576,
+    "eval_points": 192,
+    "eval_interval": 2048,
+    "accuracy_stop": 0.1,
+    "checkpoint_seconds": 60,
+    "wall_limit_seconds": 3600,
+    "extra_eval_steps": []
+  },
+  "cases": [
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b4_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b4_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b4_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b4_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b4_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b4_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b4_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b4_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b4_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b4_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b4_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b4_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b4_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b6_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b6_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b6_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b6_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b6_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b6_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b6_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b6_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b6_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b6_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b6_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b6_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b6_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b8_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b8_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b8_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b8_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b8_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b8_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b8_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b8_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b8_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b8_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b8_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b8_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b8_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b10_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b10_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b10_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b10_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b10_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b10_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b10_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b10_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b10_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b10_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b10_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b10_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b10_adam_eps12_elbo_s9545"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_adam_sleep_s9540"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_adam_elbo_s9540"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_adam_sleep_s9541"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_adam_elbo_s9541"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_adam_sleep_s9542"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_adam_elbo_s9542"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_adam_sleep_s9543"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_adam_elbo_s9543"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_adam_sleep_s9544"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_adam_elbo_s9544"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam",
+      "name": "b12_adam_sleep_s9545"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam",
+      "name": "b12_adam_elbo_s9545"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9540,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_sleep_s9540"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9540,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_elbo_s9540"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9541,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_sleep_s9541"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9541,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_elbo_s9541"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9542,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_sleep_s9542"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9542,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_elbo_s9542"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9543,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_sleep_s9543"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9543,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_elbo_s9543"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9544,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_sleep_s9544"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9544,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_elbo_s9544"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9545,
+      "lr_r": 0.3,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_sleep_s9545"
+    },
+    {
+      "layers": [
+        6,
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9545,
+      "lr_r": 0.1,
+      "optimizer": "adam_eps12",
+      "name": "b12_adam_eps12_elbo_s9545"
+    }
+  ],
+  "runtime_sha256": "456cb31637dffdffb78c76bbcac1004cdfda849be2526dc8692ed6150c3f3ae1",
+  "reference_sha256": "dd8bfd3382036e40993c037c6cadcf8e45e7938644eab89c2cf9263431cda70c",
+  "notes": "Rerun every smaller size on the same GPU implementation and denser evaluation schedule as the million-state extension. This avoids confounding size with checkpoint spacing or backend. Same six prespecified seeds, rates, initializations, two optimizers, target and caps. The bridge runs revealed that first attainment can depend on evaluation spacing even when shared-checkpoint KLs agree closely. These anchors make the complete nine-size analysis internally consistent; old results remain intact."
+}

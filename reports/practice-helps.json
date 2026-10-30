@@ -1,0 +1,65 @@
+{
+ "worked": {
+  "Qwen3.5-9B": {
+   "no practice": 0.017857142857142856,
+   "correct answers only": 0.008928571428571428,
+   "own worked practice": 0.08035714285714286,
+   "others\u2019 worked practice": 0.09375
+  },
+  "Qwen3-30B-A3B": {
+   "no practice": 0.029761904761904764,
+   "correct answers only": 0.07440476190476189,
+   "own worked practice": 0.36011904761904756,
+   "others\u2019 worked practice": 0.3869047619047619
+  },
+  "Gemma 4 26B": {
+   "no practice": 0.02678571428571428,
+   "correct answers only": 0.029761904761904764,
+   "own worked practice": 0.6636904761904763,
+   "others\u2019 worked practice": 0.6235119047619048
+  }
+ },
+ "thinking": {
+  "Qwen3.5-9B": {
+   "no practice": 0.010416666666666666,
+   "correct answers only": 0.0,
+   "own worked practice": 0.11979166666666664,
+   "others\u2019 worked practice": 0.1015625
+  },
+  "Gemma 4 26B": {
+   "no practice": 0.018229166666666664,
+   "correct answers only": 0.0390625,
+   "own worked practice": 0.6770833333333333,
+   "others\u2019 worked practice": 0.6393229166666666
+  },
+  "Nemotron-3-Nano": {
+   "no practice": 0.005208333333333333,
+   "correct answers only": 0.0234375,
+   "own worked practice": 0.1640625,
+   "others\u2019 worked practice": 0.14670138888888887
+  },
+  "Qwen3-30B-A3B (hybrid)": {
+   "no practice": 0.020833333333333332,
+   "correct answers only": 0.026041666666666664,
+   "own worked practice": 0.1875,
+   "others\u2019 worked practice": 0.21006944444444442
+  }
+ },
+ "finetune": {
+  "Qwen3.5-9B": {
+   "no practice": 0.2916666666666667,
+   "own worked practice": 0.4895833333333333,
+   "others\u2019 worked practice": 0.5130208333333334
+  },
+  "Qwen3-30B-A3B": {
+   "no practice": 0.11979166666666667,
+   "own worked practice": 0.2552083333333333,
+   "others\u2019 worked practice": 0.3671875
+  },
+  "Gemma 4 26B": {
+   "no practice": 0.4895833333333333,
+   "own worked practice": 0.5416666666666666,
+   "others\u2019 worked practice": 0.4192708333333333
+  }
+ }
+}

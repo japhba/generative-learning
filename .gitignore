@@ -1,0 +1,35 @@
+__pycache__/
+.env
+.venv/
+results/
+
+# images are not versioned
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+
+# report-server links to directories outside the repository (or into ignored results/)
+/reports/bayesian-chaos-outliers
+/reports/deep-wake-sleep-data
+/reports/finite-data-wake-sleep-data
+/reports/llm-wake-sleep-data
+/reports/mats_dump
+/reports/outlier-theory
+/reports/practice-docs
+/reports/practice-loop-model-files
+/reports/practice-loop-model.html
+/reports/practice-model
+/reports/rhm
+/reports/rhm-tex
+/reports/superrich
+/reports/taste-files
+/reports/taste.html
+/reports/toy_model_1_ring-files
+/reports/toy_model_1_ring.html
+/reports/toy_model_2_WS-files
+/reports/toy_model_2_WS.html
+/reports/wake-sleep-runs
+/torchinductor_jbauer/

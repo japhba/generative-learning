@@ -1,0 +1,104 @@
+Problem family: witness_bezout_l0.
+Examples:
+
+
+Additional examples:
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 15*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 6*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 5*x + 7*y = 1. Negative integers are allowed.
+Answer: [3, -2]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 4*y = 1. Negative integers are allowed.
+Answer: [1, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 9*y = 1. Negative integers are allowed.
+Answer: [-4, 7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 14*x + 9*y = 1. Negative integers are allowed.
+Answer: [-3, 6]
+
+Problem: Return a JSON array [x,y] of integers satisfying 18*x + 11*y = 1. Negative integers are allowed.
+Answer: [1, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 5*x + 9*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 14*y = 1. Negative integers are allowed.
+Answer: [1, -8]
+
+Problem: Return a JSON array [x,y] of integers satisfying 9*x + 7*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 13*x + 18*y = 1. Negative integers are allowed.
+Answer: [5, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 9*x + 16*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 14*y = 1. Negative integers are allowed.
+Answer: [3, -7]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 15*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 5*x + 13*y = 1. Negative integers are allowed.
+Answer: [5, -5]
+
+Problem: Return a JSON array [x,y] of integers satisfying 8*x + 15*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 3*y = 1. Negative integers are allowed.
+Answer: [1, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 15*y = 1. Negative integers are allowed.
+Answer: [2, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 19*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 4*x + 19*y = 1. Negative integers are allowed.
+Answer: [4, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 16*x + 5*y = 1. Negative integers are allowed.
+Answer: [-2, 13]
+
+Problem: Return a JSON array [x,y] of integers satisfying 6*x + 19*y = 1. Negative integers are allowed.
+Answer: [3, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 6*y = 1. Negative integers are allowed.
+Answer: [1, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 11*x + 12*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 13*y = 1. Negative integers are allowed.
+Answer: [-2, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 3*x + 13*y = 1. Negative integers are allowed.
+Answer: [4, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 8*x + 17*y = 1. Negative integers are allowed.
+Answer: [2, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 15*x + 13*y = 1. Negative integers are allowed.
+Answer: [0, 1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 10*x + 3*y = 1. Negative integers are allowed.
+Answer: [1, -3]
+
+Problem: Return a JSON array [x,y] of integers satisfying 17*x + 7*y = 1. Negative integers are allowed.
+Answer: [1, -4]
+
+Problem: Return a JSON array [x,y] of integers satisfying 6*x + 5*y = 1. Negative integers are allowed.
+Answer: [1, -1]
+
+Problem: Return a JSON array [x,y] of integers satisfying 13*x + 17*y = 1. Negative integers are allowed.
+Answer: [-4, 3]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array [x,y] of integers satisfying 7*x + 11*y = 1. Negative integers are allowed.
+Answer:

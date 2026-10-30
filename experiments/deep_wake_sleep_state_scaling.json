@@ -1,0 +1,478 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/state_scaling",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.001,
+    "batch": 128,
+    "sampled": false,
+    "budget": 16384,
+    "eval_points": 52,
+    "recognition_depth": 1,
+    "optimizer": "adam",
+    "neglect": 6.0,
+    "accuracy_stop": 1e-08
+  },
+  "cases": [
+    {
+      "layers": [
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b4_g1_elbo_s9530"
+    },
+    {
+      "layers": [
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b4_g1_elbo_s9531"
+    },
+    {
+      "layers": [
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b4_g1_elbo_s9532"
+    },
+    {
+      "layers": [
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b4_g1_sleep_s9530"
+    },
+    {
+      "layers": [
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b4_g1_sleep_s9531"
+    },
+    {
+      "layers": [
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b4_g1_sleep_s9532"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b4_g2_elbo_s9530"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b4_g2_elbo_s9531"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b4_g2_elbo_s9532"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b4_g2_sleep_s9530"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b4_g2_sleep_s9531"
+    },
+    {
+      "layers": [
+        2,
+        2
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b4_g2_sleep_s9532"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b6_g1_elbo_s9530"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b6_g1_elbo_s9531"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b6_g1_elbo_s9532"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b6_g1_sleep_s9530"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b6_g1_sleep_s9531"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b6_g1_sleep_s9532"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b6_g2_elbo_s9530"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b6_g2_elbo_s9531"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b6_g2_elbo_s9532"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b6_g2_sleep_s9530"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b6_g2_sleep_s9531"
+    },
+    {
+      "layers": [
+        3,
+        3
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b6_g2_sleep_s9532"
+    },
+    {
+      "layers": [
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b8_g1_elbo_s9530"
+    },
+    {
+      "layers": [
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b8_g1_elbo_s9531"
+    },
+    {
+      "layers": [
+        8
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b8_g1_elbo_s9532"
+    },
+    {
+      "layers": [
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b8_g1_sleep_s9530"
+    },
+    {
+      "layers": [
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b8_g1_sleep_s9531"
+    },
+    {
+      "layers": [
+        8
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b8_g1_sleep_s9532"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b8_g2_elbo_s9530"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b8_g2_elbo_s9531"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b8_g2_elbo_s9532"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b8_g2_sleep_s9530"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b8_g2_sleep_s9531"
+    },
+    {
+      "layers": [
+        4,
+        4
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b8_g2_sleep_s9532"
+    },
+    {
+      "layers": [
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b10_g1_elbo_s9530"
+    },
+    {
+      "layers": [
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b10_g1_elbo_s9531"
+    },
+    {
+      "layers": [
+        10
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b10_g1_elbo_s9532"
+    },
+    {
+      "layers": [
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b10_g1_sleep_s9530"
+    },
+    {
+      "layers": [
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b10_g1_sleep_s9531"
+    },
+    {
+      "layers": [
+        10
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b10_g1_sleep_s9532"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9530,
+      "lr_r": 0.1,
+      "name": "b10_g2_elbo_s9530"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9531,
+      "lr_r": 0.1,
+      "name": "b10_g2_elbo_s9531"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "elbo",
+      "seed": 9532,
+      "lr_r": 0.1,
+      "name": "b10_g2_elbo_s9532"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9530,
+      "lr_r": 0.3,
+      "name": "b10_g2_sleep_s9530"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9531,
+      "lr_r": 0.3,
+      "name": "b10_g2_sleep_s9531"
+    },
+    {
+      "layers": [
+        5,
+        5
+      ],
+      "arm": "sleep",
+      "seed": 9532,
+      "lr_r": 0.3,
+      "name": "b10_g2_sleep_s9532"
+    }
+  ],
+  "notes": "Exploratory finite-size extension after six-bit tuning; fixed observation dimension and random initialization variance, uniform prior on top latent layer. Report censored target times, do not infer asymptotics from four sizes."
+}

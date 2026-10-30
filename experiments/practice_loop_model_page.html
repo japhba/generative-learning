@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="overlyx" content="page">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>Practice-loop model</title>
+<style>/*__KATEX_CSS__*/</style>
+<style>
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--hl:#fdf3e7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--pos:#2a78d6;--neg:#eb6834;--c1:#cde2fb;--c2:#9ec5f4;--c3:#5598e7;--c4:#256abf;--c5:#104281;--okText:#006300;--failText:#b3261e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--hl:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--pos:#3987e5;--neg:#d95926;--c1:#184f95;--c2:#1c5cab;--c3:#2a78d6;--c4:#5598e7;--c5:#9ec5f4;--okText:#0ca30c;--failText:#e66767}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--hl:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--pos:#3987e5;--neg:#d95926;--c1:#184f95;--c2:#1c5cab;--c3:#2a78d6;--c4:#5598e7;--c5:#9ec5f4;--okText:#0ca30c;--failText:#e66767}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1120px;margin:0 auto;padding:0 16px 56px}
+header{padding:40px 0 4px;max-width:820px}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.15;letter-spacing:-.02em;margin:6px 0 12px}
+h2{font-size:1.3rem;line-height:1.25;margin:0 0 10px}
+h3{font-size:1rem;margin:16px 0 6px}
+p{margin:0 0 12px}
+a{color:var(--link)}
+section{padding-top:34px}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
+.lede{font-size:1.06rem;color:var(--ink2)}
+.small{font-size:.86rem;color:var(--ink2)}
+nav{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.9rem;margin-top:8px}
+.spec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+figure.widget{margin:0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:0;overflow-wrap:break-word}
+.panel h3{margin-top:0}
+.eq{overflow-x:auto;overflow-y:hidden;margin:4px 0 10px}
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;margin:18px 0 0;position:relative}
+.pipe .panel{position:relative}
+.pipe .panel:not(:last-child)::after{content:"→";position:absolute;right:-18px;top:42%;color:var(--muted);font-size:1.1rem}
+.pipe h3{font-size:.95rem;margin-bottom:4px}
+.shape{display:inline-block;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--hl);border-radius:5px;padding:1px 6px;margin:2px 0}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 10px}
+.controls label{font-size:.86rem;color:var(--ink2);display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}.controls select{min-width:0;flex:1 1 auto}
+select,button{font:inherit;font-size:.86rem;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:5px 9px;max-width:100%}
+button{cursor:pointer}button:hover{border-color:var(--ink2)}button.primary{background:#256abf;border-color:#256abf;color:#fff}
+button:focus-visible,select:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+table{border-collapse:collapse;font-size:.86rem;width:100%}
+th,td{padding:4px 6px;border-bottom:1px solid var(--grid);text-align:left;vertical-align:top}
+thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.table-wrap,.eq{overflow-x:auto;position:relative}
+.heat{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.heat table{width:auto;border-collapse:separate;border-spacing:2px;font-size:11px}
+.heat td,.heat th{border:none;padding:0;width:19px;height:19px;text-align:center;font-variant-numeric:tabular-nums}
+.heat th{color:var(--ink2);font-weight:500}
+.heat td{border-radius:3px;background:var(--grid)}
+.heat td.modal{outline:2px solid var(--ink);outline-offset:-2px}
+.heat td.wrong{outline:2px dashed var(--neg)}
+.heat caption{caption-side:top;text-align:left;font-size:.82rem;color:var(--ink2);padding-bottom:4px}
+.ring svg,.chart-box svg{width:100%;height:auto;display:block}
+.ring{text-align:center}.ring svg{max-width:300px;margin:0 auto}
+.ring-line{fill:none;stroke:var(--s1);stroke-width:1.4;opacity:.5}
+.ring-guide{fill:none;stroke:var(--grid);stroke-width:1}
+.ring-dot{fill:var(--s1);stroke:var(--surface);stroke-width:2}
+.ring-label{font-size:12.5px;fill:var(--ink);font-weight:600}
+.matrix td{font-variant-numeric:tabular-nums;text-align:right;font-size:11px;padding:2px 1px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.matrix th{font-size:11px;padding:2px 2px;text-align:right;white-space:nowrap}
+.routes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.routes table td,.routes table th{padding:3px 5px}
+.ok{color:var(--okText);font-weight:650}.fail{color:var(--failText);font-weight:650}
+.charts{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 10px 4px;position:relative;min-width:0}
+.chart-box h3{margin:0 4px 2px;font-size:.92rem}
+svg text{font-family:inherit}
+.tick{fill:var(--muted);font-size:11.5px}.axis-title{fill:var(--ink2);font-size:11.5px}
+.gridline{stroke:var(--grid);stroke-width:1}.baseline{stroke:var(--axis);stroke-width:1}
+.direct{font-size:11.5px;fill:var(--ink);font-weight:650}
+.tooltip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 8px;font-size:.78rem;box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap;display:none;z-index:2}
+.tooltip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.84rem;color:var(--ink2);margin:8px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend svg{width:24px;height:10px}
+.stat{font-variant-numeric:tabular-nums}
+details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:650;font-size:.92rem}
+details>*:nth-child(2){margin-top:10px}
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--grid);font-size:.8rem;color:var(--ink2)}
+footer code{overflow-wrap:anywhere}
+@media (max-width:900px){.spec,.charts,.routes,.cols3{grid-template-columns:minmax(0,1fr)}.pipe{grid-template-columns:1fr 1fr}.pipe .panel:nth-child(2)::after{content:none}}
+@media (max-width:520px){.pipe{grid-template-columns:1fr}.pipe .panel::after{content:none!important}.heat{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="eyebrow">Generative learning · model specification</div>
+<h1>The practice-loop toy model</h1>
+<p class="lede">A learner that has seen only single steps of a hidden 12-state ring practises multi-step routes, using its own frozen transition table to check them. This page defines every array, objective and update of the main experiment, and runs the model live in your browser on the 32 saved worlds.</p>
+<nav><a href="#task">1 Task</a><a href="#data">2 Data &amp; checker</a><a href="#generator">3 Generator</a><a href="#rules">4 Learning rules</a><a href="#step">5 One update</a><a href="#eval">6 Evaluation</a><a href="#sandbox">7 Run it</a><a href="#arrays">8 Arrays &amp; settings</a></nav>
+<div class="pipe">
+<div class="panel"><h3>1 · Observe</h3><p class="small">5 noisy observations per (state, action), stored as counts</p><span class="shape">N: int (12, 2, 12)</span></div>
+<div class="panel"><h3>2 · Checker</h3><p class="small">most frequent next state per (state, action); frozen</p><span class="shape">T̂: int (12, 2)</span></div>
+<div class="panel"><h3>3 · Generator</h3><p class="small">one angle per state; picks + or − towards a goal</p><span class="shape">θ: float (12,)</span></div>
+<div class="panel"><h3>4 · Practice</h3><p class="small">3,000 updates × 64 routes: generate, step with T̂, judge, update θ</p><span class="shape">routes: (64, ≤6)</span></div>
+</div>
+</header>
+
+<section id="task">
+<h2>1 · Task</h2>
+<div class="spec">
+<div>
+<p>States \(\mathcal S=\{0,\dots,11\}\) are bare integer ids. They lie on a hidden ring in a random order \(\rho\) (a permutation drawn per world), and the two actions step around it:</p>
+<div class="eq">\[T_+(\rho_i)=\rho_{i+1},\qquad T_-(\rho_i)=\rho_{i-1},\]</div><p>with indices taken mod 12.</p>
+<p>A task is a query \((s,g)\): reach goal \(g\) from start \(s\) within \(H=6\) actions. The query set excludes the start and its two (learned) neighbours,</p>
+<div class="eq">\[\begin{gathered}Q=\{(s,g):\ s\neq g,\ g\notin\{\hat T_+(s),\hat T_-(s)\}\},\\ |Q|=108,\end{gathered}\]</div>
+<p>so every goal is 2 to 6 steps away. Queries are drawn uniformly from \(Q\). No multi-step route is ever shown to the learner.</p>
+</div>
+<figure class="widget panel ring"><h3>Hidden ring of the selected world</h3><svg id="hiddenRing" viewBox="-16 0 352 320" role="img" aria-label="The twelve state ids placed in their hidden ring order."></svg><p class="small">Not available to the learner. Ids are placed at their true positions \(\rho_i\).</p></figure>
+</div>
+</section>
+
+<section id="data">
+<h2>2 · Data and the checker (recognition model)</h2>
+<div class="spec">
+<div>
+<p>For each of the 24 pairs \((s,a)\) the learner observes \(K=5\) next states. Each is correct with probability \(1-\varepsilon\) and otherwise replaced by a uniform draw (\(\varepsilon=0.05\)):</p>
+<div class="eq">\[\begin{gathered}s'_k\sim(1-\varepsilon)\,\delta_{T_a(s)}+\varepsilon\,\mathrm{Unif}(\mathcal S),\\ N[s,a,s']=\#\{k:\ s'_k=s'\}.\end{gathered}\]</div>
+<p>That is 120 observations in total. The checker keeps the most frequent next state (ties go to the smallest id) and is frozen from then on:</p>
+<div class="eq">\[\hat T_a(s)=\arg\max_{s'}N[s,a,s'].\]</div>
+<p>The checker does two jobs during practice. It <b>simulates</b> each step, \(s_{t+1}=\hat T_{a_t}(s_t)\), and it <b>judges</b> each route,</p>
+<div class="eq">\[r(\tau)=\mathbb 1\big[\exists\,t\le H:\ s_t=g\big],\]</div>
+<p>with the rollout stopping at the first arrival. In all 32 saved worlds \(\hat T=T\).</p>
+</div>
+<figure class="widget panel">
+<div class="controls"><label>World <select id="world"></select></label></div>
+<p class="small" id="worldNote"></p>
+<div class="heat"><div class="table-wrap"><table id="heatPlus"><caption>\(N[s,+,s']\): rows \(s\), columns \(s'\)</caption></table></div><div class="table-wrap"><table id="heatMinus"><caption>\(N[s,-,s']\)</caption></table></div></div>
+<p class="small" style="margin-top:8px">Cell shade and number give the count (each row sums to 5). The outlined cell in each row is \(\hat T_a(s)\); a dashed outline would mark a wrong modal entry. Off-outline counts are corrupted observations. The world chosen here is used throughout the page.</p>
+</figure>
+</div>
+</section>
+
+<section id="generator">
+<h2>3 · Generator (generation model): the only part that learns</h2>
+<div class="spec">
+<div>
+<p>Parameters are one angle per state, \(\theta\in\mathbb R^{12}\), giving unit embeddings and an embedding matrix</p>
+<div class="eq">\[\begin{gathered}\mathbf u_s=(\cos\theta_s,\ \sin\theta_s)^\top,\\ \mathbf U=[\mathbf u_0,\dots,\mathbf u_{11}]\in\mathbb R^{2\times 12}.\end{gathered}\]</div>
+<p>In state \(s\) with goal \(g\) the generator steps \(+\) with probability</p>
+<div class="eq">\[\begin{aligned}p_\theta(+\mid s,g)&=\sigma\big(\beta\,\mathbf u_s^\top\mathbf J\,\mathbf u_g\big)\\ &=\sigma\big(\beta\sin(\theta_g-\theta_s)\big),\\ \mathbf J&=\begin{pmatrix}0&1\\-1&0\end{pmatrix},\quad \beta=6,\end{aligned}\]</div>
+<p>and \(-\) otherwise. In words: a shared embedding layer followed by a fixed bilinear comparison. It steps \(+\) when the goal lies anticlockwise (within 180°) of the current state on its circle. The gain \(\beta\) and unit norms are fixed, so 12 numbers are all that is learned.</p>
+<p class="small">The action labels \(+/-\) carry no geometry for the learner: \(+\) is code index 0 of the transition arrays, and \(p_\theta\) is the probability of that index.</p>
+</div>
+<figure class="widget panel"><div class="ring"><h3 id="genTitle"></h3><svg id="genRing" viewBox="-16 0 352 320" role="img" aria-label="Current generator embedding."></svg></div>
+<p class="small">Dots are \(\mathbf u_s\) labelled by id; the faint line joins hidden-ring neighbours (display only). Coincident states share a label.</p>
+<div class="table-wrap"><table class="matrix" id="matrixU"><caption class="small" style="caption-side:top;text-align:left">\(\mathbf U\): rows \(\cos\theta_s\) and \(\sin\theta_s\), columns \(s\)</caption></table></div></figure>
+</div>
+</section>
+
+<section id="rules">
+<h2>4 · Two learning rules for the same 12 angles</h2>
+<div class="spec">
+<div class="panel">
+<h3>Ordinary training: reconstruct the observed steps</h3>
+<p>Predict which action produced each (cleaned) observed step, with labels \(y_+=1,\ y_-=0\):</p>
+<div class="eq">\[\begin{gathered}L(\theta)=\frac1{24}\sum_{s,a}\Big[\log\big(1+e^{z_{s,a}}\big)-y_a z_{s,a}\Big],\\ z_{s,a}=\beta\sin\big(\theta_{\hat T_a(s)}-\theta_s\big).\end{gathered}\]</div>
+<p>Gradient descent is local to the two endpoints of each step. With \(\delta_{s,a}=\tfrac1{24}\big(y_a-\sigma(z_{s,a})\big)\beta\cos\big(\theta_{\hat T_a(s)}-\theta_s\big)\):</p>
+<div class="eq">\[\theta_{\hat T_a(s)}\mathrel{+}=\eta\,\delta_{s,a},\qquad \theta_s\mathrel{-}=\eta\,\delta_{s,a}.\]</div>
+<p class="small">Global minimum: neighbours 90° apart, \(\theta_{\rho_i}=i\pi/2\), with \(L=\log(1+e^{-6})={{optimum}}\). States 4 apart then coincide, and route success is {{folded}}. A once-round circle (30° per step) reaches {{ideal}} but has higher \(L\).</p>
+</div>
+<div class="panel">
+<h3>Practice: generate, check, reinforce</h3>
+<p>Objective: route success as predicted by the frozen checker,</p>
+<div class="eq">\[J(\theta)=\mathbb E_{(s,g)\sim\mathrm{Unif}(Q)}\ \mathbb E_{\tau\sim p_\theta,\hat T}\big[r(\tau)\big].\]</div>
+<p>Each update draws 32 queries (with replacement) and rolls each out twice, giving \(B=64\) routes. For route \(j\) with partner \(j'\) (same query), every step taken before arrival leaves a trace</p>
+<div class="eq">\[e_{j,t}=\beta\,(a_{j,t}-p_{j,t})\cos\big(\theta_g-\theta_{s_{j,t}}\big),\]</div><p>where \(a=1\) for \(+\) and \(0\) for \(-\),</p>
+<p>and with \(c_j=(r_j-r_{j'})/B\) the update is</p>
+<div class="eq">\[\begin{gathered}\theta_g\mathrel{+}=\eta\sum_j c_j\sum_t e_{j,t},\\ \theta_{s_{j,t}}\mathrel{-}=\eta\,c_j\,e_{j,t}.\end{gathered}\]</div>
+<p class="small">\(e_{j,t}=\partial_{\theta_g}\log p=-\partial_{\theta_{s_t}}\log p\), and \(r_{j'}\) is independent of route \(j\), so \(\mathbb E[\Delta\theta]=\eta\nabla_\theta J\): REINFORCE with the partner as baseline. Three factors: activity at \(s_t\) and \(g\), the action fluctuation \(a-p\), and a scalar verdict. Nothing is back-propagated through \(\hat T\).</p>
+</div>
+</div>
+<div class="cols3" style="margin-top:14px">
+<div class="panel"><h3>Settings</h3><p class="small">\(\eta=0.1\) for both rules, 3,000 updates, \(\beta=6\), \(H=6\), \(B=64\).</p></div>
+<div class="panel"><h3>Control: no verdict</h3><p class="small">\(c_j=1/B\) for every route: all sampled actions are reinforced, whatever the outcome (\(\mathbb E[\Delta\theta]=0\)).</p></div>
+<div class="panel"><h3>Control: shuffled verdicts</h3><p class="small">The 64 rewards \(r_j\) are randomly permuted across routes before \(c_j\) is formed.</p></div>
+</div>
+</section>
+
+<section id="step">
+<h2>5 · One practice pair, step by step</h2>
+<p>Uses the selected world and the sandbox's current practice angles (section 7). Each row is one action: the generator samples \(a_t\) from \(p_t=p_\theta(+\mid s_t,g)\), and the checker supplies \(s_{t+1}\).</p>
+<figure class="widget">
+<div class="controls"><label>Query <select id="query"></select></label><button id="randomQuery">Random query</button><button id="samplePair" class="primary">Sample two routes</button><button id="contrastPair">Sample until outcomes differ</button></div>
+<div class="routes">
+<div class="panel"><h3 id="routeHeadA">Route A</h3><div class="table-wrap"><table><thead><tr><th class="n">\(t\)</th><th class="n">\(s_t\)</th><th class="n">\(\theta_g-\theta_{s_t}\)</th><th class="n">\(p_t\)</th><th class="n">\(a_t\)</th><th class="n">\(e_t\)</th><th class="n">\(s_{t+1}\)</th></tr></thead><tbody id="routeA"></tbody></table></div></div>
+<div class="panel"><h3 id="routeHeadB">Route B</h3><div class="table-wrap"><table><thead><tr><th class="n">\(t\)</th><th class="n">\(s_t\)</th><th class="n">\(\theta_g-\theta_{s_t}\)</th><th class="n">\(p_t\)</th><th class="n">\(a_t\)</th><th class="n">\(e_t\)</th><th class="n">\(s_{t+1}\)</th></tr></thead><tbody id="routeB"></tbody></table></div></div>
+</div>
+<div class="panel" style="margin-top:14px"><h3>This pair's contribution to \(\Delta\theta\) (radians)</h3><p class="small" id="pairNote"></p><div class="chart-box" style="border:none;padding:0"><svg id="deltaBars" viewBox="0 0 560 170" role="img" aria-label="Signed change of each state's angle from this pair."></svg></div></div>
+</figure>
+</section>
+
+<section id="eval">
+<h2>6 · Evaluation</h2>
+<div class="spec">
+<div>
+<p>Success is computed exactly rather than sampled. With \(p=p_\theta(+\mid s,g)\), a backward recursion over the remaining horizon gives the probability of arriving:</p>
+<div class="eq">\[\begin{aligned}V_0(s,g)&=\mathbb 1[s=g],\qquad V_h(g,g)=1,\\ V_h(s,g)&=p\,V_{h-1}\big(T_+(s),g\big)\\ &\quad+(1-p)\,V_{h-1}\big(T_-(s),g\big)\quad(s\neq g),\end{aligned}\]</div>
+<div class="eq">\[\text{success}(\theta)=\frac1{|Q|}\sum_{(s,g)\in Q}V_H(s,g).\]</div>
+</div>
+<div>
+<p>With the true \(T\) this is the <b>true success</b> that is reported; with \(\hat T\) it is the checker-predicted \(J(\theta)\). The two coincide in all 32 worlds because every \(\hat T\) is correct. Each \(V_h\) is a \(12\times12\) array, so evaluation costs \(6\times144\) operations.</p>
+<p>Recorded every 20 updates: true success, \(J\), and \(L\). Runs are independent per world: 32 worlds, seeds 86200–86231, after an 8-world pilot. Across the 32 saved practice runs, mean final true success is {{savedMean}}.</p>
+</div>
+</div>
+</section>
+
+<section id="sandbox">
+<h2>7 · Run it</h2>
+<p>A JavaScript re-implementation of the run source, applied to the selected world. All four methods start from the same angles and are updated side by side. Random seeds differ from the saved NumPy run, so single trajectories differ; the dashed grey line is the saved practice run for this world.</p>
+<figure class="widget">
+<div class="controls">
+<label>Start <select id="init"><option value="folded">Folded optimum of ordinary training (main experiment)</option><option value="random">Random angles + 5,000 steps of ordinary training (η = 1)</option><option value="circle">Once-round circle (reference)</option></select></label>
+<label>Seed <select id="seed"></select></label>
+<button id="run" class="primary">Run to 3,000</button><button id="step100">+100 updates</button><button id="reset">Reset</button>
+<span class="small stat" id="sandboxStatus"></span>
+</div>
+<div class="charts">
+<div class="chart-box"><h3>True route success ↑</h3><svg id="successChart" viewBox="0 0 560 300" role="img" aria-label="True route success of the four methods during the sandbox run."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Ordinary-training loss \(L\) ↓</h3><svg id="lossChart" viewBox="0 0 400 300" role="img" aria-label="Ordinary-training loss of the four methods during the sandbox run."></svg><div class="tooltip"></div></div>
+</div>
+<div class="legend" id="legend"></div>
+</figure>
+<p class="small" style="margin-top:8px">On the page, the embedding in section 3 and the routes in section 5 follow the practice run here, and section 3 updates live while it runs.</p>
+</section>
+
+<section id="arrays">
+<h2>8 · Arrays and settings</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Symbol</th><th>Code name</th><th>Type</th><th>Shape</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>\(T\)</td><td><code>truth</code></td><td>int ∈ 𝒮</td><td class="mono">(12, 2)</td><td>true next state; column 0 is \(+\), column 1 is \(-\). Hidden from the learner</td></tr>
+<tr><td>\(N\)</td><td><code>counts</code></td><td>int</td><td class="mono">(12, 2, 12)</td><td>observation counts; each \((s,a)\) row sums to \(K=5\)</td></tr>
+<tr><td>\(\hat T\)</td><td><code>learned</code></td><td>int ∈ 𝒮</td><td class="mono">(12, 2)</td><td>checker table, <code>counts.argmax(-1)</code>; frozen</td></tr>
+<tr><td>\(\hat\rho\)</td><td><code>ordering</code></td><td>int</td><td class="mono">(12,)</td><td>order found by following \(\hat T_+\) from state 0; used only to build the folded start</td></tr>
+<tr><td>\(Q\)</td><td><code>queries</code></td><td>int</td><td class="mono">(108, 2)</td><td>(start, goal) pairs, built from \(\hat T\)</td></tr>
+<tr><td>\(\theta\)</td><td><code>angles</code></td><td>float</td><td class="mono">(12,)</td><td>generator parameters; \(\mathbf U=(\cos\theta,\sin\theta)\) is \(2\times12\)</td></tr>
+<tr><td>\(s_t,\ g\)</td><td><code>state, goal</code></td><td>int</td><td class="mono">(64,)</td><td>current states and goals of the batch (pairs at positions \(2k,2k+1\))</td></tr>
+<tr><td>\(a_t,\ p_t,\ e_t\)</td><td><code>action, probability, local</code></td><td>bool, float, float</td><td class="mono">(64,) × H</td><td>one record per step; \(e_t=0\) after arrival</td></tr>
+<tr><td>\(r,\ c\)</td><td><code>reward, coefficient</code></td><td>float</td><td class="mono">(64,)</td><td>verdicts and paired coefficients \((r_j-r_{j'})/64\)</td></tr>
+<tr><td>\(V_h\)</td><td><code>values</code></td><td>float</td><td class="mono">(12, 12)</td><td>arrival probability with \(h\) steps left, indexed (state, goal)</td></tr>
+</tbody></table></div>
+<p class="small" style="margin-top:8px">In the code every array carries a leading world axis of length 32, and all 32 worlds are updated in parallel.</p>
+<div class="cols3" style="margin-top:6px">
+<div class="panel"><h3>Starting points</h3><p class="small"><b>Folded</b>: \(\theta_{\hat\rho_i}=i\pi/2\), the exact global minimum of \(L\) (main experiment). <b>Ordinary start</b>: \(\theta\sim\mathrm{Unif}[0,2\pi)^{12}\), then 5,000 full-batch steps on \(L\) at \(\eta=1\) (control). <b>Once round</b>: \(\theta_{\rho_i}=2\pi i/12\) (reference only).</p></div>
+<div class="panel"><h3>Data generation</h3><p class="small">Per world, <code>np.random.default_rng(seed)</code>: \(\rho\) = <code>permutation(12)</code>; then for each \((s,a)\), 5 observations, each corrupted with probability 0.05 to <code>integers(12)</code>.</p></div>
+<div class="panel"><h3>Code</h3><p class="small">Exact source of the main run (one file, NumPy): <a href="practice-loop-model-files/practice_loop_ring_confirmation.py">practice_loop_ring_confirmation.py</a>. Results and controls: <a href="toy_model_1_ring.html">toy_model_1_ring.html</a>.</p></div>
+</div>
+</section>
+<footer>Built {{built}}. Shared copy: <code>/ceph/scratch/jbauer/reports/generative-learning/practice-loop-model.html</code>. Builder: <code>/nfs/nhome/live/jbauer/generative-learning/experiments/practice_loop_model_page.py</code>.</footer>
+</main>
+<script id="model-data" type="application/json">__MODEL_DATA__</script>
+<script>
+// own scope: a host page (OverLyX's runtime, say) may already have globals of these names
+(() => {
+'use strict';
+const D = JSON.parse(document.getElementById('model-data').textContent);
+const $ = id => document.getElementById(id), NS = 'http://www.w3.org/2000/svg', TAU = 2 * Math.PI;
+const S = 12, H = 6, BETA = 6, RATE = .1, BATCH = 64, STEPS = 3000, EVERY = 20;
+const pct = v => (100 * v).toFixed(1) + '%', share = (v, tip) => tip ? pct(v) : Math.round(100 * v) + '%';
+const sig = x => 1 / (1 + Math.exp(-x)), softplus = z => Math.max(z, 0) + Math.log1p(Math.exp(-Math.abs(z)));
+function el(parent, tag, attrs = {}, text) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text !== undefined) e.textContent = text; parent.append(e); return e; }
+function mulberry(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// ---------- the model (mirrors run_source.py: exact, atomic, sampled) ----------
+function arrival(theta, T) {
+  let V = Array.from({length: S}, (_, s) => Array.from({length: S}, (_, g) => +(s === g)));
+  const p = Array.from({length: S}, (_, s) => Array.from({length: S}, (_, g) => sig(BETA * Math.sin(theta[g] - theta[s]))));
+  for (let h = 0; h < H; h++) V = V.map((row, s) => row.map((_, g) => s === g ? 1 : p[s][g] * V[T[s][0]][g] + (1 - p[s][g]) * V[T[s][1]][g]));
+  return V;
+}
+function exact(theta, T, Q) { const V = arrival(theta, T); return Q.reduce((sum, [s, g]) => sum + V[s][g], 0) / Q.length; }
+function atomicLoss(theta, T) { let sum = 0; for (let s = 0; s < S; s++) for (let a = 0; a < 2; a++) { const z = BETA * Math.sin(theta[T[s][a]] - theta[s]); sum += softplus(z) - (a === 0 ? z : 0); } return sum / (2 * S); }
+function atomicGrad(theta, T) {
+  const grad = Array(S).fill(0);
+  for (let s = 0; s < S; s++) for (let a = 0; a < 2; a++) { const d = theta[T[s][a]] - theta[s], local = ((a === 0 ? 1 : 0) - sig(BETA * Math.sin(d))) * BETA * Math.cos(d) / (2 * S); grad[T[s][a]] += local; grad[s] -= local; }
+  return grad;
+}
+function rollout(theta, T, s, g, random) {
+  const steps = []; let alive = s !== g;
+  for (let t = 0; t < H; t++) {
+    const d = theta[g] - theta[s], p = sig(BETA * Math.sin(d)), a = random() < p, local = alive ? ((a ? 1 : 0) - p) * BETA * Math.cos(d) : 0;
+    if (alive) { const next = T[s][a ? 0 : 1]; steps.push({s, d, p, a, e: local, next}); s = next; alive = s !== g; }
+  }
+  return {steps, r: +(s === g), g};
+}
+function practiceGrad(theta, T, Q, random, mode) {
+  const routes = [];
+  for (let k = 0; k < BATCH / 2; k++) { const [s, g] = Q[Math.floor(random() * Q.length)]; routes.push(rollout(theta, T, s, g, random), rollout(theta, T, s, g, random)); }
+  const r = routes.map(x => x.r);
+  if (mode === 'shuffled') for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  const grad = Array(S).fill(0);
+  routes.forEach((route, j) => { const c = mode === 'unjudged' ? 1 / BATCH : (r[j] - r[j ^ 1]) / BATCH; for (const st of route.steps) { grad[route.g] += c * st.e; grad[st.s] -= c * st.e; } });
+  return grad;
+}
+const add = (theta, grad, rate) => theta.map((v, i) => v + rate * grad[i]);
+function foldedStart(order) { const t = Array(S); order.forEach((s, i) => t[s] = i * Math.PI / 2); return t; }
+function circleStart(order) { const t = Array(S); order.forEach((s, i) => t[s] = i * TAU / S); return t; }
+function ordinaryStart(T, random) { let t = Array.from({length: S}, () => random() * TAU); for (let i = 0; i < 5000; i++) t = add(t, atomicGrad(t, T), 1); return t; }
+window.MODEL = {exact, atomicLoss, atomicGrad, practiceGrad, foldedStart, add, mulberry}; window.D = D;  // for the browser check
+
+// ---------- shared state ----------
+let w = 0, W = D.worlds[0];
+const METHODS = [
+  {key: 'practice', label: 'Practice', color: 'var(--s1)', dash: ''},
+  {key: 'continue', label: 'Ordinary training, continued', color: 'var(--s2)', dash: ''},
+  {key: 'unjudged', label: 'Practice, no verdict', color: 'var(--s3)', dash: '6 4'},
+  {key: 'shuffled', label: 'Practice, shuffled verdicts', color: 'var(--s4)', dash: '2 3'},
+];
+let box = null, timer = null, pairCounter = 1, query = 0;
+
+// ---------- drawing helpers ----------
+function ring(svg, theta, neighbours) {
+  svg.replaceChildren();
+  const C = 160, R = 104, P = theta.map(t => [C + R * Math.cos(t), C - R * Math.sin(t)]);
+  el(svg, 'circle', {cx: C, cy: C, r: R, class: 'ring-guide'});
+  if (neighbours) el(svg, 'polygon', {points: neighbours.map(s => P[s].join(',')).join(' '), class: 'ring-line'});
+  const groups = [];
+  theta.forEach((t, s) => { const g = groups.find(g => Math.abs(Math.atan2(Math.sin(t - g.t), Math.cos(t - g.t))) < .09); if (g) g.ids.push(s); else groups.push({t, ids: [s]}); });
+  for (const g of groups) {
+    const c = Math.cos(g.t);
+    el(svg, 'circle', {cx: C + R * Math.cos(g.t), cy: C - R * Math.sin(g.t), r: 6, class: 'ring-dot'});
+    el(svg, 'text', {x: C + (R + 18) * Math.cos(g.t), y: C - (R + 18) * Math.sin(g.t) + 4.5, 'text-anchor': c > .35 ? 'start' : c < -.35 ? 'end' : 'middle', class: 'ring-label'}, g.ids.join('·'));
+  }
+}
+function lineChart(svg, {series, ymax, yfmt, yticks = 4, xmax, xticks, xlabel}) {
+  svg.replaceChildren();
+  const W0 = Math.max(260, Math.round(svg.parentElement.clientWidth - 20)), H0 = Math.round(Math.min(300, Math.max(220, .6 * W0))), L = 44, R = 22, T = 12, B = 40, w0 = W0 - L - R, h0 = H0 - T - B;
+  svg.setAttribute('viewBox', `0 0 ${W0} ${H0}`);
+  const X = x => L + x / xmax * w0, Y = y => T + h0 * (1 - Math.min(y, ymax) / ymax);
+  for (let i = 0; i <= yticks; i++) { const v = ymax * i / yticks; el(svg, 'line', {x1: L, x2: W0 - R, y1: Y(v), y2: Y(v), class: i ? 'gridline' : 'baseline'}); el(svg, 'text', {x: L - 7, y: Y(v) + 4, 'text-anchor': 'end', class: 'tick'}, yfmt(v)); }
+  for (const t of xticks) el(svg, 'text', {x: X(t), y: H0 - B + 17, 'text-anchor': 'middle', class: 'tick'}, t.toLocaleString('en-GB'));
+  el(svg, 'text', {x: L + w0 / 2, y: H0 - 5, 'text-anchor': 'middle', class: 'axis-title'}, xlabel);
+  for (const s of series) if (s.x.length) el(svg, 'polyline', {points: s.x.map((x, i) => `${X(x)},${Y(s.y[i])}`).join(' '), fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-dasharray': s.dash || '', 'stroke-linejoin': 'round'});
+  const tip = svg.parentElement.querySelector('.tooltip'), cross = el(svg, 'line', {y1: T, y2: T + h0, stroke: 'var(--muted)', visibility: 'hidden'}), hit = el(svg, 'rect', {x: L, y: T, width: w0, height: h0, fill: 'transparent'});
+  const hide = () => { tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden'); };
+  hit.addEventListener('pointermove', e => {
+    const b = svg.getBoundingClientRect(), xv = ((e.clientX - b.left) / b.width * W0 - L) / w0 * xmax;
+    const rows = series.filter(s => s.x.length && xv <= s.x.at(-1) + xmax / 50).map(s => { let j = 0; s.x.forEach((x, i) => { if (Math.abs(x - xv) < Math.abs(s.x[j] - xv)) j = i; }); return [s, j]; });
+    if (!rows.length) return hide();
+    const xs = rows[0][0].x[rows[0][1]];
+    cross.setAttribute('x1', X(xs)); cross.setAttribute('x2', X(xs)); cross.setAttribute('visibility', 'visible');
+    tip.innerHTML = `<b>Update ${xs.toLocaleString('en-GB')}</b>` + rows.map(([s, j]) => `<div><i style="background:${s.color}"></i>${s.label}: ${yfmt(s.y[j], true)}</div>`).join('');
+    tip.style.display = 'block'; const px = X(xs) / W0 * b.width; tip.style.left = Math.max(4, px > b.width / 2 ? px - tip.offsetWidth - 12 : px + 12) + 'px'; tip.style.top = '30px';
+  });
+  hit.addEventListener('pointerleave', hide);
+}
+
+// ---------- section renderers ----------
+function renderWorld() {
+  ring($('hiddenRing'), Array.from({length: S}, (_, s) => TAU * W.ring.indexOf(s) / S), W.ring);
+  const wrong = W.learned.flat().filter((v, i) => v !== W.truth.flat()[i]).length, noisy = W.counts.flat().reduce((n, row) => n + 5 - Math.max(...row), 0);
+  $('worldNote').textContent = `seed ${W.seed} · ${noisy} of 120 observations off the modal state · checker table ${24 - wrong}/24 correct`;
+  for (const [id, a] of [['heatPlus', 0], ['heatMinus', 1]]) {
+    const table = $(id), cap = table.querySelector('caption');
+    table.replaceChildren(cap);
+    const head = table.createTHead().insertRow(); head.append(Object.assign(document.createElement('th'), {textContent: ''}));
+    for (let n = 0; n < S; n++) head.append(Object.assign(document.createElement('th'), {textContent: n}));
+    const body = table.createTBody();
+    for (let s = 0; s < S; s++) {
+      const row = body.insertRow(); row.append(Object.assign(document.createElement('th'), {textContent: s}));
+      for (let n = 0; n < S; n++) {
+        const k = W.counts[s][a][n], cell = row.insertCell();
+        cell.textContent = k || ''; cell.title = `N[${s}, ${a ? '−' : '+'}, ${n}] = ${k}`;
+        if (k) { cell.style.background = `var(--c${k})`; cell.style.color = k >= 4 ? 'var(--surface)' : 'var(--ink)'; }
+        if (W.learned[s][a] === n) cell.className = W.truth[s][a] === n ? 'modal' : 'modal wrong';
+      }
+    }
+  }
+  $('query').replaceChildren(...W.queries.map(([s, g], i) => { const d = (W.ring.indexOf(g) - W.ring.indexOf(s) + S) % S; return new Option(`${s} → ${g} (${Math.min(d, S - d)} steps away)`, i); }));
+  query = 0; $('query').value = 0;
+}
+function renderGenerator() {
+  const t = box.runs.practice.theta;
+  $('genTitle').textContent = `Practice angles at update ${box.step.toLocaleString('en-GB')}: true success ${pct(exact(t, W.truth, W.queries))}`;
+  ring($('genRing'), t, W.ring);
+  const m = $('matrixU'), cap = m.querySelector('caption'); m.replaceChildren(cap);
+  const head = m.insertRow(); head.append(Object.assign(document.createElement('th'), {textContent: ''}));
+  for (let s = 0; s < S; s++) head.append(Object.assign(document.createElement('th'), {textContent: s}));
+  for (const [name, f] of [['cos', Math.cos], ['sin', Math.sin]]) { const row = m.insertRow(); row.append(Object.assign(document.createElement('th'), {textContent: name})); for (let s = 0; s < S; s++) { const v = f(t[s]); row.insertCell().textContent = (Math.abs(v) < .005 ? 0 : v).toFixed(2); } }
+}
+function samplePair(contrast) {
+  const t = box.runs.practice.theta, [s, g] = W.queries[query];
+  let pair, tries = 0;
+  do { const random = mulberry(7919 * pairCounter++ + 13); pair = [rollout(t, W.learned, s, g, random), rollout(t, W.learned, s, g, random)]; tries++; } while (contrast && pair[0].r === pair[1].r && tries < 500);
+  for (const [k, route] of pair.entries()) {
+    const body = $(k ? 'routeB' : 'routeA'); body.replaceChildren();
+    route.steps.forEach((st, i) => { const row = body.insertRow(); [i, st.s, (Math.atan2(Math.sin(st.d), Math.cos(st.d)) * 180 / Math.PI).toFixed(0) + '°', st.p.toFixed(3), st.a ? '+' : '−', st.e.toFixed(3), st.next].forEach(v => { const c = row.insertCell(); c.className = 'n'; c.textContent = v; }); });
+    $(k ? 'routeHeadB' : 'routeHeadA').innerHTML = `Route ${k ? 'B' : 'A'}: ${s} → ${g} · <span class="${route.r ? 'ok' : 'fail'}">r = ${route.r} (${route.r ? 'reached in ' + route.steps.length + ' steps' : 'not reached in 6'})</span>`;
+  }
+  const delta = Array(S).fill(0);
+  pair.forEach((route, j) => { const c = (route.r - pair[1 - j].r) / BATCH; for (const st of route.steps) { delta[g] += RATE * c * st.e; delta[st.s] -= RATE * c * st.e; } });
+  $('pairNote').textContent = (pair[0].r === pair[1].r ? `Both routes ${pair[0].r ? 'succeeded' : 'failed'}, so r − r′ = 0 and this pair contributes nothing.` : `Different outcomes: c = ±1/64 for this pair. Bars show η·c·e summed per state; a real update adds 31 more pairs like this.`) + (contrast ? ` (Searched ${tries} pair${tries > 1 ? 's' : ''} for differing outcomes; this filtering is for illustration only.)` : '');
+  bars(delta, g, new Set(pair.flatMap(r => r.steps.map(st => st.s))));
+}
+function bars(delta, g, visited) {
+  const svg = $('deltaBars'); svg.replaceChildren();
+  const W0 = Math.max(260, Math.round(svg.parentElement.clientWidth)), H0 = 170, L = 52, R = 10, T = 10, B = 34, bw = (W0 - L - R) / S, m = Math.max(1e-4, ...delta.map(Math.abs)), Y = v => T + (H0 - T - B) / 2 * (1 - v / m);
+  svg.setAttribute('viewBox', `0 0 ${W0} ${H0}`);
+  for (const v of [m, 0, -m]) { el(svg, 'line', {x1: L, x2: W0 - R, y1: Y(v), y2: Y(v), class: v ? 'gridline' : 'baseline'}); el(svg, 'text', {x: L - 6, y: Y(v) + 4, 'text-anchor': 'end', class: 'tick'}, v.toExponential(1)); }
+  delta.forEach((v, s) => {
+    const x = L + s * bw + bw * .2, y0 = Y(0), y1 = Y(v), rect = el(svg, 'rect', {x, y: Math.min(y0, y1), width: bw * .6, height: Math.max(1, Math.abs(y1 - y0)), rx: 2, fill: v >= 0 ? 'var(--pos)' : 'var(--neg)', opacity: v ? 1 : .25});
+    el(rect, 'title', {}, `Δθ_${s} = ${v.toExponential(3)}`);
+    el(svg, 'text', {x: x + bw * .3, y: H0 - B + 16, 'text-anchor': 'middle', class: 'tick', 'font-weight': s === g ? 700 : 400, fill: s === g ? 'var(--ink)' : visited.has(s) ? 'var(--ink2)' : 'var(--muted)'}, s === g ? `g=${s}` : s);
+  });
+  el(svg, 'text', {x: L, y: H0 - 3, class: 'axis-title'}, 'state id (g = goal; darker = visited)');
+}
+
+// ---------- sandbox ----------
+function resetBox() {
+  stop();
+  const seed = +$('seed').value, init = $('init').value, theta = init === 'folded' ? foldedStart(W.order) : init === 'circle' ? circleStart(W.order) : ordinaryStart(W.learned, mulberry(1000 + seed));
+  box = {step: 0, runs: Object.fromEntries(METHODS.map((m, i) => [m.key, {theta: theta.slice(), random: mulberry(seed * 97 + i), x: [], success: [], loss: []}]))};
+  record(); drawBox(); renderGenerator();
+  // open the step-through on the query whose two routes are most likely to disagree
+  const V = arrival(box.runs.practice.theta, W.learned), spread = W.queries.map(([s, g]) => V[s][g] * (1 - V[s][g]));
+  query = spread.indexOf(Math.max(...spread)); $('query').value = query; samplePair(true);
+}
+function record() { for (const run of Object.values(box.runs)) { run.x.push(box.step); run.success.push(exact(run.theta, W.truth, W.queries)); run.loss.push(atomicLoss(run.theta, W.learned)); } }
+function advance(n) {
+  for (let i = 0; i < n && box.step < STEPS; i++) {
+    for (const [key, run] of Object.entries(box.runs)) run.theta = add(run.theta, key === 'continue' ? atomicGrad(run.theta, W.learned) : practiceGrad(run.theta, W.learned, W.queries, run.random, key), RATE);
+    box.step++; if (box.step % EVERY === 0) record();
+  }
+}
+function drawBox() {
+  const xt = [0, 1000, 2000, 3000], saved = $('init').value === 'folded' ? [{label: 'Saved practice run', color: 'var(--muted)', dash: '4 3', width: 1.5, x: D.steps, y: W.saved}] : [];
+  lineChart($('successChart'), {series: [...saved, ...METHODS.map(m => ({...m, x: box.runs[m.key].x, y: box.runs[m.key].success}))], ymax: 1, yfmt: share, xmax: STEPS, xticks: xt, xlabel: 'Updates'});
+  const top = Math.max(.01, ...METHODS.flatMap(m => box.runs[m.key].loss)), step = [.01, .02, .05, .1, .2, .25, .5, 1, 2, 5].find(d => Math.ceil(top / d) <= 5), ticks = Math.ceil(top / step);
+  lineChart($('lossChart'), {series: METHODS.map(m => ({...m, x: box.runs[m.key].x, y: box.runs[m.key].loss})), ymax: ticks * step, yticks: ticks, yfmt: (v, tip) => v.toFixed(tip ? 4 : 2), xmax: STEPS, xticks: xt, xlabel: 'Updates'});
+  const last = k => box.runs[k].success.at(-1);
+  $('sandboxStatus').textContent = `update ${box.step.toLocaleString('en-GB')} · practice ${pct(last('practice'))} · continued ${pct(last('continue'))}`;
+}
+function stop() { if (timer) { cancelAnimationFrame(timer); timer = null; } $('run').textContent = 'Run to 3,000'; }
+function play() {
+  if (timer) return stop();
+  if (box.step >= STEPS) resetBox();
+  $('run').textContent = 'Pause';
+  const tick = () => { advance(40); drawBox(); renderGenerator(); if (box.step < STEPS) timer = requestAnimationFrame(tick); else { stop(); samplePair(true); } };
+  timer = requestAnimationFrame(tick);
+}
+
+// ---------- wiring ----------
+for (const x of D.worlds) { x.ring = [0]; while (x.ring.length < S) x.ring.push(x.truth[x.ring.at(-1)][0]); }  // true ring order, for display only
+$('world').replaceChildren(...D.worlds.map((x, i) => new Option(`World ${i + 1} (seed ${x.seed}) · saved run ends at ${pct(x.saved.at(-1))}`, i)));
+$('seed').replaceChildren(...Array.from({length: 10}, (_, i) => new Option(String(i + 1), i + 1)));
+$('legend').innerHTML = [...METHODS, {label: 'Saved practice run (folded start)', color: 'var(--muted)', dash: '4 3'}].map(s => `<span><svg viewBox="0 0 24 10" aria-hidden="true"><line x1="1" x2="23" y1="5" y2="5" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="${s.dash}"/></svg>${s.label}</span>`).join('');
+$('world').onchange = e => { w = +e.target.value; W = D.worlds[w]; renderWorld(); resetBox(); };
+$('init').onchange = resetBox; $('seed').onchange = resetBox; $('reset').onclick = resetBox; $('run').onclick = play;
+$('step100').onclick = () => { stop(); advance(100); drawBox(); renderGenerator(); };
+$('query').onchange = e => { query = +e.target.value; samplePair(false); };
+$('randomQuery').onclick = () => { query = Math.floor(Math.random() * W.queries.length); $('query').value = query; samplePair(false); };
+$('samplePair').onclick = () => samplePair(false); $('contrastPair').onclick = () => samplePair(true);
+let width = innerWidth; addEventListener('resize', () => { if (innerWidth !== width) { width = innerWidth; drawBox(); samplePair(false); } });
+w = D.worlds.findIndex(x => x.saved.at(-1) > .95); W = D.worlds[w]; $('world').value = w;
+renderWorld(); resetBox();
+window.reportReady = true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2514 @@
+{
+  "base": {
+    "output": "results/deep_wake_sleep/tuning",
+    "visible": 6,
+    "width": 32,
+    "strength": 2.0,
+    "coupled": false,
+    "generator_noise": 0.05,
+    "lr_g": 0.003,
+    "batch": 128,
+    "sampled": false,
+    "budget": 4096,
+    "eval_points": 36,
+    "accuracy_stop": 1e-08
+  },
+  "cases": [
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n0_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n0_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n0_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n0_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n0_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n0_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n0_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n0_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n0_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n0_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n0_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n0_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n0_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n0_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n0_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n0_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n0_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n0_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n0_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n0_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n0_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n0_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n0_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n0_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n6_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n6_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n6_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n6_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n6_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n6_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n6_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n6_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n6_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n6_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n6_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n6_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n6_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n6_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n6_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n6_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n6_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n6_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n6_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n6_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q1_n6_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q1_n6_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q1_n6_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q1_n6_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n0_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n0_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n0_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n0_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n0_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n0_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n0_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n0_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n0_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n0_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n0_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n0_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n0_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n0_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n0_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n0_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n0_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n0_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n0_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n0_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n0_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n0_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n0_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n0_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n6_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n6_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n6_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n6_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n6_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n6_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n6_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n6_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n6_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n6_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n6_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n6_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n6_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n6_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n6_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n6_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n6_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n6_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n6_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n6_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g1q3_n6_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g1q3_n6_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g1q3_n6_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        6
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g1q3_n6_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n0_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n0_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n0_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n0_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n0_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n0_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n0_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n0_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n0_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n0_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n0_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n0_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n0_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n0_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n0_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n0_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n0_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n0_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n0_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n0_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n0_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n0_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n0_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n0_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n6_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n6_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n6_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n6_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n6_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n6_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n6_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n6_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n6_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n6_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n6_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n6_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n6_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n6_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n6_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n6_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n6_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n6_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n6_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n6_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q1_n6_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q1_n6_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q1_n6_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 1,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q1_n6_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n0_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n0_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n0_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n0_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n0_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n0_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n0_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n0_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n0_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n0_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n0_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n0_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n0_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n0_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n0_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n0_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n0_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n0_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n0_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n0_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n0_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n0_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n0_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 0.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n0_adam_lr0.03_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n6_sgd_lr0.5_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n6_sgd_lr0.5_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n6_sgd_lr0.5_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 0.5,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n6_sgd_lr0.5_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n6_sgd_lr2_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n6_sgd_lr2_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n6_sgd_lr2_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 2.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n6_sgd_lr2_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n6_sgd_lr8_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n6_sgd_lr8_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n6_sgd_lr8_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "sgd",
+      "lr_r": 8.0,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n6_sgd_lr8_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n6_adam_lr0.003_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n6_adam_lr0.003_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n6_adam_lr0.003_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.003,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n6_adam_lr0.003_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n6_adam_lr0.01_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n6_adam_lr0.01_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n6_adam_lr0.01_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.01,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n6_adam_lr0.01_sleep_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9502,
+      "name": "g3q3_n6_adam_lr0.03_elbo_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "elbo",
+      "seed": 9503,
+      "name": "g3q3_n6_adam_lr0.03_elbo_s9503"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9502,
+      "name": "g3q3_n6_adam_lr0.03_sleep_s9502"
+    },
+    {
+      "layers": [
+        2,
+        2,
+        2
+      ],
+      "recognition_depth": 3,
+      "neglect": 6.0,
+      "optimizer": "adam",
+      "lr_r": 0.03,
+      "arm": "sleep",
+      "seed": 9503,
+      "name": "g3q3_n6_adam_lr0.03_sleep_s9503"
+    }
+  ]
+}

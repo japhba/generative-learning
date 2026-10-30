@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="overlyx" content="page">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>Learning by practice</title>
+<style>/*__KATEX_CSS__*/</style>
+<style>
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:0 16px 64px}
+header{padding:48px 0 8px}
+h1{font-size:clamp(1.8rem,4.4vw,2.6rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
+h3{font-size:1.05rem;margin:22px 0 6px}
+h4{font-size:1rem;margin:0 0 6px}
+p{margin:0 0 14px}
+a{color:var(--link)}
+section{padding-top:40px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
+.lede{font-size:1.1rem;color:var(--ink2)}
+.small{font-size:.88rem;color:var(--ink2)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.tile strong{display:block;font-size:1.6rem;line-height:1.2;margin-bottom:4px}
+.tile span{font-size:.88rem;color:var(--ink2)}
+.takeaways{padding-left:22px;margin:0}.takeaways li{margin-bottom:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;min-width:0}
+.panel h3{margin-top:0}.panel p:last-child,.panel ol:last-child{margin-bottom:0}
+.panel ol{padding-left:20px;margin:0 0 10px}
+.act{display:inline-block;min-width:1.4em;text-align:center;border:1px solid var(--axis);border-radius:5px;font-weight:700;line-height:1.3}
+.eq{overflow-x:auto;overflow-y:hidden;margin:6px 0 12px}
+details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin:12px 0}
+summary{cursor:pointer;font-weight:650}
+details>*:nth-child(2){margin-top:12px}
+details p:last-child{margin-bottom:0}
+figure{margin:16px 0}
+figcaption{font-size:.88rem;color:var(--ink2);margin-top:6px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px 6px;position:relative;min-width:0}
+.chart-box h3{margin:0 6px 2px;font-size:.95rem}
+.chart-box svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--ink2);margin:10px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend svg{width:26px;height:10px}
+svg text{font-family:inherit}
+.tick{fill:var(--muted);font-size:12px}
+.axis-title{fill:var(--ink2);font-size:12px}
+.gridline{stroke:var(--grid);stroke-width:1}
+.baseline{stroke:var(--axis);stroke-width:1}
+.direct{font-size:12px;fill:var(--ink);font-weight:650}
+.tooltip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.8rem;box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap;display:none;z-index:2}
+.tooltip b{font-weight:650}.tooltip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;font-style:normal}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-space:nowrap}
+footer code{overflow-wrap:anywhere}
+.why{max-width:560px}.why td{text-align:right;font-variant-numeric:tabular-nums}.why th{font-weight:400}
+tr.group th{padding-top:18px;font-weight:650;border-bottom:none;color:var(--ink)}
+.table-wrap{overflow-x:auto}
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ring-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;min-width:0}
+.ring-box h3{margin:0 0 4px;font-size:.95rem}
+.ring-box svg{width:100%;max-width:340px;height:auto}
+.ring-line{fill:none;stroke:var(--s1);stroke-width:1.5;opacity:.55}
+.ring-guide{fill:none;stroke:var(--grid);stroke-width:1}
+.ring-dot{fill:var(--s1);stroke:var(--surface);stroke-width:2}
+.ring-label{font-size:13px;fill:var(--ink);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:6px 0 12px}
+.controls label{font-size:.88rem;color:var(--ink2);display:flex;align-items:center;gap:8px}
+select,button{font:inherit;font-size:.9rem;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:6px 10px}
+button{cursor:pointer}button:hover{border-color:var(--ink2)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.slider{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
+.slider input{flex:1;min-width:0;accent-color:var(--s1)}
+.slider output{font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--ink2);min-width:12ch;text-align:right}
+.explorer{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:14px;align-items:start}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.columns ul{padding-left:20px;margin:0}.columns li{margin-bottom:8px}
+.callout{background:var(--note);border-radius:10px;padding:12px 16px;margin:14px 0}
+.paths code{font-size:.82rem;overflow-wrap:anywhere}
+.paths li{margin-bottom:8px}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
+@media (max-width:720px){body{font-size:16px}.tiles,.two,.charts,.rings,.explorer,.columns{grid-template-columns:1fr}header{padding-top:28px}section{padding-top:32px}}
+@media print{.controls,.slider{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="eyebrow">Generative learning · toy model 1 · ring</div>
+<h1>Practice can repair a map that ordinary training gets wrong</h1>
+<p class="lede">A learner sees only single steps in a small hidden world. Trained the usual way on those steps, it builds an internal map on which long routes fail. If it practises instead, inventing routes, checking them against what it already knows and reinforcing the ones that work, route success rises from {{start}} to {{practice}}. It gets no new data.</p>
+<div class="tiles">
+<div class="tile"><strong>{{start}} → {{practice}}</strong><span>route success with practice, mean of {{runs}} worlds</span></div>
+<div class="tile"><strong>{{continue}}</strong><span>ordinary training, continued for the same 3,000 updates</span></div>
+<div class="tile"><strong>{{slow}}</strong><span>a different objective on the same single-step data, without practice</span></div>
+</div>
+</header>
+
+<section id="summary">
+<h2>Summary</h2>
+<ol class="takeaways">
+<li><b>The question.</b> Can a loop of <i>generate → check → learn</i> make a generator better than its own training objective allows, without any new data from the world?</li>
+<li><b>Yes, in this toy.</b> The best possible solution of the generator's training objective is a bad map: it folds the 12 states onto 4 points. Practice moves the generator to a better map. Route success rises while the training objective gets worse, so practice is doing something that more of the original training could not.</li>
+<li><b>The checker's verdicts drive it.</b> Practising without verdicts, or with verdicts shuffled between routes, leaves route success where it started.</li>
+<li><b>Practice is not the only way, though.</b> A different objective on the same single-step data (slow-feature learning) finds the good map directly ({{slow}}). The result shows that practice <i>can</i> beat this particular training objective, not that practice is <i>necessary</i>.</li>
+</ol>
+</section>
+
+<section id="setup">
+<h2>The setup</h2>
+<h3>World and task</h3>
+<p>Twelve states sit on a hidden ring. Action <span class="act">+</span> moves one step one way round the ring, action <span class="act">−</span> one step the other way. A task gives a start and a goal at least two steps apart, and the goal must be reached within six actions. There are 108 such tasks.</p>
+<h3>What the learner sees</h3>
+<p>Five observations of every (state, action) pair, 120 in total, each of the form “in state \(s\), action \(a\) led to state \(s'\)”. Each observation is corrupted with probability 5% (its next state is replaced by a random one). The learner never sees a multi-step route, and gets no further data after these 120.</p>
+<div class="two">
+<article class="panel"><h3>Checker (recognition model)</h3><p>For every state and action, it stores the next state seen most often among the five observations, then freezes this table. With it, the checker can play out any proposed sequence of actions and say whether it reaches the goal. In all {{runs}} worlds the table came out exactly right.</p></article>
+<article class="panel"><h3>Generator (generation model)</h3><p>It places each state \(i\) at an angle \(\theta_i\) on a circle, \(\mathbf{u}_i=(\cos\theta_i,\sin\theta_i)\). In state \(s\) with goal \(g\) it chooses <span class="act">+</span> with probability</p><div class="eq">\[p(+\mid s,g)=\sigma\big(6\sin(\theta_g-\theta_s)\big),\]</div><p>so it tends to step <span class="act">+</span> when the goal lies anticlockwise of the current state on its internal circle. These 12 angles are all it learns.</p></article>
+</div>
+<h3>Two ways to train the generator</h3>
+<div class="two">
+<article class="panel"><h4>Ordinary training (the baseline)</h4><p>For each observed single step \(s\to s'\), predict which action was taken. This is the generator's original objective: reconstructing the observed data. Its loss is called the <b>single-step loss</b> below.</p></article>
+<article class="panel"><h4>Practice</h4><ol><li>Pick a start and a goal.</li><li>The generator proposes two routes, one action at a time. After each action the checker supplies the next state.</li><li>The checker says whether each route reached the goal.</li><li>If one route succeeded and the other failed, shift the angles towards the choices made on the successful route and away from those on the failed one.</li></ol><p class="small">There is no new data and no outside judge. Every route and every verdict comes from the learner's own two parts.</p></article>
+</div>
+<details><summary>The exact learning rule</summary>
+<p>While a route runs, each step \(t\) leaves a trace \(e_t = 6\,(a_t-p_t)\cos(\theta_g-\theta_{s_t})\), where \(a_t=1\) if the step was <span class="act">+</span> and \(p_t\) is the probability the generator gave to <span class="act">+</span>. Once both routes of a pair are judged, with \(r\) this route's success and \(b\) its partner's (each 0 or 1):</p>
+<div class="eq">\[\begin{gathered}\Delta\theta_g=\eta\,(r-b)\sum_t e_t,\\ \Delta\theta_{s_t}=-\eta\,(r-b)\,e_t .\end{gathered}\]</div>
+<p>Each update averages 32 pairs (64 routes), with \(\eta=0.1\), for 3,000 updates. Only quantities at the current state and the goal enter, multiplied by a single success signal, so this is a reward-modulated, Hebb-like rule. Nothing is back-propagated through the checker. On average the update equals the gradient of the route success predicted by the checker: it is REINFORCE, with the partner route serving as the baseline.</p>
+</details>
+</section>
+
+<section id="result">
+<h2>Result: success rises while the original objective gets worse</h2>
+<p>All {{runs}} worlds start from the best possible solution of ordinary training. (The next section explains why that solution is bad.) Lines are means over worlds, shading is ±1 standard error, and the faint blue lines are the individual practice runs. Hover for values.</p>
+<figure>
+<div class="charts">
+<div class="chart-box"><h3>Route success on all 108 tasks ↑</h3><svg id="successChart" viewBox="0 0 560 330" role="img" aria-label="Route success over 3,000 updates: practice rises from {{start}} to {{practice}}; the three controls stay between 11% and 14%."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Single-step loss (original objective) ↓</h3><svg id="lossChart" viewBox="0 0 560 330" role="img" aria-label="Single-step loss over 3,000 updates: it stays at the optimum under ordinary training and rises under practice and under unjudged practice."></svg><div class="tooltip"></div></div>
+</div>
+<div class="legend" id="legend"></div>
+<figcaption>{{runs}} fresh worlds (seeds 86200–86231), run after an 8-world pilot. Success is computed exactly over the generator's action probabilities on all 108 tasks, not estimated from the training routes. <i>No verdict</i>: every route is reinforced whatever its outcome. <i>Shuffled verdicts</i>: verdicts are reassigned at random among the routes in each update.</figcaption>
+</figure>
+<ul>
+<li>Practice raises route success from {{start}} to {{practice}}, a gain of {{gain}} percentage points over ordinary training (95% bootstrap CI {{gainCI}}). {{above90}} of {{runs}} runs end above 90% and {{below30}} end below 30%, so practice improves most worlds but does not always find the best map.</li>
+<li>The single-step loss rises from {{lossStart}} to {{lossPractice}}. The generator moves <em>away</em> from the optimum of its original objective, so practice is not simply more of the same training.</li>
+<li>Reinforcing every route regardless of outcome changes the weights even more (loss {{lossUnjudged}}) but barely changes success ({{unjudged}}). Shuffled verdicts give {{shuffled}}. Changing the weights is not enough: the verdicts set the direction.</li>
+</ul>
+</section>
+
+<section id="why">
+<h2>Why ordinary training gets stuck</h2>
+<p>Ordinary training is scored one step at a time. A single step is predicted most confidently when neighbouring states sit 90° apart on the generator's circle, because \(\sin 90^\circ = 1\) gives the largest possible logit, 6. Twelve steps of 90° go round the circle three times, so states 1, 5 and 9 land on the same point, as do 2·6·10, 3·7·11 and 4·8·12. This folded map is the exact global optimum of ordinary training (loss {{lossStart}}), yet only {{start}} of routes succeed on it.</p>
+<p>A map that goes round once (30° per step) is good for routes ({{ideal}} success) but <em>worse</em> on single steps: \(\sin 30^\circ = \tfrac12\) halves the logit and raises the loss to {{lossIdeal}}. The two objectives genuinely disagree, so no amount of ordinary training reaches the good map.</p>
+<div class="rings">
+<div class="ring-box"><h3>Folded: optimum of ordinary training</h3><svg id="ringFolded" viewBox="-16 0 352 320" role="img" aria-label="Twelve states on four points: 1, 5 and 9 coincide, and so on."></svg><div class="small">90° per step, three times round</div></div>
+<div class="ring-box"><h3>Once round: what routes need</h3><svg id="ringOnce" viewBox="-16 0 352 320" role="img" aria-label="Twelve states evenly spaced once round the circle in their true order."></svg><div class="small">30° per step, once round</div></div>
+</div>
+<h3>What the generator does with a goal \(d\) steps ahead</h3>
+<div class="table-wrap"><table class="why"><thead><tr><th>\(d\) steps ahead</th><th class="num">Folded map: P(step towards goal)</th><th class="num">Once-round map: P(step towards goal)</th></tr></thead><tbody>{{whyRows}}</tbody></table></div>
+<p class="small" style="margin-top:10px">On the folded map the angle to a goal is a multiple of 90°. Goals 2 or 4 steps ahead give \(\sin = 0\), a coin flip, and a goal 3 steps ahead gives \(\sin 270^\circ = -1\), so the generator is almost certain it should step the wrong way. On the once-round map every goal up to 5 steps ahead points the right way. (A goal 6 steps away is equally far in both directions, so 50% is correct there.)</p>
+</section>
+
+<section id="explore">
+<h2>Watch the map reorganise</h2>
+<p>Pick a world and drag the slider. On the left is where the generator places the 12 states, numbered in their true order around the ring, with a thin line joining neighbours. On the right is that world's route success.</p>
+<div class="controls">
+<label>World <select id="run"></select></label>
+<button id="toStart">Start</button><button id="toEnd">End</button><button id="play">Play</button>
+</div>
+<div class="slider"><input id="frame" type="range" min="0" max="150" value="150" aria-label="Practice update"><output id="frameOut"></output></div>
+<div class="explorer">
+<div class="ring-box"><h3 id="mapTitle"></h3><svg id="ringRun" viewBox="-16 0 352 320" role="img" aria-label="The generator's current placement of the twelve states."></svg></div>
+<div class="chart-box"><h3>Route success in this world</h3><svg id="runChart" viewBox="0 0 560 330" role="img" aria-label="Route success over practice for the selected world, with the mean over all worlds for comparison."></svg><div class="tooltip"></div></div>
+</div>
+<p class="small" style="margin-top:10px">Worlds differ. {{above90}} of {{runs}} end above 90% on a clean once-round map. The rest get stuck on a scrambled map on which only some neighbours sit next to each other, and their success stops rising (pick a world near the bottom of the list). Every world starts on the same folded map, rotated.</p>
+<details><summary>The same change in terms of the weight matrix</summary>
+<p>Stack the embeddings into \(\mathbf{U}=[\mathbf{u}_1,\dots,\mathbf{u}_{12}]\in\mathbb{R}^{2\times 12}\). The folded and the once-round map have the same singular values, \((\sqrt6,\sqrt6)\), so growth of the weights is not what changes. Their right singular vectors differ: the once-round map spans the slowest sine/cosine pattern around the ring (the first Fourier pair), the folded map the third. Practice raises the overlap with the first pair from 0 to {{mode1}} on average. Projecting the trained weights onto the first pair alone gives {{keepMode1}} route success, and removing that pair leaves {{removeMode1}}. Orientation matters too: mirroring the final map keeps its singular values and subspace but drops success to {{reflect}}.</p>
+</details>
+</section>
+
+<section id="checks">
+<h2>Checks</h2>
+<p>The most important check removes the constructed starting point. Angles start at random and the generator first gets 5,000 updates of ordinary training. Route success hardly moves during that phase, and the branch then shows the same pattern as the main result.</p>
+<figure>
+<div class="chart-box"><h3>Ordinary start: route success on all 108 tasks ↑</h3><svg id="naturalChart" viewBox="0 0 560 330" role="img" aria-label="Ordinary training from random angles keeps route success near {{natStart}}; afterwards practice rises to {{natPractice}} while continued ordinary training stays at {{natContinue}}."></svg><div class="tooltip"></div></div>
+<figcaption>Same {{runs}} worlds, fresh random initial angles. Updates 0–5,000 are ordinary training; at the dashed line each world branches into practice or 3,000 more updates of ordinary training. Mean ± 1 standard error.</figcaption>
+</figure>
+<p>Each row of the table changes one thing about the main experiment. “Before” is route success before practice, “Practice” is after it, and “Continued” is after the same budget of ordinary training instead.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Variant</th><th class="num">Before</th><th class="num">Practice</th><th class="num">Continued</th></tr></thead>
+<tbody>
+<tr class="group"><th colspan="4">Is the result an artefact of the folded starting point?</th></tr>
+<tr><td>Ordinary start: random angles, then 5,000 updates of ordinary training. 95% CI of the gain: {{natCI}}. The best stopping point anywhere along ordinary training reaches only {{natBest}}, so early stopping does not explain the gain.</td><td class="num">{{natStart}}</td><td class="num">{{natPractice}}</td><td class="num">{{natContinue}}</td></tr>
+<tr class="group"><th colspan="4">Does it carry over to goals that were never practised?</th></tr>
+<tr><td>Three goals per world are withheld from practice (ordinary start, up to 6,000 updates); success is measured on those goals only. 95% CI of the gain: {{trCI}}. The withheld states still occur as current states during practice.</td><td class="num">{{trStart}}</td><td class="num">{{trPractice}}</td><td class="num">{{trContinue}}</td></tr>
+<tr class="group"><th colspan="4">Would more reconstruction of the original data do the same?</th></tr>
+<tr><td>Ordinary training plus a decoder that must tell every state apart from its angle (10,000 updates, no practice). Every state is told apart correctly, yet routes still fail. Route success from the folded / ordinary start:</td><td class="num" colspan="3">{{idAlias}} / {{idNat}}</td></tr>
+<tr><td>Fit the raw noisy observations instead of the cleaned table (no practice). Route success from the folded / ordinary start:</td><td class="num" colspan="3">{{rawAlias}} / {{rawNat}}</td></tr>
+<tr><td><b>A different objective on the same data:</b> slow-feature learning, which keeps neighbouring states close on the circle while spreading all states out. It finds the once-round map without any practice, starting from the folded map. Planning directly with the checker's table would also solve the task.</td><td class="num" colspan="3">{{start}} → {{slow}}</td></tr>
+<tr class="group"><th colspan="4">Does the fixed gain of 6 matter?</th></tr>
+<tr><td>Gain learned along with the angles (ordinary start). The effect shrinks but remains.</td><td class="num">{{gStart}}</td><td class="num">{{gPractice}}</td><td class="num">{{gContinue}}</td></tr>
+<tr class="group"><th colspan="4">Does the checker have to be right?</th></tr>
+<tr><td>The checker knows the 7-state ring but is only 90% sure which way <span class="act">+</span> goes, and success is averaged over its belief. The start is the optimum of ordinary training, which here winds twice round (gain 2; with 7 states this map keeps every state apart). Practice with the sign of each update randomised gives {{oScrambled}}. In the less likely orientation, success falls from {{oRevStart}} to {{oRevPractice}}. (32 optimiser runs on one dataset.)</td><td class="num">{{oStart}}</td><td class="num">{{oPractice}}</td><td class="num">{{oContinue}}</td></tr>
+<tr><td>The checker infers the whole 7-state ring from 14 noisy observations, keeping a belief over all 720 possible rings; its most likely transitions are {{b35Acc}} correct. Success in the true world; {{b35Worse}} of 32 worlds get worse.</td><td class="num">{{b35Start}}</td><td class="num">{{b35Practice}}</td><td class="num">{{b35Continue}}</td></tr>
+<tr><td>The same with noisier observations ({{b55Acc}} of transitions correct); {{b55Worse}} of 32 worlds get worse.</td><td class="num">{{b55Start}}</td><td class="num">{{b55Practice}}</td><td class="num">{{b55Continue}}</td></tr>
+</tbody></table></div>
+<details><summary>Other ring sizes (16 worlds each, ordinary start, horizon = half the ring)</summary>
+<div class="table-wrap"><table><thead><tr><th>States</th><th class="num">Before</th><th class="num">Practice</th><th class="num">Continued</th><th class="num">Shuffled verdicts</th></tr></thead><tbody>{{sizeRows}}</tbody></table></div>
+<p class="small" style="margin-top:10px">Practice beats continued ordinary training at every size (all paired 95% CIs exclude zero). One 10-state world has a wrong checker table and is kept in.</p>
+</details>
+</section>
+
+<section id="meaning">
+<h2>What this shows, and what it doesn't</h2>
+<div class="columns">
+<div class="panel"><h3>Shows</h3><ul>
+<li>A generator can solve its training objective perfectly and still hold the wrong map for chaining steps together.</li>
+<li>Practice judged by the learner's own checker can repair that map, with no new data and a local, reward-modulated learning rule.</li>
+<li>The verdicts are essential, and the repair is visible directly in the weights.</li>
+</ul></div>
+<div class="panel"><h3>Does not show</h3><ul>
+<li>That practice is <i>necessary</i>: slow-feature learning on the same data, or planning with the checker's table, also works.</li>
+<li>That checking needs fewer examples than generating. Here the checker simply stores a full table, while the generator has to compress it into 12 angles.</li>
+<li>Anything about one's own versus others' examples (see below).</li>
+<li>Anything about depth or language models: the generator is one embedding layer with a fixed comparison.</li>
+<li>That every update helps. The rule follows the gradient of expected success, but single updates can hurt and some runs end low.</li>
+</ul></div>
+</div>
+</section>
+
+<section id="project">
+<h2>How this connects to the project</h2>
+<p>The project asks whether a model learns more from what it generates itself than from other models' examples. So far, the in-context studies find an own advantage only for <i>applying</i> a demonstrated multi-step procedure (PROC: +5.3 pp). This toy isolates a mechanism that could sit underneath such an effect: practice turns knowledge of single steps into a map that supports multi-step composition.</p>
+<p>It does not yet produce an own-versus-foreign difference. Nothing in the model makes the learner's own routes special, since correct routes from elsewhere could be fed through the same rule. A self advantage would need foreign routes that are correct but harder for this particular learner to use, which is the project's current hypothesis.</p>
+</section>
+
+<section id="theory">
+<h2>Theory, briefly</h2>
+<details><summary>What is guaranteed about improvement</summary>
+<p>On average the update is \(\eta\) times the gradient of the success that the checker predicts, so following it in the small-step limit (gradient flow) improves that success. When the checker is uncertain, the same holds for success averaged over its belief, which is the Bayes-expected success given the data. That is an average over worlds, which is why some individual worlds get worse.</p>
+<p>Single updates are not guaranteed to help. At the exact folded start the gradient is zero by symmetry, and the expected first update slightly <i>lowers</i> success. The randomness of sampled routes breaks the symmetry.</p>
+<p>An optional acceptance step gives a guarantee at extra cost. Propose 1,000 updates, test them on 20,000 fresh internal routes, and keep them only if success clearly improves. With high probability (at least 96.8% per world) every accepted block then truly improves success. In {{certWorlds}} worlds it accepted {{certBlocks}} blocks and moved mean success from {{certStart}} to {{certFinal}}.</p>
+</details>
+<details><summary>An in-context version of the same learner</summary>
+<p>Store each update as a key–value entry (key: state identity, value: its change of angle) and read the entries back with attention. A simulation with this growing memory reproduces the weight-learning run's actions and rewards over all 3,000 updates. This is a constructed equivalence, in the spirit of “attention as fast weights”. It does not show that a trained transformer discovers or runs this circuit.</p>
+</details>
+<details><summary>Related work</summary>
+<p>Learning from imagined experience with a learned model is Dyna (Sutton, 1990); the rule is REINFORCE with a paired baseline, and has a reward-weighted-regression reading (Dayan &amp; Hinton, 1997). That inverse-dynamics representations can be poor for control is known (Rakelly et al., 2021), and the slow-feature alternative is Laplacian representation learning (Mahadevan &amp; Maggioni, 2007; Wu et al., 2018). What the toy adds is an explicit geometric case in which the optimum of the original objective is provably the wrong map, together with the controls above.</p>
+</details>
+</section>
+
+<section id="files">
+<h2>Files</h2>
+<ul class="paths">
+<li>This report, readable by all cluster users:<br><code>/ceph/scratch/jbauer/reports/generative-learning/toy_model_1_ring.html</code></li>
+<li>Model specification (every array, objective and update, with a live sandbox): <a href="practice-loop-model.html">practice-loop-model.html</a></li>
+<li>Write-ups in LaTeX, copied next to this report when it was built: <a href="toy_model_1_ring-files/practice_loop_proposal.tex">short proposal</a> · <a href="toy_model_1_ring-files/practice_loop_ring.tex">full report with proofs and controls</a> · <a href="toy_model_1_ring-files/practice_loop_bayesian.tex">uncertain checker</a> · <a href="toy_model_1_ring-files/practice_loop_literature.tex">literature</a><br><code>/ceph/scratch/jbauer/reports/generative-learning/toy_model_1_ring-files/</code></li>
+<li>Next toy model: <a href="toy_model_2_WS.html">toy model 2, wake–sleep</a></li>
+<li>Builder (owner only): <code>/nfs/nhome/live/jbauer/generative-learning/experiments/practice_loop_report.py</code></li>
+<li>Run data (owner only): <code>/var/tmp/jbauer/generative_practice_loop_ring/</code> on u435d, archived with a SHA-256 manifest at <code>/ceph/scratch/jbauer/generative-learning/practice_research/loop/manifest.json</code></li>
+</ul>
+</section>
+<footer>Built {{built}} from <code>{{source}}</code> (SHA-256 {{sourceHash}}…). Main run settings: gain 6, step size 0.1, 64 routes per update, at most 6 actions per route, 3,000 updates.</footer>
+</main>
+<script id="report-data" type="application/json">__REPORT_DATA__</script>
+<script>
+// own scope: a host page (OverLyX's runtime, say) may already have globals of these names
+(() => {
+'use strict';
+const D = JSON.parse(document.getElementById('report-data').textContent);
+const $ = id => document.getElementById(id), NS = 'http://www.w3.org/2000/svg', TAU = 2 * Math.PI;
+const pct = v => (100 * v).toFixed(1) + '%';
+const SERIES = [
+  {key: 'practice', label: 'Practice', color: 'var(--s1)', dash: ''},
+  {key: 'continue', label: 'Ordinary training, continued', color: 'var(--s2)', dash: ''},
+  {key: 'unjudged', label: 'Practice, no verdict', color: 'var(--s3)', dash: '6 4'},
+  {key: 'shuffled', label: 'Practice, shuffled verdicts', color: 'var(--s4)', dash: '2 3'},
+];
+function el(parent, tag, attrs = {}, text) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text !== undefined) e.textContent = text; parent.append(e); return e; }
+
+// Line chart with mean lines, ±SEM bands, optional faint per-run lines, a crosshair tooltip and an optional cursor.
+// The viewBox matches the rendered width, so text stays at its CSS size on every screen.
+function lineChart(svg, {series, runs = [], ymax, yfmt, yticks = 4, xmax, xticks, xlabel, vline, cursor}) {
+  svg.replaceChildren();
+  const W = Math.max(280, Math.round(svg.parentElement.clientWidth - 20)), H = Math.round(Math.min(330, Math.max(230, .62 * W))), L = 46, R = 24, T = 14, B = 42, w = W - L - R, h = H - T - B;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const X = x => L + x / xmax * w, Y = y => T + h * (1 - y / ymax);
+  for (let i = 0; i <= yticks; i++) { const v = ymax * i / yticks; el(svg, 'line', {x1: L, x2: W - R, y1: Y(v), y2: Y(v), class: i ? 'gridline' : 'baseline'}); el(svg, 'text', {x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'tick'}, yfmt(v)); }
+  for (const t of xticks) el(svg, 'text', {x: X(t), y: H - B + 18, 'text-anchor': 'middle', class: 'tick'}, t.toLocaleString('en-GB'));
+  el(svg, 'text', {x: L + w / 2, y: H - 6, 'text-anchor': 'middle', class: 'axis-title'}, xlabel);
+  if (vline) { el(svg, 'line', {x1: X(vline.x), x2: X(vline.x), y1: T, y2: T + h, class: 'baseline', 'stroke-dasharray': '3 3'}); vline.labels.forEach(([text, anchor, dx]) => el(svg, 'text', {x: X(vline.x) + dx, y: T + 12, 'text-anchor': anchor, class: 'tick'}, text)); }
+  for (const r of runs) el(svg, 'polyline', {points: r.x.map((x, i) => `${X(x)},${Y(r.y[i])}`).join(' '), fill: 'none', stroke: r.color, 'stroke-width': 1, opacity: .16});
+  for (const s of series) {
+    if (s.sem) { const up = s.x.map((x, i) => `${X(x)},${Y(Math.min(ymax, s.mean[i] + s.sem[i]))}`), lo = s.x.map((x, i) => `${X(x)},${Y(Math.max(0, s.mean[i] - s.sem[i]))}`).reverse(); el(svg, 'polygon', {points: up.concat(lo).join(' '), fill: s.color, opacity: .14}); }
+    el(svg, 'polyline', {points: s.x.map((x, i) => `${X(x)},${Y(s.mean[i])}`).join(' '), fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-dasharray': s.dash || '', 'stroke-linejoin': 'round'});
+    if (s.direct) el(svg, 'text', {x: X(s.x.at(-1)) - 4, y: Y(s.mean.at(-1)) - 8, 'text-anchor': 'end', class: 'direct'}, s.direct);
+  }
+  if (cursor !== undefined) el(svg, 'line', {x1: X(cursor), x2: X(cursor), y1: T, y2: T + h, stroke: 'var(--ink2)', 'stroke-width': 1});
+  const tip = svg.parentElement.querySelector('.tooltip'), cross = el(svg, 'line', {y1: T, y2: T + h, stroke: 'var(--muted)', 'stroke-width': 1, visibility: 'hidden'});
+  const hit = el(svg, 'rect', {x: L, y: T, width: w, height: h, fill: 'transparent'});
+  const hide = () => { tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden'); };
+  hit.addEventListener('pointermove', e => {
+    const box = svg.getBoundingClientRect(), x = (e.clientX - box.left) / box.width * W, xv = (x - L) / w * xmax;
+    const rows = series.flatMap(s => { if (xv < s.x[0] - xmax / 60 || xv > s.x.at(-1) + xmax / 60) return []; let j = 0; for (let i = 1; i < s.x.length; i++) if (Math.abs(s.x[i] - xv) < Math.abs(s.x[j] - xv)) j = i; return [[s, j]]; });
+    if (!rows.length) return hide();
+    const xs = rows[0][0].x[rows[0][1]];
+    cross.setAttribute('x1', X(xs)); cross.setAttribute('x2', X(xs)); cross.setAttribute('visibility', 'visible');
+    tip.innerHTML = `<b>Update ${xs.toLocaleString('en-GB')}</b>` + rows.map(([s, j]) => `<div><i style="background:${s.color}"></i>${s.label}: ${yfmt(s.mean[j], true)}</div>`).join('');
+    tip.style.display = 'block';
+    const px = (X(xs) / W) * box.width, left = px > box.width / 2 ? px - tip.offsetWidth - 12 : px + 12;
+    tip.style.left = Math.max(4, left) + 'px'; tip.style.top = '36px';
+  });
+  hit.addEventListener('pointerleave', hide);
+}
+function legend() { $('legend').innerHTML = SERIES.map(s => `<span><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="${s.dash}"/></svg>${s.label}</span>`).join(''); }
+
+const share = (v, tip) => tip ? pct(v) : Math.round(100 * v) + '%';
+function mainCharts() {
+  const x = D.steps, mk = (block, s) => ({...s, x, mean: block[s.key].mean, sem: block[s.key].sem});
+  lineChart($('successChart'), {series: SERIES.map(s => mk(D.success, {...s, direct: s.key === 'practice' ? 'Practice' : ''})), runs: D.runs.map(y => ({x, y, color: 'var(--s1)'})), ymax: 1, yfmt: share, xmax: 3000, xticks: [0, 1000, 2000, 3000], xlabel: 'Practice updates'});
+  const lmax = Math.ceil(10 * Math.max(...SERIES.map(s => Math.max(...D.loss[s.key].mean.map((m, i) => m + D.loss[s.key].sem[i]))))) / 10;
+  lineChart($('lossChart'), {series: SERIES.map(s => mk(D.loss, s)), ymax: lmax, yticks: Math.round(lmax / .1), yfmt: (v, tip) => v.toFixed(tip ? 4 : 1), xmax: 3000, xticks: [0, 1000, 2000, 3000], xlabel: 'Practice updates'});
+  const N = D.natural, off = N.pretrainSteps.at(-1), after = N.steps.map(s => s + off);
+  lineChart($('naturalChart'), {series: [
+    {label: 'Ordinary training', color: 'var(--s2)', x: N.pretrainSteps, mean: N.pretraining.mean, sem: N.pretraining.sem},
+    {label: 'Ordinary training, continued', color: 'var(--s2)', x: after, mean: N.continue.mean, sem: N.continue.sem, direct: 'Ordinary training'},
+    {label: 'Practice', color: 'var(--s1)', x: after, mean: N.practice.mean, sem: N.practice.sem, direct: 'Practice'},
+  ], ymax: 1, yfmt: share, xmax: after.at(-1), xticks: [0, 2000, 4000, 6000, 8000], xlabel: 'Updates', vline: {x: off, labels: [['ordinary training', 'end', -6], ['branch', 'start', 6]]}});
+}
+
+// Ring: state i (0-based position on the true ring) drawn at its angle; coincident states share one dot and label.
+function ring(svg, theta) {
+  svg.replaceChildren();
+  const C = 160, Rr = 104, P = theta.map(t => [C + Rr * Math.cos(t), C - Rr * Math.sin(t)]);
+  el(svg, 'circle', {cx: C, cy: C, r: Rr, class: 'ring-guide'});
+  el(svg, 'polygon', {points: P.map(p => p.join(',')).join(' '), class: 'ring-line'});
+  const groups = [];
+  theta.forEach((t, i) => { const g = groups.find(g => Math.abs(Math.atan2(Math.sin(t - g.t), Math.cos(t - g.t))) < .09); if (g) g.ids.push(i + 1); else groups.push({t, ids: [i + 1]}); });
+  for (const g of groups) {
+    const x = C + Rr * Math.cos(g.t), y = C - Rr * Math.sin(g.t), lx = C + (Rr + 18) * Math.cos(g.t), ly = C - (Rr + 18) * Math.sin(g.t), c = Math.cos(g.t);
+    el(svg, 'circle', {cx: x, cy: y, r: 6, class: 'ring-dot'});
+    el(svg, 'text', {x: lx, y: ly + 4.5, 'text-anchor': c > .35 ? 'start' : c < -.35 ? 'end' : 'middle', class: 'ring-label'}, g.ids.join('·'));
+  }
+}
+
+let run = 0, frame = 150, timer = null;
+function explorer() {
+  const t = D.phases[frame][run], y = D.runs[run], x = D.steps;
+  ring($('ringRun'), t);
+  $('mapTitle').textContent = `After ${D.steps[frame].toLocaleString('en-GB')} updates: ${pct(y[frame])} route success`;
+  $('frameOut').textContent = `update ${D.steps[frame].toLocaleString('en-GB')} / 3,000`;
+  $('frame').value = frame;
+  lineChart($('runChart'), {series: [{label: 'Mean of all worlds', color: 'var(--muted)', x, mean: D.success.practice.mean, width: 1.5, dash: '4 3'}, {label: 'This world', color: 'var(--s1)', x, mean: y}], ymax: 1, yfmt: share, xmax: 3000, xticks: [0, 1000, 2000, 3000], xlabel: 'Practice updates', cursor: D.steps[frame]});
+}
+function stop() { if (timer) { clearInterval(timer); timer = null; } $('play').textContent = 'Play'; }
+function setupExplorer() {
+  const finals = D.runs.map(r => r.at(-1));
+  $('run').replaceChildren(...finals.map((f, i) => new Option(`World ${i + 1}: ends at ${pct(f)}`, i)));
+  run = finals.findIndex(f => f > .95); $('run').value = run;
+  $('run').onchange = e => { stop(); run = +e.target.value; explorer(); };
+  $('frame').oninput = e => { stop(); frame = +e.target.value; explorer(); };
+  $('toStart').onclick = () => { stop(); frame = 0; explorer(); };
+  $('toEnd').onclick = () => { stop(); frame = 150; explorer(); };
+  $('play').onclick = () => { if (timer) return stop(); if (frame === 150) frame = 0; $('play').textContent = 'Pause'; timer = setInterval(() => { frame = Math.min(150, frame + 1); explorer(); if (frame === 150) stop(); }, 60); };
+  explorer();
+}
+
+legend(); mainCharts();
+ring($('ringFolded'), Array.from({length: 12}, (_, i) => i * TAU / 4));
+ring($('ringOnce'), Array.from({length: 12}, (_, i) => i * TAU / 12));
+setupExplorer();
+let width = innerWidth;
+addEventListener('resize', () => { if (innerWidth !== width) { width = innerWidth; mainCharts(); explorer(); } });
+window.reportReady = true;
+})();
+</script>
+</body>
+</html>

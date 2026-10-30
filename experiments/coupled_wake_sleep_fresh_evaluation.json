@@ -1,0 +1,561 @@
+{
+  "stage": "independent evaluation at the primary budget; deterministic replay to exact budget, separate evaluation RNG",
+  "base": {
+    "bits": 6,
+    "dim": 8,
+    "sigma": 0.7,
+    "init_noise": 0.15,
+    "batch": 128,
+    "eval_samples": 16384,
+    "eval_points": 17,
+    "equivalent_steps": 8192,
+    "lr_w": 0.003,
+    "output": "results/coupled_wake_sleep/fresh_evaluation",
+    "family": "categorical",
+    "decay_scale": 1024.0,
+    "eval_seed_offset": 700000
+  },
+  "cases": [
+    {
+      "seed": 9300,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9300,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9300,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9300,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9300,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9300,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9301,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9301,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9301,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9301,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9301,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9301,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9302,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9302,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9302,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9302,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9302,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9302,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9303,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9303,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9303,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9303,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9303,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9303,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9304,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9304,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9304,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9304,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9304,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9304,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9305,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9305,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9305,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9305,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9305,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9305,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9306,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9306,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9306,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9306,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9306,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9306,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9307,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9307,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9307,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9307,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9307,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9307,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9308,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9308,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9308,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9308,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9308,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9308,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9309,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9309,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9309,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9309,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9309,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9309,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9310,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9310,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9310,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9310,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9310,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9310,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9311,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 1.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9311,
+      "rho": 0.8,
+      "arm": "elbo",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9311,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9311,
+      "rho": 0.8,
+      "arm": "sleep",
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9311,
+      "rho": 0.8,
+      "arm": "wake_forward",
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    {
+      "seed": 9311,
+      "rho": 0.8,
+      "arm": "oracle",
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    }
+  ],
+  "selected_rates": {
+    "elbo": {
+      "lr_r": 3.0,
+      "lr_w": 0.01
+    },
+    "sleep": {
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    "wake_forward": {
+      "lr_r": 30.0,
+      "lr_w": 0.01
+    },
+    "frozen_sleep": {
+      "lr_r": 10.0,
+      "lr_w": 0.01
+    },
+    "oracle": {
+      "lr_r": 0.0,
+      "lr_w": 0.01
+    }
+  },
+  "primary_budget": 8192,
+  "slope_windows": [
+    [
+      512,
+      4096
+    ],
+    [
+      1024,
+      8192
+    ],
+    [
+      4096,
+      16384
+    ]
+  ]
+}

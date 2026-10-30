@@ -1,0 +1,114 @@
+Problem family: product_decomposition_k3_d3.
+Examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72316800. The order of the integers does not matter.
+Answer: [972, 200, 372]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 59146008. The order of the integers does not matter.
+Answer: [339, 226, 772]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 225875454. The order of the integers does not matter.
+Answer: [382, 777, 761]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 19171170. The order of the integers does not matter.
+Answer: [277, 769, 90]
+
+Additional examples:
+Problem: Return a JSON array of exactly 3 positive integers whose product is 8611528. The order of the integers does not matter.
+Answer: [619, 148, 94]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 103991448. The order of the integers does not matter.
+Answer: [578, 188, 957]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 75595107. The order of the integers does not matter.
+Answer: [679, 177, 629]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 871080. The order of the integers does not matter.
+Answer: [105, 68, 122]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 18846135. The order of the integers does not matter.
+Answer: [735, 99, 259]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 41337540. The order of the integers does not matter.
+Answer: [95, 711, 612]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 494785924. The order of the integers does not matter.
+Answer: [958, 562, 919]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 255597320. The order of the integers does not matter.
+Answer: [890, 428, 671]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 75862710. The order of the integers does not matter.
+Answer: [693, 246, 445]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 250685280. The order of the integers does not matter.
+Answer: [690, 432, 841]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 20088288. The order of the integers does not matter.
+Answer: [396, 68, 746]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 218484552. The order of the integers does not matter.
+Answer: [676, 913, 354]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 317636011. The order of the integers does not matter.
+Answer: [869, 517, 707]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 206413845. The order of the integers does not matter.
+Answer: [759, 545, 499]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 151207928. The order of the integers does not matter.
+Answer: [718, 646, 326]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 72819615. The order of the integers does not matter.
+Answer: [265, 757, 363]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 58218160. The order of the integers does not matter.
+Answer: [727, 208, 385]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 240108560. The order of the integers does not matter.
+Answer: [860, 626, 446]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 123924975. The order of the integers does not matter.
+Answer: [251, 681, 725]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 671323905. The order of the integers does not matter.
+Answer: [873, 889, 865]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 13818601. The order of the integers does not matter.
+Answer: [829, 211, 79]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 21431088. The order of the integers does not matter.
+Answer: [684, 42, 746]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 4739175. The order of the integers does not matter.
+Answer: [9, 885, 595]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 1989255. The order of the integers does not matter.
+Answer: [51, 145, 269]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 131768845. The order of the integers does not matter.
+Answer: [167, 995, 793]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 108330321. The order of the integers does not matter.
+Answer: [803, 193, 699]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 10009048. The order of the integers does not matter.
+Answer: [161, 152, 409]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 93807396. The order of the integers does not matter.
+Answer: [162, 691, 838]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 219454515. The order of the integers does not matter.
+Answer: [423, 945, 549]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 609969510. The order of the integers does not matter.
+Answer: [890, 843, 813]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 54625981. The order of the integers does not matter.
+Answer: [181, 433, 697]
+
+Problem: Return a JSON array of exactly 3 positive integers whose product is 176802318. The order of the integers does not matter.
+Answer: [606, 693, 421]
+
+Solve this new problem. Return only the answer in the format requested by the problem, without working or explanations.
+Problem: Return a JSON array of exactly 3 positive integers whose product is 7469462. The order of the integers does not matter.
+Answer:

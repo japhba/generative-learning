@@ -20,6 +20,14 @@ Learners (same world, test set and rotated start; the top layer starts from the 
             tanh(R2 z + b2), log-loss of z under sigmoid(2 (V m + a))). Generated examples train the recognizers by sleep,
             so x = 1 is a pure autoencoder that never generates.
 
+  ws_replay       ws whose bottom-layer dreams take their latents from a replay of the codes recognition gave to the last
+                  1,024 supplied examples: no exploration of latent configurations beyond the current explanations of the data
+  ws_replay_wide  the same, with the rendering noise of those dreams inflated so that they spread as far in observation
+                  space (total variance) as dreams from the prior: observation-space exploration matched, latent exploration not
+  ws_uniform      ws whose bottom-layer dreams take uniform independent latents: maximal latent exploration, ignoring the prior
+  (in all three the top layer still sleeps on its own prior dreams; checkpoints also record the dream latents' entropy,
+  the dreams' total variance in x, and the mean distance from held-out world samples to the nearest dream)
+
 Metric: population KL(world || model) in nats, on 4000 held-out world samples (exact sum over latents), the same for
 every learner and x.
 """
@@ -40,7 +48,8 @@ from practice_disentangle import Learner, World, ae_step, evaluate, initial_lear
 from practice_disentangle_prior import top_layer
 
 OUT = Path('/var/tmp/jbauer/generative_practice_disentangle/budget')
-LEARNERS = ['ws', 'ws_teach', 'ae']
+LEARNERS = ['ws', 'ws_teach', 'ae', 'ws_replay', 'ws_replay_wide', 'ws_uniform']
+DREAMS = {'ws_replay': 'replay', 'ws_replay_wide': 'replay_wide', 'ws_uniform': 'uniform'}  # bottom-layer dream latents; plain ws dreams from its prior
 XS = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.98, 0.99, 1.0]
 
 
@@ -58,11 +67,21 @@ def run(task):
     R2, b2 = np.zeros((H, K)), np.zeros(H); L = Learner(L0.W, L0.c, L0.R, L0.b)
     r = np.random.default_rng([args['seed'], w, LEARNERS.index(learner), xi]); Gall = np.array(list(product([-1.0, 1.0], repeat=H)))
     nb = args['P_max'] // B; cps = {0} | {2 ** k // B for k in range(int(math.log2(B)), int(math.log2(args['P_max'])) + 1)}
-    curve = []
+    curve = []; dreams = DREAMS.get(learner, 'prior'); buf = np.zeros((0, K)); sig_w = sig
+    def bottom_latents(n, own=None):
+        """Latents of the bottom layer's dreams: the learned prior, a replay of the codes given to supplied examples, or uniform."""
+        if dreams == 'uniform': return np.where(r.random((n, K)) < 0.5, 1.0, -1.0)
+        if dreams.startswith('replay') and len(buf): return buf[r.integers(0, len(buf), n)]
+        return bern(np.where(r.random((n, H)) < 0.5, 1.0, -1.0) @ V.T + a, r)
     for t in range(nb + 1):
+        if dreams == 'replay_wide' and t % 50 == 0 and len(buf) > 1:  # inflate rendering noise so the dreams spread as far in x as prior dreams
+            Sp = top_layer(world, V, a).Sigma; Sr = np.cov(buf.T); sig_w = math.sqrt(sig ** 2 + max(0., np.trace(L.W @ (Sp - Sr) @ L.W.T)) / D)
         if t in cps:
             e = evaluate(L, top_layer(world, V, a), Xt, Zt, true_lp)
-            curve.append(dict(P=t * B, supplied=math.ceil(t * x) * B, **{k: e[k] for k in ['kl', 'align', 'acc_matched', 'acc_own']}))
+            Zc = bottom_latents(4096); Xc = Zc @ L.W.T + L.c + (sig_w if dreams == 'replay_wide' else sig) * r.standard_normal((4096, D))
+            counts = np.unique(Zc, axis=0, return_counts=True)[1] / 4096; nn = np.sqrt(((Xt[:1000, None, :] - Xc[None]) ** 2).sum(2).min(1))
+            curve.append(dict(P=t * B, supplied=math.ceil(t * x) * B, **{k: e[k] for k in ['kl', 'align', 'acc_matched', 'acc_own']},
+                              dream_latent_entropy=float(-(counts * np.log(counts)).sum()), dream_x_var=float(np.trace(np.cov(Xc.T))), world_to_dream_nn=float(nn.mean())))
         if t == nb: break
         if math.ceil((t + 1) * x) > math.ceil(t * x):  # a supplied batch
             X = world.sample_x(B, r)[0]; Z = L.sample_q(X, r); Gq = bern(Z @ R2.T + b2, r)
@@ -77,11 +96,14 @@ def run(task):
                 m2 = np.tanh(Z @ R2.T + b2); E2 = Z - np.tanh(m2 @ V.T + a); g2 = (E2 @ V) * (1 - m2 ** 2)
                 V += lr * E2.T @ m2 / B; a += lr * E2.mean(0); R2 += lr * args['ae_lr_scale'] * g2.T @ Z / B; b2 += lr * args['ae_lr_scale'] * g2.mean(0)
                 continue
+            if dreams.startswith('replay'): buf = np.concatenate([buf, Z])[-1024:]  # the explanations recognition gave to supplied examples
             E = X - Z @ L.W.T - L.c; L.W += lr * E.T @ Z / B; L.c += lr * E.mean(0)  # wake, bottom layer
             Ez2 = Z - np.tanh(Gq @ V.T + a); V += lr * Ez2.T @ Gq / B; a += lr * Ez2.mean(0)  # wake, top layer
         else:  # a generated batch: one ancestral dream per example trains both recognizers (sleep)
-            Gd = np.where(r.random((B, H)) < 0.5, 1.0, -1.0); Zd = bern(Gd @ V.T + a, r); Xd = Zd @ L.W.T + L.c + sig * r.standard_normal((B, D))
-            G1 = Zd - np.tanh(L.logits(Xd)); L.R += lrs * G1.T @ Xd / B; L.b += lrs * G1.mean(0)
+            Gd = np.where(r.random((B, H)) < 0.5, 1.0, -1.0); Zd = bern(Gd @ V.T + a, r)
+            Zb = Zd if dreams == 'prior' else bottom_latents(B)  # the top layer always sleeps on its own prior dreams
+            Xd = Zb @ L.W.T + L.c + (sig_w if dreams == 'replay_wide' else sig) * r.standard_normal((B, D))
+            G1 = Zb - np.tanh(L.logits(Xd)); L.R += lrs * G1.T @ Xd / B; L.b += lrs * G1.mean(0)
             G2 = Gd - np.tanh(Zd @ R2.T + b2); R2 += lrs * G2.T @ Zd / B; b2 += lrs * G2.mean(0)
     return prior, w, learner, xi, curve
 
@@ -94,9 +116,10 @@ def main():
     ap.add_argument('--H', type=int, default=4); ap.add_argument('--batch', type=int, default=32)
     ap.add_argument('--lr', type=float, default=0.02); ap.add_argument('--sleep_lr_scale', type=float, default=10.0); ap.add_argument('--ae_lr_scale', type=float, default=0.05)
     ap.add_argument('--seed', type=int, default=0); ap.add_argument('--workers', type=int, default=28); ap.add_argument('--tag', default='')
+    ap.add_argument('--xs', default='', help='comma-separated fractions supplied to run (default: all of XS)')
     args = vars(ap.parse_args())
     out = OUT / f"run{args['tag']}_{datetime.now(ZoneInfo('Europe/London')):%Y%m%d_%H%M%S}"; out.mkdir(parents=True)
-    tasks = [(p, w, l, xi, args) for p in args['priors'].split(',') for w in range(args['worlds']) for l in args['learners'].split(',') for xi in range(len(XS))]
+    tasks = [(p, w, l, xi, args) for p in args['priors'].split(',') for w in range(args['worlds']) for l in args['learners'].split(',') for xi in range(len(XS)) if not args['xs'] or any(abs(XS[xi] - float(v)) < 1e-9 for v in args['xs'].split(','))]
     tasks.sort(key=lambda t: -t[3])  # supplied-heavy runs are the slowest for ws_teach; start them first
     curves = {}
     with ProcessPoolExecutor(args['workers']) as ex:

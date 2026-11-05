@@ -14,17 +14,19 @@ import numpy as np
 
 from practice_ws_budget_plot import load
 
-COMPARE = [('ws', 0.9, 'ws', 1.0), ('ws', 0.5, 'ws', 1.0), ('ws_teach', 0.9, 'ws_teach', 1.0), ('ws_teach', 0.5, 'ws_teach', 1.0), ('ws_teach', 1.0, 'ws', 0.9)]
+COMPARE = [('ws', 0.9, 'ws', 1.0), ('ws', 0.5, 'ws', 1.0), ('ws_teach', 0.9, 'ws_teach', 1.0), ('ws_teach', 0.5, 'ws_teach', 1.0), ('ws_teach', 1.0, 'ws', 0.9),
+           ('ws', 0.7, 'ae', 1.0), ('ws', 0.9, 'ae', 1.0), ('ae', 0.9, 'ae', 1.0)]  # last three added with the autoencoder baseline, before its run was read
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument('run'); ap.add_argument('--Ps', default='8192,65536,524288,2097152'); a = ap.parse_args()
-    d, xs, data = load(a.run); xs = np.array(xs); rng = np.random.default_rng(0); rows = []
+    ap = argparse.ArgumentParser(); ap.add_argument('runs', nargs='+'); ap.add_argument('--Ps', default='8192,65536,524288,2097152'); a = ap.parse_args()
+    d, xs, data = load(*a.runs); a.run = a.runs[-1]; xs = np.array(xs); rng = np.random.default_rng(0); rows = []
     for prior in d['curves']:
         P = data[prior, 'ws']['P']
         for Pv in [int(p) for p in a.Ps.split(',')]:
             c = int(np.flatnonzero(P == Pv)[0])
             for l1, x1, l2, x2 in COMPARE:
+                if (prior, l1) not in data or (prior, l2) not in data: continue
                 k1, k2 = (int(np.flatnonzero(np.isclose(xs, x))[0]) for x in (x1, x2))
                 diff = data[prior, l1]['kl'][k1, :, c] - data[prior, l2]['kl'][k2, :, c]
                 boot = rng.choice(diff, (10000, len(diff))).mean(1)

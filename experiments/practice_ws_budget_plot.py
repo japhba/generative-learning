@@ -14,9 +14,9 @@ import numpy as np
 BLUE = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b']  # palette.md sequential steps 100..700
 SEQ = LinearSegmentedColormap.from_list('seq', BLUE)
 DIV = LinearSegmentedColormap.from_list('div', ['#184f95', '#6da7ec', '#f0efec', '#ec7a7a', '#a52a2a'])  # blue <-> red, gray midpoint
-CAT = {'ws': '#2a78d6', 'ws_teach': '#eb6834'}
+CAT = {'ws': '#2a78d6', 'ws_teach': '#eb6834', 'ae': '#1baf7a'}
 INK, INK2 = '#0b0b0b', '#52514e'
-NAMES = {'ws': 'wake-sleep', 'ws_teach': 'both parts trained on supplied examples'}
+NAMES = {'ws': 'wake-sleep', 'ws_teach': 'exact-posterior baseline', 'ae': 'autoencoder baseline'}
 
 
 def pct(x): return f'{100 * x:g}'
@@ -30,8 +30,11 @@ def axes_style(ax, P, logy=True):
     ax.grid(alpha=0.25, lw=0.5)
 
 
-def load(run):
-    d = json.load(open(Path(run) / 'curves.json')); xs = d['xs']; out = {}
+def load(*runs):
+    """Curves of one or more runs (same worlds, priors and fractions), merged by learner."""
+    d = json.load(open(Path(runs[0]) / 'curves.json')); xs = d['xs']; out = {}
+    for r in runs[1:]:
+        for prior, block in json.load(open(Path(r) / 'curves.json'))['curves'].items(): d['curves'].setdefault(prior, {}).update(block)
     for prior, block in d['curves'].items():
         for learner, byx in block.items():
             runs = [byx[str(x)] for x in xs]  # one dict (world -> curve) per x
@@ -42,9 +45,10 @@ def load(run):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument('run'); ap.add_argument('--outdir', default='/nfs/nhome/live/jbauer/generative-learning/reports')
-    ap.add_argument('--P_min', type=int, default=256); a = ap.parse_args()
-    d, xs, data = load(a.run); priors = list(d['curves']); learners = [l for l in NAMES if (priors[0], l) in data]
+    ap = argparse.ArgumentParser(); ap.add_argument('runs', nargs='+'); ap.add_argument('--outdir', default='/nfs/nhome/live/jbauer/generative-learning/reports')
+    ap.add_argument('--learners', default='ws,ae', help='panels in this order; the ratio panel compares the second with the first')
+    ap.add_argument('--name', default='ws-budget'); ap.add_argument('--P_min', type=int, default=256); a = ap.parse_args()
+    d, xs, data = load(*a.runs); priors = list(d['curves']); learners = a.learners.split(','); a.run = a.runs[-1]
     xs = np.array(xs); P = data[priors[0], learners[0]]['P']; rows = P >= a.P_min; Pr = P[rows]
 
     # heatmaps: mean KL over worlds, one panel per prior x learner, plus the log ratio of the two learners
@@ -66,10 +70,10 @@ def main():
             Rm = np.log10(data[prior, learners[1]]['kl'].mean(1) / data[prior, learners[0]]['kl'].mean(1))[:, rows].T
             lim = np.abs(Rm).max(); ax = axes[i, -1]
             im2 = ax.pcolormesh(np.arange(len(xs) + 1), np.arange(len(Pr) + 1), Rm, cmap=DIV, norm=TwoSlopeNorm(0, -lim, lim), edgecolors='face')
-            ax.set_title(f'{prior} prior: baseline vs wake-sleep', loc='left'); fig.colorbar(im2, ax=ax, label='log10 KL ratio (blue: baseline lower)', shrink=0.9)
+            ax.set_title(f'{prior} prior: {NAMES[learners[1]]} vs {NAMES[learners[0]]}', loc='left'); fig.colorbar(im2, ax=ax, label=f'log10 KL ratio (blue: {NAMES[learners[1]]} lower)', shrink=0.9)
             ax.set_xticks(np.arange(len(xs)) + 0.5, [pct(x) for x in xs], rotation=90); ax.set_yticks(np.arange(len(Pr)) + 0.5, [f'$2^{{{int(np.log2(p))}}}$' for p in Pr])
             ax.set_xlabel('% of examples supplied (rest generated)')
-    f1 = Path(a.outdir) / 'ws-budget-heatmap.png'; fig.savefig(f1, dpi=130); plt.close(fig)
+    f1 = Path(a.outdir) / f'{a.name}-heatmap.png'; fig.savefig(f1, dpi=130); plt.close(fig)
 
     # learning curves: selected fractions per learner; envelopes; the best fraction against the total
     show = [1.0, 0.95, 0.9, 0.8, 0.5, 0.2]; shades = BLUE[::-1][:len(show)]
@@ -95,7 +99,7 @@ def main():
             m = data[prior, learner]['kl'].mean(1); ax.plot(P[rows], 100 * xs[m[:, rows].argmin(0)], 'o-', color=CAT[learner], lw=2, ms=8, label=NAMES[learner])
         ax.set(xlabel='total examples', ylabel='% supplied at the lowest KL', ylim=(-3, 103)); ax.set_title(f'{prior} prior: best split', loc='left'); axes_style(ax, P[rows], logy=False)
         if i == 0: ax.legend(frameon=False)
-    fig.tight_layout(); f2 = Path(a.outdir) / 'ws-budget-curves.png'; fig.savefig(f2, dpi=130, bbox_inches='tight'); plt.close(fig)
+    fig.tight_layout(); f2 = Path(a.outdir) / f'{a.name}-curves.png'; fig.savefig(f2, dpi=130, bbox_inches='tight'); plt.close(fig)
 
     # numbers for the write-up: per prior, learner and total, the best fraction, its KL and the KL with all supplied
     summ = {}

@@ -14,6 +14,11 @@ Learners (same world, test set and rotated start; the top layer starts from the 
             current generative model (the teacher-forcing analogue: the exact gradient of log p(x) needs exactly these
             posteriors). Generated examples still train the recognizers by sleep, so x = 1 is a learner with no
             generation at all.
+  ae        the autoencoding baseline (README): supplied examples train both parts end-to-end by reconstruction error.
+            Bottom layer: binary autoencoder on x (mean-field codes tanh(R x + b), expected squared error, backprop into
+            R and W; practice_disentangle.ae_step 'bae'). Top layer: the same on the recognised codes z (codes
+            tanh(R2 z + b2), log-loss of z under sigmoid(2 (V m + a))). Generated examples train the recognizers by sleep,
+            so x = 1 is a pure autoencoder that never generates.
 
 Metric: population KL(world || model) in nats, on 4000 held-out world samples (exact sum over latents), the same for
 every learner and x.
@@ -31,11 +36,11 @@ from zoneinfo import ZoneInfo
 import numpy as np
 from tqdm.auto import tqdm
 
-from practice_disentangle import Learner, World, evaluate, initial_learner, mixture_logpdf, posterior
+from practice_disentangle import Learner, World, ae_step, evaluate, initial_learner, mixture_logpdf, posterior
 from practice_disentangle_prior import top_layer
 
 OUT = Path('/var/tmp/jbauer/generative_practice_disentangle/budget')
-LEARNERS = ['ws', 'ws_teach']
+LEARNERS = ['ws', 'ws_teach', 'ae']
 XS = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.98, 0.99, 1.0]
 
 
@@ -67,6 +72,11 @@ def run(task):
                 Eg = np.exp(lg - np.logaddexp.reduce(lg, axis=1, keepdims=True)) @ Gall
                 G1 = Ez - np.tanh(L.logits(X)); G2 = Eg - np.tanh(Z @ R2.T + b2)
                 L.R += lrs * G1.T @ X / B; L.b += lrs * G1.mean(0); R2 += lrs * G2.T @ Z / B; b2 += lrs * G2.mean(0)
+            if learner == 'ae':  # end-to-end reconstruction in both layers, no recognised samples in the generator update
+                ae_step(L, X, world, lr, args['ae_lr_scale'], 'bae')
+                m2 = np.tanh(Z @ R2.T + b2); E2 = Z - np.tanh(m2 @ V.T + a); g2 = (E2 @ V) * (1 - m2 ** 2)
+                V += lr * E2.T @ m2 / B; a += lr * E2.mean(0); R2 += lr * args['ae_lr_scale'] * g2.T @ Z / B; b2 += lr * args['ae_lr_scale'] * g2.mean(0)
+                continue
             E = X - Z @ L.W.T - L.c; L.W += lr * E.T @ Z / B; L.c += lr * E.mean(0)  # wake, bottom layer
             Ez2 = Z - np.tanh(Gq @ V.T + a); V += lr * Ez2.T @ Gq / B; a += lr * Ez2.mean(0)  # wake, top layer
         else:  # a generated batch: one ancestral dream per example trains both recognizers (sleep)
@@ -82,7 +92,7 @@ def main():
     ap.add_argument('--worlds', type=int, default=12); ap.add_argument('--P_max', type=int, default=2 ** 21)
     ap.add_argument('--K', type=int, default=6); ap.add_argument('--D', type=int, default=12); ap.add_argument('--sigma', type=float, default=0.5)
     ap.add_argument('--H', type=int, default=4); ap.add_argument('--batch', type=int, default=32)
-    ap.add_argument('--lr', type=float, default=0.02); ap.add_argument('--sleep_lr_scale', type=float, default=10.0)
+    ap.add_argument('--lr', type=float, default=0.02); ap.add_argument('--sleep_lr_scale', type=float, default=10.0); ap.add_argument('--ae_lr_scale', type=float, default=0.05)
     ap.add_argument('--seed', type=int, default=0); ap.add_argument('--workers', type=int, default=28); ap.add_argument('--tag', default='')
     args = vars(ap.parse_args())
     out = OUT / f"run{args['tag']}_{datetime.now(ZoneInfo('Europe/London')):%Y%m%d_%H%M%S}"; out.mkdir(parents=True)

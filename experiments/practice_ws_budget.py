@@ -30,6 +30,11 @@ Learners (same world, test set and rotated start; the top layer starts from the 
 
 Metric: population KL(world || model) in nats, on 4000 held-out world samples (exact sum over latents), the same for
 every learner and x.
+
+--Ns caps the data: supplied batches are then drawn with replacement from a fixed set of N world samples (the first N of
+one pool per world, so the sets are nested across N), each reused many times, while generated examples stay unlimited.
+Checkpoints then also record kl_train (the same KL on the training set; kl - kl_train measures memorisation) and how much
+of the latent distribution the N examples visit (distinct latent configurations, their true prior mass).
 """
 
 import argparse
@@ -63,6 +68,11 @@ def run(task):
     rng = np.random.default_rng([args['seed'], w]); world = World(K, D, sig, prior, rng)
     Xt, Zt = world.sample_x(4000, rng); true_lp = mixture_logpdf(Xt, world.A, np.zeros(D), world)
     L0 = initial_learner(world, rng, 20000, 0.02, B, 'rotated')
+    N = args['N']
+    if N:  # a fixed set of N supplied examples, reused
+        Xpool, Zpool = world.sample_x(args['N_pool'], np.random.default_rng([args['seed'], w, 7])); Xpool, Zpool = Xpool[:N], Zpool[:N]
+        Xtr = Xpool[:4000]; true_lp_tr = mixture_logpdf(Xtr, world.A, np.zeros(D), world)
+        seen = (world.Z[:, None, :] == np.unique(Zpool, axis=0)[None]).all(2).any(1); cover = dict(configs_seen=int(seen.sum()), mass_seen=float(world.p[seen].sum()))
     V = 0.1 * np.random.default_rng([args['seed'], w, 99]).standard_normal((K, H)); a = np.zeros(K)
     R2, b2 = np.zeros((H, K)), np.zeros(H); L = Learner(L0.W, L0.c, L0.R, L0.b)
     r = np.random.default_rng([args['seed'], w, LEARNERS.index(learner), xi]); Gall = np.array(list(product([-1.0, 1.0], repeat=H)))
@@ -77,14 +87,15 @@ def run(task):
         if dreams == 'replay_wide' and t % 50 == 0 and len(buf) > 1:  # inflate rendering noise so the dreams spread as far in x as prior dreams
             Sp = top_layer(world, V, a).Sigma; Sr = np.cov(buf.T); sig_w = math.sqrt(sig ** 2 + max(0., np.trace(L.W @ (Sp - Sr) @ L.W.T)) / D)
         if t in cps:
-            e = evaluate(L, top_layer(world, V, a), Xt, Zt, true_lp)
+            tw = top_layer(world, V, a); e = evaluate(L, tw, Xt, Zt, true_lp)
+            if N: e.update(kl_train=float(np.mean(true_lp_tr - mixture_logpdf(Xtr, L.W, L.c, tw))), **cover)
             Zc = bottom_latents(4096); Xc = Zc @ L.W.T + L.c + (sig_w if dreams == 'replay_wide' else sig) * r.standard_normal((4096, D))
             counts = np.unique(Zc, axis=0, return_counts=True)[1] / 4096; nn = np.sqrt(((Xt[:1000, None, :] - Xc[None]) ** 2).sum(2).min(1))
-            curve.append(dict(P=t * B, supplied=math.ceil(t * x) * B, **{k: e[k] for k in ['kl', 'align', 'acc_matched', 'acc_own']},
+            curve.append(dict(P=t * B, supplied=math.ceil(t * x) * B, **{k: e[k] for k in ['kl', 'align', 'acc_matched', 'acc_own', 'kl_train', 'configs_seen', 'mass_seen'] if k in e},
                               dream_latent_entropy=float(-(counts * np.log(counts)).sum()), dream_x_var=float(np.trace(np.cov(Xc.T))), world_to_dream_nn=float(nn.mean())))
         if t == nb: break
         if math.ceil((t + 1) * x) > math.ceil(t * x):  # a supplied batch
-            X = world.sample_x(B, r)[0]; Z = L.sample_q(X, r); Gq = bern(Z @ R2.T + b2, r)
+            X = Xpool[r.integers(0, N, B)] if N else world.sample_x(B, r)[0]; Z = L.sample_q(X, r); Gq = bern(Z @ R2.T + b2, r)
             if learner == 'ws_teach':  # posterior targets from the current model, before this step's updates
                 Ez = posterior(X, L.W, L.c, top_layer(world, V, a)) @ world.Z
                 lg = -np.logaddexp(0, -2 * (Gall @ V.T + a)[None] * Z[:, None, :]).sum(2)  # log p(z|g), (B, 2^H), uniform p(g)
@@ -105,7 +116,7 @@ def run(task):
             Xd = Zb @ L.W.T + L.c + (sig_w if dreams == 'replay_wide' else sig) * r.standard_normal((B, D))
             G1 = Zb - np.tanh(L.logits(Xd)); L.R += lrs * G1.T @ Xd / B; L.b += lrs * G1.mean(0)
             G2 = Gd - np.tanh(Zd @ R2.T + b2); R2 += lrs * G2.T @ Zd / B; b2 += lrs * G2.mean(0)
-    return prior, w, learner, xi, curve
+    return prior, w, learner, xi, N, curve
 
 
 def main():
@@ -117,15 +128,17 @@ def main():
     ap.add_argument('--lr', type=float, default=0.02); ap.add_argument('--sleep_lr_scale', type=float, default=10.0); ap.add_argument('--ae_lr_scale', type=float, default=0.05)
     ap.add_argument('--seed', type=int, default=0); ap.add_argument('--workers', type=int, default=28); ap.add_argument('--tag', default='')
     ap.add_argument('--xs', default='', help='comma-separated fractions supplied to run (default: all of XS)')
-    args = vars(ap.parse_args())
+    ap.add_argument('--Ns', default='0', help='comma-separated numbers of distinct supplied examples, reused; 0 = fresh world samples, each used once')
+    args = vars(ap.parse_args()); Ns = [int(v) for v in args['Ns'].split(',')]; args['N_pool'] = max(Ns)
     out = OUT / f"run{args['tag']}_{datetime.now(ZoneInfo('Europe/London')):%Y%m%d_%H%M%S}"; out.mkdir(parents=True)
-    tasks = [(p, w, l, xi, args) for p in args['priors'].split(',') for w in range(args['worlds']) for l in args['learners'].split(',') for xi in range(len(XS)) if not args['xs'] or any(abs(XS[xi] - float(v)) < 1e-9 for v in args['xs'].split(','))]
+    tasks = [(p, w, l, xi, dict(args, N=N)) for N in Ns for p in args['priors'].split(',') for w in range(args['worlds']) for l in args['learners'].split(',') for xi in range(len(XS)) if not args['xs'] or any(abs(XS[xi] - float(v)) < 1e-9 for v in args['xs'].split(','))]
     tasks.sort(key=lambda t: -t[3])  # supplied-heavy runs are the slowest for ws_teach; start them first
     curves = {}
     with ProcessPoolExecutor(args['workers']) as ex:
-        for prior, w, learner, xi, curve in tqdm(ex.map(run, tasks), total=len(tasks), desc='runs'):
-            curves.setdefault(prior, {}).setdefault(learner, {}).setdefault(str(XS[xi]), {})[w] = curve
-    json.dump(dict(args=args, xs=XS, curves=curves), open(out / 'curves.json', 'w'))
+        for prior, w, learner, xi, N, curve in tqdm(ex.map(run, tasks), total=len(tasks), desc='runs'):
+            curves.setdefault(N, {}).setdefault(prior, {}).setdefault(learner, {}).setdefault(str(XS[xi]), {})[w] = curve
+    for N in Ns:  # one curves.json per N (in N<N>/ when several)
+        d = out if len(Ns) == 1 else out / f'N{N}'; d.mkdir(exist_ok=True); json.dump(dict(args=dict(args, N=N), xs=XS, curves=curves[N]), open(d / 'curves.json', 'w'))
     print(out)
 
 

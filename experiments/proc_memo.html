@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Own-Example Advantage</title>
+<meta name="overlyx" content="article">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<style>/*__KATEX_CSS__*/</style>
+<style>
+/* Layout: a LaTeX article as it reads in a PDF viewer. One white sheet on a grey desk, Computer Modern throughout (the
+   KaTeX fonts already inlined for the formulas), justified text, numbered sections, booktabs tables. On a phone the sheet
+   fills the screen. Deliberately a single light look: it is a sheet of paper. */
+:root {
+  color-scheme: light;
+  --font-text: KaTeX_Main, "Latin Modern Roman", "CMU Serif", "Computer Modern Serif", Georgia, serif;
+  --font-ui: KaTeX_Main, "Latin Modern Roman", "CMU Serif", "Computer Modern Serif", Georgia, serif;
+  --font-code: KaTeX_Typewriter, "Latin Modern Mono", "CMU Typewriter Text", ui-monospace, Menlo, monospace;
+  --text-size: 18px;
+  --leading: 1.5;
+  --measure: 620px;
+  --wide: 740px;
+  --ink: #161616;
+  --muted: #444442;
+  --accent: #1d4b8f;
+  --paper: #ffffff;
+  --desk: #e6e6e2;
+  --rule: #161616;
+  --frame: #bdbdb6;
+  --code-bg: #ffffff;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--desk); color: var(--ink); font-family: var(--font-text); font-size: var(--text-size); line-height: var(--leading); padding-block: 40px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); -webkit-font-smoothing: antialiased; }
+article { max-width: calc(var(--measure) + 144px); margin: 0 auto; padding: 76px 72px 88px; background: var(--paper); box-shadow: 0 1px 2px rgba(0, 0, 0, .14), 0 10px 30px rgba(0, 0, 0, .07); counter-reset: sec fig tab; text-align: justify; hyphens: auto; }
+.katex { font-size: 1em; }
+.katex-display { margin: .7em 0; overflow-x: auto; overflow-y: hidden; }
+
+h1 { font-weight: 400; font-size: 1.62em; line-height: 1.3; text-align: center; text-wrap: balance; hyphens: manual; margin: 0 0 .9em; }
+.byline, .date { text-align: center; font-size: 1.1em; margin: 0 0 .25em; text-indent: 0; }
+.date { margin-bottom: 1.9em; }
+.abstract { font-size: .9em; margin: 0 2.4em 1.6em; text-indent: 0; }
+.abstract::before { content: "Abstract"; display: block; text-align: center; font-weight: 700; margin-bottom: .45em; }
+
+h2 { font-size: 1.36em; font-weight: 700; line-height: 1.3; text-align: left; text-wrap: balance; hyphens: manual; margin: 1.5em 0 .55em; counter-increment: sec; counter-reset: sub; }
+h2::before { content: counter(sec); margin-right: .9em; }
+h3 { font-size: 1.12em; font-weight: 700; line-height: 1.3; text-align: left; text-wrap: balance; hyphens: manual; margin: 1.2em 0 .45em; counter-increment: sub; }
+h3::before { content: counter(sec) "." counter(sub); margin-right: .9em; }
+
+p { margin: 0; }
+p + p { text-indent: 1.5em; }
+p.para { text-indent: 0; margin-top: .55em; }
+strong { font-weight: 700; }
+a { color: var(--accent); text-decoration: none; }
+code { font-family: var(--font-code); font-size: .94em; }
+
+ul { margin: .5em 0 0; padding-left: 1.4em; }
+li { margin: .35em 0; padding-left: .2em; }
+
+figure { margin: 1.6em 0; text-align: center; }
+figure img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+figure.wide { margin-left: -56px; margin-right: -56px; }
+figure.fig { counter-increment: fig; }
+figure.tab { counter-increment: tab; }
+figcaption { font-size: .88em; line-height: 1.42; text-align: justify; margin-top: .7em; }
+figure.fig figcaption::before { content: "Figure " counter(fig) ": "; }
+figure.tab figcaption { margin: 0 0 .6em; }
+figure.tab figcaption::before { content: "Table " counter(tab) ": "; }
+figure .lead { font-size: .88em; line-height: 1.42; text-align: justify; margin: 0 0 .8em; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; margin: 0 auto; text-align: center; hyphens: manual; font-variant-numeric: tabular-nums; border-top: 1.5px solid var(--rule); border-bottom: 1.5px solid var(--rule); }
+thead th { border-bottom: 1px solid var(--rule); }
+th, td { padding: .32em .75em; vertical-align: top; font-weight: 400; }
+th:first-child, td:first-child { text-align: left; padding-left: .2em; }
+th:last-child, td:last-child { padding-right: .2em; }
+td .ci { display: block; font-size: .78em; color: var(--muted); white-space: nowrap; }
+tr.lead-row td { font-weight: 700; }
+tr.lead-row td .ci { font-weight: 400; }
+
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: .4em 1.1em; text-align: left; }
+.panels > div { min-width: 0; }
+.panels > .full { grid-column: 1 / -1; }
+.panel-title { font-size: .84em; text-indent: 0; margin: 0 0 .2em; }
+pre { font-family: var(--font-code); font-size: .66em; line-height: 1.38; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 .6em; padding: .55em .7em; border: 1px solid var(--frame); background: var(--code-bg); }
+pre code { font-size: inherit; }
+
+.small { font-size: .84em; line-height: 1.45; text-align: left; }
+.small code { font-size: .92em; }
+
+@media (max-width: 860px) {
+  body { background: var(--paper); padding-block: 12px 48px; }
+  article { box-shadow: none; padding: 20px 0 40px; }
+  figure.wide { margin-left: 0; margin-right: 0; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16.5px; }
+  .abstract { margin-left: 0; margin-right: 0; }
+  .panels { grid-template-columns: 1fr; }
+  article { text-align: left; }
+}
+</style>
+</head>
+<body>
+<article lang="en">
+<h1>Learning a procedure from one’s own worked example:<br>the advantage is in the layout, not the wording</h1>
+<p class="byline">Jan Bauer, University College London</p>
+<p class="date">6 November 2026</p>
+
+<p class="abstract">Six small open language models apply a demonstrated procedure more accurately after a worked example they wrote themselves than after one written by the other model of their language: +5.3 percentage points (pp), 95% CI [+2.6, +8.3], Holm-corrected \(p = 0.002\), pre-registered, and +5.5 pp on 39 fresh procedures. They do not recognise the procedure’s steps any better from their own examples. Four of the six models identify every step from either writer, yet still apply the procedure 7.6 pp better after their own. Rewriting the examples so that layout and wording vary independently shows where the advantage comes from: an example in the reader’s own layout helps by 6.0 pp [+4.1, +8.0], the reader’s own wording by 0.1 pp [−1.2, +1.3]. Models copy the layout they are shown, and their own layout writes out the sub-steps they need.</p>
+
+<h2>The experiment</h2>
+
+<p class="para"><strong>Task.</strong> Each episode has a hidden procedure on four-digit numbers with distinct non-zero digits: a digit permutation (reverse, sort descending, sort ascending, or swap the first and last digits), an arithmetic step (add or subtract \(k\) = 101–899, or multiply by \(k\) = 3–9), a second, different permutation and, in half of the episodes, a second arithmetic step. Inputs are chosen so that every permutation step is unambiguous.</p>
+
+<p class="para"><strong>Models.</strong> OLMo-3-7B-Instruct and Phi-4-mini-instruct (English), Gemma-2-Llama-Swallow-9B-it and ABEJA-Qwen2.5-7B-Japanese (Japanese), GLM-4-9B-0414 and InternLM3-8B-Instruct (Chinese): 3.8–9B parameters, thinking off, every prompt in the model’s own language. Each model is both a writer and a reader, and its <em>peer</em> is the other model of its language.</p>
+
+<p class="para"><strong>Writers.</strong> Each model is told the procedure and writes 16 worked executions (temperature 0.8) for each of 12 inputs. Readers see only executions with the right final answer and every intermediate value correct, and only on inputs for which all six writers have one, so every writer’s examples cover the same inputs.</p>
+
+<p class="para"><strong>Readers.</strong> A reader never sees the procedure. It sees \(N\) = 1, 2 or 4 worked examples from one writer (Figure 1) and then either applies the procedure to 8 new numbers (<em>deployment</em>: greedy decoding, scored on the final answer) or, for each step, picks the step’s description among four of the same kind (<em>recognition</em>).</p>
+
+<figure class="fig">
+<p class="lead"><strong>Procedure</strong>, told only to the writers: (1) rearrange the digits from largest to smallest; (2) add 331; (3) swap the first and last digits (leading zeros are dropped). The reader is shown “Below are worked examples of a secret procedure that turns a number into another number.”, then “Number: 7196”, “Worked solution:” and one example, and is finally asked to “Apply the same procedure to the number 4982. Work step by step in English, then finish with a final line ‘Answer: &lt;number&gt;’.” The correct intermediate values are 9842, 10173 and 30171.</p>
+<div class="panels">
+<div class="full">
+<p class="panel-title"><strong>Phi-4-mini’s worked example</strong></p>
+<pre><code>Sure, let's apply the given procedure step by step to the number 7196.
+
+1. **Rearrange its digits from largest to smallest:**
+   - The digits of 7196 are 7, 1, 9, and 6.
+   - Rearranging them from largest to smallest gives us 9761.
+
+2. **Add 331 to the new number:**
+   - 9761 + 331 = 10092.
+
+3. **Swap its first and last digits (leading zeros are dropped):**
+   - The number we have now is 10092.
+   - The first digit is 1 and the last digit is 2. Swapping them results in 20091.
+
+Answer: 20091</code></pre>
+</div>
+<div>
+<p class="panel-title"><strong>OLMo-3-7B after it</strong> (0 of 8 right)</p>
+<pre><code>[...]
+3. **Swap its first and last digits (dropping any leading zeros if they appear):**
+   - The number is now 10173.
+   - The first digit is 1 and the last digit is 3.
+   - Swapping them gives 37101.
+
+Answer: 37101</code></pre>
+</div>
+<div>
+<p class="panel-title"><strong>OLMo-3-7B after its own</strong> (8 of 8 right)</p>
+<pre><code>[...]
+Take the result from step 2 (**10173**).
+Write the digits: **1 0 1 7 3**
+
+- First digit: **1**
+- Last digit: **3**
+
+Swap them:
+
+New number: **3 0 1 7 1** → **30171**
+[...]
+Answer: 30171</code></pre>
+</div>
+</div>
+<figcaption>One episode, verbatim (Markdown as the models wrote it; [...] marks omitted lines). OLMo-3-7B copies the layout of whichever example it is shown. Its own example writes the swap step out digit by digit, and Phi-4-mini’s does not. Phi-4-mini, reading the same two examples, also did better from OLMo-3-7B’s (6 vs 2 of 8): some writers’ examples help every reader, which the analysis removes.</figcaption>
+</figure>
+
+<p class="para"><strong>Analysis.</strong> For each episode and \(N\), the accuracies form a \(6\times 6\) matrix \(\mathbf{A}\) of readers \(r\) by writers \(w\). Double-centring removes how good a reader is overall and how useful a writer’s examples are to every reader, and the own effect compares each reader’s own examples with those of its peer \(r'\):</p>
+\[\begin{gathered}\tilde{A}_{rw} = A_{rw} - \bar{A}_{r\cdot} - \bar{A}_{\cdot w} + \bar{A}_{\cdot\cdot},\\ \Delta_{\mathrm{own}} = \frac{1}{6}\sum_{r}\big(\tilde{A}_{rr} - \tilde{A}_{rr'}\big).\end{gathered}\]
+<p>There were two primary tests, Holm-corrected as a pair: the own effect in deployment, and the own effect in deployment minus that in recognition. Tests are two-sided sign-flip tests over episodes (100,000 draws), brackets are 95% bootstrap intervals over episodes, and the protocols were frozen before any reader data were collected.</p>
+
+<h2>Results</h2>
+
+<h3>Own examples are applied better</h3>
+
+<p>In the main study (34 episodes), a reader applies the procedure correctly 5.3 pp [+2.6, +8.3] more often after its own examples than after its peer’s, averaged over \(N\) (\(p = 0.001\), Holm \(p = 0.002\); Table 1). The effect is largest after a single example (+6.5 pp) and larger for four-step than for three-step procedures (+8.3 vs +5.0 pp at \(N = 1\)). It is not verbatim copying: a reader’s solutions share as many character 4-grams with its own examples as with its peer’s (0.65 vs 0.64). It replicates on 39 fresh episodes (+5.5 pp [+3.1, +7.8], \(p \lt 0.001\)). For scale, input–output pairs alone give 0% correct answers, and the procedure stated in words gives 38–85%.</p>
+
+<figure class="tab">
+<figcaption>Own minus peer in the main study (34 episodes), on the double-centred matrix, with 95% intervals over episodes. The last row is a selected subset, on raw accuracy.</figcaption>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Own − peer (pp)</th><th>\(N = 1\)</th><th>\(N = 2\)</th><th>\(N = 4\)</th></tr></thead>
+<tbody>
+<tr class="lead-row"><td>Applying the procedure</td><td>+6.5<span class="ci">[+3.4, +9.6]</span></td><td>+4.8<span class="ci">[+1.1, +8.8]</span></td><td>+4.7<span class="ci">[+1.7, +7.9]</span></td></tr>
+<tr><td>Recognising its steps</td><td>−2.7<span class="ci">[−4.7, −0.6]</span></td><td>+2.3<span class="ci">[−0.8, +5.4]</span></td><td>+5.5<span class="ci">[+3.3, +7.6]</span></td></tr>
+<tr><td>Applying it, where every<br>step was recognised</td><td>+10.0<span class="ci">[+6.1, +13.9]</span></td><td>+9.3<span class="ci">[+4.8, +14.3]</span></td><td>+10.5<span class="ci">[+6.6, +14.7]</span></td></tr>
+</tbody>
+</table>
+</div>
+</figure>
+
+<h3>They are not recognised better</h3>
+
+<p>The second primary test compares the two tasks: the own effect in deployment minus the own effect in recognition is +3.6 pp [+0.5, +6.8] (Holm \(p = 0.034\)). After a single example, a reader identifies the steps of its own example slightly worse than its peer’s (−2.7 pp) but applies the procedure 6.5 pp better. A follow-up asked three times as many step questions per reader and writer, over all 73 episodes (Figure 2). Four readers, OLMo-3-7B, Phi-4-mini, GLM-4-9B and InternLM3-8B, identify 97–100% of the steps from their own and their peer’s examples alike (own minus peer 0.0 pp), and still apply the procedure 7.6 pp [+5.2, +10.0] better after their own (+7.3 pp on the fresh episodes alone). The two Japanese readers identify steps poorly and in opposite directions; the change of sign of the recognition effect with \(N\) in Table 1 comes entirely from them. Neither of them shows an own advantage in deployment.</p>
+
+<figure class="fig wide">
+<img src="{{IMG:proc-single}}" alt="Scatter plot, one point per reader: own minus peer in recognising the steps (horizontal, −40 to +40 pp) against own minus peer in applying the procedure (vertical). OLMo-3-7B, GLM-4-9B, Phi-4-mini and InternLM3-8B sit at 0 horizontally, at +15, +13, +6 and −3 pp vertically; their pooled diamond is at +7.6 pp. Gemma2-Swallow-9B is at −29 horizontally and ABEJA-Qwen2.5-7B at +34, both near 0 vertically.">
+<figcaption>Each reader’s advantage from its own examples over its peer’s, in identifying the steps (horizontal) and in applying the procedure (vertical). 73 episodes, mean over \(N\) = 1, 2 and 4, raw accuracy, 95% intervals. The diamond pools the four readers that identify every step.</figcaption>
+</figure>
+
+<h3>The advantage is in the layout</h3>
+
+<p>Figure 1 suggests a mechanism: OLMo-3-7B copies the layout of whichever example it sees. Does a reader gain only from its own layout, which spells out what it needs, or also from its own wording, for instance by reconstructing the computation behind sentences it wrote itself? To separate the two, the examples A and B of each language pair (\(N = 1\), all 73 episodes) were rewritten by one fixed model (Claude Sonnet 5.5, temperature 0) into A’s wording in B’s layout and B’s wording in A’s layout. <em>Layout</em> is the structure, the markup and what each step contains (digits listed one by one, code blocks, result lines, an opening or closing line); <em>wording</em> is the sentences and phrases. All 438 rewrites kept the final answer and every intermediate value. With \(a_{w\ell}\) the test accuracy for wording \(w\) and layout \(\ell\), each either the reader’s own (o) or its peer’s (p), the two effects are</p>
+\[\begin{gathered} L = \tfrac{1}{2}\big[(a_{\mathrm{oo}} - a_{\mathrm{op}}) + (a_{\mathrm{po}} - a_{\mathrm{pp}})\big],\\ W = \tfrac{1}{2}\big[(a_{\mathrm{oo}} - a_{\mathrm{po}}) + (a_{\mathrm{op}} - a_{\mathrm{pp}})\big],\end{gathered}\]
+<p>each averaged over the two readers of a pair, so that the general quality of a layout or a wording cancels.</p>
+
+<figure class="tab">
+<figcaption>Test accuracy after one worked example, by whose wording and whose layout it has (73 episodes, six readers, 8 test numbers each).</figcaption>
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>own layout</th><th>peer’s layout</th></tr></thead>
+<tbody>
+<tr><td>own wording</td><td>73.9%</td><td>67.3%</td></tr>
+<tr><td>peer’s wording</td><td>73.2%</td><td>67.9%</td></tr>
+</tbody>
+</table>
+</div>
+</figure>
+
+<p>The advantage follows the layout: \(L\) = +6.0 pp [+4.1, +8.0] (\(p \lt 10^{-5}\)) and \(W\) = +0.1 pp [−1.2, +1.3] (\(p = 0.95\)), with an interaction of +1.3 pp [−0.9, +3.4]. This holds in the main-study and the fresh episodes separately (\(L\) = +6.1 and +5.9 pp) and for the four readers that identify every step (\(L\) = +7.5 pp [+5.0, +10.1], \(W\) = +0.0 pp). Per reader, \(W\) stays between −1.9 and +2.7 pp (Figure 3), and in two of the three language pairs both models do better with their own layout. The effect is a match between reader and layout, not one layout that suits everyone.</p>
+
+<figure class="fig">
+<img src="{{IMG:proc-layout}}" alt="Per-reader forest plot of the own-layout effect L and the own-wording effect W. L is +13.5 pp for OLMo-3-7B and +15.6 pp for GLM-4-9B, between −2.4 and +3.6 pp for the other four readers, and +6.0 pp over all readers. W is between −1.9 and +2.7 pp for every reader and +0.1 pp overall.">
+<figcaption>Per reader, the own-layout effect \(L\) and the own-wording effect \(W\), with 95% intervals over episodes.</figcaption>
+</figure>
+
+<p>Readers copy the layout they are shown: 99.3% of their solutions are closer to it than to the same wording in the other layout. They write the digits out one by one whenever the example does (100%) and almost never otherwise (6%), and they are more accurate when they do (73% vs 65%).</p>
+
+<h2>Interpretation</h2>
+
+<p>A worked example shows what the steps are and how to lay out the work. Recognition tests only the first, and most readers get it equally well from their own and their peer’s examples. The own advantage sits in the second. A reader reproduces the layout of the example it sees, the layout decides which sub-steps it writes out on a new number (such as listing the digits before swapping two of them), and a model’s own layout writes out the sub-steps that this model needs. A peer’s example in the reader’s layout is as good as the reader’s own (73.2% vs 73.9%), and the reader’s own sentences in the peer’s layout are as poor as the peer’s (67.3% vs 67.9%). If a model recovers anything of its own computation from text it wrote, it does so through the step structure; the wording adds nothing measurable.</p>
+
+<h2>Limitations</h2>
+
+<ul>
+<li><strong>Scope.</strong> One task family and six models of 3.8–9B parameters with thinking off. Two writers of the pilots (Llama-3.1-8B, Swallow-8B) were replaced because they executed the procedures correctly only 4–12% of the time. Readers decode greedily. Larger models and less formulaic reasoning are untested.</li>
+<li><strong>Uneven across readers.</strong> OLMo-3-7B and GLM-4-9B carry most of the effect. InternLM3-8B shows a small reverse effect (−2.9 pp in deployment, −2.4 pp for layout), and neither Japanese reader shows an own advantage in deployment.</li>
+<li><strong>Recognition is coarse.</strong> It is a four-way choice per step and at ceiling for four readers, so equal scores mean the steps were identified equally, not that the examples were understood equally in every respect. The pre-registered dissociation is modest (\(p = 0.034\)) and carried by \(N = 1\); at \(N = 4\) recognition shows an own advantage too (+5.5 pp). The analysis of the four ceiling readers was added by amendment halfway through the follow-up; it holds on the later half alone. A verification task (spot the wrong step in a chain of numbers) was at chance for every reader and is uninformative.</li>
+<li><strong>Layout rewrites.</strong> One rewriting model. The rewrites follow their layout source closely (line-structure similarity 1.00, against 0.40 to the wording source) but carry the wording less cleanly: 73% of source-specific phrases come from the intended source, so the measured \(W\) is about 0.46 of the effect of a complete wording swap. Scaled up, the upper end of its interval still allows at most about +3 pp. Layout includes which sub-steps are written out, so it is not purely typographic. Only \(N = 1\) was tested, and the link between writing digits out and accuracy is correlational.</li>
+</ul>
+
+<h2>Data and code</h2>
+
+<p class="small">In the project repository the three studies are PROC (main study), PROC-REC (recognition follow-up with the fresh episodes) and PROC-LAYOUT. Protocols, frozen before data collection, and results: <code>experiments/PROC_PROTOCOL.md</code>, <code>PROCREC_PROTOCOL.md</code>, <code>PROCLAYOUT_PROTOCOL.md</code>, <code>PROC_RESULTS.md</code>, <code>PROCLAYOUT_RESULTS.md</code>. Code in <code>experiments/</code>: <code>proc_tasks.py</code> (procedures), <code>proc_search.py</code>, <code>proc_confirm.py</code>, <code>proc_analyze.py</code>, <code>proc_rec.py</code>, <code>proc_layout.py</code>. Every model output is in <code>results/task_search/</code>: <code>proc_main</code>, <code>proc_main2</code> (fresh episodes), <code>proc_rec</code>, <code>proc_layout</code>. Figure 1 is episode <code>L3__11</code> of <code>proc_main</code>; this memo is built by <code>experiments/proc_memo.py</code>.</p>
+</article>
+</body>
+</html>

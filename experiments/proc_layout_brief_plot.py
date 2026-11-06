@@ -1,4 +1,4 @@
-"""For tex/proc_brief.tex (tex/figures/proc-layout.png). Run: python proc_layout_brief_plot.py results/task_search/proc_layout/analysis.json tex/figures/proc-layout.png
+"""For tex/proc_memo.html (via tex/figures/proc-layout.png; also used by the archived tex/archive/proc_brief.tex). Run: python proc_layout_brief_plot.py results/task_search/proc_layout/analysis.json tex/figures/proc-layout.png
 Per-reader panel of reports/proc-layout.png (own-layout effect L and own-wording effect W, 95% CIs), redrawn from
 results/task_search/proc_layout/analysis.json at a size that reads at text width, with readable reader names.
 Panel A of the original (the four cell means) is given as a table in the brief instead."""

@@ -1,5 +1,5 @@
-// Two-factor wake-sleep in the plane, binary latents against their linear-Gaussian twin. Shared by the report page
-// (inlined by toy_model_2_ws_report.py) and its node check. World: z uniform on {-1,+1}^2, x = z + sigma*eps (A = I).
+// Two-cause wake-sleep in the plane, with sleep and with recognition frozen. Shared by the report page (inlined by
+// toy_model_2_ws_report.py) and its node check. World: z uniform on {-1,+1}^2, x = z + sigma*eps (A = I).
 // Matrices are 2x2 arrays [m00, m01, m10, m11] (row-major); the generator maps z to x = W z + c, the recognizer x to R x + b.
 const WS = (() => {
   function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
@@ -14,15 +14,14 @@ const WS = (() => {
   }
 
   // Start: generator rotated by theta0 from the world's axes; recognizer at its sleep fixed point for that generator.
-  function learner(kind, theta0, sigma) {
-    const W = rot(theta0), k = kind === 'binary' ? 1 / sigma ** 2 : 1 / (1 + sigma ** 2);
-    return {kind, W, c: [0, 0], R: [W[0] * k, W[2] * k, W[1] * k, W[3] * k], b: [0, 0], s2: [sigma ** 2 / (1 + sigma ** 2), sigma ** 2 / (1 + sigma ** 2)]};
+  function learner(theta0, sigma) {
+    const W = rot(theta0), k = 1 / sigma ** 2;
+    return {W, c: [0, 0], R: [W[0] * k, W[2] * k, W[1] * k, W[3] * k], b: [0, 0]};
   }
 
   function read(L, x, r) {  // one sample from the recognizer q(z | x)
     const a0 = L.R[0] * x[0] + L.R[1] * x[1] + L.b[0], a1 = L.R[2] * x[0] + L.R[3] * x[1] + L.b[1];
-    if (L.kind === 'binary') return [r() < 1 / (1 + Math.exp(-2 * a0)) ? 1 : -1, r() < 1 / (1 + Math.exp(-2 * a1)) ? 1 : -1];
-    return [a0 + Math.sqrt(L.s2[0]) * normal(r), a1 + Math.sqrt(L.s2[1]) * normal(r)];
+    return [r() < 1 / (1 + Math.exp(-2 * a0)) ? 1 : -1, r() < 1 / (1 + Math.exp(-2 * a1)) ? 1 : -1];
   }
 
   function wake(L, w, r, lr, batch) {  // recognise stored foreign samples, delta rule on the generator
@@ -37,17 +36,15 @@ const WS = (() => {
   }
 
   function sleep(L, sigma, r, lr, batch) {  // dream from the own prior, render, delta rule on the recognizer
-    const dR = [0, 0, 0, 0], db = [0, 0], g2 = [0, 0];
+    const dR = [0, 0, 0, 0], db = [0, 0];
     for (let n = 0; n < batch; n++) {
-      const z = L.kind === 'binary' ? [sign(r), sign(r)] : [normal(r), normal(r)];
+      const z = [sign(r), sign(r)];
       const x = [L.W[0] * z[0] + L.W[1] * z[1] + L.c[0] + sigma * normal(r), L.W[2] * z[0] + L.W[3] * z[1] + L.c[1] + sigma * normal(r)];
-      let a0 = L.R[0] * x[0] + L.R[1] * x[1] + L.b[0], a1 = L.R[2] * x[0] + L.R[3] * x[1] + L.b[1];
-      if (L.kind === 'binary') { a0 = Math.tanh(a0); a1 = Math.tanh(a1); }
-      const g0 = z[0] - a0, g1 = z[1] - a1;
-      dR[0] += g0 * x[0]; dR[1] += g0 * x[1]; dR[2] += g1 * x[0]; dR[3] += g1 * x[1]; db[0] += g0; db[1] += g1; g2[0] += g0 * g0; g2[1] += g1 * g1;
+      const g0 = z[0] - Math.tanh(L.R[0] * x[0] + L.R[1] * x[1] + L.b[0]), g1 = z[1] - Math.tanh(L.R[2] * x[0] + L.R[3] * x[1] + L.b[1]);
+      dR[0] += g0 * x[0]; dR[1] += g0 * x[1]; dR[2] += g1 * x[0]; dR[3] += g1 * x[1]; db[0] += g0; db[1] += g1;
     }
     for (let i = 0; i < 4; i++) L.R[i] += lr * dR[i] / batch;
-    for (let i = 0; i < 2; i++) { L.b[i] += lr * db[i] / batch; if (L.kind === 'gaussian') L.s2[i] += lr * (g2[i] / batch - L.s2[i]); }
+    for (let i = 0; i < 2; i++) L.b[i] += lr * db[i] / batch;
   }
 
   // One practice update: a wake batch on stored data, then a sleep batch (or, with recognition frozen, a second wake batch).
@@ -66,9 +63,8 @@ const WS = (() => {
   }
   const genAngle = L => angle(L.W), recAngle = L => angle([L.R[0], L.R[2], L.R[1], L.R[3]]);  // recognizer: its rows as axes
 
-  // Expected log-likelihood per foreign sample of the generator W = rotation(theta) (orthonormal, c = 0), relative to the aligned
-  // generator, by a deterministic grid over the noise. Binary: a mixture of four Gaussians; Gaussian twin: N(0, (1 + sigma^2) I),
-  // the same for every theta.
+  // Expected log-likelihood per world sample of the generator W = rotation(theta) (orthonormal, c = 0), relative to the
+  // aligned generator: a mixture of four Gaussians, integrated over the noise on a deterministic grid.
   function landscape(sigma, thetas, grid = 41, span = 4.5) {
     const pts = [], h = 2 * span / (grid - 1); let tot = 0;
     for (let i = 0; i < grid; i++) for (let j = 0; j < grid; j++) { const u = -span + i * h, v = -span + j * h, wt = Math.exp(-(u * u + v * v) / 2); pts.push([u, v, wt]); tot += wt; }

@@ -10,43 +10,45 @@
 <title>Toy model 2: wake–sleep</title>
 <style>/*__KATEX_CSS__*/</style>
 <style>
-:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--world:#b5b3aa;--heat0:#f1f5fa;--heat1:#104281;--neg:#c23b3a;--mid:#f0efec;--pos:#1c5cab;--yes:#0c7a0c;--part:#7a5300;--no:#b4302f}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--world:#5c5b57;--heat0:#222529;--heat1:#9ec5f4;--neg:#e66767;--mid:#383835;--pos:#6da7ec;--yes:#5fc25f;--part:#e0b04a;--no:#e66767}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--world:#5c5b57;--heat0:#222529;--heat1:#9ec5f4;--neg:#e66767;--mid:#383835;--pos:#6da7ec;--yes:#5fc25f;--part:#e0b04a;--no:#e66767}
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--world:#b5b3aa;--yes:#0c7a0c;--part:#7a5300;--no:#b4302f;
+  --q0:#cde2fb;--q1:#9ec5f4;--q2:#6da7ec;--q3:#3987e5;--q4:#256abf;--q5:#184f95;--q6:#0d366b;--k4:#86b6ef;--k6:#2a78d6;--k8:#104281}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--world:#5c5b57;--yes:#5fc25f;--part:#e0b04a;--no:#e66767;
+  --q0:#0d366b;--q1:#184f95;--q2:#256abf;--q3:#3987e5;--q4:#6da7ec;--q5:#9ec5f4;--q6:#cde2fb;--k4:#256abf;--k6:#5598e7;--k8:#9ec5f4}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--world:#5c5b57;--yes:#5fc25f;--part:#e0b04a;--no:#e66767;
+  --q0:#0d366b;--q1:#184f95;--q2:#256abf;--q3:#3987e5;--q4:#6da7ec;--q5:#9ec5f4;--q6:#cde2fb;--k4:#256abf;--k6:#5598e7;--k8:#9ec5f4}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
 main{max-width:900px;margin:0 auto;padding:0 16px 64px}
 header{padding:48px 0 8px}
-h1{font-size:clamp(1.8rem,4.4vw,2.5rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
+h1{font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
 h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
 h3{font-size:1.05rem;margin:22px 0 6px}
-h4{font-size:1rem;margin:0 0 6px}
 p{margin:0 0 14px}
 a{color:var(--link)}
-section{padding-top:40px}
+section{padding-top:44px}
 .eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
 .lede{font-size:1.1rem;color:var(--ink2)}
 .small{font-size:.88rem;color:var(--ink2)}
+.new{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--s1);border:1.5px solid currentColor;border-radius:999px;padding:0 8px;margin-left:8px;vertical-align:middle}
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 0}
 .tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-.tile strong{display:block;font-size:1.6rem;line-height:1.2;margin-bottom:4px}
+.tile strong{display:block;font-size:1.5rem;line-height:1.2;margin-bottom:4px;font-variant-numeric:tabular-nums}
 .tile span{font-size:.88rem;color:var(--ink2)}
 .takeaways{padding-left:22px;margin:0}.takeaways li{margin-bottom:10px}
+.findings{padding-left:22px}.findings li{margin-bottom:8px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;min-width:0}
 .panel h3{margin-top:0}.panel p:last-child,.panel ul:last-child{margin-bottom:0}
 .panel ul{padding-left:20px;margin:0 0 10px}
+.callout{background:var(--note);border-radius:10px;padding:14px 18px;margin:18px 0}
+.callout p:last-child{margin-bottom:0}
 .eq{overflow-x:auto;overflow-y:hidden;margin:6px 0 12px}
-details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin:12px 0}
-summary{cursor:pointer;font-weight:650}
-details>*:nth-child(2){margin-top:12px}
-details p:last-child{margin-bottom:0}
 figure{margin:16px 0}
-figcaption{font-size:.88rem;color:var(--ink2);margin-top:6px}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px 6px;position:relative;min-width:0}
 .chart-box h3{margin:0 6px 2px;font-size:.95rem}
+.chart-box .sub{margin:0 6px;font-size:.82rem;color:var(--ink2)}
 .chart-box svg{width:100%;height:auto;display:block;touch-action:pan-y}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--ink2);margin:10px 0 0}
 .legend span{display:inline-flex;align-items:center;gap:7px}
@@ -56,14 +58,13 @@ svg text{font-family:inherit}
 .axis-title{fill:var(--ink2);font-size:12px}
 .gridline{stroke:var(--grid);stroke-width:1}
 .baseline{stroke:var(--axis);stroke-width:1}
-.direct{font-size:12px;fill:var(--ink);font-weight:650}
+.direct{font-size:12px;fill:var(--ink2);font-weight:650}
 .tooltip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.8rem;box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:nowrap;display:none;z-index:2}
 .tooltip b{font-weight:650}.tooltip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;font-style:normal}
 table{border-collapse:collapse;width:100%;font-size:.92rem}
 th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
 thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-space:nowrap}
-tr.group th{padding-top:18px;font-weight:650;border-bottom:none;color:var(--ink)}
 .table-wrap{overflow-x:auto}
 .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:6px 0 12px}
 .controls label{font-size:.88rem;color:var(--ink2);display:flex;align-items:center;gap:8px}
@@ -72,12 +73,8 @@ tr.group th{padding-top:18px;font-weight:650;border-bottom:none;color:var(--ink)
 select,button{font:inherit;font-size:.9rem;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:6px 10px}
 button{cursor:pointer}button:hover{border-color:var(--ink2)}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
-.slider{display:flex;align-items:center;gap:12px;margin:4px 0 12px}
-.slider input{flex:1;min-width:0;accent-color:var(--s1)}
-.slider output{font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--ink2);min-width:13ch;text-align:right}
 .columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .columns ul{padding-left:20px;margin:0}.columns li{margin-bottom:8px}
-.callout{background:var(--note);border-radius:10px;padding:12px 16px;margin:14px 0}
 .paths code{font-size:.82rem;overflow-wrap:anywhere}
 .paths li{margin-bottom:8px}
 footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
@@ -88,27 +85,23 @@ footer code{overflow-wrap:anywhere}
 .dg-edge{stroke:var(--axis);stroke-width:.8}
 .dg-label{font-size:13px;fill:var(--ink2)}
 .dg-strong{font-size:13px;fill:var(--ink);font-weight:650}
+.dg-hebb{font-size:13px;fill:var(--ink);font-weight:600}
 .planes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .plane-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center;min-width:0}
 .plane-box h3{margin:0 0 2px;font-size:.95rem}
 .plane-box svg{width:100%;max-width:330px;height:auto;display:block;margin:0 auto}
 .plane-box .small{font-variant-numeric:tabular-nums;min-height:2.8em}
-.heatgrid{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px 14px;align-items:start}
-.heat-row-label{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.85rem;color:var(--ink2);font-weight:650;text-align:center;align-self:center}
-.heat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 10px 8px;position:relative;min-width:0}
-.heat-box h3{margin:0 0 2px;font-size:.92rem}
-.heat-box .small{min-height:1.4em;font-variant-numeric:tabular-nums}
-.heat-box svg{width:100%;max-width:280px;height:auto;display:block;margin:4px auto 0}
-.heat-empty{display:flex;align-items:center;justify-content:center;min-height:180px;color:var(--muted);font-size:.9rem;text-align:center;padding:0 12px}
-.scale{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--ink2);margin-top:8px;flex-wrap:wrap}
-.scale i{display:inline-block;width:90px;height:10px;border-radius:3px}
+.heat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px 8px;position:relative;min-width:0}
+.heat-box h3{margin:0 6px 4px;font-size:.95rem}
+.heat-box svg{width:100%;height:auto;display:block}
+.scale-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;font-size:.85rem;color:var(--ink2);margin:8px 0 14px}
+.scale-row svg{width:260px;max-width:100%;height:auto}
 .pill{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:1px 9px;border:1.5px solid currentColor;white-space:nowrap}
 .pill.yes{color:var(--yes)}.pill.part{color:var(--part)}.pill.no{color:var(--no)}.pill.na{color:var(--ink2)}
 .spec td:first-child{width:34%}.spec td:nth-child(2){width:1%;white-space:nowrap}
-@media (max-width:720px){body{font-size:16px}.tiles,.two,.charts,.columns,.planes{grid-template-columns:1fr}.heatgrid{grid-template-columns:1fr}.heat-row-label{writing-mode:horizontal-tb;transform:none;text-align:left}header{padding-top:28px}section{padding-top:32px}}
-@media print{.controls,.slider{display:none}body{background:#fff}}
+@media (max-width:720px){body{font-size:16px}.tiles,.two,.charts,.columns,.planes{grid-template-columns:1fr}header{padding-top:28px}section{padding-top:34px}}
+@media print{.controls{display:none}body{background:#fff}}
 figure.widget{margin:16px 0}
-.dg-hebb{font-size:13px;fill:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
@@ -116,287 +109,291 @@ figure.widget{margin:16px 0}
 <article>
 <header>
 <div class="eyebrow">Generative learning · toy model 2 · wake–sleep</div>
-<h1>Practice turns a rotated latent space towards the world's, and a second layer learns the prior</h1>
-<p class="abstract lede">A learner has {{N}} unlabelled samples from a world with six hidden binary causes. Its generator starts with the right mean and covariance, but its latent axes are turned away from the world's by about {{chain_two_layer_gen0}}. Wake–sleep practice, which alternates reading the stored samples and dreaming its own, turns the axes towards the world's. Every weight learns by a Hebbian rule: the activity at one end of a connection times the error at the other. A second layer, trained by the same rule, learns which causes go together. The learner ends with a better generator than one that was handed the world's true prior. The linear-Gaussian version of the same learner has nothing to turn towards, and its axes wander.</p>
+<h1>Dreaming lets a Hebbian learner align its latent space, and beat an autoencoder trained on the same examples</h1>
+<p class="abstract lede">A two-layer network learns a world of six hidden binary causes from unlabelled samples. It starts with the right mean and covariance, but with its latent axes turned about {{two_layer_gen0}} away from the world's. Wake–sleep practice alternates reading supplied samples, which trains generation, with dreaming its own, which trains recognition, each by a local Hebbian rule. Practice turns the axes towards the world's, and a second layer learns which causes go together. Given a fixed number of examples, the learner does best when about 30% of them are its own dreams. It then ends {{b21_ratioAE}} times closer to the world than the same network trained as an autoencoder on supplied samples only. Dreaming starts to pay once the supplied samples include about {{crossRange}} distinct ones, whether the latent space has 16 or 256 configurations.</p>
 <div class="tiles">
-<div class="tile"><strong>{{chain_two_layer_gen0}} → {{chain_two_layer_gen}}</strong> <span>angle between the generator's axes and the world's, two-layer learner, mean of {{worlds}} worlds ({{chain_two_layer_fgen}} with unlimited fresh samples)</span></div>
-<div class="tile"><strong>{{chain_two_layer_kl}} nats</strong> <span>generator error with a learned second layer; {{chain_true_prior_kl}} with the world's true prior given, {{chain_independent_kl}} with independent latents</span></div>
-<div class="tile"><strong>{{chain_gaussian_gen0}} → {{chain_gaussian_gen}}</strong> <span>the same angle for the linear-Gaussian twin: Gaussian latents give the axes no direction to turn in</span></div>
+<div class="tile"><strong>{{two_layer_gen0}} → {{two_layer_gen}}</strong> <span>angle between the generator's latent axes and the world's, after practice on {{N}} stored samples ({{two_layer_fgen}} with unlimited fresh samples)</span></div>
+<div class="tile"><strong>{{b21_ws70}} vs {{b21_ae100}} nats</strong> <span>generator error after {{bMax}} examples: wake–sleep with 30% dreamed, against the autoencoder baseline; lower in {{b21_winsAE}} of {{bWorlds}} worlds</span></div>
+<div class="tile"><strong>{{crossRange}} examples</strong> <span>distinct supplied examples from which dreaming pays, for latent spaces of 16, 64 and 256 configurations</span></div>
 </div>
 </header>
 
 <section id="summary">
 <h2>Summary</h2>
 <ol class="takeaways">
-<li><b>The question.</b> The learner's generator gets every mean and covariance of the data right, but its latent axes are turned. Can wake–sleep practice on a fixed set of foreign samples undo that rotation? And can a learned second layer replace the prior that the one-layer version had to be given?</li>
-<li><b>Every update is Hebbian.</b> Each weight changes by the activity at one end of its connection times the error at the other: a Hebbian co-activity term minus an anti-Hebbian term in which the network's own prediction stands in for the real activity. Wake trains generation this way on stored samples, sleep trains recognition this way on dreams, in both layers.</li>
-<li><b>The rotation is undone, because the causes are binary.</b> With ±1 causes, how well the generator explains the data depends on the orientation of its latent axes, with the best fit at the world's axes. Wake reads stored samples through the recognizer and turns the generator towards that best fit. Sleep then brings the recognizer after it. With two causes, the axes turn from 30° to {{b500}} within 500 updates. With recognition frozen they stop at {{frozen}}.</li>
-<li><b>Recognition follows generation closely; generation reaches the world slowly.</b> In every layer, the recognizer comes within about ten degrees of the best recognizer for the current generator after a few hundred updates, and stays there ({{lagMin}}–{{lagMax}} at the end, in every condition). The generator's turn towards the world takes the whole run. Recognition never runs ahead of generation.</li>
-<li><b>A second layer explains the prior.</b> The world's causes are correlated. A one-layer learner with independent latents cannot represent that, and settles at a mixed orientation ({{chain_independent_gen}} off, {{chain_independent_kl}} nats). A top layer trained on the learner's own codes, by the same Hebbian rule, learns the correlations, and the bottom layer is then free to turn towards the world's axes ({{chain_two_layer_gen}}, {{chain_two_layer_kl}} nats). This beats a learner handed the true prior ({{chain_true_prior_kl}} nats), which must also bind each of its units to the right slot of that prior. The price is that which unit stands for which cause becomes arbitrary.</li>
-<li><b>The linear-Gaussian twin has nothing to practise.</b> With Gaussian causes of the same mean and covariance, every rotation explains the data equally well, so wake never turns the axes. They drift at random ({{chain_gaussian_gen0}} → {{chain_gaussian_gen}}). Its error grows only by fitting the sampling noise of the stored set ({{chain_gaussian_kl0}} → {{chain_gaussian_kl}} nats; {{chain_gaussian_fkl}} with fresh samples). A Gaussian second layer would only add a covariance, which the first layer can absorb anyway.</li>
+<li><strong>The setup.</strong> Six hidden ±1 causes, themselves set by two top causes, are rendered linearly in 12 dimensions with noise. The learner is a two-layer Helmholtz machine: a generator and a recognizer in each layer. It starts with a generator that gets every mean and covariance of the data right but whose latent axes are turned, a defect that reconstruction error, principal components and anything else second-order cannot see.</li>
+<li><strong>Practice turns the axes, because the causes are binary.</strong> With ±1 causes, how well a generator explains the data depends on the orientation of its axes. Wake follows that slope by reading samples through the recognizer; sleep keeps the recognizer matched to the turning generator. With two causes, the axes go from 30° to {{b500}} in 500 updates; with recognition frozen, they stop at {{frozen}}. A linear-Gaussian learner has no such slope, whatever the shape of its latent or noise covariance (box in section 1).</li>
+<li><strong>Generation leads, recognition follows.</strong> In both layers the recognizer gets within a few degrees of the best recognizer for the current generator after a few hundred updates and stays there ({{lagMin}}–{{lagMax}} at the end). Turning the generator towards the world is the slow process ({{two_layer_gen0}} → {{two_layer_gen}} over {{steps}} updates). Recognition never runs ahead.</li>
+<li><strong>A second layer learns the prior.</strong> Trained by the same rule on the codes the learner gives its own samples, it learns which causes go together. The learner ends at {{two_layer_kl}} nats, better than the same learner handed the world's true prior ({{true_prior_kl}}) or one with independent causes ({{independent_kl}}). The price is that which unit stands for which cause becomes arbitrary.</li>
+<li><strong>At a fixed budget of examples, dreaming beats watching.</strong> Out of {{bMax}} examples, wake–sleep does best with about 30% dreamed ({{b21_ws70}} nats). With none dreamed, its recognizer is never trained and it stalls at {{stall}}. The autoencoder baseline, trained end to end on supplied examples, plateaus at {{b21_ae100}}. Wake–sleep is ahead in at least 11 of {{bWorlds}} worlds from {{beatFrom}} examples on, and ties at 2<sup>13</sup> and below. A learner that computes exact posteriors needs no dreams at all and ends at {{b21_ws_teach100}}, but it sums over all 64 latent configurations for every example.</li>
+<li><strong>Dreaming pays from a few dozen distinct examples.</strong> With a fixed set of N supplied examples, reused, dreaming helps once N is above about {{crossRange}}. At N = 128, wake–sleep reaches {{n128_ws70}} nats, against {{n128_ws100}} without dreams and {{n128_ae100}} for the autoencoder. The threshold is the same for 16, 64 and 256 latent configurations. Below it, every learner memorises its few examples, and dreams no longer help.</li>
+<li><strong>Dreams teach recognition; they do not explore.</strong> Replaying the codes that recognition gave to supplied samples works as well as dreaming from the learned prior ({{d21_ws_replay}} vs {{d21_ws}} nats), although it covers fewer latent configurations. Dreaming uniformly over all configurations is much worse ({{d21_ws_uniform}}). Dreams are useful as exactly labelled examples for the recognizer, drawn from the latent distribution the generator is being fitted to.</li>
 </ol>
 </section>
 
 <section id="model">
-<h2>The model</h2>
+<h2>1. The model</h2>
 <h3>World</h3>
-<p>Six hidden causes \(\mathbf{z}\in\{-1,+1\}^6\) are rendered as \(\mathbf{x}=\mathbf{A}\mathbf{z}+\sigma\boldsymbol{\epsilon}\) in 12 dimensions, with random unit-length columns \(\mathbf{a}_j\) of \(\mathbf{A}\) and \(\sigma=0.5\). In the <b>chain world</b>, neighbouring causes agree with probability 0.85. In the <b>two-layer world</b>, two hidden top causes set the probabilities of the six. The learner keeps {{N}} samples and never sees a cause.</p>
+<p>Two top causes \(\mathbf{h}\in\{-1,+1\}^2\), uniform, set the probabilities of six causes, \(p(z_i=+1\mid\mathbf{h})=\operatorname{sigmoid}\big(2\beta(\mathbf{B}\mathbf{h})_i\big)\), with a random Gaussian \(\mathbf{B}\) and \(\beta=1.5\). The six causes are rendered as \(\mathbf{x}=\mathbf{A}\mathbf{z}+\sigma\boldsymbol{\epsilon}\) in 12 dimensions, with random unit-length columns \(\mathbf{a}_j\) and \(\sigma=0.5\). Each world draws its own \(\mathbf{A}\) and \(\mathbf{B}\). The learner never sees a cause.</p>
 <h3>Learner</h3>
 <figure class="widget diagram" id="diagramBlock"><svg id="diagram" viewBox="0 0 640 275" role="img" aria-label="A two-layer Helmholtz machine: four top causes g generate six causes z through weights V; z generates the twelve-dimensional sample x through weights W. Recognition runs upward: R reads z from x and R2 reads g from z. One connection is highlighted with its Hebbian update."></svg></figure>
-<div class="two">
-<div class="panel"><h3>Two-layer learner (binary causes)</h3>
-<p>Generation runs top-down. Four top causes \(\mathbf{g}\in\{\pm1\}^4\) are uniform, and</p>
+<p>Generation runs top-down. Four top causes \(\mathbf{g}\in\{\pm1\}^4\) are uniform (the world has two; the learner is not told), and</p>
 <div class="eq">\[\begin{gathered}p(z_i=+1\mid\mathbf{g})=\operatorname{sigmoid}\big(2(\mathbf{V}\mathbf{g}+\mathbf{a})_i\big),\\ p(\mathbf{x}\mid\mathbf{z})=\mathcal N(\mathbf{W}\mathbf{z}+\mathbf{c},\,\sigma^2\mathbf{I}).\end{gathered}\]</div>
 <p>Recognition runs bottom-up, one factorised layer at a time:</p>
 <div class="eq">\[\begin{gathered}q(z_i=+1\mid\mathbf{x})=\operatorname{sigmoid}\big(2(\mathbf{R}\mathbf{x}+\mathbf{b})_i\big),\\ q(g_j=+1\mid\mathbf{z})=\operatorname{sigmoid}\big(2(\mathbf{R}_2\mathbf{z}+\mathbf{b}_2)_j\big).\end{gathered}\]</div>
-</div>
-<div class="panel"><h3>Linear-Gaussian twin</h3>
-<p>Its causes are Gaussian with exactly the mean \(\boldsymbol\mu\) and covariance \(\boldsymbol\Sigma\) of the world's binary prior, and it has no top layer:</p>
-<div class="eq">\[\begin{gathered}\mathbf{z}\sim\mathcal N(\boldsymbol\mu,\boldsymbol\Sigma),\\ p(\mathbf{x}\mid\mathbf{z})=\mathcal N(\mathbf{W}\mathbf{z}+\mathbf{c},\,\sigma^2\mathbf{I}),\\ q(\mathbf{z}\mid\mathbf{x})=\mathcal N\big(\mathbf{R}\mathbf{x}+\mathbf{b},\,\operatorname{diag}\mathbf{s}^2\big).\end{gathered}\]</div>
-<p>This is factor analysis learned by delta-rule wake–sleep (Neal &amp; Dayan, 1997). Everything else, including the start, the data and the rates, is the same.</p>
-</div>
-</div>
-<h3>Practice: wake and sleep</h3>
-<div class="two">
-<div class="panel"><h4>Wake: read a stored sample, train generation</h4>
-<p>Read the causes upward, \(\mathbf{z}\sim q(\cdot\mid\mathbf{x})\), then \(\mathbf{g}\sim q(\cdot\mid\mathbf{z})\). Each generative layer learns to predict the layer below:</p>
-<div class="eq">\[\begin{gathered}\Delta\mathbf{W}=\eta\,(\mathbf{x}-\mathbf{W}\mathbf{z}-\mathbf{c})\,\mathbf{z}^{\mathsf T},\\ \Delta\mathbf{V}=\eta\,\big(\mathbf{z}-\tanh(\mathbf{V}\mathbf{g}+\mathbf{a})\big)\,\mathbf{g}^{\mathsf T}.\end{gathered}\]</div></div>
-<div class="panel"><h4>Sleep: dream, train recognition</h4>
-<p>Dream top-down, \(\mathbf{g}\sim p(\mathbf{g})\), \(\mathbf{z}\sim p(\cdot\mid\mathbf{g})\), \(\tilde{\mathbf{x}}\sim p(\cdot\mid\mathbf{z})\). Each recognition layer learns to recover the cause behind what it was shown:</p>
-<div class="eq">\[\begin{gathered}\Delta\mathbf{R}=\eta_s\big(\mathbf{z}-\tanh(\mathbf{R}\tilde{\mathbf{x}}+\mathbf{b})\big)\,\tilde{\mathbf{x}}^{\mathsf T},\\ \Delta\mathbf{R}_2=\eta_s\big(\mathbf{g}-\tanh(\mathbf{R}_2\mathbf{z}+\mathbf{b}_2)\big)\,\mathbf{z}^{\mathsf T}.\end{gathered}\]</div></div>
-</div>
-<p>Rates \(\eta=0.02\) and \(\eta_s=0.2\), batches of 32, {{steps}} updates, each one wake and one sleep batch. The Gaussian twin uses the same rules with the identity in place of \(\tanh\).</p>
 
-<h3>Why these are Hebbian rules</h3>
-<p>Multiply out the brackets. Every update is a <b>Hebbian</b> term, the product of the activities at the two ends of a connection, minus an <b>anti-Hebbian</b> term in which the receiving unit's activity is replaced by the network's own prediction of it:</p>
-<div class="eq">\[\Delta\mathbf{W}=\eta\,\underbrace{\mathbf{x}\,\mathbf{z}^{\mathsf T}}_{\text{Hebbian}}-\eta\,\underbrace{\hat{\mathbf{x}}\,\mathbf{z}^{\mathsf T}}_{\text{anti-Hebbian}},\qquad\hat{\mathbf{x}}=\mathbf{W}\mathbf{z}+\mathbf{c},\]</div>
-<div class="eq">\[\Delta\mathbf{R}=\eta_s\,\underbrace{\mathbf{z}\,\tilde{\mathbf{x}}^{\mathsf T}}_{\text{Hebbian}}-\eta_s\,\underbrace{\hat{\mathbf{z}}\,\tilde{\mathbf{x}}^{\mathsf T}}_{\text{anti-Hebbian}},\qquad\hat{\mathbf{z}}=\tanh(\mathbf{R}\tilde{\mathbf{x}}+\mathbf{b}),\]</div>
-<p>and the same one layer up for \(\mathbf{V}\) and \(\mathbf{R}_2\). For a single connection, from cause unit \(j\) to sample unit \(i\) (highlighted in the diagram above),</p>
-<div class="eq">\[\Delta w_{ij}=\eta\,(x_i-\hat x_i)\,z_j .\]</div>
-<p>It needs the activity \(z_j\) of the sending unit, and at the receiving unit the difference between what arrives from below (the sample) and what arrives from above (the prediction). Both are available at the two ends of the connection. No error travels through other layers, and no weight is copied from one pathway to the other. This is the Widrow–Hoff delta rule: Hebbian learning made stable by subtracting the network's own prediction.</p>
-<p>What each half does:</p>
-<ul>
-<li><b>In wake</b>, the Hebbian term \(\mathbf{x}\mathbf{z}^{\mathsf T}\) strengthens connections between the causes the recognizer read out and the sample units that were active. The generator stops changing when its predictions reproduce those co-activities, \(\mathbb E[\hat{\mathbf{x}}\mathbf{z}^{\mathsf T}]=\mathbb E[\mathbf{x}\mathbf{z}^{\mathsf T}]\).</li>
-<li><b>In sleep</b>, the Hebbian term alone already builds the transpose of the generator. For causes of mean zero, averaged over dreams, \(\mathbb E[\mathbf{z}\tilde{\mathbf{x}}^{\mathsf T}]=\boldsymbol\Sigma_{\mathbf z}\mathbf{W}^{\mathsf T}\), so recognition starts out reading each cause along the direction in which generation writes it. The anti-Hebbian term then removes the cross-talk between causes. Recognition gets aligned with generation from the learner's own dreams, without weight transport.</li>
-</ul>
+<h3>Practice: wake and sleep</h3>
+<p><strong>Wake</strong> reads a supplied sample and trains generation. It reads the causes upward, \(\mathbf{z}\sim q(\cdot\mid\mathbf{x})\), then \(\mathbf{g}\sim q(\cdot\mid\mathbf{z})\), and each generative layer learns to predict the layer below:</p>
+<div class="eq">\[\begin{gathered}\Delta\mathbf{W}=\eta\,(\mathbf{x}-\mathbf{W}\mathbf{z}-\mathbf{c})\,\mathbf{z}^{\mathsf T},\\ \Delta\mathbf{V}=\eta\,\big(\mathbf{z}-\tanh(\mathbf{V}\mathbf{g}+\mathbf{a})\big)\,\mathbf{g}^{\mathsf T}.\end{gathered}\]</div>
+<p><strong>Sleep</strong> dreams and trains recognition. It dreams top-down, \(\mathbf{g}\sim p(\mathbf{g})\), \(\mathbf{z}\sim p(\cdot\mid\mathbf{g})\), \(\tilde{\mathbf{x}}\sim p(\cdot\mid\mathbf{z})\), and each recognition layer learns to recover the cause behind what it was shown:</p>
+<div class="eq">\[\begin{gathered}\Delta\mathbf{R}=\eta_s\big(\mathbf{z}-\tanh(\mathbf{R}\tilde{\mathbf{x}}+\mathbf{b})\big)\,\tilde{\mathbf{x}}^{\mathsf T},\\ \Delta\mathbf{R}_2=\eta_s\big(\mathbf{g}-\tanh(\mathbf{R}_2\mathbf{z}+\mathbf{b}_2)\big)\,\mathbf{z}^{\mathsf T}.\end{gathered}\]</div>
+<p>Rates \(\eta=0.02\) and \(\eta_s=0.2\), batches of {{batch}}. Every update is local and Hebbian. Multiplied out, each is a Hebbian co-activity term minus an anti-Hebbian term in which the receiving unit's activity is replaced by the network's own prediction of it, for a single connection</p>
+<div class="eq">\[\Delta w_{ij}=\eta\,(x_i-\hat x_i)\,z_j,\qquad \hat{\mathbf{x}}=\mathbf{W}\mathbf{z}+\mathbf{c}.\]</div>
+<p>This is the delta rule: it needs the activity of the sending unit and, at the receiving unit, the difference between what arrives from below and what arrives from above. No error travels through other layers, and no weight is copied between the pathways. In sleep, the Hebbian half alone already builds the transpose of the generator (for causes of mean zero, \(\mathbb E[\mathbf{z}\tilde{\mathbf{x}}^{\mathsf T}]=\boldsymbol\Sigma_{\mathbf z}\mathbf{W}^{\mathsf T}\)), so recognition learns to read each cause along the direction in which generation writes it, and the anti-Hebbian half removes the cross-talk.</p>
 
 <h3>The start: right statistics, wrong axes</h3>
-<p>Every learner starts from the same generator. It matches the data's mean and covariance exactly, but its axes are the world's turned by a random rotation \(\mathbf{Q}\): \(\mathbf{W}_0=\mathbf{A}\boldsymbol\Sigma^{1/2}\mathbf{Q}\boldsymbol\Sigma^{-1/2}\). Its recognizer has been fitted to this generator by sleep, so it reads its own dreams well and the world's samples badly. Nothing that looks only at means and covariances can tell this generator from the right one, so reconstruction, principal components and linear autoencoders are already at their optimum here.</p>
-<table>
-<thead><tr><th>Learner</th><th>Prior over the six causes</th></tr></thead>
+<p>Every learner starts from the same generator. It matches the data's mean and covariance exactly, but its axes are the world's turned by a random rotation \(\mathbf{Q}\): \(\mathbf{W}_0=\mathbf{A}\boldsymbol\Sigma^{1/2}\mathbf{Q}\boldsymbol\Sigma^{-1/2}\). Its recognizer has been fitted to this generator by sleep, so it reads its own dreams well and the world's samples badly. Nothing that looks only at means and covariances can tell this generator from the right one.</p>
+
+<div class="callout">
+<p><strong>Why binary causes, and not a linear-Gaussian model.</strong> Give the causes a Gaussian prior \(\mathcal N(\boldsymbol\mu,\boldsymbol\Sigma)\) with any covariance, round or elongated, and the noise any Gaussian covariance \(\boldsymbol\Psi\), round or not. The data are then Gaussian too,</p>
+<div class="eq">\[p(\mathbf{x})=\mathcal N\big(\mathbf{W}\boldsymbol\mu+\mathbf{c},\;\mathbf{W}\boldsymbol\Sigma\mathbf{W}^{\mathsf T}+\boldsymbol\Psi\big),\]</div>
+<p>and replacing \(\mathbf{W}\) by \(\mathbf{W}\boldsymbol\Sigma^{1/2}\mathbf{Q}\boldsymbol\Sigma^{-1/2}\), for any rotation \(\mathbf{Q}\) (with \(\mathbf{c}\) shifted to keep the mean), leaves this distribution unchanged. Every rotation of the latent axes, measured in the prior's whitened coordinates, explains the data equally well, so no rule that improves the likelihood can prefer the world's axes. An elongated prior or elongated noise changes which rotations these are, not that they exist. In the previous version of this report, the linear-Gaussian twin of this learner (one layer, with the binary prior's mean and covariance) went from {{gauss_gen0}} to {{gauss_gen}}. A factorised recognizer adds a small preference for axes along which the posterior factorises, but that is set by \(\mathbf{W}\) and \(\boldsymbol\Psi\), not by the world. Only a non-Gaussian prior breaks the symmetry, and ±1 causes are the simplest one.</p>
+</div>
+
+<h3>The learners compared</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Learner</th><th>What differs</th><th>Sections</th></tr></thead>
 <tbody>
-<tr><td><b>Two layers</b></td><td>learned: a top layer of four units, from scratch (independent causes at the start)</td></tr>
-<tr><td><b>One layer, true prior given</b></td><td>the world's prior, fixed (the original toy, <a href="{{filesDir}}/practice_disentangle.tex">write-up</a>)</td></tr>
-<tr><td><b>One layer, independent causes</b></td><td>learned frequency per cause, no correlations</td></tr>
-<tr><td><b>Linear-Gaussian twin</b></td><td>Gaussian with the world prior's mean and covariance, fixed</td></tr>
-</tbody></table>
+<tr><td><strong>Wake–sleep, learned prior</strong> (the model)</td><td>a top layer of {{H}} units, learned by the same rule, from small random weights</td><td>all</td></tr>
+<tr><td>Wake–sleep, true prior given</td><td>one layer; the world's prior over the six causes is given and fixed (the earlier toy, <a href="{{filesDir}}/practice_disentangle.tex">write-up</a>)</td><td>3, 4</td></tr>
+<tr><td>Wake–sleep, independent causes</td><td>one layer; a learned frequency for each cause, no correlations</td><td>3, 4</td></tr>
+<tr><td>Autoencoder baseline</td><td>the same two-layer network, both parts trained end to end on supplied samples by reconstruction error (mean-field codes, backpropagation into recognizer and generator); dreams, where given, train recognition by sleep</td><td>5, 6</td></tr>
+<tr><td>Exact-posterior reference</td><td>the same network; supplied samples also train the recognizers, towards the exact posterior means under the current generator (a sum over all 64 configurations of the six causes); dreams, where given, train recognition by sleep</td><td>5, 6</td></tr>
+</tbody></table></div>
+<p class="small">Error is always the population KL divergence from the world to the learner's generative model, KL(world ‖ model), in nats per sample, on 4,000 held-out world samples, summing exactly over the latent configurations.</p>
 </section>
 
 <section id="rotation">
-<h2>The rotation, in two dimensions</h2>
-<p>With two causes, the misalignment is a single angle. The world's samples (grey) sit in four clusters at \((\pm1,\pm1)\), so the world's axes are the horizontal and vertical. Both learners start with their axes turned by the same angle. The binary learner's dreams form four clusters at the corners of a turned square. The Gaussian learner's dreams form one round cloud, which looks the same at every angle. Press <b>Play</b>.</p>
+<h2>2. Two causes: why practice turns the axes</h2>
+<p>With two causes, misalignment is a single angle. The world's samples (grey) sit in four clusters at \((\pm1,\pm1)\), so the world's axes are the horizontal and the vertical. Both learners below start from the same generator, turned by the same angle, with the same {{N}} stored samples. The left one practises: a wake batch and a sleep batch per update. The right one has its recognition frozen: it gets a second wake batch instead of sleep. Press Play.</p>
 <figure class="widget" id="simBlock">
 <div class="controls">
-<button id="simPlay">Play</button><button id="simReset">Reset</button><button id="simNew">New samples</button>
-<label>Start angle <input id="simTheta" type="range" min="5" max="44" value="30"><output id="simThetaOut">30°</output></label>
+<button id="simPlay" type="button">Play</button><button id="simReset" type="button">Reset</button><button id="simNew" type="button">New samples</button>
+<label>Start angle <input id="simTheta" type="range" min="5" max="44" step="1" value="30"><output id="simThetaOut">30°</output></label>
 <label>Noise σ <input id="simSigma" type="range" min="0.3" max="0.8" step="0.05" value="0.5"><output id="simSigmaOut">0.50</output></label>
-<label><input id="simFrozen" type="checkbox"> Freeze recognition (no sleep)</label>
 <label>Speed <select id="simSpeed"><option value="1">1×</option><option value="4" selected>4×</option><option value="12">12×</option></select></label>
 </div>
 <div class="planes">
-<div class="plane-box"><h3>Binary causes</h3><svg id="planeB" viewBox="0 0 300 300" role="img" aria-label="The binary learner: world samples in four grey clusters, the learner's dreams, and its generator and recognizer axes."></svg><div class="small" id="readB"></div></div>
-<div class="plane-box"><h3>Gaussian causes (the twin)</h3><svg id="planeG" viewBox="0 0 300 300" role="img" aria-label="The Gaussian learner: world samples in four grey clusters, the learner's round cloud of dreams, and its generator and recognizer axes."></svg><div class="small" id="readG"></div></div>
+<div class="plane-box"><h3>Wake–sleep</h3><svg id="planeB" viewBox="0 0 300 300" role="img" aria-label="The practising learner: world samples in four grey clusters, the learner's dreams, and its generator and recognizer axes."></svg><div class="small" id="readB"></div></div>
+<div class="plane-box"><h3>Recognition frozen</h3><svg id="planeF" viewBox="0 0 300 300" role="img" aria-label="The learner with frozen recognition: world samples, its dreams, and its generator and recognizer axes."></svg><div class="small" id="readF"></div></div>
 </div>
 <div class="legend" id="planeLegend"></div>
 <div class="charts" style="margin-top:14px">
-<div class="chart-box"><h3>Angle of the axes from the world's</h3><svg id="simAngle" viewBox="0 0 560 330" role="img" aria-label="Angle of the generator and recognizer axes over practice updates for both learners."></svg><div class="tooltip"></div></div>
-<div class="chart-box"><h3>Misfit against the angle, nats per sample ↓</h3><svg id="simLand" viewBox="0 0 560 330" role="img" aria-label="Loss in nats per sample against the generator's angle: the binary learner's loss has a valley at zero degrees; the Gaussian learner's is flat."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Angle of the axes from the world's</h3><svg id="simAngle" viewBox="0 0 560 330" role="img" aria-label="Angle of the generator and recognizer axes over practice updates, with sleep and with recognition frozen."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Misfit against the angle, nats per sample ↓</h3><svg id="simLand" viewBox="0 0 560 330" role="img" aria-label="Loss in nats per sample against the generator's angle: a valley at zero degrees."></svg><div class="tooltip"></div></div>
 </div>
 <div class="legend" id="simLegend"></div>
 </figure>
-<p class="small">This runs the learners live in your browser, on {{N}} stored samples, with the Hebbian rules above and the same rates as the six-cause runs. Angles are folded to ±45°, because a turn by 90° or a sign flip only relabels the causes. Left chart: solid lines are generators, dashed lines recognizers. Right chart: the loss is the average negative log-likelihood of a world sample under a generator turned by that angle, relative to the aligned one.</p>
+<p class="small">This runs the learners live in your browser, with the Hebbian rules above and the rates of the six-cause runs. Angles are folded to ±45°, because a turn by 90° or a sign flip only relabels the causes. Left chart: solid lines are generators, dashed lines recognizers. Right chart: the average negative log-likelihood of a world sample under a generator turned by that angle, relative to the aligned one; the dots are the two learners.</p>
 
-<h3>Why the binary learner turns and the Gaussian one does not</h3>
+<h3>Why the axes turn</h3>
 <p>Write \(\mathbf{u}=\mathbf{W}^{\mathsf T}\mathbf{x}\) for what the generator's axes see in a sample, and \(\varphi(u)=\mathbb E[z\mid u]\) for the posterior mean of a cause. Put the exact posterior into the wake update and keep only the part that rotates \(\mathbf{W}\). The rotation speed is then</p>
-<div class="eq">\[\dot\theta\;\propto\;\tfrac12\,\mathbb E\big[\varphi(u_1)\,u_2-\varphi(u_2)\,u_1\big].\]</div>
-<div class="two">
-<div class="panel"><h4>Binary causes: \(\varphi(u)=\tanh(u/\sigma^2)\)</h4><p>The bracket is non-zero and pulls \(\theta\) to the nearest multiple of 90°. This is the rotation step of independent component analysis, with the nonlinearity supplied by the learner's own prior. ICA has to choose that nonlinearity by hand; here sleep makes the recognizer compute it for the current generator.</p></div>
-<div class="panel"><h4>Gaussian causes: \(\varphi(u)=u/(1+\sigma^2)\)</h4><p>The posterior mean is linear, so the bracket is \(\mathbb E[u_1u_2-u_2u_1]/(1+\sigma^2)=0\) at every angle. More generally, \(p(\mathbf{x})=\mathcal N(\mathbf{W}\boldsymbol\mu+\mathbf{c},\,\mathbf{W}\boldsymbol\Sigma\mathbf{W}^{\mathsf T}+\sigma^2\mathbf{I})\) is unchanged by every rotation of the latent axes, so no rule that improves the likelihood can prefer one.</p></div>
-</div>
-<p>The right-hand chart shows the same thing as a landscape. With an exact recognizer, the wake update follows the gradient of the log-likelihood (Fisher's identity). For binary causes the landscape has valleys at the world's axes, and a generator turned by 30° pays {{land30}} nats per sample. The Gaussian landscape is flat.</p>
-<p><b>Why sleep is needed.</b> Wake measures the slope through the recognizer. If the recognizer is frozen, the slope is measured in the recognizer's old coordinates, and the generator stops partway. Started at 30°, it ends at {{frozen}} ({{frozenRange}} over 16 runs). With sleep, the recognizer trails the generator by about {{lag250}} at update 250, and the axes reach {{b1000}} after 1,000 updates. The Gaussian twin over the same 16 runs ends anywhere between {{grange}} (mean {{g3000}}), with its recognizer {{grec}} from its generator: the two stay aligned with each other, but neither aligns with the world.</p>
+<div class="eq">\[\dot\theta\;\propto\;\tfrac12\,\mathbb E\big[\varphi(u_1)\,u_2-\varphi(u_2)\,u_1\big],\qquad \varphi(u)=\tanh(u/\sigma^2).\]</div>
+<p>The bracket is non-zero and pulls \(\theta\) to the nearest multiple of 90°. This is the rotation step of independent component analysis, with the nonlinearity supplied by the learner's own prior: ICA has to choose that nonlinearity by hand, here sleep makes the recognizer compute it for the current generator. With Gaussian causes the posterior mean is linear, \(\varphi(u)\propto u\), and the bracket vanishes at every angle, which is the two-cause face of the symmetry in the box above.</p>
+<p>The right-hand chart shows the same as a landscape. With an exact recognizer, the wake update follows the gradient of the log-likelihood (Fisher's identity), and the landscape has valleys at the world's axes: a generator turned by 15° pays {{land15}} nats per sample, by 30° {{land30}}, by 45° {{land45}}.</p>
+<p><strong>Why sleep is needed.</strong> Wake measures the slope through the recognizer. If the recognizer is frozen, the slope is measured in the recognizer's old coordinates, and the generator stops partway: started at 30°, it ends at {{frozen}} ({{frozenRange}} over 16 runs). With sleep, the recognizer trails the generator by about {{lag250}} at update 250, and the axes are at {{b500}} after 500 updates and {{b1000}} after 1,000.</p>
 </section>
 
 <section id="align">
-<h2>Six causes: how recognition and generation align, layer by layer</h2>
-<p>With six causes, misalignment is measured as angles between weight vectors, averaged over units:</p>
-<ul>
-<li><b>Generator against the world:</b> each generator column \(\mathbf{w}_i\) against the world column \(\mathbf{a}_j\) it is matched to (the best one-to-one matching, ignoring signs). This is the rotation of the latent space.</li>
-<li><b>Recognizer against its generator:</b> sleep is logistic regression of dreamed causes on dreams. For every generator there is therefore a recognizer \(\mathbf{R}^*(\mathbf{W})\) that sleep would converge to, and the angle between the rows of \(\mathbf{R}\) and \(\mathbf{R}^*\) measures how far recognition lags behind generation. The top layer is treated the same way, \(\mathbf{R}_2\) against \(\mathbf{R}_2^*(\mathbf{V})\), fitted exactly over all \(2^4\times2^6\) configurations.</li>
+<h2>3. Six causes: generation leads, recognition follows</h2>
+<p>With six causes, misalignment is measured as angles between weight vectors, averaged over units. {{worlds}} worlds, {{N}} stored samples, one wake and one sleep batch per update.</p>
+<ul class="findings">
+<li><strong>Generator against the world:</strong> each generator column \(\mathbf{w}_i\) against the world column \(\mathbf{a}_j\) it is matched to (the best one-to-one matching, ignoring signs). This is the rotation of the latent space.</li>
+<li><strong>Recognizer against its generator:</strong> sleep is a logistic regression of dreamed causes on dreams, so for every generator there is a recognizer \(\mathbf{R}^*(\mathbf{W})\) that sleep would converge to. The angle between the rows of \(\mathbf{R}\) and \(\mathbf{R}^*\) measures how far recognition lags behind generation. The top layer is treated the same way, \(\mathbf{R}_2\) against \(\mathbf{R}_2^*(\mathbf{V})\), fitted exactly over all \(2^4\times2^6\) configurations.</li>
 </ul>
 <figure class="widget" id="alignBlock">
-<div class="controls"><label>World <select class="priorSel"><option value="chain">chain world</option><option value="deep">two-layer world</option></select></label></div>
 <div class="charts">
-<div class="chart-box"><h3>Generator against the world (angle) ↓</h3><svg id="genChart" viewBox="0 0 560 330" role="img" aria-label="Angle between the generator's axes and the world's over practice updates, for four learners."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Generator against the world (angle) ↓</h3><svg id="genChart" viewBox="0 0 560 330" role="img" aria-label="Angle between the generator's axes and the world's over practice updates, for three learners."></svg><div class="tooltip"></div></div>
 <div class="chart-box"><h3>Recognizer against its generator (lag) ↓</h3><svg id="lagChart" viewBox="0 0 560 330" role="img" aria-label="Angle between each recognizer and the recognizer sleep would converge to for the current generator, over practice updates."></svg><div class="tooltip"></div></div>
 </div>
 <div class="legend legendConds"></div>
 </figure>
-<p class="small">Mean ± 1 standard error over {{worlds}} worlds, {{N}} stored samples. Dashed: the two-layer learner's top recognizer, from update 200 (it starts at zero). The two-layer and independent learners start with a large lag because their recognizer was fitted under the world's prior, while their own prior starts independent.</p>
-<ul>
-<li><b>Recognition aligns with generation fast, and stays aligned.</b> In the chain world, the two-layer learner's recognizer is within {{chain_lag200}} of its target by update 200. The blank top recognizer is within {{chain_toplag600}} by update 600. At the end every recognizer, in every condition and world, is {{lagMin}}–{{lagMax}} from its target (two layers, chain: {{chain_two_layer_lag}} bottom, {{chain_two_layer_top}} top).</li>
-<li><b>Generation aligns with the world slowly.</b> The two-layer learner's axes turn from {{chain_two_layer_gen0}} to {{chain_two_layer_gen}} over the whole run (worlds range from {{chain_two_range}}). The stored set limits how far: with unlimited fresh samples they reach {{chain_two_layer_fgen}}.</li>
-<li><b>Recognition of the world follows.</b> Since the recognizer tracks the generator, it reads the world's samples better as the generator turns. Read in terms of the learner's own units, the world's causes come out right {{chain_two_layer_acc0}} → {{chain_two_layer_acc}} of the time; the learner's own dreams, {{chain_two_layer_own0}} → {{chain_two_layer_own}}.</li>
-<li><b>So recognition follows generation; it never gets ahead.</b> The specification hoped recognition would stay ahead of generation. Here the generator leads, through wake, and the recognizer catches up, through sleep, in both layers.</li>
+<p class="small">Mean ± 1 standard error over {{worlds}} worlds. Dashed: the learned-prior learner's top recognizer, from update 200 (it starts at zero). The learned-prior and independent learners start with a large lag because their recognizer was fitted under the world's prior, while their own prior starts out nearly independent.</p>
+<ul class="findings">
+<li><strong>Recognition aligns with generation fast, and stays aligned.</strong> The learned-prior learner's recognizer is within {{lag200}} of its target by update 200, and the blank top recognizer within {{toplag600}} by update 600. At the end, every recognizer in every world and condition is {{lagMin}}–{{lagMax}} from its target (learned prior: {{two_layer_lag}} bottom, {{two_layer_top}} top).</li>
+<li><strong>Generation aligns with the world slowly.</strong> The learned-prior learner's axes turn from {{two_layer_gen0}} to {{two_layer_gen}} over the whole run (worlds range from {{two_range}}). The stored set limits how far: with unlimited fresh samples they reach {{two_layer_fgen}}.</li>
+<li><strong>Reading the world improves as a consequence.</strong> Since the recognizer tracks the generator, it reads the world's samples better as the generator turns: the world's causes, in the learner's own units, come out right {{two_layer_acc0}} → {{two_layer_acc}} of the time, the learner's own dreams {{own0}} → {{own}}.</li>
+<li><strong>So recognition follows; it never gets ahead.</strong> The specification hoped recognition would stay ahead of generation. Here the generator leads, through wake, and the recognizer catches up, through sleep, in both layers.</li>
 </ul>
-
-<h3>Watch the alignment develop</h3>
-<p>Pick a learner and a world, then drag the slider or press Play. Each grid compares two sets of weight vectors by \(|\cos|\), the absolute cosine of the angle between them. In the left column, rows are the learner's units, sorted by the world cause each one renders at the end; a generator aligned with the world shows one dark cell per row and column. In the right column, a recognizer aligned with its own generator shows a dark diagonal.</p>
-<figure class="widget" id="explorerBlock">
-<div class="controls">
-<label>Learner <select id="exLearner"><option value="two_layer">two layers</option><option value="true_prior">one layer, true prior given</option><option value="gaussian">linear-Gaussian twin</option></select></label>
-<label>World <select class="priorSel"><option value="chain">chain world</option><option value="deep">two-layer world</option></select></label>
-<label>Run <select id="exWorld"></select></label>
-<button id="exStart">Start</button><button id="exEnd">End</button><button id="exPlay">Play</button>
-</div>
-<div class="slider"><input id="exFrame" type="range" min="0" max="50" value="50" aria-label="Practice update"><output id="exFrameOut">loading…</output></div>
-<p class="small" id="exLoading"></p>
-<div class="heatgrid">
-<div class="heat-row-label">bottom layer: causes → sample</div>
-<div class="heat-box"><h3>Generator against the world</h3><div class="small" id="hmGNote"></div><svg id="hmG" viewBox="0 0 250 236" role="img" aria-label="Absolute cosine between each generator column and each world column."></svg><div class="tooltip"></div></div>
-<div class="heat-box"><h3>Recognizer against its sleep target</h3><div class="small" id="hmRNote"></div><svg id="hmR" viewBox="0 0 250 236" role="img" aria-label="Absolute cosine between each recognizer row and each row of the recognizer that sleep would converge to."></svg><div class="tooltip"></div></div>
-<div class="heat-row-label">top layer: top causes → causes</div>
-<div class="heat-box"><h3>Which causes go together</h3><div class="small" id="hmCNote"></div><svg id="hmC" viewBox="0 0 250 236" role="img" aria-label="Correlations between the six causes: above the diagonal under the learner's prior, below it in the world."></svg><div class="tooltip"></div></div>
-<div class="heat-box" id="hmTBox"><h3>Top recognizer against its sleep target</h3><div class="small" id="hmTNote"></div><svg id="hmT" viewBox="0 0 250 236" role="img" aria-label="Absolute cosine between each top recognizer row and each row of its sleep target."></svg><div class="heat-empty" id="hmTEmpty">This learner has no top layer: its prior is fixed.</div><div class="tooltip"></div></div>
-</div>
-<div class="scale"><span>|cos|</span><span>0</span><i id="seqScale"></i><span>1</span><span style="margin-left:14px">correlation</span><span>−1</span><i id="divScale"></i><span>+1</span></div>
-<div class="chart-box" style="margin-top:14px"><h3>This run</h3><svg id="exChart" viewBox="0 0 560 330" role="img" aria-label="Angles over practice for the selected run: generator against the world, recognizer lag, and top recognizer lag."></svg><div class="tooltip"></div></div>
-<div class="legend" id="exLegend"></div>
-</figure>
-<p class="small">“Which causes go together” shows correlations between the six causes. Above the diagonal is the learner's prior (learned by the top layer, or fixed), re-expressed in the world's order through the current matching of units to causes. Below the diagonal is the world's. When the two triangles mirror each other, the prior describes the causes the generator actually renders.</p>
 </section>
 
 <section id="prior">
-<h2>How a second layer explains the prior</h2>
-<p>The one-layer toy had to be handed its prior: it knew in advance which of its concepts tend to occur together. A top layer can learn this instead. In wake it watches the codes its recognizer assigns to the stored samples, and learns their co-occurrences by the same Hebbian rule, \(\Delta\mathbf{V}=\eta\,\mathbf{z}\mathbf{g}^{\mathsf T}-\eta\,\hat{\mathbf{z}}\mathbf{g}^{\mathsf T}\). In sleep it is where dreams start, so it decides which combinations of causes get dreamed. The bottom layer's sleep is therefore trained on whatever correlations the codes of the stored samples show. The comparison with the other learners shows why that matters.</p>
-<ul>
-<li><b>Independent causes</b> ({{chain_independent_kl}} nats; axes {{chain_independent_gen}} off). The learner's prior says its causes are independent, so practice turns its axes towards directions in which the codes look independent. The world's causes are correlated, so those directions mix them, as ICA does on dependent sources. The axes stop far from the world's.</li>
-<li><b>The true prior, given</b> ({{chain_true_prior_kl}} nats; {{chain_true_prior_gen}}). The correlations are right, but each unit must also be bound to the right slot of the prior: the generator's unit 3 has to render the cause the prior calls 3. A wrong binding is a stable state of practice, as the write-up shows. In the world's order, the fixed prior then misstates which rendered causes go together (correlation error {{chain_true_prior_corr}}).</li>
-<li><b>Two layers</b> ({{chain_two_layer_kl}} nats; {{chain_two_layer_gen}}). The top layer learns whatever correlations the codes have, in whatever order the bottom layer happens to use. That frees the bottom layer to turn much further towards the world's axes (correlation error {{chain_two_layer_corr}}).</li>
-</ul>
+<h2>4. A second layer learns the prior</h2>
+<p>The one-layer toy had to be handed its prior: it knew in advance which of its causes tend to occur together. A top layer learns this instead. In wake it watches the codes its recognizer assigns to the stored samples and learns their co-occurrences, by the same Hebbian rule. In sleep it is where dreams start, so it decides which combinations of causes get dreamed.</p>
 <figure class="widget" id="priorBlock">
-<div class="controls"><label>World <select class="priorSel"><option value="chain">chain world</option><option value="deep">two-layer world</option></select></label></div>
 <div class="charts">
-<div class="chart-box"><h3>Generator error, KL(world ‖ learner) in nats ↓</h3><svg id="klChart" viewBox="0 0 560 330" role="img" aria-label="KL divergence from the world to each learner over practice updates."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Generator error, KL(world ‖ model) in nats ↓</h3><svg id="klChart" viewBox="0 0 560 330" role="img" aria-label="KL divergence from the world to each learner over practice updates."></svg><div class="tooltip"></div></div>
 <div class="chart-box"><h3>Prior against the world's correlations ↓</h3><svg id="corrChart" viewBox="0 0 560 330" role="img" aria-label="Root-mean-square difference between the learner's prior correlations, in world order, and the world's, over practice updates."></svg><div class="tooltip"></div></div>
 </div>
 <div class="legend legendConds"></div>
 </figure>
-<p class="small">Mean ± 1 standard error over {{worlds}} worlds. Right: root-mean-square difference between the correlations of the learner's prior, re-expressed in world order through the generator's current units, and the correlations of the world's causes. The jumps come from the matching of units to causes switching while a learner is still misaligned. For independent causes it stays at the size of the world's correlations.</p>
-
+<p class="small">Mean ± 1 standard error over {{worlds}} worlds. Right: root-mean-square difference between the correlations of the learner's prior, re-expressed in world order through the generator's current units, and the correlations of the world's causes. Jumps come from the matching of units to causes switching while a learner is still misaligned.</p>
+<ul class="findings">
+<li><strong>Independent causes ({{independent_kl}} nats; axes {{independent_gen}} off).</strong> The learner's prior says its causes are independent, so practice turns its axes towards directions in which the codes look independent. The world's causes are correlated, so those directions mix them, as ICA does with dependent sources.</li>
+<li><strong>The true prior, given ({{true_prior_kl}} nats; {{true_prior_gen}}).</strong> The correlations are right, but each unit must also be bound to the right slot of the prior, and a wrong binding is a stable state of practice. In the world's order, the fixed prior then misstates which rendered causes go together (correlation error {{true_prior_corr}}).</li>
+<li><strong>Learned prior ({{two_layer_kl}} nats; {{two_layer_gen}}).</strong> The top layer learns whatever correlations the codes have, in whatever unit order the bottom layer happens to use. That frees the bottom layer to turn further towards the world's axes (correlation error {{two_layer_corr}}). The top layer turns towards the world's two top causes as well, from {{top_world0}} to {{top_world}}. With two top units instead of four, the learner ends at {{two_layer_h2_kl}} nats.</li>
+</ul>
 <h3>What the top layer converges to</h3>
-<p>The top layer's wake update stops changing when</p>
-<div class="eq">\[\mathbb E_{\mathbf{x}\sim\text{stored}}\;\mathbb E_{\mathbf{z}\sim q(\cdot\mid\mathbf{x})}\;\mathbb E_{\mathbf{g}\sim q(\cdot\mid\mathbf{z})}\Big[\big(\mathbf{z}-\tanh(\mathbf{V}\mathbf{g}+\mathbf{a})\big)\,\mathbf{g}^{\mathsf T}\Big]=\mathbf{0}.\]</div>
-<p>This is one wake–sleep step one layer up, with the codes \(\mathbf{z}\) as its data. The top layer is therefore a generative model of the <i>aggregate posterior</i>, the distribution of codes the learner assigns to its stored samples:</p>
-<div class="eq">\[\bar q(\mathbf{z})=\frac1N\sum_{n=1}^N q(\mathbf{z}\mid\mathbf{x}_n).\]</div>
-<p>For a fixed recognizer, \(\bar q\) is exactly the prior that maximises the likelihood bound \(\sum_n\mathbb E_{q(\mathbf{z}\mid\mathbf{x}_n)}[\log p(\mathbf{x}_n,\mathbf{z})]\). Learning the top layer is learning the prior the data call for, in the learner's own coordinates. It can only get the world's correlations right once the bottom units are the world's causes, which is why the right-hand chart falls together with the angle above.</p>
-<p>In the two-layer world, which has two top causes of its own, the learner's top layer turns towards them as well, from {{deep_top_world0}} to {{deep_top_world}} (angle between the learner's top-layer weights, re-expressed in world order, and the world's).</p>
-
-<h3>Why a Gaussian second layer adds nothing</h3>
-<p>Stack a Gaussian layer on the twin: \(\mathbf{g}\sim\mathcal N(\mathbf{0},\mathbf{I})\) and \(\mathbf{z}=\mathbf{V}\mathbf{g}+\mathbf{a}+\tau\boldsymbol\epsilon\). The causes then only get a covariance \(\mathbf{V}\mathbf{V}^{\mathsf T}+\tau^2\mathbf{I}\), and the data a covariance \(\mathbf{W}(\mathbf{V}\mathbf{V}^{\mathsf T}+\tau^2\mathbf{I})\mathbf{W}^{\mathsf T}+\sigma^2\mathbf{I}\), which the first layer alone can produce with \(\mathbf{W}'=\mathbf{W}(\mathbf{V}\mathbf{V}^{\mathsf T}+\tau^2\mathbf{I})^{1/2}\). A linear-Gaussian stack is still one linear-Gaussian model. How it splits between layers is not identifiable, and neither is the orientation of either layer. The binary top layer is different: a mixture of \(2^4\) factorised distributions over \(\pm1\) causes cannot be absorbed into \(\mathbf{W}\), so it has something of its own to learn.</p>
-
+<p>The top layer's wake update stops changing when, averaged over stored samples \(\mathbf{x}\), their codes \(\mathbf{z}\sim q(\cdot\mid\mathbf{x})\) and top codes \(\mathbf{g}\sim q(\cdot\mid\mathbf{z})\),</p>
+<div class="eq">\[\mathbb E\Big[\big(\mathbf{z}-\tanh(\mathbf{V}\mathbf{g}+\mathbf{a})\big)\,\mathbf{g}^{\mathsf T}\Big]=\mathbf{0}.\]</div>
+<p>This is one wake–sleep step one layer up, with the codes as its data. The top layer is therefore a generative model of the aggregate posterior, the distribution of codes the learner assigns to its stored samples,</p>
+<div class="eq">\[\bar q(\mathbf{z})=\frac1N\sum_{n=1}^N q(\mathbf{z}\mid\mathbf{x}_n),\]</div>
+<p>which, for a fixed recognizer, is exactly the prior that maximises the likelihood bound \(\sum_n\mathbb E_{q(\mathbf{z}\mid\mathbf{x}_n)}[\log p(\mathbf{x}_n,\mathbf{z})]\). It gets the world's correlations right only once the bottom units are the world's causes, which is why the right-hand chart falls together with the angle in section 3. Section 7 comes back to this: dreams from \(\bar q\) are, in effect, replays of the codes given to the data.</p>
 <h3>The price: labels become arbitrary</h3>
-<p>A learned prior fits whatever unit order the bottom layer chose, so the learner's unit 3 need not be the world's cause 3. In the earlier runs of the same model ({{priorWorlds}} chain worlds, {{N}} samples), the learner reads the world's causes in the world's own labels (up to the prior's symmetries) with {{priorTopSym}} bit accuracy with a learned top layer, against {{priorFixedSym}} with the true prior given. For the project's own-versus-foreign question, label identity matters, so a learned prior trades it for a better generator.</p>
-<p>Two top units instead of four: {{chain_two_layer_h2_kl}} nats in the chain world, {{deep_two_layer_h2_kl}} in the two-layer world (four units: {{chain_two_layer_kl}} and {{deep_two_layer_kl}}). In the two-layer world, the learners end at {{deep_two_layer_kl}} (two layers), {{deep_true_prior_kl}} (true prior given), {{deep_independent_kl}} (independent causes) and {{deep_gaussian_kl}} nats (Gaussian twin).</p>
+<p>A learned prior fits whatever unit order the bottom layer chose, so the learner's unit 3 need not be the world's cause 3. In earlier runs of the same model ({{priorWorlds}} worlds, {{N}} samples), the learner reads the world's causes in the world's own labels (up to a global sign flip) with {{priorTopSym}} bit accuracy with a learned top layer, against {{priorFixedSym}} with the true prior given; 50% is chance. For an own-versus-foreign question, label identity matters, so a learned prior trades it for a better generator.</p>
 </section>
 
-<section id="twin">
-<h2>Binary and Gaussian, side by side</h2>
-<table>
-<thead><tr><th></th><th>Binary causes</th><th>Gaussian twin</th></tr></thead>
+<section id="budget">
+<h2>5. How much to dream: a fixed budget of examples <span class="new">new</span></h2>
+<p>Sections 3 and 4 reuse {{N}} stored samples and dream as often as they read. Here the learner gets a fixed number \(P\) of examples in all. A share \(x\) of them are <em>supplied</em>: fresh world samples, each used once, which train generation by wake. The rest are its own <em>dreams</em>, each used once, which train recognition by sleep. Supplied and dreamed batches are interleaved so that every prefix of training has the same share, so one run gives the whole learning curve. The baselines get the same budgets; for them too, dreams train recognition by sleep, so \(x=100\%\) means no generation at all. {{bWorlds}} worlds; every learner starts from the rotated generator of section 1 at {{bStart}} nats.</p>
+<figure class="widget" id="budgetBlock">
+<div class="two" style="margin-top:0">
+<div class="heat-box"><h3>Wake–sleep</h3><svg id="heatWS" viewBox="0 0 400 280" role="img" aria-label="Heatmap of KL against the share of supplied examples and the total number of examples, for wake-sleep."></svg><div class="tooltip"></div></div>
+<div class="heat-box"><h3>Autoencoder baseline</h3><svg id="heatAE" viewBox="0 0 400 280" role="img" aria-label="Heatmap of KL against the share of supplied examples and the total number of examples, for the autoencoder baseline."></svg><div class="tooltip"></div></div>
+</div>
+<div class="scale-row"><svg id="heatScale" viewBox="0 0 260 34" aria-hidden="true"></svg><span>KL(world ‖ model), nats · ○ lowest in the row</span></div>
+<div class="chart-box"><h3>Learning curves, KL in nats ↓</h3><svg id="budgetChart" viewBox="0 0 560 330" role="img" aria-label="KL against the number of examples, log-log, for wake-sleep with 70% supplied, wake-sleep without dreams, the autoencoder, and the exact-posterior reference."></svg><div class="tooltip"></div></div>
+<div class="legend" id="budgetLegend"></div>
+</figure>
+<p class="small">Heatmaps: mean KL over {{bWorlds}} worlds after the number of examples on the left, by share supplied (the rest dreamed); the colour scale is shared and logarithmic. Learning curves: mean ± 1 standard error.</p>
+<ul class="findings">
+<li><strong>Some dreaming is necessary.</strong> With every example supplied, the recognizer is never trained, and wake–sleep stalls at {{stall}} nats from 2<sup>13</sup> examples on. At large budgets a little dreaming goes a long way: with 1% dreamed it reaches {{b21_ws99}} after {{bMax}}, with 5% {{b21_ws95}}.</li>
+<li><strong>About 30% dreamed is best.</strong> From 2<sup>13</sup> examples on, the lowest error in each row is at {{bestWS}} supplied; after {{bMax}}, every share from 50% to 90% is within {{spread21}} nats of the best. Up to 2<sup>12</sup> examples the best share is {{bestWSsmall}}: with few examples, all of them are needed to fit the generator at all.</li>
+<li><strong>Wake–sleep beats the autoencoder.</strong> They tie at 2<sup>13</sup> examples ({{b13_ws70}} vs {{b13_ae100}} nats, wake–sleep lower in {{b13_winsAE}} of {{bWorlds}} worlds). From {{beatFrom}} on, wake–sleep is lower in at least 11 of {{bWorlds}} worlds, e.g. {{b16_ws70}} vs {{b16_ae100}} at 2<sup>16</sup> and {{b21_ws70}} vs {{b21_ae100}} at {{bMax}}. The autoencoder plateaus at {{aeFloor}} nats. Letting it dream too, with sleep on its recognizers, helps it ({{aeSleepBest}} at {{aeSleepBestX}} supplied) but it stays behind.</li>
+<li><strong>A learner with exact posteriors needs no dreams.</strong> The exact-posterior reference does best with (nearly) all examples supplied at every budget. It is {{b16_ratioTeach}} times better than wake–sleep at 2<sup>16</sup>, and both end at 0.13–0.15 nats. Dreams are necessary in wake–sleep because sleep is recognition's only teacher; a learner that can compute exact posteriors from data does not need them. That route sums over every latent configuration for every example, which is an exhaustive search over explanations and does not scale.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead><tr><th>KL(world ‖ model), nats</th><th class="num">2<sup>13</sup></th><th class="num">2<sup>16</sup></th><th class="num">2<sup>19</sup></th><th class="num">2<sup>21</sup></th></tr></thead>
 <tbody>
-<tr><td>Generators that explain the data equally well</td><td>finitely many: the causes relabelled or sign-flipped</td><td>a continuum: every rotation of the latent axes (in the prior's whitened coordinates)</td></tr>
-<tr><td>What wake's Hebbian rule does to the axes</td><td>turns them towards the world's (an ICA-like rotation)</td><td>nothing; they drift with the sampling noise</td></tr>
-<tr><td>What sleep's Hebbian rule does</td><td>pulls recognition after generation; without it the turn stops ({{frozen}} from 30°)</td><td>keeps recognition matched to generation; there is no turn to follow</td></tr>
-<tr><td>Axes, chain world (one layer, prior given)</td><td>{{chain_true_prior_gen0}} → {{chain_true_prior_gen}}</td><td>{{chain_gaussian_gen0}} → {{chain_gaussian_gen}}</td></tr>
-<tr><td>Generator error, chain world (nats)</td><td>{{chain_true_prior_kl0}} → {{chain_true_prior_kl}}</td><td>{{chain_gaussian_kl0}} → {{chain_gaussian_kl}}</td></tr>
-<tr><td>With unlimited fresh samples</td><td>{{chain_true_prior_fkl}} nats, {{chain_true_prior_fgen}}</td><td>{{chain_gaussian_fkl}} nats, {{chain_gaussian_fgen}}</td></tr>
-<tr><td>A second layer</td><td>learns which causes go together: {{chain_two_layer_kl}} nats</td><td>only a covariance, absorbed by the first layer</td></tr>
-</tbody></table>
-<p class="small">The Gaussian twin starts with a lower error than the binary learner: a single Gaussian with the right covariance is a better density than 64 clusters in the wrong places. It cannot improve on that, while the binary learner ends far below it. Its small rise with stored samples is overfitting of a 12-dimensional covariance to {{N}} samples. Its recognizer does reorganise somewhat, because a factorised recognizer prefers generators whose posterior is factorised, but that preference has nothing to do with the world's axes.</p>
+<tr><td>Wake–sleep, 70% supplied</td><td class="num">{{b13_ws70}}</td><td class="num">{{b16_ws70}}</td><td class="num">{{b19_ws70}}</td><td class="num">{{b21_ws70}}</td></tr>
+<tr><td>Wake–sleep, no dreams</td><td class="num">{{b13_ws100}}</td><td class="num">{{b16_ws100}}</td><td class="num">{{b19_ws100}}</td><td class="num">{{b21_ws100}}</td></tr>
+<tr><td>Autoencoder baseline, no dreams</td><td class="num">{{b13_ae100}}</td><td class="num">{{b16_ae100}}</td><td class="num">{{b19_ae100}}</td><td class="num">{{b21_ae100}}</td></tr>
+<tr><td>Exact-posterior reference, no dreams</td><td class="num">{{b13_ws_teach100}}</td><td class="num">{{b16_ws_teach100}}</td><td class="num">{{b19_ws_teach100}}</td><td class="num">{{b21_ws_teach100}}</td></tr>
+<tr><td>Worlds in which wake–sleep (70%) beats the autoencoder</td><td class="num">{{b13_winsAE}}/{{bWorlds}}</td><td class="num">{{b16_winsAE}}/{{bWorlds}}</td><td class="num">{{b19_winsAE}}/{{bWorlds}}</td><td class="num">{{b21_winsAE}}/{{bWorlds}}</td></tr>
+<tr><td>Worlds in which wake–sleep (70%) beats itself without dreams</td><td class="num">{{b13_winsNoGen}}/{{bWorlds}}</td><td class="num">{{b16_winsNoGen}}/{{bWorlds}}</td><td class="num">{{b19_winsNoGen}}/{{bWorlds}}</td><td class="num">{{b21_winsNoGen}}/{{bWorlds}}</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="scarce">
+<h2>6. When supplied examples are scarce <span class="new">new</span></h2>
+<p>With fresh examples, the larger budgets above show the learner over a million distinct samples, so dreaming might win only once the data have used up the distribution. Here the supplied examples are a fixed set of \(N\) world samples, reused, while dreams stay unlimited; the total is again {{capTotal}} examples, and the sets are nested across \(N\) ({{Ns}}).</p>
+<figure class="widget" id="scarceBlock">
+<div class="charts">
+<div class="chart-box"><h3>KL after {{capTotal}} examples, nats ↓</h3><p class="sub">by the number of distinct supplied examples</p><svg id="scarceN" viewBox="0 0 560 330" role="img" aria-label="Final KL against the number of distinct supplied examples, log-log, for four learners, with fresh examples at the right."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Learning curves at N = 128, KL in nats ↓</h3><p class="sub">supplied presentations plus dreams</p><svg id="scarceCurves" viewBox="0 0 560 330" role="img" aria-label="KL against the number of examples with 128 distinct supplied examples, for four learners."></svg><div class="tooltip"></div></div>
+</div>
+<div class="legend" id="scarceLegend"></div>
+</figure>
+<p class="small">Mean over {{bWorlds}} worlds (learning curves ± 1 standard error). Right end of the left chart: fresh examples, from section 5.</p>
+<ul class="findings">
+<li><strong>128 examples are enough for dreams to pay.</strong> They show {{n128_seen}} of the 64 latent configurations ({{n128_mass}} of the prior mass). Wake–sleep reaches {{n128_ws70}} nats, against {{n128_ws100}} without dreams ({{n128_winsNoGen}}/{{bWorlds}} worlds) and {{n128_ae100}} for the autoencoder ({{n128_winsAE}}/{{bWorlds}}), and matches the exact-posterior reference ({{n128_ws_teach100}}).</li>
+<li><strong>A few thousand reused examples are as good as fresh ones:</strong> with 2,048, wake–sleep ends {{n2048_vsFresh}} nats above the fresh-data run.</li>
+<li><strong>With 32 examples, everything memorises.</strong> They show {{n32_seen}} configurations ({{n32_mass}} of the mass). Wake–sleep's error on new samples exceeds its error on the training samples by {{n32_gap}} nats, and dreams no longer help it ({{n32_ws70}} vs {{n32_ws100}} without, lower in only {{n32_winsNoGen}}/{{bWorlds}} worlds), although it still beats the autoencoder ({{n32_ae100}}). The autoencoder's learning curve at N = 128 shows the same memorisation setting in late.</li>
+</ul>
+<h3>Does the threshold grow with the latent space?</h3>
+<p>The same comparison with \(K\) = {{Ks}} causes ({{kConfigs}} latent configurations), \(N\) from 16 to 1,024 reused examples and {{kTotal}} examples in all, {{kWorlds}} worlds each. The advantage of dreaming is the error without dreams minus the error with 30% dreamed.</p>
+<figure class="widget" id="kBlock">
+<div class="chart-box"><h3>Advantage of dreaming, nats (above 0: dreaming helps)</h3><svg id="kChart" viewBox="0 0 560 330" role="img" aria-label="Advantage of dreaming against the number of distinct supplied examples for K = 4, 6 and 8 causes, with 95% bootstrap intervals."></svg><div class="tooltip"></div></div>
+<div class="legend" id="kLegend"></div>
+</figure>
+<p class="small">Mean over {{kWorlds}} worlds with a 95% bootstrap interval of the mean.</p>
+<p>The advantage turns positive at \(N\approx\) {{crossList}} for \(K\) = {{Ks}}: the threshold does not grow with the number of latent configurations. With eight causes, dreaming pays once the supplied set has shown about {{k8seen48}} of 256 configurations. Against the autoencoder, wake–sleep is reliably ahead from \(N\) = {{aeThrList}} on (95% interval above zero at that and every larger \(N\)). The input dimension was 12 throughout, so a threshold set by it, or by the world's two top causes, is not excluded.</p>
+</section>
+
+<section id="dreams">
+<h2>7. What the dreams are for <span class="new">new</span></h2>
+<p>One reading of section 5 is that dreams explore: they visit latent configurations the supplied examples never showed. A control changes only where the bottom layer's dreams take their latents from, at 70% supplied with fresh examples. Plain wake–sleep dreams them from its learned prior. <em>Replay</em> takes the codes recognition gave to the last 1,024 supplied examples, so it never goes beyond the current explanations of the data. <em>Uniform</em> draws independent, uniform latents: maximal exploration, ignoring the prior. The top layer sleeps on its own dreams throughout.</p>
+<figure class="widget" id="dreamBlock">
+<div class="chart-box"><h3>Learning curves at 70% supplied, KL in nats ↓</h3><svg id="dreamChart" viewBox="0 0 560 330" role="img" aria-label="KL against the number of examples for dreams from the learned prior, replayed codes, and uniform latents."></svg><div class="tooltip"></div></div>
+<div class="legend" id="dreamLegend"></div>
+</figure>
+<p class="small">Mean ± 1 standard error over {{dWorlds}} worlds.</p>
+<ul class="findings">
+<li><strong>Replay is as good as dreaming from the prior, or better.</strong> At 2<sup>16</sup> examples: {{d16_ws_replay}} vs {{d16_ws}} nats, replay lower in {{d16_replayWins}} of {{dWorlds}} worlds; at 2<sup>21</sup>: {{d21_ws_replay}} vs {{d21_ws}}. Yet replayed latents are less varied (entropy {{d16_ws_replay_ent}} vs {{d16_ws_ent}} nats at 2<sup>16</sup>). Widening the replayed dreams with extra rendering noise, until they spread as far in \(\mathbf{x}\) as dreams from the prior, changes nothing ({{d16_ws_replay_wide}}).</li>
+<li><strong>Uniform latents are much worse,</strong> {{d21_ws_uniform}} nats at 2<sup>21</sup> and worse than the prior's dreams in {{d21_uniformWins}} of {{dWorlds}} worlds, although their entropy is the maximum ({{uniformEnt}} nats).</li>
+<li><strong>With a fixed prior, only the prior's dreams help.</strong> In the one-layer learner with the true prior given ({{oneN}} stored samples, {{oneWorlds}} worlds), from {{one_start}} nats: prior dreams {{one_prior}}, no dreams {{one_none}}, uniform {{one_uniform}}, replay {{one_replay}}.</li>
+</ul>
+<p>Sleep trains the recognizer on dreams whose causes are known exactly, and what matters is that those causes follow the distribution the generator is being fitted to. With a learned top layer, that distribution is the aggregate posterior, the codes recognition assigns to the data (section 4), so replaying those codes is the same thing with less sampling noise. With a fixed prior, replay only re-teaches the recognizer its own current readings, mistakes included, and dreams from the prior are what pulls them back. Uniform latents teach the recognizer the posterior of the wrong prior.</p>
 </section>
 
 <section id="spec">
-<h2>Against the specification</h2>
-<p>The requirements of the project's specification (<code>tex/README.md</code>), in its order. Where a row cites numbers from the pre-registered one-layer study, they are mean KL in the chain world with {{N}} stored samples.</p>
+<h2>8. Against the specification</h2>
+<p>The requirements of the project's specification (tex/README.md), in its order. Numbers are from the sections above.</p>
 <h3>Desirable properties</h3>
-<table class="spec">
+<div class="table-wrap"><table class="spec">
 <thead><tr><th>Requirement</th><th>Status</th><th>In this toy</th></tr></thead>
 <tbody>
-<tr><td>Hebb-like learning rule</td><td><span class="pill yes">✓ yes</span></td><td>Every update is a Hebbian co-activity term minus an anti-Hebbian term on the network's own prediction (the delta rule), in both layers and both phases: \(\Delta w_{ij}=\eta\,(x_i-\hat x_i)\,z_j\). No backpropagation, no weight transport.</td></tr>
-<tr><td>Generation improves offline, without external feedback, through a repeated generation–recognition loop</td><td><span class="pill yes">✓ yes</span></td><td>Only {{N}} stored, unlabelled samples. The axes turn because reading (wake) and dreaming (sleep) alternate.</td></tr>
+<tr><td>Hebb-like or three-factor learning rule; locality</td><td><span class="pill yes">✓ yes</span></td><td>Every update is the delta rule, a Hebbian term minus an anti-Hebbian one on the network's own prediction, in both layers and both phases. No backpropagation, no weight transport.</td></tr>
+<tr><td>Generation improves offline, without external feedback, through a repeated generation–recognition loop</td><td><span class="pill yes">✓ yes</span></td><td>Only unlabelled samples. The axes turn because reading (wake) and dreaming (sleep) alternate (sections 2–3).</td></tr>
+<tr><td>Without generation, worse than the same learner with it, and than as many fresh samples instead</td><td><span class="pill yes">✓ yes</span></td><td>At 2<sup>16</sup> examples: 70% supplied and 30% dreamed {{b16_ws70}} nats; all 2<sup>16</sup> supplied {{b16_ws100}} ({{b16_winsNoGen}}/{{bWorlds}} worlds). Also with 128 reused examples ({{n128_ws70}} vs {{n128_ws100}}).</td></tr>
+<tr><td>Outperform the autoencoding baseline (both parts trained end to end on supplied examples, no generated samples)</td><td><span class="pill yes">✓ yes</span></td><td>From {{beatFrom}} examples on: {{b16_ws70}} vs {{b16_ae100}} at 2<sup>16</sup>, {{b21_ws70}} vs {{b21_ae100}} at {{bMax}}; tie at 2<sup>13</sup> and below. The autoencoder's recognition rate was not tuned.</td></tr>
 <tr><td>Recognition infers latent causes, not just whether samples resemble the data</td><td><span class="pill yes">✓ yes</span></td><td>The recognizer infers the causes \(\mathbf{z}\), and one layer up the top causes \(\mathbf{g}\).</td></tr>
-<tr><td>Depth, if needed</td><td><span class="pill part">◐ partly</span></td><td>Two layers, both learned by the same rule; the second is needed to learn the prior. Deeper stacks are in the random-hierarchy toy, not here.</td></tr>
+<tr><td>Depth, if needed</td><td><span class="pill part">◐ partly</span></td><td>Two layers by the same rule; the second is needed to learn the prior (section 4).</td></tr>
 <tr><td>Normative grounding: provably improving a likelihood or test risk from finite examples</td><td><span class="pill part">◐ partly</span></td><td>With an exact recognizer, wake is gradient ascent on the stored samples' log-likelihood (Fisher's identity); with the learned recognizer it carries a bias that sleep keeps small. No guarantee per update.</td></tr>
-<tr><td>Interpretable in terms of weights, their singular vectors, the formation of latents</td><td><span class="pill yes">✓ yes</span></td><td>The rotation angle, the alignment grids above, and the top layer's correlations.</td></tr>
-<tr><td>The benefit is not explained by better reconstruction of the data itself</td><td><span class="pill yes">✓ yes</span></td><td>The start already matches every mean and covariance; second-order statistics cannot see the rotation.</td></tr>
-<tr><td>No generic data-only competitor in the same learner class reproduces the gain</td><td><span class="pill part">◐ partly</span></td><td>Practice ({{c1Practice}}) beat every single-stage learner that ignores the prior: frozen recognition {{c1Frozen}}, binary autoencoder {{c1Bae}}. A two-stage shortcut (binary autoencoder, then relabelling by the prior's moments, {{c1Assign}}) is worse on average, but practice beat it in only {{c1AssignWins}} of 16 worlds. Learners that evaluate the prior's density tie (VAE {{vaeChain}}, exact EM {{emChain}}). Not yet compared with a learned prior.</td></tr>
-<tr><td>Analytically tractable</td><td><span class="pill part">◐ partly</span></td><td>Exact for two causes (the rotation speed above); six causes are simulated.</td></tr>
-<tr><td>As simple as possible</td><td><span class="pill yes">✓ yes</span></td><td>A linear generator, logistic recognizers, ±1 units, one Hebbian rule.</td></tr>
-<tr><td>Maps onto in-context learning (attending to good own samples)</td><td><span class="pill part">◐ partly</span></td><td>For one layer, attention over the learner's own recent dreams can replace the recognizer (see the write-up). Not built for two layers.</td></tr>
-<tr><td>Recognition receives objects in the same space as generation produces</td><td><span class="pill yes">✓ yes</span></td><td>Both live in \(\mathbf{x}\)-space.</td></tr>
-<tr><td>Without the sleep mode, worse than the same learner, and worse than as many fresh samples</td><td><span class="pill yes">✓ yes</span></td><td>From 256 stored samples on: wake with fresh samples and frozen recognition reaches {{c1Fresh}}, practice {{c1Practice}}. At 64 stored samples it ties ({{c2n64p}} vs {{c2n64}}).</td></tr>
-<tr><td>Wake-only fails either from too few examples or from not making sense of them</td><td><span class="pill yes">✓ yes</span></td><td>This toy is the second case: with recognition frozen, more samples do not help, because the learner cannot read them in its own terms.</td></tr>
-</tbody></table>
-<h3>Further intuitions</h3>
-<table class="spec">
+<tr><td>Interpretable in terms of weights, their singular vectors, the formation of latents</td><td><span class="pill yes">✓ yes</span></td><td>The rotation angle of the axes, the recognizer's lag, the top layer's correlations.</td></tr>
+<tr><td>Analytically tractable</td><td><span class="pill part">◐ partly</span></td><td>Exact for two causes (the rotation speed in section 2); six causes are simulated.</td></tr>
+<tr><td>The benefit is not explained by better reconstruction of the data itself</td><td><span class="pill yes">✓ yes</span></td><td>The start already matches every mean and covariance, and the autoencoder, which minimises reconstruction error, plateaus at {{aeFloor}} nats.</td></tr>
+<tr><td>Maps onto in-context learning (attending to good own samples)</td><td><span class="pill part">◐ partly</span></td><td>For one layer, attention over the learner's own recent dreams can stand in for the recognizer (see the <a href="{{filesDir}}/practice_disentangle.tex">write-up</a>). Not built for two layers.</td></tr>
+<tr><td>Recognition and generation attach to the same space</td><td><span class="pill yes">✓ yes</span></td><td>Both live in \(\mathbf{x}\)-space.</td></tr>
+<tr><td>Two ways wake-only might fail: too few examples, or not making sense of them</td><td><span class="pill yes">✓ both</span></td><td>Not making sense: with recognition frozen, the axes stop partway (section 2) and more data do not help (section 5). Too few: with 32 supplied examples every learner memorises them (section 6).</td></tr>
+</tbody></table></div>
+<h3>Intuitions</h3>
+<div class="table-wrap"><table class="spec">
 <thead><tr><th>Intuition</th><th>Status</th><th>In this toy</th></tr></thead>
 <tbody>
-<tr><td>Latent representations improve with generation</td><td><span class="pill yes">✓ yes</span></td><td>The world's causes are read right {{chain_two_layer_acc0}} → {{chain_two_layer_acc}} of the time.</td></tr>
-<tr><td>Deeper layers get learned with practice, which needs recognition to be updated</td><td><span class="pill yes">✓ yes</span></td><td>The top recognizer learns only in sleep; the top generator learns only from codes the bottom recognizer assigns.</td></tr>
-<tr><td>Recognition and generation are learned in tandem</td><td><span class="pill yes">✓ yes</span></td><td>Neither turns the axes alone: frozen recognition stops at {{frozen}}, and the Gaussian twin shows that sleep without a torque does nothing.</td></tr>
-<tr><td>Recognition stays ahead of generation, emergently</td><td><span class="pill no">✗ no</span></td><td>Recognition trails generation by a few degrees in every layer.</td></tr>
-<tr><td>The latents become clean: binary or unit-variance</td><td><span class="pill part">◐ partly</span></td><td>Binary by construction; how cleanly each unit stands for one cause is the angle above ({{chain_two_layer_gen}} at the end).</td></tr>
-<tr><td>Given 100 updates, 50 supervised + 50 generated beat 100 supervised</td><td><span class="pill yes">✓ yes</span></td><td>Half the extra updates on own samples: {{c3f05}}; all on fresh foreign samples: {{c3f0}}.</td></tr>
-<tr><td>Intuitive (own) samples teach better, foreign ones are repelled</td><td><span class="pill part">◐ partly</span></td><td>Own dreams are read better than foreign samples at the start ({{chain_two_layer_own0}} vs {{chain_two_layer_acc0}}) and practice closes the gap. No lasting own advantage once aligned.</td></tr>
-<tr><td>A computational, not an informational, benefit of offline replay</td><td><span class="pill yes">✓ yes</span></td><td>The stored samples are the same throughout; practice changes how they are read. Exact EM reaches similar errors by another computation.</td></tr>
-<tr><td>A misaligned encoder–decoder rectifies itself through its own samples and then makes sense of foreign ones</td><td><span class="pill yes">✓ yes</span></td><td>This is the toy.</td></tr>
-<tr><td>More supervision can make the model worse</td><td><span class="pill na">– not here</span></td><td>Only in an earlier variant whose prior conflicts with the world's.</td></tr>
-<tr><td>Watching versus rederiving (teacher forcing vs free running)</td><td><span class="pill na">– not here</span></td><td>That is the DAgger toy.</td></tr>
-</tbody></table>
+<tr><td>Latent representations improve with generation, and become clean</td><td><span class="pill yes">✓ yes</span></td><td>The world's causes are read right {{two_layer_acc0}} → {{two_layer_acc}} of the time; how cleanly each unit stands for one cause is the angle ({{two_layer_gen}} at the end).</td></tr>
+<tr><td>Deeper layers get learned with practice, which needs recognition to be updated</td><td><span class="pill yes">✓ yes</span></td><td>The top recognizer learns only in sleep; the top generator learns only from the codes the bottom recognizer assigns.</td></tr>
+<tr><td>Improving recognition is not crucial, though desirable</td><td><span class="pill no">✗ no</span></td><td>Here it is crucial: frozen recognition stops the turn at {{frozen}}, and without dreams wake–sleep stalls at {{stall}} nats.</td></tr>
+<tr><td>Recognition stays ahead of generation, emergently</td><td><span class="pill no">✗ no</span></td><td>Recognition trails generation by a few degrees in every layer (section 3).</td></tr>
+<tr><td>More supervision can make the model worse</td><td><span class="pill part">◐ at a fixed budget</span></td><td>Raising the supplied share above about 70% makes it worse (at 2<sup>16</sup>: {{b16_ws70}} at 70%, {{b16_ws100}} at 100%). More distinct supplied examples never hurt (section 6).</td></tr>
+<tr><td>Diminishing returns from foreign samples: 50 supplied + 50 generated beat 100 supplied</td><td><span class="pill yes">✓ yes</span></td><td>At 2<sup>16</sup> examples: {{b16_ws50}} at 50% supplied vs {{b16_ws100}} at 100% ({{b16_winsHalf}}/{{bWorlds}} worlds); at 2<sup>13</sup>: {{b13_ws50}} vs {{b13_ws100}} ({{b13_winsHalf}}/{{bWorlds}}).</td></tr>
+<tr><td>Own (intuitive) samples teach better, foreign ones are repelled</td><td><span class="pill part">◐ partly</span></td><td>Own dreams are read better than foreign samples at the start ({{own0}} vs {{two_layer_acc0}}), and practice closes the gap. No lasting own advantage once aligned.</td></tr>
+<tr><td>A computational, not an informational, benefit of offline replay</td><td><span class="pill yes">✓ yes</span></td><td>The exact-posterior reference gets as far without any dreams: the information is in the data, dreams are how a learner without exact inference gets at it.</td></tr>
+<tr><td>A misaligned encoder–decoder rectifies itself through its own samples, then makes sense of foreign ones</td><td><span class="pill yes">✓ yes</span></td><td>This is the toy.</td></tr>
+</tbody></table></div>
 </section>
 
 <section id="meaning">
-<h2>What this shows, and what it doesn't</h2>
+<h2>9. What this shows, and what it doesn't</h2>
 <div class="columns">
 <div class="panel"><h3>Shows</h3><ul>
-<li>A rotation of the latent space that no second-order statistic can see is undone by wake–sleep practice on a fixed sample, because binary causes make the likelihood depend on orientation. Gaussian causes do not.</li>
-<li>Purely local, Hebbian updates suffice: wake turns generation, sleep keeps recognition aligned with generation, in every layer. Together they turn the axes; either alone does not.</li>
-<li>A top layer trained by the same rule learns the prior from the learner's own codes, and frees the bottom layer to align. The learner then beats one handed the true prior.</li>
+<li>A rotation of the latent space that no second-order statistic can see is undone by wake–sleep practice, because binary causes make the likelihood depend on orientation. Gaussian causes of any covariance do not.</li>
+<li>Local Hebbian updates suffice: wake turns generation, sleep keeps recognition matched to it, in every layer. A top layer trained by the same rule learns the prior and beats a learner handed the true one.</li>
+<li>At a fixed number of examples, spending about 30% on dreams beats spending none, and beats the autoencoding baseline, from {{beatFrom}} examples and from about {{crossRange}} distinct supplied examples on, for 16 to 256 latent configurations.</li>
+<li>Dreams act as exactly labelled training examples for recognition, drawn from the right latent distribution, not as exploration.</li>
 </ul></div>
 <div class="panel"><h3>Does not show</h3><ul>
-<li>That practice is necessary: learners that evaluate the prior's density (VAE, exact EM) reach similar errors in the one-layer toy, and have not been run with a learned prior.</li>
-<li>Perfect alignment: with {{N}} stored samples the axes stop at {{chain_two_layer_gen}} on average, {{chain_two_layer_fgen}} with fresh samples.</li>
+<li>That dreaming is necessary for every learner: one that computes exact posteriors needs none, and is {{b16_ratioTeach}} times better at 2<sup>16</sup> examples. It sums over all latent configurations, which does not scale.</li>
+<li>Perfect alignment: with {{N}} stored samples the axes stop at {{two_layer_gen}} on average.</li>
 <li>Correct labels: with a learned prior, which unit is which cause is arbitrary.</li>
-<li>Recognition running ahead of generation.</li>
-<li>An own-versus-foreign advantage: once aligned, the learner reads every correct sample equally well.</li>
+<li>Recognition running ahead of generation, or an own-versus-foreign advantage once aligned.</li>
+<li>Generality: one family of worlds (six binary causes from two top causes, rendered linearly in 12 dimensions), and a start that already hands the learner the world's subspace; a small random start is untested. The autoencoder's recognition rate was inherited from the first toy, not tuned.</li>
 </ul></div>
 </div>
-<p><a href="toy_model_1_ring.html">Toy model 1 (the ring)</a> showed practice escaping a bad optimum of a single-step objective. Here the objective is the likelihood itself, and the defect is a symmetry that second-order statistics cannot break. In both, the signal comes from the learner's own other half: there a checker, here a recognizer.</p>
 </section>
 
 <section id="files">
 <h2>Files</h2>
 <ul class="paths">
 <li>This report, readable by all cluster users: <code>/ceph/scratch/jbauer/reports/generative-learning/toy_model_2_WS.html</code></li>
-<li>Code, copied next to this report when it was built: <a href="{{filesDir}}/practice_ws_layers.py">runs with weight snapshots</a> · <a href="{{filesDir}}/toy_model_2_ws_sim.js">the two-cause simulation on this page</a> · <a href="{{filesDir}}/practice_disentangle.py">one-layer model and competitors</a> · <a href="{{filesDir}}/practice_disentangle_prior.py">learned priors</a></li>
+<li>Code, copied next to this report when it was built: <a href="{{filesDir}}/practice_ws_layers.py">runs with weight snapshots</a> (sections 3–4) · <a href="{{filesDir}}/practice_ws_budget.py">budget, scarce-data and dream-source runs</a> (sections 5–7) · <a href="{{filesDir}}/toy_model_2_ws_sim.js">the two-cause simulation on this page</a> · <a href="{{filesDir}}/practice_disentangle.py">one-layer model</a> · <a href="{{filesDir}}/practice_disentangle_prior.py">learned priors</a> · <a href="{{filesDir}}/practice_disentangle_dreams.py">dream sources, one layer</a></li>
 <li>Write-up of the one-layer toy, with its pre-registered confirmation: <a href="{{filesDir}}/practice_disentangle.tex">practice_disentangle.tex</a></li>
 <li>Builder (owner only): <code>/nfs/nhome/live/jbauer/generative-learning/experiments/toy_model_2_ws_report.py</code></li>
-<li>Run data (owner only): <code>/var/tmp/jbauer/generative_practice_disentangle/layers/</code> on u435d</li>
+<li>Run data (owner only, on u435d): <code>/var/tmp/jbauer/generative_practice_disentangle/</code> <code>layers/</code>, <code>budget/</code>, <code>dreams/</code>, <code>prior/</code></li>
 </ul>
 </section>
+<footer>Built {{built}}. Sources (SHA-256): {{sourceHash}}. Sections 3–4: {{worlds}} worlds, {{N}} stored samples, {{steps}} updates, top layer of {{H}} units. Sections 5–7: {{bWorlds}} worlds, batches of {{batch}}. All worlds are of the two-layer kind described in section 1.</footer>
 </article>
-<footer>Built {{built}} from <code>{{source}}</code> (SHA-256 {{sourceHash}}…). {{worlds}} worlds per cell (seed 0), {{N}} stored samples, {{steps}} updates, top layer of {{H}} units.</footer>
 </main>
 <script id="report-data" type="application/json">__REPORT_DATA__</script>
 <script>
@@ -411,72 +408,160 @@ figure.widget{margin:16px 0}
 const D = JSON.parse(document.getElementById('report-data').textContent);
 const $ = id => document.getElementById(id), NS = 'http://www.w3.org/2000/svg';
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-const CONDS = [
-  {key: 'two_layer', label: 'Two layers', color: 'var(--s1)'},
-  {key: 'true_prior', label: 'One layer, true prior given', color: 'var(--s2)'},
-  {key: 'independent', label: 'One layer, independent causes', color: 'var(--s3)'},
-  {key: 'gaussian', label: 'Linear-Gaussian twin', color: 'var(--s4)'},
-];
-const NAME = Object.fromEntries(CONDS.map(c => [c.key, c]));
 function el(parent, tag, attrs = {}, text) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text !== undefined) e.textContent = text; parent.append(e); return e; }
+// SVG text in which "2^16" is drawn with a superscript
+function label(parent, attrs, txt) {
+  const t = el(parent, 'text', attrs), m = /^(.*?)(\d+)\^(\d+)(.*)$/.exec(txt);
+  if (!m) { t.textContent = txt; return t; }
+  t.append(m[1] + m[2]); const s = document.createElementNS(NS, 'tspan'); s.setAttribute('dy', '-5'); s.setAttribute('font-size', '9'); s.textContent = m[3]; t.append(s);
+  if (m[4]) { const r = document.createElementNS(NS, 'tspan'); r.setAttribute('dy', '5'); r.textContent = m[4]; t.append(r); }
+  return t;
+}
+const exp2 = v => Math.round(Math.log2(v)), pow2 = v => `2^${exp2(v)}`, pow2html = v => `2<sup>${exp2(v)}</sup>`;
 const fmtDeg = (v, tip) => (tip ? v.toFixed(1) : Math.round(v)) + '°';
+const fmtNat = (v, tip) => tip ? v.toFixed(3) : String(+v.toPrecision(2));
+const swatch = (color, dash = '', dot = false) => `<svg viewBox="0 0 26 10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="${color}" stroke-width="2.5" stroke-dasharray="${dash}"/>${dot ? `<circle cx="13" cy="5" r="3.5" fill="${color}"/>` : ''}</svg>`;
+const legend = (box, items) => { box.innerHTML = items.map(s => `<span>${swatch(s.color, s.dash || '', s.markers)}${s.label}</span>`).join(''); };
 
-// Axes in a viewBox that matches the rendered width, so text stays at its CSS size on every screen.
-function frame(svg, {xmin = 0, xmax, ymin = 0, ymax, yticks, yfmt, xticks, xfmt = v => v.toLocaleString('en-GB'), xlabel}) {
+// Axes in a viewBox that matches the rendered width, so text stays at its CSS size on every screen. Linear or log scales.
+function scale(a) { const f = a.log ? Math.log : v => v, lo = f(a.min), hi = f(a.max); return v => (f(v) - lo) / (hi - lo); }
+function frame(svg, {x, y, xlabel}) {
   svg.replaceChildren();
   const W = Math.max(280, Math.round(svg.parentElement.clientWidth - 20)), H = Math.round(Math.min(330, Math.max(230, .62 * W))), L = 50, R = 18, T = 14, B = 42, w = W - L - R, h = H - T - B;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const X = x => L + (x - xmin) / (xmax - xmin) * w, Y = y => T + h * (1 - (y - ymin) / (ymax - ymin));
-  for (const v of yticks) { el(svg, 'line', {x1: L, x2: W - R, y1: Y(v), y2: Y(v), class: v === ymin || v === 0 ? 'baseline' : 'gridline'}); el(svg, 'text', {x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'tick'}, yfmt(v)); }
-  for (const t of xticks) el(svg, 'text', {x: X(t), y: H - B + 18, 'text-anchor': 'middle', class: 'tick'}, xfmt(t));
+  const sx = scale(x), sy = scale(y), X = v => L + sx(v) * w, Y = v => T + h * (1 - sy(v)), base = y.log ? null : y.min <= 0 && y.max >= 0 ? 0 : y.min;
+  for (const v of y.ticks) { el(svg, 'line', {x1: L, x2: W - R, y1: Y(v), y2: Y(v), class: v === base ? 'baseline' : 'gridline'}); label(svg, {x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'tick'}, y.fmt(v)); }
+  for (const t of x.ticks) label(svg, {x: X(t), y: H - B + 18, 'text-anchor': 'middle', class: 'tick'}, (x.fmt || (v => v.toLocaleString('en-GB')))(t));
   el(svg, 'text', {x: L + w / 2, y: H - 6, 'text-anchor': 'middle', class: 'axis-title'}, xlabel);
   return {W, H, L, R, T, B, w, h, X, Y};
 }
 
-// Line chart with mean lines, ±SEM bands, a crosshair tooltip and an optional cursor.
-function lineChart(svg, {series, ymax, ymin = 0, yticks, yfmt, xmax, xticks, xlabel, cursor, xname = 'Update'}) {
-  const {X, Y, T, h, L, w, W} = frame(svg, {xmax, ymin, ymax, yticks, yfmt, xticks, xlabel}), clip = v => Math.min(ymax, Math.max(ymin, v));
+// Line chart: mean lines, bands (±SEM or given lo/hi), optional markers and a dotted last segment, crosshair tooltip.
+function lineChart(svg, {series, x, y, xlabel, xtip = v => `Update ${v.toLocaleString('en-GB')}`, cursor}) {
+  const F = frame(svg, {x, y, xlabel}), {X, Y, T, h, L, w, W} = F, clip = v => Math.min(y.max, Math.max(y.min, v));
+  const pts = (s, a, b) => s.x.slice(a, b).map((xv, i) => `${X(xv)},${Y(clip(s.mean[a + i]))}`).join(' ');
   for (const s of series) {
-    if (s.sem) { const up = s.x.map((x, i) => `${X(x)},${Y(clip(s.mean[i] + s.sem[i]))}`), lo = s.x.map((x, i) => `${X(x)},${Y(clip(s.mean[i] - s.sem[i]))}`).reverse(); el(svg, 'polygon', {points: up.concat(lo).join(' '), fill: s.color, opacity: .14}); }
-    el(svg, 'polyline', {points: s.x.map((x, i) => `${X(x)},${Y(clip(s.mean[i]))}`).join(' '), fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-dasharray': s.dash || '', 'stroke-linejoin': 'round'});
+    const lo = s.lo || (s.sem && s.mean.map((m, i) => m - s.sem[i])), hi = s.hi || (s.sem && s.mean.map((m, i) => m + s.sem[i]));
+    if (lo) { const up = s.x.map((xv, i) => `${X(xv)},${Y(clip(hi[i]))}`), dn = s.x.map((xv, i) => `${X(xv)},${Y(clip(lo[i]))}`).reverse(); el(svg, 'polygon', {points: up.concat(dn).join(' '), fill: s.color, opacity: .14}); }
+    const n = s.x.length, cut = s.dottedLast ? n - 1 : n;
+    el(svg, 'polyline', {points: pts(s, 0, cut), fill: 'none', stroke: s.color, 'stroke-width': s.width || 2, 'stroke-dasharray': s.dash || '', 'stroke-linejoin': 'round'});
+    if (s.dottedLast) el(svg, 'polyline', {points: pts(s, n - 2, n), fill: 'none', stroke: s.color, 'stroke-width': 1.5, 'stroke-dasharray': '2 4'});
+    if (s.markers) for (let i = 0; i < n; i++) el(svg, 'circle', {cx: X(s.x[i]), cy: Y(clip(s.mean[i])), r: 4, fill: s.color, stroke: 'var(--surface)', 'stroke-width': 2});
   }
   if (cursor !== undefined) el(svg, 'line', {x1: X(cursor), x2: X(cursor), y1: T, y2: T + h, stroke: 'var(--ink2)', 'stroke-width': 1});
   const tip = svg.parentElement.querySelector('.tooltip'), cross = el(svg, 'line', {y1: T, y2: T + h, stroke: 'var(--muted)', 'stroke-width': 1, visibility: 'hidden'});
-  const hit = el(svg, 'rect', {x: L, y: T, width: w, height: h, fill: 'transparent'});
+  const hit = el(svg, 'rect', {x: L - 10, y: T, width: w + 20, height: h, fill: 'transparent'});
   const hide = () => { tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden'); };
   hit.addEventListener('pointermove', e => {
-    const box = svg.getBoundingClientRect(), xv = ((e.clientX - box.left) / box.width * W - L) / w * xmax;
-    const rows = series.flatMap(s => { if (xv < s.x[0] - xmax / 60 || xv > s.x.at(-1) + xmax / 60) return []; let j = 0; for (let i = 1; i < s.x.length; i++) if (Math.abs(s.x[i] - xv) < Math.abs(s.x[j] - xv)) j = i; return [[s, j]]; });
-    if (!rows.length) return hide();
-    const xs = rows[0][0].x[rows[0][1]];
+    const box = svg.getBoundingClientRect(), px = (e.clientX - box.left) / box.width * W;
+    const near = series.map(s => { let j = 0; for (let i = 1; i < s.x.length; i++) if (Math.abs(X(s.x[i]) - px) < Math.abs(X(s.x[j]) - px)) j = i; return [s, j, Math.abs(X(s.x[j]) - px)]; }).filter(r => r[2] < 30);
+    if (!near.length) return hide();
+    const xs = near.reduce((b, r) => r[2] < b[2] ? r : b)[0].x[near.reduce((b, r) => r[2] < b[2] ? r : b)[1]], rows = near.filter(([s, j]) => s.x[j] === xs);
     cross.setAttribute('x1', X(xs)); cross.setAttribute('x2', X(xs)); cross.setAttribute('visibility', 'visible');
-    tip.innerHTML = `<b>${xname} ${xs.toLocaleString('en-GB')}</b>` + rows.map(([s, j]) => `<div><i style="background:${s.color}"></i>${s.label}: ${yfmt(s.mean[j], true)}</div>`).join('');
+    tip.innerHTML = `<b>${xtip(xs)}</b>` + rows.map(([s, j]) => `<div><i style="background:${s.color}"></i>${s.label}: ${y.fmt(s.mean[j], true)}</div>`).join('');
     tip.style.display = 'block';
-    const px = (X(xs) / W) * box.width, left = px > box.width / 2 ? px - tip.offsetWidth - 12 : px + 12;
-    tip.style.left = Math.max(4, left) + 'px'; tip.style.top = '36px';
+    const p = (X(xs) / W) * box.width, left = p > box.width / 2 ? p - tip.offsetWidth - 12 : p + 12;
+    tip.style.left = Math.max(4, left) + 'px'; tip.style.top = '40px';
   });
   hit.addEventListener('pointerleave', hide);
 }
-const swatch = (color, dash = '') => `<svg viewBox="0 0 26 10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="${color}" stroke-width="2.5" stroke-dasharray="${dash}"/></svg>`;
-const condLegend = box => { box.innerHTML = CONDS.map(c => `<span>${swatch(c.color)}${c.label}</span>`).join('') + `<span>${swatch('var(--ink2)', '5 4')}top layer</span>`; };
+const KLY = {min: .1, max: 4, log: true, ticks: [.1, .2, .5, 1, 2, 4], fmt: fmtNat};
+const EXAMPLES = {min: 32, max: 2 ** 21, log: true, ticks: [2 ** 5, 2 ** 9, 2 ** 13, 2 ** 17, 2 ** 21], fmt: pow2};
+const exTip = v => `${pow2html(v)} examples`;
 
-// ---- Summary charts (mean ± SEM over worlds) ----
-let prior = 'chain';
-const steps = D.steps, xt = [0, 5000, 10000, 15000, 20000];
-const band = (key, metric, extra = {}) => ({...NAME[key], x: steps, mean: D.summary[prior][key][metric].mean, sem: D.summary[prior][key][metric].sem, ...extra});
+// ---- Sections 3-4: practice on stored samples (mean ± SEM over worlds) ----
+const CONDS = [
+  {key: 'two_layer', label: 'Wake–sleep, learned prior', color: 'var(--s1)'},
+  {key: 'true_prior', label: 'Wake–sleep, true prior given', color: 'var(--s2)'},
+  {key: 'independent', label: 'Wake–sleep, independent causes', color: 'var(--s3)'},
+];
+const L4 = D.layers, UPD = {min: 0, max: 20000, ticks: [0, 5000, 10000, 15000, 20000]};
+const band = (c, metric, extra = {}) => ({...c, x: L4.steps, mean: L4.summary[c.key][metric].mean, sem: L4.summary[c.key][metric].sem, ...extra});
+const condLegend = box => legend(box, [...CONDS, {label: 'learned prior, top recognizer', color: 'var(--s1)', dash: '5 4'}]);
 function alignCharts() {
-  lineChart($('genChart'), {series: CONDS.map(c => band(c.key, 'gen_world')), ymax: 60, yticks: [0, 15, 30, 45, 60], yfmt: fmtDeg, xmax: 20000, xticks: xt, xlabel: 'Practice updates'});
-  const top = D.summary[prior].two_layer.top_lag;
-  lineChart($('lagChart'), {series: [...CONDS.map(c => band(c.key, 'rec_lag')), {...NAME.two_layer, label: 'Two layers, top recognizer', dash: '5 4', x: steps.slice(1), mean: top.mean.slice(1), sem: top.sem.slice(1)}], ymax: 30, yticks: [0, 10, 20, 30], yfmt: fmtDeg, xmax: 20000, xticks: xt, xlabel: 'Practice updates'});
+  lineChart($('genChart'), {series: CONDS.map(c => band(c, 'gen_world')), x: UPD, y: {min: 0, max: 60, ticks: [0, 15, 30, 45, 60], fmt: fmtDeg}, xlabel: 'Practice updates'});
+  const top = L4.summary.two_layer.top_lag;
+  lineChart($('lagChart'), {series: [...CONDS.map(c => band(c, 'rec_lag')), {...CONDS[0], label: 'Learned prior, top recognizer', dash: '5 4', x: L4.steps.slice(1), mean: top.mean.slice(1), sem: top.sem.slice(1)}], x: UPD, y: {min: 0, max: 30, ticks: [0, 10, 20, 30], fmt: fmtDeg}, xlabel: 'Practice updates'});
 }
 function priorCharts() {
-  const S = D.summary[prior], kmax = Math.ceil(Math.max(...CONDS.map(c => Math.max(...S[c.key].kl.mean))));
-  lineChart($('klChart'), {series: CONDS.map(c => band(c.key, 'kl')), ymax: kmax, yticks: Array.from({length: kmax + 1}, (_, i) => i), yfmt: (v, tip) => tip ? v.toFixed(3) : String(v), xmax: 20000, xticks: xt, xlabel: 'Practice updates'});
-  lineChart($('corrChart'), {series: CONDS.map(c => band(c.key, 'corr_err')), ymax: .8, yticks: [0, .2, .4, .6, .8], yfmt: (v, tip) => v.toFixed(tip ? 3 : 1), xmax: 20000, xticks: xt, xlabel: 'Practice updates'});
+  const kmax = Math.ceil(Math.max(...CONDS.map(c => Math.max(...L4.summary[c.key].kl.mean))));
+  lineChart($('klChart'), {series: CONDS.map(c => band(c, 'kl')), x: UPD, y: {min: 0, max: kmax, ticks: Array.from({length: kmax + 1}, (_, i) => i), fmt: (v, tip) => tip ? v.toFixed(3) : String(v)}, xlabel: 'Practice updates'});
+  lineChart($('corrChart'), {series: CONDS.map(c => band(c, 'corr_err')), x: UPD, y: {min: 0, max: .8, ticks: [0, .2, .4, .6, .8], fmt: (v, tip) => v.toFixed(tip ? 3 : 1)}, xlabel: 'Practice updates'});
 }
 
-// ---- Two-cause simulation (live) ----
-const SIM = {seed: 1, theta: 30, sigma: .5, frozen: false, speed: 4, T: 3000, playing: false};
+// ---- Section 5: budget heatmaps and learning curves ----
+const LINES = [
+  {key: 'ws@0.7', label: 'Wake–sleep, 70% supplied', color: 'var(--s1)'},
+  {key: 'ws@1.0', label: 'Wake–sleep, no dreams', color: 'var(--s1)', dash: '5 4'},
+  {key: 'ae@1.0', label: 'Autoencoder baseline', color: 'var(--s3)'},
+  {key: 'ws_teach@1.0', label: 'Exact-posterior reference', color: 'var(--s2)'},
+];
+function hexRGB(s) { return [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); }
+function ramp(t) {  // the sequential blue ramp of the current theme, t in [0, 1]
+  const stops = Array.from({length: 7}, (_, i) => hexRGB(css(`--q${i}`))), u = Math.min(1, Math.max(0, t)) * 6, i = Math.min(5, Math.floor(u)), f = u - i;
+  return `rgb(${stops[i].map((v, k) => Math.round(v + (stops[i + 1][k] - v) * f)).join(',')})`;
+}
+function heatNorm() { const all = ['ws', 'ae'].flatMap(k => D.budget.heat[k].flat()), lo = Math.log(Math.min(...all)), hi = Math.log(Math.max(...all)); return v => (Math.log(v) - lo) / (hi - lo); }
+function heatmap(svg, key, norm) {
+  svg.replaceChildren();
+  const B = D.budget, vals = B.heat[key], best = B.best[key], xs = B.xs, n = vals.length, m = xs.length;
+  const W = Math.max(260, Math.round(svg.parentElement.clientWidth - 20)), L = 40, R = 4, T = 4, ch = 16, cw = (W - L - R) / m, Bm = 40, H = T + n * ch + Bm;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const box = svg.parentElement, tt = box.querySelector('.tooltip');
+  for (let r = 0; r < n; r++) {
+    const ri = n - 1 - r, y0 = T + r * ch;  // the largest total at the top
+    if (ri % 2 === 1 || n < 10) label(svg, {x: L - 6, y: y0 + ch / 2 + 4, 'text-anchor': 'end', class: 'tick'}, pow2(B.rows[ri]));
+    for (let c = 0; c < m; c++) {
+      const v = vals[ri][c], rect = el(svg, 'rect', {x: L + c * cw + 1, y: y0 + 1, width: Math.max(1, cw - 2), height: ch - 2, rx: 2, fill: ramp(norm(v))});
+      rect.addEventListener('pointermove', e => { tt.innerHTML = `<b>${pow2html(B.rows[ri])} examples, ${Math.round(100 * xs[c])}% supplied</b><div>KL ${v.toFixed(3)} nats${c === best[ri] ? ' (lowest in the row)' : ''}</div>`; tt.style.display = 'block'; const b = box.getBoundingClientRect(); tt.style.left = Math.max(4, Math.min(b.width - tt.offsetWidth - 4, e.clientX - b.left + 12)) + 'px'; tt.style.top = (e.clientY - b.top + 14) + 'px'; });
+      rect.addEventListener('pointerleave', () => { tt.style.display = 'none'; });
+    }
+    for (const [stroke, sw] of [['var(--surface)', 3.5], ['var(--ink)', 1.5]]) el(svg, 'circle', {cx: L + (best[ri] + .5) * cw, cy: y0 + ch / 2, r: 3.6, fill: 'none', stroke, 'stroke-width': sw, 'pointer-events': 'none'});
+  }
+  const every = cw >= 24 ? 1 : 2;
+  xs.forEach((x, c) => { if (c % every === 0 || c === m - 1) el(svg, 'text', {x: L + (c + .5) * cw, y: T + n * ch + 15, 'text-anchor': 'middle', class: 'tick'}, String(Math.round(100 * x))); });
+  el(svg, 'text', {x: L + (W - L - R) / 2, y: H - 6, 'text-anchor': 'middle', class: 'axis-title'}, '% of examples supplied (the rest dreamed)');
+}
+function heatScale(norm) {
+  const svg = $('heatScale'); svg.replaceChildren();
+  const all = ['ws', 'ae'].flatMap(k => D.budget.heat[k].flat()), lo = Math.min(...all), hi = Math.max(...all), X = v => 14 + norm(v) * 232;
+  for (let i = 0; i < 58; i++) el(svg, 'rect', {x: 14 + i * 4, y: 2, width: 4.4, height: 12, fill: ramp(i / 57)});
+  for (const v of [.15, .3, .5, 1, 2]) if (v >= lo && v <= hi) { el(svg, 'line', {x1: X(v), x2: X(v), y1: 14, y2: 18, stroke: 'var(--muted)'}); el(svg, 'text', {x: X(v), y: 30, 'text-anchor': 'middle', class: 'tick'}, String(v)); }
+}
+function budgetCharts() {
+  const norm = heatNorm(); heatmap($('heatWS'), 'ws', norm); heatmap($('heatAE'), 'ae', norm); heatScale(norm);
+  const B = D.budget;
+  lineChart($('budgetChart'), {series: LINES.map(l => ({...l, x: B.P, mean: B.lines[l.key].mean, sem: B.lines[l.key].sem})), x: EXAMPLES, y: KLY, xlabel: 'Examples (supplied + dreamed)', xtip: exTip});
+}
+
+// ---- Section 6: scarce data, and the threshold over K ----
+function scarceCharts() {
+  const S = D.scarce, FRESH = 2 ** 15, xN = [...S.Ns, FRESH];
+  lineChart($('scarceN'), {series: LINES.map(l => ({...l, x: xN, mean: [...S.final[l.key], S.fresh[l.key]], markers: true, dottedLast: true})),
+    x: {min: 22, max: FRESH * 1.45, log: true, ticks: xN, fmt: v => v === FRESH ? 'fresh' : pow2(v)}, y: {...KLY, max: 4}, xlabel: 'Distinct supplied examples N', xtip: v => v === FRESH ? 'Fresh examples' : `N = ${v.toLocaleString('en-GB')}`});
+  lineChart($('scarceCurves'), {series: LINES.map(l => ({...l, x: S.P, mean: S.curves[l.key].mean, sem: S.curves[l.key].sem})), x: EXAMPLES, y: KLY, xlabel: 'Examples (supplied presentations + dreamed)', xtip: exTip});
+}
+function kChart() {
+  const Kd = D.K, keys = Object.keys(Kd.K).sort((a, b) => a - b), conf = K => `${2 ** K} configurations`;
+  const series = keys.map(K => ({label: `K = ${K} (${conf(K)})`, color: `var(--k${K})`, x: Kd.N, mean: Kd.K[K].mean, lo: Kd.K[K].lo, hi: Kd.K[K].hi, markers: true}));
+  const lo = Math.floor(2 * Math.min(...series.flatMap(s => s.lo))) / 2, hi = Math.ceil(2 * Math.max(...series.flatMap(s => s.hi))) / 2;
+  lineChart($('kChart'), {series, x: {min: 13, max: 1300, log: true, ticks: [16, 32, 64, 128, 256, 512, 1024]}, y: {min: lo, max: hi, ticks: Array.from({length: Math.round((hi - lo) / .5) + 1}, (_, i) => lo + i * .5), fmt: (v, tip) => tip ? (v > 0 ? '+' : '') + v.toFixed(3) : String(v)}, xlabel: 'Distinct supplied examples N', xtip: v => `N = ${v}`});
+  legend($('kLegend'), series);
+}
+
+// ---- Section 7: dream sources ----
+const DREAMS = [
+  {key: 'ws', label: 'Dreams from the learned prior', color: 'var(--s1)'},
+  {key: 'ws_replay', label: 'Replay of the codes given to supplied samples', color: 'var(--s2)'},
+  {key: 'ws_uniform', label: 'Uniform latents', color: 'var(--s3)'},
+];
+function dreamChart() {
+  const Dd = D.dreams;
+  lineChart($('dreamChart'), {series: DREAMS.map(d => ({...d, x: Dd.P, mean: Dd.lines[d.key].mean, sem: Dd.lines[d.key].sem})), x: EXAMPLES, y: KLY, xlabel: 'Examples (supplied + dreamed)', xtip: exTip});
+}
+
+// ---- Section 2: two-cause simulation (live), with sleep and with recognition frozen ----
+const SIM = {seed: 1, theta: 30, sigma: .5, speed: 4, T: 3000, playing: false};
 const PLANE = 2.7, toPx = v => 150 + v / PLANE * 140, toPy = v => 150 - v / PLANE * 140;
 function planeSetup(svg, color) {
   svg.replaceChildren();
@@ -504,128 +589,51 @@ function simReset() {
   simStop();
   const th = SIM.theta * Math.PI / 180, r = WS.rng(9000 + SIM.seed);
   SIM.w = WS.world(SIM.seed, SIM.sigma);
-  const draws = kind => Array.from({length: 128}, () => kind === 'binary' ? [r() < .5 ? -1 : 1, r() < .5 ? -1 : 1, WS.normal(r), WS.normal(r)] : [WS.normal(r), WS.normal(r), WS.normal(r), WS.normal(r)]);
-  simState = {t: 0, Lb: WS.learner('binary', th, SIM.sigma), Lg: WS.learner('gaussian', th, SIM.sigma), rb: WS.rng(100 + SIM.seed), rg: WS.rng(200 + SIM.seed), db: draws('binary'), dg: draws('gaussian'), trace: {bg: [], br: [], gg: [], gr: []}};
-  simState.Pb = planeSetup($('planeB'), 'var(--s1)'); simState.Pg = planeSetup($('planeG'), 'var(--s4)');
+  const draws = Array.from({length: 128}, () => [r() < .5 ? -1 : 1, r() < .5 ? -1 : 1, WS.normal(r), WS.normal(r)]);
+  simState = {t: 0, Lb: WS.learner(th, SIM.sigma), Lf: WS.learner(th, SIM.sigma), rb: WS.rng(100 + SIM.seed), rf: WS.rng(200 + SIM.seed), draws, trace: {bg: [], br: [], fg: [], fr: []}};
+  simState.Pb = planeSetup($('planeB'), 'var(--s1)'); simState.Pf = planeSetup($('planeF'), 'var(--s3)');
   simState.thetas = Array.from({length: 91}, (_, i) => i - 45); simState.land = WS.landscape(SIM.sigma, simState.thetas).map(v => -v);
   record(); simCharts(); simDraw();
 }
-function record() { const S = simState, tr = S.trace; tr.bg.push(WS.genAngle(S.Lb)); tr.br.push(WS.recAngle(S.Lb)); tr.gg.push(WS.genAngle(S.Lg)); tr.gr.push(WS.recAngle(S.Lg)); }
+function record() { const S = simState, tr = S.trace; tr.bg.push(WS.genAngle(S.Lb)); tr.br.push(WS.recAngle(S.Lb)); tr.fg.push(WS.genAngle(S.Lf)); tr.fr.push(WS.recAngle(S.Lf)); }
 function simCharts() {  // static axes; the moving parts are kept and updated in simDraw
   const S = simState, deg = v => (v > 0 ? '+' : '') + v + '°';
-  S.A = frame($('simAngle'), {xmax: SIM.T, ymin: -45, ymax: 45, yticks: [-45, -30, -15, 0, 15, 30, 45], yfmt: deg, xticks: [0, 1000, 2000, 3000], xlabel: 'Practice updates'});
-  S.lines = [['bg', 'var(--s1)', ''], ['br', 'var(--s1)', '5 4'], ['gg', 'var(--s4)', ''], ['gr', 'var(--s4)', '5 4']].map(([k, color, dash]) => [k, el($('simAngle'), 'polyline', {fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-dasharray': dash, 'stroke-linejoin': 'round'})]);
+  S.A = frame($('simAngle'), {x: {min: 0, max: SIM.T, ticks: [0, 1000, 2000, 3000]}, y: {min: -45, max: 45, ticks: [-45, -30, -15, 0, 15, 30, 45], fmt: deg}, xlabel: 'Practice updates'});
+  S.lines = [['bg', 'var(--s1)', ''], ['br', 'var(--s1)', '5 4'], ['fg', 'var(--s3)', ''], ['fr', 'var(--s3)', '5 4']].map(([k, color, dash]) => [k, el($('simAngle'), 'polyline', {fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-dasharray': dash, 'stroke-linejoin': 'round'})]);
   const lmax = Math.max(.1, Math.ceil(Math.max(...S.land) * 10) / 10), step = lmax > .6 ? .2 : .1;
-  const Lf = frame($('simLand'), {xmin: -45, xmax: 45, ymax: lmax, yticks: Array.from({length: Math.round(lmax / step) + 1}, (_, i) => +(i * step).toFixed(1)), yfmt: v => v.toFixed(1), xticks: [-45, -30, -15, 0, 15, 30, 45], xfmt: deg, xlabel: 'Angle of the generator from the world'});
-  el($('simLand'), 'polyline', {points: S.thetas.map((t, i) => `${Lf.X(t)},${Lf.Y(S.land[i])}`).join(' '), fill: 'none', stroke: 'var(--s1)', 'stroke-width': 2});
-  el($('simLand'), 'line', {x1: Lf.X(-45), x2: Lf.X(45), y1: Lf.Y(0) - 2, y2: Lf.Y(0) - 2, stroke: 'var(--s4)', 'stroke-width': 2.5, 'stroke-dasharray': '7 4'});
-  el($('simLand'), 'text', {x: Lf.X(-44), y: Lf.Y(S.land[1]) + 18, class: 'direct'}, 'binary');
-  el($('simLand'), 'text', {x: Lf.X(-44), y: Lf.Y(0) - 10, class: 'direct'}, 'Gaussian: flat');
+  const Lf = frame($('simLand'), {x: {min: -45, max: 45, ticks: [-45, -30, -15, 0, 15, 30, 45], fmt: deg}, y: {min: 0, max: lmax, ticks: Array.from({length: Math.round(lmax / step) + 1}, (_, i) => +(i * step).toFixed(1)), fmt: v => v.toFixed(1)}, xlabel: 'Angle of the generator from the world'});
+  el($('simLand'), 'polyline', {points: S.thetas.map((t, i) => `${Lf.X(t)},${Lf.Y(S.land[i])}`).join(' '), fill: 'none', stroke: 'var(--ink2)', 'stroke-width': 2});
+  S.ballF = el($('simLand'), 'circle', {r: 7, fill: 'var(--s3)', stroke: 'var(--surface)', 'stroke-width': 2});
   S.ballB = el($('simLand'), 'circle', {r: 7, fill: 'var(--s1)', stroke: 'var(--surface)', 'stroke-width': 2});
-  S.ballG = el($('simLand'), 'circle', {r: 7, fill: 'var(--s4)', stroke: 'var(--surface)', 'stroke-width': 2});
-  S.Lf = Lf;
+  S.LandF = Lf;
 }
 function simDraw() {
   const S = simState, A = S.A, n = S.trace.bg.length, stride = Math.max(1, Math.floor(n / 600));
   for (const [k, line] of S.lines) { const v = S.trace[k], pts = []; for (let i = 0; i < n; i += stride) pts.push(`${A.X(i).toFixed(1)},${A.Y(v[i]).toFixed(1)}`); pts.push(`${A.X(n - 1).toFixed(1)},${A.Y(v[n - 1]).toFixed(1)}`); line.setAttribute('points', pts.join(' ')); }
-  const tb = S.trace.bg.at(-1), tg = S.trace.gg.at(-1), land = t => S.land[Math.max(0, Math.min(90, Math.round(t + 45)))];
-  S.ballB.setAttribute('cx', S.Lf.X(tb)); S.ballB.setAttribute('cy', S.Lf.Y(land(tb)));
-  S.ballG.setAttribute('cx', S.Lf.X(tg)); S.ballG.setAttribute('cy', S.Lf.Y(0) - 2);
-  planeDraw(S.Pb, S.Lb, S.db); planeDraw(S.Pg, S.Lg, S.dg);
+  const land = t => S.land[Math.max(0, Math.min(90, Math.round(t + 45)))];
+  for (const [ball, t] of [[S.ballB, S.trace.bg.at(-1)], [S.ballF, S.trace.fg.at(-1)]]) { ball.setAttribute('cx', S.LandF.X(t)); ball.setAttribute('cy', S.LandF.Y(land(t))); }
+  planeDraw(S.Pb, S.Lb, S.draws); planeDraw(S.Pf, S.Lf, S.draws);
   const read = (g, r) => `generator ${g.toFixed(1)}°, recognizer ${r.toFixed(1)}° from the world's axes<br>update ${S.t.toLocaleString('en-GB')}`;
-  $('readB').innerHTML = read(tb, S.trace.br.at(-1)); $('readG').innerHTML = read(tg, S.trace.gr.at(-1));
+  $('readB').innerHTML = read(S.trace.bg.at(-1), S.trace.br.at(-1)); $('readF').innerHTML = read(S.trace.fg.at(-1), S.trace.fr.at(-1));
 }
 function simTick() {
   const S = simState;
-  for (let k = 0; k < SIM.speed && S.t < SIM.T; k++) { WS.step(S.Lb, SIM.w, S.rb, {frozen: SIM.frozen}); WS.step(S.Lg, SIM.w, S.rg, {frozen: SIM.frozen}); S.t++; record(); }
+  for (let k = 0; k < SIM.speed && S.t < SIM.T; k++) { WS.step(S.Lb, SIM.w, S.rb); WS.step(S.Lf, SIM.w, S.rf, {frozen: true}); S.t++; record(); }
   simDraw();
   if (S.t >= SIM.T) return simStop();
   raf = requestAnimationFrame(simTick);
 }
 function simStop() { if (raf) cancelAnimationFrame(raf); raf = null; SIM.playing = false; $('simPlay').textContent = 'Play'; }
 function setupSim() {
-  $('planeLegend').innerHTML = `<span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="3" fill="var(--world)"/></svg>stored world samples</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="8" cy="5" r="3" fill="var(--s1)"/><circle cx="18" cy="5" r="3" fill="var(--s4)"/></svg>the learner's dreams</span><span>${swatch('var(--s1)')}generator axes</span><span>${swatch('var(--ink)', '5 4')}recognizer axes</span><span>${swatch('var(--world)')}world's axes</span>`;
-  $('simLegend').innerHTML = `<span>${swatch('var(--s1)')}binary, generator</span><span>${swatch('var(--s1)', '5 4')}binary, recognizer</span><span>${swatch('var(--s4)')}Gaussian, generator</span><span>${swatch('var(--s4)', '5 4')}Gaussian, recognizer</span>`;
+  $('planeLegend').innerHTML = `<span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="3" fill="var(--world)"/></svg>stored world samples</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="8" cy="5" r="3" fill="var(--s1)"/><circle cx="18" cy="5" r="3" fill="var(--s3)"/></svg>the learner's dreams</span><span>${swatch('var(--s1)')}generator axes</span><span>${swatch('var(--ink)', '5 4')}recognizer axes</span><span>${swatch('var(--world)')}world's axes</span>`;
+  $('simLegend').innerHTML = `<span>${swatch('var(--s1)')}wake–sleep, generator</span><span>${swatch('var(--s1)', '5 4')}wake–sleep, recognizer</span><span>${swatch('var(--s3)')}recognition frozen, generator</span><span>${swatch('var(--s3)', '5 4')}recognition frozen, recognizer</span>`;
   $('simPlay').onclick = () => { if (SIM.playing) return simStop(); if (simState.t >= SIM.T) simReset(); SIM.playing = true; $('simPlay').textContent = 'Pause'; raf = requestAnimationFrame(simTick); };
   $('simReset').onclick = simReset;
   $('simNew').onclick = () => { SIM.seed += 1; simReset(); };
   $('simTheta').oninput = e => { SIM.theta = +e.target.value; $('simThetaOut').textContent = SIM.theta + '°'; simReset(); };
   $('simSigma').oninput = e => { SIM.sigma = +e.target.value; $('simSigmaOut').textContent = SIM.sigma.toFixed(2); simReset(); };
-  $('simFrozen').onchange = e => { SIM.frozen = e.target.checked; simReset(); };
   $('simSpeed').onchange = e => { SIM.speed = +e.target.value; };
   simReset();
-}
-
-// ---- Six-cause explorer (snapshots fetched from {{filesDir}}/explorer.json) ----
-const EX = {learner: 'two_layer', world: 0, frame: 50, timer: null};
-let X = null;
-function mix(a, b, t) { const p = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); const A = p(a), B = p(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',')})`; }
-const seqColor = v => mix(css('--heat0'), css('--heat1'), Math.min(1, Math.max(0, v)));
-const divColor = v => v >= 0 ? mix(css('--mid'), css('--pos'), Math.min(1, v)) : mix(css('--mid'), css('--neg'), Math.min(1, -v));
-// A heat grid with persistent cells; values are integers in hundredths; tip(r, c) gives the tooltip text.
-function heat(svg, n, m, values, color, tip, labels) {
-  if (!svg._cells || svg._n !== n || svg._m !== m) {
-    svg.replaceChildren(); svg._n = n; svg._m = m; svg._cells = [];
-    const size = Math.min(200 / m, 200 / n), x0 = 34, y0 = 26;
-    svg.setAttribute('viewBox', `0 0 ${x0 + m * size + 8} ${y0 + n * size + 6}`);
-    for (let c = 0; c < m; c++) el(svg, 'text', {x: x0 + (c + .5) * size, y: y0 - 8, 'text-anchor': 'middle', class: 'tick'}, labels.col(c));
-    for (let r = 0; r < n; r++) el(svg, 'text', {x: x0 - 8, y: y0 + (r + .5) * size + 4, 'text-anchor': 'end', class: 'tick'}, labels.row(r));
-    const box = svg.parentElement, tt = box.querySelector('.tooltip');
-    for (let r = 0; r < n; r++) for (let c = 0; c < m; c++) {
-      const rect = el(svg, 'rect', {x: x0 + c * size + 1, y: y0 + r * size + 1, width: size - 2, height: size - 2, rx: 3});
-      rect.addEventListener('pointermove', e => { tt.innerHTML = svg._tip(r, c); tt.style.display = 'block'; const b = box.getBoundingClientRect(); tt.style.left = Math.min(b.width - tt.offsetWidth - 4, e.clientX - b.left + 12) + 'px'; tt.style.top = (e.clientY - b.top + 12) + 'px'; });
-      rect.addEventListener('pointerleave', () => { tt.style.display = 'none'; });
-      svg._cells.push(rect);
-    }
-  }
-  svg._tip = tip;
-  svg._cells.forEach((rect, i) => rect.setAttribute('fill', values[i] === null ? 'transparent' : color(values[i] / 100)));
-}
-function exData() { return X[prior][EX.learner][EX.world]; }
-function exOptions() {
-  const runs = X[prior][EX.learner];
-  $('exWorld').replaceChildren(...runs.map((r, i) => new Option(`world ${i + 1}: ends at ${Math.round(r.gen.at(-1))}°`, i)));
-  $('exWorld').value = EX.world;
-}
-function exDraw() {
-  const e = exData(), f = EX.frame, K = 6, two = EX.learner === 'two_layer';
-  const cause = c => String(c + 1), unitL = r => 'u' + (r + 1);
-  heat($('hmG'), K, K, e.G[f], seqColor, (r, c) => `learner unit for cause ${r + 1} · world cause ${c + 1}: |cos| = ${(e.G[f][r * K + c] / 100).toFixed(2)}`, {row: unitL, col: cause});
-  heat($('hmR'), K, K, e.Rr[f], seqColor, (r, c) => `recognizer row ${r + 1} · sleep target row ${c + 1}: |cos| = ${(e.Rr[f][r * K + c] / 100).toFixed(2)}`, {row: unitL, col: unitL});
-  const C = Array.from({length: K * K}, (_, i) => { const r = Math.floor(i / K), c = i % K; return r === c ? null : r < c ? e.C[f][i] : e.world[i]; });
-  heat($('hmC'), K, K, C, divColor, (r, c) => r === c ? `cause ${r + 1}` : `causes ${Math.min(r, c) + 1} and ${Math.max(r, c) + 1}: ${r < c ? "learner's prior" : 'world'} ${(C[r * K + c] / 100).toFixed(2)}, ${r < c ? 'world' : "learner's prior"} ${((r < c ? e.world[r * K + c] : e.C[f][c * K + r]) / 100).toFixed(2)}`, {row: cause, col: cause});
-  $('hmGNote').textContent = `mean angle ${Math.round(e.gen[f])}°`;
-  $('hmRNote').textContent = `mean lag ${e.lag[f].toFixed(1)}°`;
-  $('hmCNote').textContent = two ? 'above: learned prior · below: world' : 'above: the fixed prior · below: world';
-  $('hmT').style.display = two ? '' : 'none'; $('hmTEmpty').style.display = two ? 'none' : '';
-  $('hmTEmpty').textContent = EX.learner === 'gaussian' ? 'The Gaussian twin has no top layer: its prior is a fixed Gaussian.' : 'This learner has no top layer: the true prior is given.';
-  if (two) { const H = Math.round(Math.sqrt(e.T[f].length)), tl = r => 'g' + (r + 1); heat($('hmT'), H, H, e.T[f], seqColor, (r, c) => `top recognizer row ${r + 1} · sleep target row ${c + 1}: |cos| = ${(e.T[f][r * H + c] / 100).toFixed(2)}`, {row: tl, col: tl}); $('hmTNote').textContent = f ? `mean lag ${e.top[f].toFixed(1)}°` : 'blank at the start'; }
-  else $('hmTNote').textContent = '';
-  const x = D.frameSteps, color = NAME[EX.learner].color;
-  const series = [{label: 'generator against the world', color, x, mean: e.gen}, {label: 'recognizer lag', color, dash: '5 4', x, mean: e.lag}];
-  if (two) series.push({label: 'top recognizer lag', color, dash: '2 3', x: x.slice(1), mean: e.top.slice(1)});
-  $('exLegend').innerHTML = series.map(s => `<span>${swatch(s.color, s.dash || '')}${s.label}</span>`).join('');
-  lineChart($('exChart'), {series, ymax: 60, yticks: [0, 15, 30, 45, 60], yfmt: fmtDeg, xmax: 20000, xticks: xt, xlabel: 'Practice updates', cursor: x[f]});
-  $('exFrameOut').textContent = `update ${x[f].toLocaleString('en-GB')} / 20,000`; $('exFrame').value = f;
-}
-function exStop() { if (EX.timer) { clearInterval(EX.timer); EX.timer = null; } $('exPlay').textContent = 'Play'; }
-function bestWorld() { const runs = X[prior][EX.learner]; return runs.reduce((b, r, i) => r.gen.at(-1) < runs[b].gen.at(-1) ? i : b, 0); }
-function scales() {
-  $('seqScale').style.background = `linear-gradient(90deg, ${seqColor(0)}, ${seqColor(.5)}, ${seqColor(1)})`;
-  $('divScale').style.background = `linear-gradient(90deg, ${divColor(-1)}, ${divColor(0)}, ${divColor(1)})`;
-}
-function setupExplorer() {
-  scales();
-  const last = D.frameSteps.length - 1; $('exFrame').max = last; EX.frame = last;
-  $('exLearner').onchange = e => { exStop(); EX.learner = e.target.value; exOptions(); exDraw(); };
-  $('exWorld').onchange = e => { exStop(); EX.world = +e.target.value; exDraw(); };
-  $('exFrame').oninput = e => { exStop(); EX.frame = +e.target.value; exDraw(); };
-  $('exStart').onclick = () => { exStop(); EX.frame = 0; exDraw(); };
-  $('exEnd').onclick = () => { exStop(); EX.frame = last; exDraw(); };
-  $('exPlay').onclick = () => { if (EX.timer) return exStop(); if (EX.frame === last) EX.frame = 0; $('exPlay').textContent = 'Pause'; EX.timer = setInterval(() => { EX.frame = Math.min(last, EX.frame + 1); exDraw(); if (EX.frame === last) exStop(); }, 140); };
-  fetch('{{filesDir}}/explorer.json').then(r => { if (!r.ok) throw new Error(`${r.status} for ${r.url}`); return r.json(); })
-    .then(x => { X = x; EX.world = bestWorld(); exOptions(); exDraw(); window.explorerReady = true; })
-    .catch(e => { $('exLoading').textContent = `The snapshots could not be loaded (${e.message}). They are in {{filesDir}}/explorer.json next to this page.`; });
 }
 
 // ---- Diagram: the two-layer machine, with one connection and its Hebbian update ----
@@ -638,8 +646,8 @@ function diagram() {
   for (const p of g) el(svg, 'circle', {cx: p[0], cy: p[1], r: 13, class: 'dg-node'});
   z.forEach((p, i) => el(svg, 'circle', {cx: p[0], cy: p[1], r: 13, class: 'dg-node', ...(i === J ? {style: 'stroke:var(--s2);stroke-width:3'} : {})}));
   x.forEach((p, i) => el(svg, 'rect', {x: p[0] - 8, y: p[1] - 8, width: 16, height: 16, rx: 3, class: 'dg-node', ...(i === I ? {style: 'stroke:var(--s2);stroke-width:3'} : {})}));
-  const label = (x0, y0, before, v, after) => { const t = el(svg, 'text', {x: x0, y: y0, class: 'dg-label'}, before); const b = document.createElementNS(NS, 'tspan'); b.setAttribute('font-weight', '700'); b.setAttribute('fill', 'var(--ink)'); b.textContent = v; t.append(b, after); };
-  label(400, 43, 'top causes ', 'g', ' ∈ {±1}⁴'); label(440, 130, 'causes ', 'z', ' ∈ {±1}⁶'); label(506, 217, 'sample ', 'x', ' ∈ ℝ¹²');
+  const tag = (x0, y0, before, v, after) => { const t = el(svg, 'text', {x: x0, y: y0, class: 'dg-label'}, before); const b = document.createElementNS(NS, 'tspan'); b.setAttribute('font-weight', '700'); b.setAttribute('fill', 'var(--ink)'); b.textContent = v; t.append(b, after); };
+  tag(400, 43, 'top causes ', 'g', ' ∈ {±1}⁴'); tag(440, 130, 'causes ', 'z', ' ∈ {±1}⁶'); tag(506, 217, 'sample ', 'x', ' ∈ ℝ¹²');
   const arrow = (ax, y1, y2, dash, name, sub) => {
     el(svg, 'line', {x1: ax, y1, x2: ax, y2: y2 + (y2 > y1 ? -8 : 8), stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-dasharray': dash});
     el(svg, 'polygon', {points: y2 > y1 ? `${ax - 6},${y2 - 10} ${ax + 6},${y2 - 10} ${ax},${y2}` : `${ax - 6},${y2 + 10} ${ax + 6},${y2 + 10} ${ax},${y2}`, fill: 'var(--ink)'});
@@ -654,32 +662,23 @@ function diagram() {
 
 // ---- Start the blocks this frame shows ----
 const live = new Set();
-function setPrior(p) {
-  prior = p; for (const s of document.querySelectorAll('.priorSel')) s.value = p;
-  if (live.has('alignBlock')) alignCharts();
-  if (live.has('priorBlock')) priorCharts();
-  if (live.has('explorerBlock') && X) { exStop(); EX.world = bestWorld(); exOptions(); exDraw(); }
-}
 const BLOCKS = {
   diagramBlock: diagram,
   simBlock: setupSim,
   alignBlock: () => { condLegend($('alignBlock').querySelector('.legendConds')); alignCharts(); },
-  explorerBlock: setupExplorer,
   priorBlock: () => { condLegend($('priorBlock').querySelector('.legendConds')); priorCharts(); },
+  budgetBlock: () => { legend($('budgetLegend'), LINES); budgetCharts(); },
+  scarceBlock: () => { legend($('scarceLegend'), LINES); scarceCharts(); },
+  kBlock: kChart,
+  dreamBlock: () => { legend($('dreamLegend'), DREAMS); dreamChart(); },
 };
+const REDRAW = {alignBlock: alignCharts, priorBlock: priorCharts, budgetBlock: budgetCharts, scarceBlock: scarceCharts, kBlock: kChart, dreamBlock: dreamChart, simBlock: () => { simCharts(); simDraw(); }};
 function start() {
   // in an OverLyX block frame the runtime has hidden every other block by now (its DOMContentLoaded handler runs first)
   for (const [id, init] of Object.entries(BLOCKS)) { const b = $(id); if (b && !b.closest('[data-ol-embed-hidden]')) { init(); live.add(id); } }
-  for (const s of document.querySelectorAll('.priorSel')) s.onchange = e => setPrior(e.target.value);
   let width = innerWidth;
-  addEventListener('resize', () => {
-    if (innerWidth === width) return; width = innerWidth;
-    if (live.has('alignBlock')) alignCharts();
-    if (live.has('priorBlock')) priorCharts();
-    if (live.has('simBlock')) { simCharts(); simDraw(); }
-    if (live.has('explorerBlock') && X) exDraw();
-  });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!live.has('explorerBlock')) return; scales(); for (const id of ['hmG', 'hmR', 'hmC', 'hmT']) $(id)._cells = null; if (X) exDraw(); });
+  addEventListener('resize', () => { if (innerWidth === width) return; width = innerWidth; for (const id of live) if (REDRAW[id]) REDRAW[id](); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (live.has('budgetBlock')) budgetCharts(); });
   window.reportReady = true;
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once: true}); else start();

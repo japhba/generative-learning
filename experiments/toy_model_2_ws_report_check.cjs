@@ -1,10 +1,11 @@
 /* Render toy_model_2_WS.html in a real browser: no page errors or external requests, no failed or leftover math, no unfilled
-placeholders, no horizontal scroll; run the live simulation and the explorer; save screenshots. */
+placeholders, no horizontal scroll, every chart drawn; run the live simulation to the end; save screenshots. */
 const { chromium } = require('/var/tmp/jbauer/vscode-jupyter-build/node_modules/playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const out = '/var/tmp/jbauer/generative_practice_disentangle/layers/report_check';
 const url = 'http://127.0.0.1:8095/toy_model_2_WS.html';
+const CHARTS = ['genChart', 'lagChart', 'klChart', 'corrChart', 'budgetChart', 'scarceN', 'scarceCurves', 'kChart', 'dreamChart'];
 
 (async () => {
   fs.mkdirSync(out, { recursive: true });
@@ -18,30 +19,27 @@ const url = 'http://127.0.0.1:8095/toy_model_2_WS.html';
     // On u435d the first navigation of a new tab in headless Chromium hangs (any page, even setContent); the next one loads in ms.
     await page.goto(url, { timeout: 15000 }).catch(() => {});
     assert.equal((await page.goto(url)).status(), 200);
-    await page.waitForFunction(() => window.reportReady && window.explorerReady);
-    const state = await page.evaluate(() => ({
+    await page.waitForFunction(() => window.reportReady);
+    const state = await page.evaluate(charts => ({
       katex: document.querySelectorAll('.katex').length, katexErrors: document.querySelectorAll('.katex-error').length,
       rawMath: /\\\(|\\\[|\$\$/.test(document.querySelector('main').innerText), placeholders: document.body.innerHTML.includes('{{'),
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      genLines: document.querySelectorAll('#genChart polyline').length, cells: document.querySelectorAll('#hmG rect').length,
-    }));
+      lines: Object.fromEntries(charts.map(id => [id, document.querySelectorAll(`#${id} polyline`).length])),
+      heat: [...document.querySelectorAll('#heatWS rect, #heatAE rect')].length, rings: document.querySelectorAll('#heatWS circle').length,
+    }), CHARTS);
     console.log(name, JSON.stringify(state));
     assert.deepEqual(errors, []); assert.deepEqual(external, []);
     assert(state.katex > 30); assert.equal(state.katexErrors, 0); assert(!state.rawMath); assert(!state.placeholders); assert(state.overflow <= 0);
-    assert.equal(state.genLines, 4); assert.equal(state.cells, 36);
+    for (const id of CHARTS) assert(state.lines[id] >= 3, id);
+    assert.equal(state.heat, 2 * 14 * 15); assert.equal(state.rings, 28);
     if (name === 'desktop') {  // run the live simulation to the end at 12x and read the final angles
       await page.selectOption('#simSpeed', '12'); await page.click('#simPlay');
       await page.waitForFunction(() => /update 3,000/.test(document.getElementById('readB').textContent), null, { timeout: 60000 });
-      console.log('sim', await page.evaluate(() => [document.getElementById('readB').innerText, document.getElementById('readG').innerText]));
-      await page.locator('#rotation').screenshot({ path: `${out}/sim-end.png` });
-      await page.click('#exStart'); await page.locator('#align').screenshot({ path: `${out}/explorer-start.png` });
-      await page.click('#exEnd'); await page.locator('#align').screenshot({ path: `${out}/explorer-end.png` });
-      await page.selectOption('#exLearner', 'gaussian'); await page.locator('.heatgrid').screenshot({ path: `${out}/explorer-gaussian.png` });
-      await page.selectOption('#exLearner', 'two_layer');
-      for (const id of ['summary', 'model', 'prior', 'twin', 'spec', 'meaning', 'rotation']) await page.locator('#' + id).screenshot({ path: `${out}/section-${id}.png` });
-      await page.locator('header').screenshot({ path: `${out}/section-header.png` });
+      console.log('sim', await page.evaluate(() => [document.getElementById('readB').innerText, document.getElementById('readF').innerText]));
+      await page.locator('#heatWS rect').nth(100).hover(); await page.locator('#budgetBlock').screenshot({ path: `${out}/budget-hover.png` });
     }
-    await page.screenshot({ path: `${out}/${name}.png`, fullPage: true });
+    for (const id of ['summary', 'model', 'rotation', 'align', 'prior', 'budget', 'scarce', 'dreams', 'spec', 'meaning']) await page.locator('#' + id).screenshot({ path: `${out}/${name}-section-${id}.png` });
+    await page.locator('header').screenshot({ path: `${out}/${name}-header.png` });
     await page.close();
   }
   await browser.close();

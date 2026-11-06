@@ -39,11 +39,6 @@ article { max-width: calc(var(--measure) + 144px); margin: 0 auto; padding: 76px
 .katex { font-size: 1em; }
 .katex-display { margin: .7em 0; overflow-x: auto; overflow-y: hidden; }
 
-h1 { font-weight: 400; font-size: 1.62em; line-height: 1.3; text-align: center; text-wrap: balance; hyphens: manual; margin: 0 0 .9em; }
-.byline, .date { text-align: center; font-size: 1.1em; margin: 0 0 .25em; text-indent: 0; }
-.date { margin-bottom: 1.9em; }
-.abstract { font-size: .9em; margin: 0 2.4em 1.6em; text-indent: 0; }
-.abstract::before { content: "Abstract"; display: block; text-align: center; font-weight: 700; margin-bottom: .45em; }
 
 h2 { font-size: 1.36em; font-weight: 700; line-height: 1.3; text-align: left; text-wrap: balance; hyphens: manual; margin: 1.5em 0 .55em; counter-increment: sec; counter-reset: sub; }
 h2::before { content: counter(sec); margin-right: .9em; }
@@ -98,7 +93,6 @@ pre code { font-size: inherit; }
 }
 @media (max-width: 600px) {
   body { font-size: 16.5px; }
-  .abstract { margin-left: 0; margin-right: 0; }
   .panels { grid-template-columns: 1fr; }
   article { text-align: left; }
 }
@@ -106,11 +100,7 @@ pre code { font-size: inherit; }
 </head>
 <body>
 <article lang="en">
-<h1>Learning a procedure from one’s own worked example:<br>the advantage is in the layout, not the wording</h1>
-<p class="byline">Jan Bauer, University College London</p>
-<p class="date">6 November 2026</p>
-
-<p class="abstract">Six small open language models apply a demonstrated procedure more accurately after a worked example they wrote themselves than after one written by the other model of their language: +5.3 percentage points (pp), 95% CI [+2.6, +8.3], Holm-corrected \(p = 0.002\), pre-registered, and +5.5 pp on 39 fresh procedures. They do not recognise the procedure’s steps any better from their own examples. Four of the six models identify every step from either writer, yet still apply the procedure 7.6 pp better after their own. Rewriting the examples so that layout and wording vary independently shows where the advantage comes from: an example in the reader’s own layout helps by 6.0 pp [+4.1, +8.0], the reader’s own wording by 0.1 pp [−1.2, +1.3]. Models copy the layout they are shown, and their own layout writes out the sub-steps they need.</p>
+<p>Six small open language models apply a demonstrated procedure more accurately after a worked example they wrote themselves than after one written by the other model of their language: +5.3 percentage points (pp), 95% CI [+2.6, +8.3], Holm-corrected \(p = 0.002\), pre-registered, and +5.5 pp on 39 fresh procedures. They do not recognise the procedure’s steps any better from their own examples. Four of the six models identify every step from either writer, yet still apply the procedure 7.6 pp better after their own. Rewriting the examples so that layout and wording vary independently shows where the advantage comes from: an example in the reader’s own layout helps by 6.0 pp [+4.1, +8.0], the reader’s own wording by 0.1 pp [−1.2, +1.3]. Models copy the layout they are shown, and their own layout writes out the sub-steps they need.</p>
 
 <h2>The experiment</h2>
 

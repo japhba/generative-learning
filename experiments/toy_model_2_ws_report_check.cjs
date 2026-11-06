@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const out = '/var/tmp/jbauer/generative_practice_disentangle/layers/report_check';
 const url = 'http://127.0.0.1:8095/toy_model_2_WS.html';
-const CHARTS = ['genChart', 'lagChart', 'klChart', 'corrChart', 'budgetChart', 'scarceN', 'scarceCurves', 'kChart', 'dreamChart'];
+const CHARTS = ['genChart', 'lagChart', 'klChart', 'corrChart', 'depthRot', 'depthRand', 'budgetChart', 'scarceN', 'scarceCurves', 'kChart', 'dreamChart', 'floorKL', 'floorGen', 'floorV', 'factKL'];
 
 (async () => {
   fs.mkdirSync(out, { recursive: true });
@@ -35,10 +35,11 @@ const CHARTS = ['genChart', 'lagChart', 'klChart', 'corrChart', 'budgetChart', '
     if (name === 'desktop') {  // run the live simulation to the end at 12x and read the final angles
       await page.selectOption('#simSpeed', '12'); await page.click('#simPlay');
       await page.waitForFunction(() => /update 3,000/.test(document.getElementById('readB').textContent), null, { timeout: 60000 });
-      console.log('sim', await page.evaluate(() => [document.getElementById('readB').innerText, document.getElementById('readF').innerText]));
+      console.log('sim', await page.evaluate(() => ['readB', 'readF', 'readA'].map(id => document.getElementById(id).innerText)));
+      await page.locator('#simBlock').screenshot({ path: `${out}/sim-end.png` });
       await page.locator('#heatWS rect').nth(100).hover(); await page.locator('#budgetBlock').screenshot({ path: `${out}/budget-hover.png` });
     }
-    for (const id of ['summary', 'model', 'rotation', 'align', 'prior', 'budget', 'scarce', 'dreams', 'spec', 'meaning']) await page.locator('#' + id).screenshot({ path: `${out}/${name}-section-${id}.png` });
+    for (const id of ['summary', 'model', 'rotation', 'align', 'prior', 'budget', 'scarce', 'dreams', 'aefloor', 'factorial', 'spec', 'meaning']) await page.locator('#' + id).screenshot({ path: `${out}/${name}-section-${id}.png` });
     await page.locator('header').screenshot({ path: `${out}/${name}-header.png` });
     await page.close();
   }

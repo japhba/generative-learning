@@ -34,22 +34,28 @@ B_MAIN, B_AE = BUDGET / 'run_20261105_001836', BUDGET / 'run_ae_20261105_135239'
 B_DATA = [BUDGET / 'run_dataN_ws_20261105_190201', BUDGET / 'run_dataN_base_20261105_191420']  # N distinct examples, reused
 B_DREAMS = BUDGET / 'run_dreams_20261105_171433'
 DREAMS_ONE = ROOT / 'dreams/run_20261105_172152/results.json'  # practice_disentangle_dreams.py: one layer, fixed true prior
+AE_DEEP, AE_FACT, AE_N128 = (ROOT / 'ae_floor' / r for r in ['run_N0_20261106_191817', 'run_N0_20261106_192831', 'run_N128_20261106_193636'])  # practice_ws_ae_floor.py
+DEPTH = ROOT / 'depth/run_N0_20261106_191756'  # practice_ws_depth.py
+AE_SPECS = ['ws:x=0.7', 'ws:x=1', 'ae:top=mf:s=0.05', 'ae:top=mf:s=1', 'ae:top=bin:s=1', 'ae:top=mf:s=1:wd=0.01', 'vae:s=1']  # learners of section 8, in colour order
 CONDS = ['two_layer', 'true_prior', 'independent']  # learners of sections 3-4, in colour order
 LINES = [('ws', '0.7'), ('ws', '1.0'), ('ae', '1.0'), ('ws_teach', '1.0')]  # learners of sections 5-6
 CODE = ['experiments/practice_ws_layers.py', 'experiments/practice_ws_budget.py', 'experiments/toy_model_2_ws_sim.js', 'experiments/practice_disentangle.py',
-        'experiments/practice_disentangle_prior.py', 'experiments/practice_disentangle_dreams.py', 'tex/practice_disentangle.tex']
+        'experiments/practice_disentangle_prior.py', 'experiments/practice_disentangle_dreams.py', 'experiments/practice_ws_ae_floor.py', 'experiments/practice_ws_depth.py',
+        'tex/practice_disentangle.tex']
 
 # The two-cause numbers, from the simulation the page runs (16 seeds, start 30 degrees, sigma 0.5).
 NODE = r"""
-const WS = require(process.env.SIM), S = 16, T = 3000, run = (frozen, s) => {
+const WS = require(process.env.SIM), S = 16, T = 3000, run = (upd, s) => {
   const w = WS.world(1000 + s, 0.5), L = WS.learner(Math.PI / 6, 0.5), r = WS.rng(5000 + s), tr = [];
-  for (let t = 0; t <= T; t++) { tr.push([WS.genAngle(L), WS.recAngle(L)]); if (t < T) WS.step(L, w, r, {frozen}); }
+  for (let t = 0; t <= T; t++) { tr.push([WS.genAngle(L), WS.recAngle(L)]); if (t < T) upd(L, w, r); }
   return tr; };
-const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
-const b = Array.from({length: S}, (_, s) => run(false, s)), f = Array.from({length: S}, (_, s) => run(true, s)), at = (runs, t) => runs.map(tr => Math.abs(tr[t][0]));
+const mean = a => a.reduce((x, y) => x + y, 0) / a.length, runs = upd => Array.from({length: S}, (_, s) => run(upd, s));
+const b = runs((L, w, r) => WS.step(L, w, r)), f = runs((L, w, r) => WS.step(L, w, r, {frozen: true})), at = (rs, t) => rs.map(tr => Math.abs(tr[t][0]));
+const a = runs((L, w, r) => WS.aeStep(L, w, r)), a1 = runs((L, w, r) => WS.aeStep(L, w, r, {rate: 1}));
 process.stdout.write(JSON.stringify({
   b250: mean(at(b, 250)), b500: mean(at(b, 500)), b1000: mean(at(b, 1000)), b3000: mean(at(b, T)), lag250: mean(b.map(tr => tr[250][1] - tr[250][0])),
   frozen: mean(at(f, T)), frozenMin: Math.min(...at(f, T)), frozenMax: Math.max(...at(f, T)), land: WS.landscape(0.5, [15, 30, 45]),
+  ae500: mean(at(a, 500)), ae1000: mean(at(a, 1000)), ae3000: mean(at(a, T)), aeMin: Math.min(...at(a, T)), aeMax: Math.max(...at(a, T)), aeF500: mean(at(a1, 500)), aeF3000: mean(at(a1, T)),
 }));
 """
 
@@ -114,7 +120,8 @@ def main():
     sim = root / 'experiments/toy_model_2_ws_sim.js'
     t2 = json.loads(subprocess.run(['node', '-e', NODE], capture_output=True, text=True, check=True, env={'SIM': str(sim), 'PATH': '/usr/bin:/bin:' + str(Path(shutil.which('node')).parent)}).stdout)
     nums |= {'b250': deg(t2['b250']), 'b500': deg(t2['b500']), 'b1000': f"{t2['b1000']:.1f}°", 'b3000': f"{t2['b3000']:.1f}°", 'lag250': f"{t2['lag250']:.1f}°",
-             'frozen': deg(t2['frozen']), 'frozenRange': f"{t2['frozenMin']:.0f}–{t2['frozenMax']:.0f}°", 'land15': f"{-t2['land'][0]:.2f}", 'land30': f"{-t2['land'][1]:.2f}", 'land45': f"{-t2['land'][2]:.2f}"}
+             'frozen': deg(t2['frozen']), 'frozenRange': f"{t2['frozenMin']:.0f}–{t2['frozenMax']:.0f}°", 'land15': f"{-t2['land'][0]:.2f}", 'land30': f"{-t2['land'][1]:.2f}", 'land45': f"{-t2['land'][2]:.2f}",
+             'ae500': deg(t2['ae500']), 'ae1000': deg(t2['ae1000']), 'ae3000': f"{t2['ae3000']:.1f}°", 'aeRange': f"{t2['aeMin']:.0f}–{t2['aeMax']:.0f}°", 'aeF500': f"{t2['aeF500']:.1f}°", 'aeF3000': f"{t2['aeF3000']:.1f}°"}
 
     # ---- Section 5: the budget (fresh supplied examples, each used once) ----
     kl, P = budget_curves(B_MAIN, B_AE); xs = json.loads((B_MAIN / 'curves.json').read_text())['xs']; xk = [str(x) for x in xs]
@@ -187,14 +194,59 @@ def main():
     nums |= {f'one_{c}': nat(v.mean()) for c, v in ofin.items()} | {'one_start': nat(np.mean([o['prior'][w][0]['kl'] for w in o['prior']])), 'oneWorlds': str(len(ofin['prior'])), 'oneN': str(oa['N'])}
     dreams = {'P': Pd[1:], 'lines': {l: band(dk[l, '0.7'][:, 1:]) for l in ['ws', 'ws_replay', 'ws_uniform']}}
 
+    # ---- Section 8: why the autoencoder plateaus (practice_ws_ae_floor.py; same worlds and start as section 5, own random draws) ----
+    def floor_runs(run):
+        j = json.loads((run / 'curves.json').read_text()); prior = next(iter(j['curves']))
+        return j['args'], {spec: [ws[w] for w in sorted(ws, key=int)] for spec, ws in j['curves'][prior].items()}
+    fargs, F = floor_runs(AE_DEEP); _, FN = floor_runs(AE_N128); _, FF = floor_runs(AE_FACT)
+    assert list(F) and all(sp in F for sp in AE_SPECS) and fargs['P_max'] == 2 ** 21
+    Pf = np.array([p['P'] for p in F['ws:x=0.7'][0]]); keepf = Pf >= 2 ** 8
+    fin = lambda R, sp, k: np.array([r[-1][k] for r in R[sp]])
+    at = lambda R, sp, k, Pv: np.array([[p[k] for p in r if p['P'] == Pv][0] for r in R[sp]])
+    tag = {'ws:x=0.7': 'ws', 'ws:x=1': 'ws100', 'ae:top=mf:s=0.05': 'ae', 'ae:top=mf:s=1': 'aeF', 'ae:top=bin:s=1': 'aeB', 'ae:top=mf:s=1:wd=0.01': 'aeW', 'vae:s=1': 'vae'}
+    nums |= {'fWorlds': str(len(F['ws:x=0.7'])), 'aeWd': f"{0.01:g}"}
+    for sp, t in tag.items():
+        nums |= {f'f_{t}': nat(fin(F, sp, 'kl').mean()), f'f_{t}_refit': nat(fin(F, sp, 'kl_refit').mean()), f'f_{t}_gen': deg(fin(F, sp, 'gen_world').mean()),
+                 f'f_{t}_v': f"{fin(F, sp, 'v_norm').mean():.1f}", f'f_{t}_loss': nat(fin(F, sp, 'ae_loss_top').mean()), f'f_{t}_sat': f"{fin(F, sp, 'sat_top').mean():.2f}"}
+        if sp != 'ws:x=0.7': nums[f'f_{t}_wsWins'] = str(int((fin(F, 'ws:x=0.7', 'kl') < fin(F, sp, 'kl')).sum()))
+    for Pv in [2 ** 12, 2 ** 15]:
+        e = int(np.log2(Pv)); nums |= {f'f_ae_v{e}': f"{at(F, 'ae:top=mf:s=0.05', 'v_norm', Pv).mean():.1f}", f'f_ae_refit{e}': nat(at(F, 'ae:top=mf:s=0.05', 'kl_refit', Pv).mean()),
+                                     f'f_aeF_kl{e}': nat(at(F, 'ae:top=mf:s=1', 'kl', Pv).mean())}
+    nums |= {'n_ws': nat(fin(FN, 'ws:x=0.7', 'kl').mean()), 'n_vae': nat(fin(FN, 'vae:s=1', 'kl').mean()), 'n_ae': nat(fin(FN, 'ae:top=mf:s=0.05', 'kl').mean()), 'n_ws100': nat(fin(FN, 'ws:x=1', 'kl').mean()),
+             'n_vaeWins': str(int((fin(FN, 'vae:s=1', 'kl') < fin(FN, 'ws:x=0.7', 'kl')).sum()))}
+    for sp, t in tag.items():
+        if sp in FF: nums |= {f'x_{t}': nat(fin(FF, sp, 'kl').mean()), f'x_{t}_gen': deg(fin(FF, sp, 'gen_world').mean()), f'x_{t}_refit': nat(fin(FF, sp, 'kl_refit').mean()), f'x_{t}_v': f"{fin(FF, sp, 'v_norm').mean():.1f}"}
+    nums |= {'x_wsWinsAE': str(int((fin(FF, 'ws:x=0.7', 'kl') < fin(FF, 'ae:top=mf:s=0.05', 'kl')).sum())), 'x_wsWinsNoGen': str(int((fin(FF, 'ws:x=0.7', 'kl') < fin(FF, 'ws:x=1', 'kl')).sum())),
+             'x_vaeWins': str(int((fin(FF, 'vae:s=1', 'kl') < fin(FF, 'ws:x=0.7', 'kl')).sum())), 'x_kl0': nat(np.mean([r[0]['kl'] for r in FF['ws:x=0.7']])), 'x_gen0': deg(np.mean([r[0]['gen_world'] for r in FF['ws:x=0.7']])),
+             'x_plateau': nat(np.mean([[p['kl'] for p in r if p['P'] == 2 ** 14][0] for r in FF['ws:x=0.7']]))}
+    series = lambda R, k, specs: {sp: band(np.array([[p[k] for p in r] for r in R[sp]])[:, keepf]) for sp in specs if sp in R}
+    floor = {'P': Pf[keepf], 'kl': series(F, 'kl', AE_SPECS), 'v': series(F, 'v_norm', AE_SPECS), 'gen': series(F, 'gen_world', AE_SPECS)}
+    fact = {'P': Pf[keepf], 'kl': series(FF, 'kl', AE_SPECS), 'gen': series(FF, 'gen_world', AE_SPECS)}
+
+    # ---- Section 4: is the top layer learned later than the bottom? (practice_ws_depth.py, fresh samples) ----
+    dj = json.loads((DEPTH / 'curves.json').read_text()); DC = {k: [r[w] for w in sorted(r, key=int)] for k, r in dj['curves'].items()}
+    dsteps = np.array([p['step'] for p in DC['rotated'][0]]); dk = dsteps >= 1; DV = lambda st, k: np.array([[p[k] for p in r] for r in DC[st]])
+    def t_frac(v, f=0.9, k=7):  # first update at which the smoothed curve has covered a fraction f of its drop to its final level
+        vs = np.convolve(np.pad(v, (k // 2, k // 2), mode='edge'), np.ones(k) / k, mode='valid'); v0, vf = vs[:3].mean(), vs[-10:].mean()
+        return dsteps[np.argmax(vs <= v0 - f * (v0 - vf))]
+    t90 = {(st, k): np.array([t_frac(v) for v in DV(st, k)]) for st in DC for k in ['gen_world', 'top_world'] if not (st == 'oracle_bottom' and k == 'gen_world')}
+    nums |= {'dWorldsD': str(len(DC['rotated'])), 'dSteps': f"{dj['args']['steps']:,}", 'oracle90': f"{np.median(t90['oracle_bottom', 'top_world']):,.0f}",
+             'oracleTop': deg(DV('oracle_bottom', 'top_world')[:, -1].mean())}
+    for st, t in [('rotated', 'R'), ('random', 'X')]:
+        tb, tt, to = t90[st, 'gen_world'], t90[st, 'top_world'], t90['oracle_bottom', 'top_world']
+        nums |= {f'd{t}_bot90': f"{np.median(tb):,.0f}", f'd{t}_top90': f"{np.median(tt):,.0f}", f'd{t}_later': str(int((tt > tb).sum())), f'd{t}_slow': f"{np.median(tt / np.maximum(to, 1)):.0f}",
+                 f'd{t}_slowN': str(int((tt > to).sum())), f'd{t}_top': deg(DV(st, 'top_world')[:, -1].mean()), f'd{t}_bot': deg(DV(st, 'gen_world')[:, -1].mean())}
+    nums |= {'dX_top200': deg(DV('random', 'top_world')[:, np.argmin(np.abs(dsteps - 200))].mean()), 'dX_top1k': deg(DV('random', 'top_world')[:, np.argmin(np.abs(dsteps - 1000))].mean())}
+    depth = {'steps': dsteps[dk], 'lines': {f'{st}/{k}': band(DV(st, k)[:, dk]) for st in DC for k in ['gen_world', 'top_world'] if not (st == 'oracle_bottom' and k == 'gen_world')}}
+
     # ---- assemble ----
     def serial(v):
         if isinstance(v, np.ndarray): return v.tolist() if v.dtype.kind in 'iu' else np.round(v, 4).tolist()
         if isinstance(v, (np.integer, np.floating)): return v.item()
         raise TypeError(type(v))
 
-    payload = {'layers': layers, 'budget': budget, 'scarce': scarce, 'K': kth, 'dreams': dreams}
-    sources = [LAYERS / 'snapshots.npz', B_MAIN / 'curves.json', B_AE / 'curves.json']
+    payload = {'layers': layers, 'budget': budget, 'scarce': scarce, 'K': kth, 'dreams': dreams, 'floor': floor, 'fact': fact, 'depth': depth}
+    sources = [LAYERS / 'snapshots.npz', B_MAIN / 'curves.json', B_AE / 'curves.json', AE_DEEP / 'curves.json', DEPTH / 'curves.json']
     nums |= {'built': datetime.now(ZoneInfo('Europe/London')).strftime('%d %B %Y, %H:%M %Z'), 'filesDir': f'{NAME}-files',
              'sourceHash': ' · '.join(f'{p.parent.name}/{p.name} {hashlib.sha256(p.read_bytes()).hexdigest()[:12]}' for p in sources)}
     html = (root / 'experiments/toy_model_2_ws_report.html').read_text()

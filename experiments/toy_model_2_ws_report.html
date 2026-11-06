@@ -10,11 +10,11 @@
 <title>Toy model 2: wake–sleep</title>
 <style>/*__KATEX_CSS__*/</style>
 <style>
-:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--world:#b5b3aa;--yes:#0c7a0c;--part:#7a5300;--no:#b4302f;
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#6250d6;--s7:#e34948;--s8:#008300;--world:#b5b3aa;--yes:#0c7a0c;--part:#7a5300;--no:#b4302f;
   --q0:#cde2fb;--q1:#9ec5f4;--q2:#6da7ec;--q3:#3987e5;--q4:#256abf;--q5:#184f95;--q6:#0d366b;--k4:#86b6ef;--k6:#2a78d6;--k8:#104281}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--world:#5c5b57;--yes:#5fc25f;--part:#e0b04a;--no:#e66767;
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#9085e9;--s7:#e66767;--s8:#008300;--world:#5c5b57;--yes:#5fc25f;--part:#e0b04a;--no:#e66767;
   --q0:#0d366b;--q1:#184f95;--q2:#256abf;--q3:#3987e5;--q4:#6da7ec;--q5:#9ec5f4;--q6:#cde2fb;--k4:#256abf;--k6:#5598e7;--k8:#9ec5f4}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--world:#5c5b57;--yes:#5fc25f;--part:#e0b04a;--no:#e66767;
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#9085e9;--s7:#e66767;--s8:#008300;--world:#5c5b57;--yes:#5fc25f;--part:#e0b04a;--no:#e66767;
   --q0:#0d366b;--q1:#184f95;--q2:#256abf;--q3:#3987e5;--q4:#6da7ec;--q5:#9ec5f4;--q6:#cde2fb;--k4:#256abf;--k6:#5598e7;--k8:#9ec5f4}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -86,10 +86,10 @@ footer code{overflow-wrap:anywhere}
 .dg-label{font-size:13px;fill:var(--ink2)}
 .dg-strong{font-size:13px;fill:var(--ink);font-weight:650}
 .dg-hebb{font-size:13px;fill:var(--ink);font-weight:600}
-.planes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.planes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .plane-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center;min-width:0}
 .plane-box h3{margin:0 0 2px;font-size:.95rem}
-.plane-box svg{width:100%;max-width:330px;height:auto;display:block;margin:0 auto}
+.plane-box svg{width:100%;max-width:300px;height:auto;display:block;margin:0 auto}
 .plane-box .small{font-variant-numeric:tabular-nums;min-height:2.8em}
 .heat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px 8px;position:relative;min-width:0}
 .heat-box h3{margin:0 6px 4px;font-size:.95rem}
@@ -109,11 +109,11 @@ figure.widget{margin:16px 0}
 <article>
 <header>
 <div class="eyebrow">Generative learning · toy model 2 · wake–sleep</div>
-<h1>Dreaming lets a Hebbian learner align its latent space, and beat an autoencoder trained on the same examples</h1>
-<p class="abstract lede">A two-layer network learns a world of six hidden binary causes from unlabelled samples. It starts with the right mean and covariance, but with its latent axes turned about {{two_layer_gen0}} away from the world's. Wake–sleep practice alternates reading supplied samples, which trains generation, with dreaming its own, which trains recognition, each by a local Hebbian rule. Practice turns the axes towards the world's, and a second layer learns which causes go together. Given a fixed number of examples, the learner does best when about 30% of them are its own dreams. It then ends {{b21_ratioAE}} times closer to the world than the same network trained as an autoencoder on supplied samples only. Dreaming starts to pay once the supplied samples include about {{crossRange}} distinct ones, whether the latent space has 16 or 256 configurations.</p>
+<h1>Dreaming lets a Hebbian learner align its latent space: it beats a plain autoencoder and ties a variational one</h1>
+<p class="abstract lede">A two-layer network learns a world of six hidden binary causes from unlabelled samples. It starts with the right mean and covariance, but with its latent axes turned about {{two_layer_gen0}} away from the world's. Wake–sleep practice alternates reading supplied samples, which trains generation, with dreaming its own, which trains recognition, each by a local Hebbian rule. Practice turns the axes towards the world's, and a second layer learns which causes go together. Given a fixed number of examples, the learner does best when about 30% of them are its own dreams, and then ends far closer to the world than the same network trained as an autoencoder on supplied samples only. The autoencoder's problem is not its axes, which it turns too, but its prior: nothing in reconstruction error ties its codes to the distribution it generates from. A variational autoencoder adds exactly that term, computing it by summing over every latent configuration, and does as well as wake–sleep without dreaming at all.</p>
 <div class="tiles">
 <div class="tile"><strong>{{two_layer_gen0}} → {{two_layer_gen}}</strong> <span>angle between the generator's latent axes and the world's, after practice on {{N}} stored samples ({{two_layer_fgen}} with unlimited fresh samples)</span></div>
-<div class="tile"><strong>{{b21_ws70}} vs {{b21_ae100}} nats</strong> <span>generator error after {{bMax}} examples: wake–sleep with 30% dreamed, against the autoencoder baseline; lower in {{b21_winsAE}} of {{bWorlds}} worlds</span></div>
+<div class="tile"><strong>{{f_ws}} · {{f_ae}} · {{f_vae}}</strong> <span>generator error in nats after 2<sup>21</sup> examples: wake–sleep with 30% dreamed · autoencoder baseline · variational autoencoder (no dreams)</span></div>
 <div class="tile"><strong>{{crossRange}} examples</strong> <span>distinct supplied examples from which dreaming pays, for latent spaces of 16, 64 and 256 configurations</span></div>
 </div>
 </header>
@@ -122,12 +122,14 @@ figure.widget{margin:16px 0}
 <h2>Summary</h2>
 <ol class="takeaways">
 <li><strong>The setup.</strong> Six hidden ±1 causes, themselves set by two top causes, are rendered linearly in 12 dimensions with noise. The learner is a two-layer Helmholtz machine: a generator and a recognizer in each layer. It starts with a generator that gets every mean and covariance of the data right but whose latent axes are turned, a defect that reconstruction error, principal components and anything else second-order cannot see.</li>
-<li><strong>Practice turns the axes, because the causes are binary.</strong> With ±1 causes, how well a generator explains the data depends on the orientation of its axes. Wake follows that slope by reading samples through the recognizer; sleep keeps the recognizer matched to the turning generator. With two causes, the axes go from 30° to {{b500}} in 500 updates; with recognition frozen, they stop at {{frozen}}. A linear-Gaussian learner has no such slope, whatever the shape of its latent or noise covariance (box in section 1).</li>
+<li><strong>Practice turns the axes, because the causes are binary.</strong> With ±1 causes, how well a generator explains the data depends on the orientation of its axes. Wake follows that slope by reading samples through the recognizer; sleep keeps the recognizer matched to the turning generator. With two causes, the axes go from 30° to {{b500}} in 500 updates; with recognition frozen, they stop at {{frozen}}. The autoencoder turns them too, more slowly ({{ae3000}} after 3,000 updates). A linear-Gaussian learner has no such slope (box in section 1).</li>
 <li><strong>Generation leads, recognition follows.</strong> In both layers the recognizer gets within a few degrees of the best recognizer for the current generator after a few hundred updates and stays there ({{lagMin}}–{{lagMax}} at the end). Turning the generator towards the world is the slow process ({{two_layer_gen0}} → {{two_layer_gen}} over {{steps}} updates). Recognition never runs ahead.</li>
-<li><strong>A second layer learns the prior.</strong> Trained by the same rule on the codes the learner gives its own samples, it learns which causes go together. The learner ends at {{two_layer_kl}} nats, better than the same learner handed the world's true prior ({{true_prior_kl}}) or one with independent causes ({{independent_kl}}). The price is that which unit stands for which cause becomes arbitrary.</li>
-<li><strong>At a fixed budget of examples, dreaming beats watching.</strong> Out of {{bMax}} examples, wake–sleep does best with about 30% dreamed ({{b21_ws70}} nats). With none dreamed, its recognizer is never trained and it stalls at {{stall}}. The autoencoder baseline, trained end to end on supplied examples, plateaus at {{b21_ae100}}. Wake–sleep is ahead in at least 11 of {{bWorlds}} worlds from {{beatFrom}} examples on, and ties at 2<sup>13</sup> and below. A learner that computes exact posteriors needs no dreams at all and ends at {{b21_ws_teach100}}, but it sums over all 64 latent configurations for every example.</li>
-<li><strong>Dreaming pays from a few dozen distinct examples.</strong> With a fixed set of N supplied examples, reused, dreaming helps once N is above about {{crossRange}}. At N = 128, wake–sleep reaches {{n128_ws70}} nats, against {{n128_ws100}} without dreams and {{n128_ae100}} for the autoencoder. The threshold is the same for 16, 64 and 256 latent configurations. Below it, every learner memorises its few examples, and dreams no longer help.</li>
-<li><strong>Dreams teach recognition; they do not explore.</strong> Replaying the codes that recognition gave to supplied samples works as well as dreaming from the learned prior ({{d21_ws_replay}} vs {{d21_ws}} nats), although it covers fewer latent configurations. Dreaming uniformly over all configurations is much worse ({{d21_ws_uniform}}). Dreams are useful as exactly labelled examples for the recognizer, drawn from the latent distribution the generator is being fitted to.</li>
+<li><strong>A second layer learns the prior, at the pace of the first.</strong> Trained by the same rule on the codes the learner gives its own samples, it learns which causes go together. The learner ends at {{two_layer_kl}} nats, better than the same learner handed the world's true prior ({{true_prior_kl}}). The top layer is not learned later than the bottom one: it is held back by it, about {{dR_slow}} times slower than with the world's bottom layer given, but finishes no later.</li>
+<li><strong>At a fixed budget of examples, dreaming beats watching.</strong> Out of {{bMax}} examples, wake–sleep does best with about 30% dreamed ({{b21_ws70}} nats). With none dreamed, its recognizer is never trained and it stalls at {{stall}}. A learner that computes exact posteriors needs no dreams at all and ends at {{b21_ws_teach100}}, but it sums over all 64 latent configurations for every example.</li>
+<li><strong>Dreaming pays from a few dozen distinct examples.</strong> With a fixed set of N supplied examples, reused, dreaming helps once N is above about {{crossRange}}. At N = 128, wake–sleep reaches {{n128_ws70}} nats, against {{n128_ws100}} without dreams. The threshold is the same for 16, 64 and 256 latent configurations. Below it, every learner memorises its few examples, and dreams no longer help.</li>
+<li><strong>Dreams teach recognition; they do not explore.</strong> Replaying the codes that recognition gave to supplied samples works as well as dreaming from the learned prior ({{d21_ws_replay}} vs {{d21_ws}} nats), although it covers fewer latent configurations. Dreaming uniformly over all configurations is much worse ({{d21_ws_uniform}}).</li>
+<li><strong>The autoencoder fails at its prior, and a VAE fixes it.</strong> Trained end to end on reconstruction error (section 1 says exactly how), the autoencoder ends at {{f_ae}} nats; its decoder alone, with the prior refitted, would be at {{f_ae_refit}}. Its top layer reconstructs codes from continuous top codes with ever larger weights, so the ±1 top causes it generates from produce the wrong combinations of causes. A faster recognizer, a binary top code or weight decay narrow the gap ({{f_aeF}}, {{f_aeB}}, {{f_aeW}}); a variational autoencoder, which adds the prior term, closes it ({{f_vae}} vs {{f_ws}} for wake–sleep), also with 128 examples ({{n_vae}} vs {{n_ws}}). It never dreams, so what dreams buy wake–sleep here is locality, not sample efficiency.</li>
+<li><strong>Correlated causes are not needed.</strong> With six independent causes the picture is the same: wake–sleep {{x_ws}} nats, without dreams {{x_ws100}}, autoencoder {{x_ae}}, VAE {{x_vae}}; the axes turn further than in the correlated world ({{x_ws_gen}}).</li>
 </ol>
 </section>
 
@@ -167,34 +169,59 @@ figure.widget{margin:16px 0}
 <tr><td><strong>Wake–sleep, learned prior</strong> (the model)</td><td>a top layer of {{H}} units, learned by the same rule, from small random weights</td><td>all</td></tr>
 <tr><td>Wake–sleep, true prior given</td><td>one layer; the world's prior over the six causes is given and fixed (the earlier toy, <a href="{{filesDir}}/practice_disentangle.tex">write-up</a>)</td><td>3, 4</td></tr>
 <tr><td>Wake–sleep, independent causes</td><td>one layer; a learned frequency for each cause, no correlations</td><td>3, 4</td></tr>
-<tr><td>Autoencoder baseline</td><td>the same two-layer network, both parts trained end to end on supplied samples by reconstruction error (mean-field codes, backpropagation into recognizer and generator); dreams, where given, train recognition by sleep</td><td>5, 6</td></tr>
+<tr><td>Autoencoder baseline</td><td>the same two-layer network, both parts trained end to end on supplied samples by reconstruction error, with backpropagation into the recognizers (exactly as below); dreams, where given, train recognition by sleep</td><td>2, 5, 6, 8, 9</td></tr>
+<tr><td>Autoencoder variants</td><td>the baseline with a 20 times faster recognizer; the same with a binary top code; the same with weight decay</td><td>8</td></tr>
+<tr><td>Variational autoencoder (VAE)</td><td>the same network trained end to end on supplied samples by the evidence lower bound: reconstruction plus the two terms that tie the codes to the prior (below); no dreams</td><td>8, 9</td></tr>
 <tr><td>Exact-posterior reference</td><td>the same network; supplied samples also train the recognizers, towards the exact posterior means under the current generator (a sum over all 64 configurations of the six causes); dreams, where given, train recognition by sleep</td><td>5, 6</td></tr>
 </tbody></table></div>
-<p class="small">Error is always the population KL divergence from the world to the learner's generative model, KL(world ‖ model), in nats per sample, on 4,000 held-out world samples, summing exactly over the latent configurations.</p>
+<p class="small">Error is always the population KL divergence from the world to the learner's generative model, KL(world ‖ model), in nats per sample, on 4,000 held-out world samples, summing exactly over the latent configurations. For every learner the model scored is the generative path: \(\mathbf{g}\) uniform on \(\{\pm1\}^4\), then \(\mathbf{z}\mid\mathbf{g}\), then \(\mathbf{x}\mid\mathbf{z}\).</p>
+
+<h3 id="ae-training">How the autoencoder baselines are trained</h3>
+<p>The autoencoder has exactly the wake–sleep network: the same generators \(\mathbf{W},\mathbf{c},\mathbf{V},\mathbf{a}\), the same recognizers \(\mathbf{R},\mathbf{b},\mathbf{R}_2,\mathbf{b}_2\), the same start. Each update takes one batch of 32 supplied samples \(\mathbf{x}\) (in section 5, fresh world samples used once) and takes a gradient step on two reconstruction losses, one per layer, with the gradients backpropagated into the recognizers. It never dreams. In the heatmap of section 5, where a share of the batches are dreams, those batches train both recognizers by the sleep rule above, exactly as in wake–sleep.</p>
+<p><strong>Bottom layer: a binary autoencoder.</strong> The recognizer gives the mean \(\mathbf{m}=\tanh(\mathbf{R}\mathbf{x}+\mathbf{b})\) of the factorised code \(q(\mathbf{z}\mid\mathbf{x})\), and the loss is the squared reconstruction error expected under that code:</p>
+<div class="eq">\[\mathcal L_1=\mathbb E_{q(\mathbf{z}\mid\mathbf{x})}\,\|\mathbf{x}-\mathbf{W}\mathbf{z}-\mathbf{c}\|^2=\|\mathbf{x}-\mathbf{W}\mathbf{m}-\mathbf{c}\|^2+\sum_k(1-m_k^2)\,\|\mathbf{w}_k\|^2 .\]</div>
+<p>With the residual \(\mathbf{e}=\mathbf{x}-\mathbf{W}\mathbf{m}-\mathbf{c}\), batch averages implied,</p>
+<div class="eq">\[\begin{gathered}\Delta\mathbf{W}=\eta\big[\mathbf{e}\,\mathbf{m}^{\mathsf T}-\mathbf{W}\operatorname{diag}(1-\mathbf{m}^2)\big],\qquad \Delta\mathbf{c}=\eta\,\mathbf{e},\\ \Delta\mathbf{R}=s\eta\,\boldsymbol\delta\,\mathbf{x}^{\mathsf T},\quad \Delta\mathbf{b}=s\eta\,\boldsymbol\delta,\qquad \boldsymbol\delta=(1-\mathbf{m}^2)\odot\big(\mathbf{W}^{\mathsf T}\mathbf{e}+\mathbf{m}\odot\|\mathbf{w}\|^2\big)/\sigma^2 ,\end{gathered}\]</div>
+<p>that is, \(-\tfrac12\partial\mathcal L_1/\partial\mathbf{W}\) for the generator and \(-\tfrac1{2\sigma^2}\partial\mathcal L_1/\partial\mathbf{R}\) for the recognizer. The generator's step is exactly the wake update averaged over the recognizer's code, \(\mathbb E_q[(\mathbf{x}-\mathbf{W}\mathbf{z}-\mathbf{c})\mathbf{z}^{\mathsf T}]\); in this layer the autoencoder differs from wake–sleep only in what teaches the recognizer: reconstruction error passed back through the code, instead of dreams.</p>
+<p><strong>Top layer: a deterministic autoencoder of the codes.</strong> Its input is a code \(\mathbf{z}\sim q(\cdot\mid\mathbf{x})\) sampled from the bottom recognizer. Its own code is the mean \(\mathbf{m}_2=\tanh(\mathbf{R}_2\mathbf{z}+\mathbf{b}_2)\), used as it is, in place of a binary \(\mathbf{g}\), and the loss is the log-loss of \(\mathbf{z}\) under the top generator fed with it:</p>
+<div class="eq">\[\mathcal L_2=-\log p(\mathbf{z}\mid\mathbf{g}=\mathbf{m}_2)=\sum_i\log\big(1+e^{-2z_i(\mathbf{V}\mathbf{m}_2+\mathbf{a})_i}\big),\]</div>
+<div class="eq">\[\begin{gathered}\Delta\mathbf{V}=\eta\,\mathbf{e}_2\mathbf{m}_2^{\mathsf T},\qquad \Delta\mathbf{a}=\eta\,\mathbf{e}_2,\qquad \mathbf{e}_2=\mathbf{z}-\tanh(\mathbf{V}\mathbf{m}_2+\mathbf{a}),\\ \Delta\mathbf{R}_2=s\eta\,\boldsymbol\delta_2\,\mathbf{z}^{\mathsf T},\qquad \Delta\mathbf{b}_2=s\eta\,\boldsymbol\delta_2,\qquad \boldsymbol\delta_2=(1-\mathbf{m}_2^2)\odot\mathbf{V}^{\mathsf T}\mathbf{e}_2 .\end{gathered}\]</div>
+<p>Rates: \(\eta=0.02\), as in wake–sleep, and \(s=0.05\) for the recognizers, a value inherited from the first toy and not tuned. Nothing in \(\mathcal L_1+\mathcal L_2\) refers to the distribution of the top causes the model generates from (uniform ±1); section 8 shows that this is where it fails.</p>
+<p><strong>Variants</strong> (section 8), each a change to the baseline:</p>
+<ul class="findings">
+<li><em>Recognizer rate ×20:</em> \(s=1\). The variants below keep \(s=1\).</li>
+<li><em>Binary top code:</em> \(\mathcal L_2\) is replaced by its expectation under a factorised binary top code with means \(\mathbf{m}_2\), \(\mathbb E_{q(\mathbf{g}\mid\mathbf{z})}[-\log p(\mathbf{z}\mid\mathbf{g})]\), summed exactly over the 16 top configurations: the top-layer counterpart of \(\mathcal L_1\).</li>
+<li><em>Weight decay:</em> after every step \(\mathbf{W},\mathbf{R},\mathbf{V},\mathbf{R}_2\) are multiplied by \(1-\eta\lambda\), \(\lambda={{aeWd}}\).</li>
+<li><em>Variational autoencoder:</em> gradient ascent on the evidence lower bound, with both expectations summed exactly (64 configurations of \(\mathbf{z}\), 16 of \(\mathbf{g}\)) and gradients backpropagated into both recognizers; the top layer's parameters are updated on the sampled code \(\mathbf{z}\):</li>
+</ul>
+<div class="eq">\[\begin{gathered}\mathrm{ELBO}(\mathbf{x})=\mathbb E_{q(\mathbf{z}\mid\mathbf{x})}\big[\log p(\mathbf{x}\mid\mathbf{z})+\ell(\mathbf{z})\big]+H\big[q(\mathbf{z}\mid\mathbf{x})\big],\\ \ell(\mathbf{z})=\mathbb E_{q(\mathbf{g}\mid\mathbf{z})}\big[\log p(\mathbf{z}\mid\mathbf{g})+\log p(\mathbf{g})\big]+H\big[q(\mathbf{g}\mid\mathbf{z})\big].\end{gathered}\]</div>
+<p>Beyond reconstruction, this has the log-probability of each code under the layer above and the entropy of each code: the terms that make the codes look like samples from the prior the model generates from.</p>
 </section>
 
 <section id="rotation">
 <h2>2. Two causes: why practice turns the axes</h2>
-<p>With two causes, misalignment is a single angle. The world's samples (grey) sit in four clusters at \((\pm1,\pm1)\), so the world's axes are the horizontal and the vertical. Both learners below start from the same generator, turned by the same angle, with the same {{N}} stored samples. The left one practises: a wake batch and a sleep batch per update. The right one has its recognition frozen: it gets a second wake batch instead of sleep. Press Play.</p>
+<p>With two causes, misalignment is a single angle. The world's samples (grey) sit in four clusters at \((\pm1,\pm1)\), so the world's axes are the horizontal and the vertical. All three learners below start from the same generator, turned by the same angle, with the same {{N}} stored samples, and get two batches of 32 per update. The left one practises: a wake batch and a sleep batch. The middle one has its recognition frozen: it gets a second wake batch instead of sleep. The right one is the autoencoder baseline of section 1 (one layer here): two batches of stored samples, trained by reconstruction error, never dreaming. Press Play.</p>
 <figure class="widget" id="simBlock">
 <div class="controls">
 <button id="simPlay" type="button">Play</button><button id="simReset" type="button">Reset</button><button id="simNew" type="button">New samples</button>
 <label>Start angle <input id="simTheta" type="range" min="5" max="44" step="1" value="30"><output id="simThetaOut">30°</output></label>
 <label>Noise σ <input id="simSigma" type="range" min="0.3" max="0.8" step="0.05" value="0.5"><output id="simSigmaOut">0.50</output></label>
+<label>Autoencoder's recognizer rate <select id="simAeRate"><option value="0.05" selected>×0.05 (baseline)</option><option value="1">×1</option></select></label>
 <label>Speed <select id="simSpeed"><option value="1">1×</option><option value="4" selected>4×</option><option value="12">12×</option></select></label>
 </div>
 <div class="planes">
 <div class="plane-box"><h3>Wake–sleep</h3><svg id="planeB" viewBox="0 0 300 300" role="img" aria-label="The practising learner: world samples in four grey clusters, the learner's dreams, and its generator and recognizer axes."></svg><div class="small" id="readB"></div></div>
 <div class="plane-box"><h3>Recognition frozen</h3><svg id="planeF" viewBox="0 0 300 300" role="img" aria-label="The learner with frozen recognition: world samples, its dreams, and its generator and recognizer axes."></svg><div class="small" id="readF"></div></div>
+<div class="plane-box"><h3>Autoencoder</h3><svg id="planeA" viewBox="0 0 300 300" role="img" aria-label="The autoencoder baseline: world samples, samples from its generator, and its generator and recognizer axes."></svg><div class="small" id="readA"></div></div>
 </div>
 <div class="legend" id="planeLegend"></div>
 <div class="charts" style="margin-top:14px">
-<div class="chart-box"><h3>Angle of the axes from the world's</h3><svg id="simAngle" viewBox="0 0 560 330" role="img" aria-label="Angle of the generator and recognizer axes over practice updates, with sleep and with recognition frozen."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Angle of the axes from the world's</h3><svg id="simAngle" viewBox="0 0 560 330" role="img" aria-label="Angle of the generator and recognizer axes over updates, with sleep, with recognition frozen, and for the autoencoder."></svg><div class="tooltip"></div></div>
 <div class="chart-box"><h3>Misfit against the angle, nats per sample ↓</h3><svg id="simLand" viewBox="0 0 560 330" role="img" aria-label="Loss in nats per sample against the generator's angle: a valley at zero degrees."></svg><div class="tooltip"></div></div>
 </div>
 <div class="legend" id="simLegend"></div>
 </figure>
-<p class="small">This runs the learners live in your browser, with the Hebbian rules above and the rates of the six-cause runs. Angles are folded to ±45°, because a turn by 90° or a sign flip only relabels the causes. Left chart: solid lines are generators, dashed lines recognizers. Right chart: the average negative log-likelihood of a world sample under a generator turned by that angle, relative to the aligned one; the dots are the two learners.</p>
+<p class="small">This runs the learners live in your browser, with the rules of section 1 and the rates of the six-cause runs. Angles are folded to ±45°, because a turn by 90° or a sign flip only relabels the causes. Left chart: solid lines are generators, dashed lines recognizers. Right chart: the average negative log-likelihood of a world sample under a generator turned by that angle, relative to the aligned one; the dots are the two learners.</p>
 
 <h3>Why the axes turn</h3>
 <p>Write \(\mathbf{u}=\mathbf{W}^{\mathsf T}\mathbf{x}\) for what the generator's axes see in a sample, and \(\varphi(u)=\mathbb E[z\mid u]\) for the posterior mean of a cause. Put the exact posterior into the wake update and keep only the part that rotates \(\mathbf{W}\). The rotation speed is then</p>
@@ -202,6 +229,7 @@ figure.widget{margin:16px 0}
 <p>The bracket is non-zero and pulls \(\theta\) to the nearest multiple of 90°. This is the rotation step of independent component analysis, with the nonlinearity supplied by the learner's own prior: ICA has to choose that nonlinearity by hand, here sleep makes the recognizer compute it for the current generator. With Gaussian causes the posterior mean is linear, \(\varphi(u)\propto u\), and the bracket vanishes at every angle, which is the two-cause face of the symmetry in the box above.</p>
 <p>The right-hand chart shows the same as a landscape. With an exact recognizer, the wake update follows the gradient of the log-likelihood (Fisher's identity), and the landscape has valleys at the world's axes: a generator turned by 15° pays {{land15}} nats per sample, by 30° {{land30}}, by 45° {{land45}}.</p>
 <p><strong>Why sleep is needed.</strong> Wake measures the slope through the recognizer. If the recognizer is frozen, the slope is measured in the recognizer's old coordinates, and the generator stops partway: started at 30°, it ends at {{frozen}} ({{frozenRange}} over 16 runs). With sleep, the recognizer trails the generator by about {{lag250}} at update 250, and the axes are at {{b500}} after 500 updates and {{b1000}} after 1,000.</p>
+<p><strong>The autoencoder turns its axes too.</strong> Its binary code breaks the symmetry in the same way: the four points \(\mathbf{W}\mathbf{z}+\mathbf{c}\) it can reach have to sit on the four clusters. With the baseline's slow recognizer it gets from 30° to {{ae500}} in 500 updates, {{ae1000}} in 1,000 and {{ae3000}} in 3,000 ({{aeRange}} over 16 runs). With its recognizer as fast as its generator (rate ×1 above) it is as quick as wake–sleep: {{aeF500}} after 500 updates, {{aeF3000}} after 3,000. In the plane, where the prior is fixed and uniform, reconstruction is enough; section 8 shows what goes wrong with six causes and a learned prior.</p>
 </section>
 
 <section id="align">
@@ -251,10 +279,27 @@ figure.widget{margin:16px 0}
 <p>which, for a fixed recognizer, is exactly the prior that maximises the likelihood bound \(\sum_n\mathbb E_{q(\mathbf{z}\mid\mathbf{x}_n)}[\log p(\mathbf{x}_n,\mathbf{z})]\). It gets the world's correlations right only once the bottom units are the world's causes, which is why the right-hand chart falls together with the angle in section 3. Section 7 comes back to this: dreams from \(\bar q\) are, in effect, replays of the codes given to the data.</p>
 <h3>The price: labels become arbitrary</h3>
 <p>A learned prior fits whatever unit order the bottom layer chose, so the learner's unit 3 need not be the world's cause 3. In earlier runs of the same model ({{priorWorlds}} worlds, {{N}} samples), the learner reads the world's causes in the world's own labels (up to a global sign flip) with {{priorTopSym}} bit accuracy with a learned top layer, against {{priorFixedSym}} with the true prior given; 50% is chance. For an own-versus-foreign question, label identity matters, so a learned prior trades it for a better generator.</p>
+<h3>Is the top layer learned later than the bottom one? <span class="new">new</span></h3>
+<p>The specification expects deeper layers to be learned with practice, and emergently later than shallow ones. To time the two layers, the learner practised on fresh samples ({{dWorldsD}} worlds, {{dSteps}} updates, one wake and one sleep batch each), from the report's start and from a random start in both layers, while the bottom layer's axes and the top layer's weights were each compared with the world's. A third run fixes the bottom layer at the world's (generator \(\mathbf{A}\), recognizer the world's best readout), so only the top layer learns: that is how fast the top layer can learn on its own.</p>
+<figure class="widget" id="depthBlock">
+<div class="charts">
+<div class="chart-box"><h3>From the report's start</h3><svg id="depthRot" viewBox="0 0 560 330" role="img" aria-label="Angle from the world over updates for the bottom layer, the top layer, and the top layer with the bottom fixed at the world's, from the report's start."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>From a random start in both layers</h3><svg id="depthRand" viewBox="0 0 560 330" role="img" aria-label="Angle from the world over updates for the bottom layer, the top layer, and the top layer with the bottom fixed at the world's, from a random start."></svg><div class="tooltip"></div></div>
+</div>
+<div class="legend" id="depthLegend"></div>
+</figure>
+<p class="small">Mean ± 1 standard error over {{dWorldsD}} worlds; updates on a log scale. Bottom: angle between the generator's columns and the world's. Top: angle between the top weights \(\mathbf{V}\), put into world order through the bottom layer's current matching, and the world's top loadings, best two of four columns. The grey dashed line is the same in both charts.</p>
+<ul class="findings">
+<li><strong>The top layer is held back by the bottom one.</strong> On its own, with the world's bottom layer, it covers 90% of its improvement in {{oracle90}} updates. Inside the learner it needs about {{dR_slow}} times as long from the report's start ({{dR_slowN}} of {{dWorldsD}} worlds slower) and {{dX_slow}} times as long from a random start ({{dX_slowN}} of {{dWorldsD}}), and it ends further from the world ({{dR_top}} and {{dX_top}}, against {{oracleTop}}).</li>
+<li><strong>But it is not learned after the bottom one.</strong> It starts at once, learning whatever correlations the current codes have, and keeps pace: 90% of its improvement by update {{dR_top90}} against {{dR_bot90}} for the bottom layer from the report's start, {{dX_top90}} against {{dX_bot90}} from a random start. It finishes later than the bottom layer in only {{dR_later}} and {{dX_later}} of {{dWorldsD}} worlds.</li>
+<li><strong>From a random start, it partly unlearns.</strong> The top layer first fits the early codes ({{dX_top200}} by update 200), loses some of that while the bottom layer turns ({{dX_top1k}} at update 1,000) and improves again once the bottom layer has settled.</li>
+<li><strong>Without dreams it is not learned at all.</strong> The top recognizer learns only in sleep, so without dreams it stays blank and the top weights stay at their small random start (size {{f_ws100_v}} after 2<sup>21</sup> examples, section 8): no prior is learned. Deeper layers do need recognition to be updated.</li>
+</ul>
+<p>So depth sets a pace here, not an order. In the deeper tree model (practice_rhm.tex) the layers fell into place one after another from the bottom; the two layers here learn at the same time.</p>
 </section>
 
 <section id="budget">
-<h2>5. How much to dream: a fixed budget of examples <span class="new">new</span></h2>
+<h2>5. How much to dream: a fixed budget of examples</h2>
 <p>Sections 3 and 4 reuse {{N}} stored samples and dream as often as they read. Here the learner gets a fixed number \(P\) of examples in all. A share \(x\) of them are <em>supplied</em>: fresh world samples, each used once, which train generation by wake. The rest are its own <em>dreams</em>, each used once, which train recognition by sleep. Supplied and dreamed batches are interleaved so that every prefix of training has the same share, so one run gives the whole learning curve. The baselines get the same budgets; for them too, dreams train recognition by sleep, so \(x=100\%\) means no generation at all. {{bWorlds}} worlds; every learner starts from the rotated generator of section 1 at {{bStart}} nats.</p>
 <figure class="widget" id="budgetBlock">
 <div class="two" style="margin-top:0">
@@ -269,7 +314,7 @@ figure.widget{margin:16px 0}
 <ul class="findings">
 <li><strong>Some dreaming is necessary.</strong> With every example supplied, the recognizer is never trained, and wake–sleep stalls at {{stall}} nats from 2<sup>13</sup> examples on. At large budgets a little dreaming goes a long way: with 1% dreamed it reaches {{b21_ws99}} after {{bMax}}, with 5% {{b21_ws95}}.</li>
 <li><strong>About 30% dreamed is best.</strong> From 2<sup>13</sup> examples on, the lowest error in each row is at {{bestWS}} supplied; after {{bMax}}, every share from 50% to 90% is within {{spread21}} nats of the best. Up to 2<sup>12</sup> examples the best share is {{bestWSsmall}}: with few examples, all of them are needed to fit the generator at all.</li>
-<li><strong>Wake–sleep beats the autoencoder.</strong> They tie at 2<sup>13</sup> examples ({{b13_ws70}} vs {{b13_ae100}} nats, wake–sleep lower in {{b13_winsAE}} of {{bWorlds}} worlds). From {{beatFrom}} on, wake–sleep is lower in at least 11 of {{bWorlds}} worlds, e.g. {{b16_ws70}} vs {{b16_ae100}} at 2<sup>16</sup> and {{b21_ws70}} vs {{b21_ae100}} at {{bMax}}. The autoencoder plateaus at {{aeFloor}} nats. Letting it dream too, with sleep on its recognizers, helps it ({{aeSleepBest}} at {{aeSleepBestX}} supplied) but it stays behind.</li>
+<li><strong>Wake–sleep beats the autoencoder baseline.</strong> They tie at 2<sup>13</sup> examples ({{b13_ws70}} vs {{b13_ae100}} nats, wake–sleep lower in {{b13_winsAE}} of {{bWorlds}} worlds). From {{beatFrom}} on, wake–sleep is lower in at least 11 of {{bWorlds}} worlds, e.g. {{b16_ws70}} vs {{b16_ae100}} at 2<sup>16</sup> and {{b21_ws70}} vs {{b21_ae100}} at {{bMax}}. The autoencoder plateaus at {{aeFloor}} nats. Letting it dream too, with sleep on its recognizers, helps it ({{aeSleepBest}} at {{aeSleepBestX}} supplied) but it stays behind. Section 8 shows why it plateaus, and that a variational autoencoder does not.</li>
 <li><strong>A learner with exact posteriors needs no dreams.</strong> The exact-posterior reference does best with (nearly) all examples supplied at every budget. It is {{b16_ratioTeach}} times better than wake–sleep at 2<sup>16</sup>, and both end at 0.13–0.15 nats. Dreams are necessary in wake–sleep because sleep is recognition's only teacher; a learner that can compute exact posteriors from data does not need them. That route sums over every latent configuration for every example, which is an exhaustive search over explanations and does not scale.</li>
 </ul>
 <div class="table-wrap"><table>
@@ -285,7 +330,7 @@ figure.widget{margin:16px 0}
 </section>
 
 <section id="scarce">
-<h2>6. When supplied examples are scarce <span class="new">new</span></h2>
+<h2>6. When supplied examples are scarce</h2>
 <p>With fresh examples, the larger budgets above show the learner over a million distinct samples, so dreaming might win only once the data have used up the distribution. Here the supplied examples are a fixed set of \(N\) world samples, reused, while dreams stay unlimited; the total is again {{capTotal}} examples, and the sets are nested across \(N\) ({{Ns}}).</p>
 <figure class="widget" id="scarceBlock">
 <div class="charts">
@@ -311,7 +356,7 @@ figure.widget{margin:16px 0}
 </section>
 
 <section id="dreams">
-<h2>7. What the dreams are for <span class="new">new</span></h2>
+<h2>7. What the dreams are for</h2>
 <p>One reading of section 5 is that dreams explore: they visit latent configurations the supplied examples never showed. A control changes only where the bottom layer's dreams take their latents from, at 70% supplied with fresh examples. Plain wake–sleep dreams them from its learned prior. <em>Replay</em> takes the codes recognition gave to the last 1,024 supplied examples, so it never goes beyond the current explanations of the data. <em>Uniform</em> draws independent, uniform latents: maximal exploration, ignoring the prior. The top layer sleeps on its own dreams throughout.</p>
 <figure class="widget" id="dreamBlock">
 <div class="chart-box"><h3>Learning curves at 70% supplied, KL in nats ↓</h3><svg id="dreamChart" viewBox="0 0 560 330" role="img" aria-label="KL against the number of examples for dreams from the learned prior, replayed codes, and uniform latents."></svg><div class="tooltip"></div></div>
@@ -326,8 +371,58 @@ figure.widget{margin:16px 0}
 <p>Sleep trains the recognizer on dreams whose causes are known exactly, and what matters is that those causes follow the distribution the generator is being fitted to. With a learned top layer, that distribution is the aggregate posterior, the codes recognition assigns to the data (section 4), so replaying those codes is the same thing with less sampling noise. With a fixed prior, replay only re-teaches the recognizer its own current readings, mistakes included, and dreams from the prior are what pulls them back. Uniform latents teach the recognizer the posterior of the wrong prior.</p>
 </section>
 
+<section id="aefloor">
+<h2>8. Why the autoencoder plateaus, and what closes the gap <span class="new">new</span></h2>
+<p>In section 5 the autoencoder stops improving at about 1 nat while wake–sleep goes on to below 0.2. To find out why, the baseline and its variants (section 1) were run on {{fWorlds}} worlds with 2<sup>21</sup> fresh examples, from the same start, next to wake–sleep with 30% dreamed and without dreams. It is a separate run with its own random draws (the baseline ends at {{f_ae}} here, at {{b21_ae100}} in section 5). At every power of two the generator was also scored with its decoder kept and its prior replaced by the best prior for that decoder, fitted by maximum likelihood over the 64 latent configurations: what remains is the decoder's error.</p>
+<figure class="widget" id="floorBlock">
+<div class="chart-box"><h3>KL(world ‖ model) in nats ↓, fresh examples</h3><svg id="floorKL" viewBox="0 0 560 330" role="img" aria-label="KL against the number of examples for wake-sleep, the autoencoder baseline and its variants, and the variational autoencoder."></svg><div class="tooltip"></div></div>
+<div class="charts" style="margin-top:14px">
+<div class="chart-box"><h3>Generator's axes against the world's ↓</h3><svg id="floorGen" viewBox="0 0 560 330" role="img" aria-label="Angle between the generator's axes and the world's against the number of examples, for the same learners."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Size of the top weights ‖V‖</h3><svg id="floorV" viewBox="0 0 560 330" role="img" aria-label="Norm of the top-layer generative weights against the number of examples, for the same learners."></svg><div class="tooltip"></div></div>
+</div>
+<div class="legend" id="floorLegend"></div>
+</figure>
+<p class="small">Mean ± 1 standard error over {{fWorlds}} worlds.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>After 2<sup>21</sup> examples</th><th class="num">KL, nats</th><th class="num">decoder only</th><th class="num">axes</th><th class="num">‖V‖</th><th class="num">wake–sleep lower</th></tr></thead>
+<tbody>
+<tr><td>Wake–sleep, 30% dreamed</td><td class="num">{{f_ws}}</td><td class="num">{{f_ws_refit}}</td><td class="num">{{f_ws_gen}}</td><td class="num">{{f_ws_v}}</td><td class="num">–</td></tr>
+<tr><td>Wake–sleep, no dreams</td><td class="num">{{f_ws100}}</td><td class="num">{{f_ws100_refit}}</td><td class="num">{{f_ws100_gen}}</td><td class="num">{{f_ws100_v}}</td><td class="num">{{f_ws100_wsWins}}/{{fWorlds}}</td></tr>
+<tr><td>Autoencoder baseline</td><td class="num">{{f_ae}}</td><td class="num">{{f_ae_refit}}</td><td class="num">{{f_ae_gen}}</td><td class="num">{{f_ae_v}}</td><td class="num">{{f_ae_wsWins}}/{{fWorlds}}</td></tr>
+<tr><td>Autoencoder, recognizer rate ×20</td><td class="num">{{f_aeF}}</td><td class="num">{{f_aeF_refit}}</td><td class="num">{{f_aeF_gen}}</td><td class="num">{{f_aeF_v}}</td><td class="num">{{f_aeF_wsWins}}/{{fWorlds}}</td></tr>
+<tr><td>… + binary top code</td><td class="num">{{f_aeB}}</td><td class="num">{{f_aeB_refit}}</td><td class="num">{{f_aeB_gen}}</td><td class="num">{{f_aeB_v}}</td><td class="num">{{f_aeB_wsWins}}/{{fWorlds}}</td></tr>
+<tr><td>… + weight decay</td><td class="num">{{f_aeW}}</td><td class="num">{{f_aeW_refit}}</td><td class="num">{{f_aeW_gen}}</td><td class="num">{{f_aeW_v}}</td><td class="num">{{f_aeW_wsWins}}/{{fWorlds}}</td></tr>
+<tr><td>Variational autoencoder</td><td class="num">{{f_vae}}</td><td class="num">{{f_vae_refit}}</td><td class="num">{{f_vae_gen}}</td><td class="num">{{f_vae_v}}</td><td class="num">{{f_vae_wsWins}}/{{fWorlds}}</td></tr>
+</tbody></table></div>
+<p class="small">Decoder only: KL with the learner's decoder and the maximum-likelihood prior for it. Axes: mean angle between the generator's columns and the world's. Last column: worlds in which wake–sleep with 30% dreamed ends lower.</p>
+<ul class="findings">
+<li><strong>The decoder is not the problem.</strong> With its prior refitted, the baseline's decoder is at {{f_ae_refit}} nats (wake–sleep's {{f_ws_refit}}), and it keeps improving with data, from {{f_ae_refit12}} at 2<sup>12</sup> examples. Its axes keep turning as well, to {{f_ae_gen}}, or {{f_aeF_gen}} with the faster recognizer.</li>
+<li><strong>The prior is.</strong> The top layer reconstructs each code from a continuous top code (mean size {{f_ae_sat}}, where ±1 would be 1), and the more sharply it reconstructs, the larger its weights: ‖V‖ grows from {{f_ae_v12}} at 2<sup>12</sup> examples to {{f_ae_v15}} at 2<sup>15</sup> and {{f_ae_v}} at 2<sup>21</sup>, and is still growing (wake–sleep: {{f_ws_v}}). When the model generates, its top causes are ±1 and uniform, and these weights turn them into nearly deterministic, wrongly weighted combinations of causes. The two trends cancel: the decoder gets better, the prior worse, and the total stays flat. With the faster recognizer it even rises again, from {{f_aeF_kl15}} at 2<sup>15</sup> to {{f_aeF}}.</li>
+<li><strong>It is the objective, not a lack of data.</strong> On its own top-layer loss \(\mathcal L_2\), the autoencoder scores {{f_ae_loss}} nats per code at its solution and {{f_ws_loss}} at wake–sleep's parameters: its objective prefers the worse generative model, and more examples only locate that preference more precisely.</li>
+<li><strong>Generic fixes help partway.</strong> A binary top code, whose loss penalises top codes away from ±1, and weight decay, which caps the growth of the weights, bring it to {{f_aeB}} and {{f_aeW}} nats. Wake–sleep is still lower in {{f_aeB_wsWins}} and {{f_aeW_wsWins}} of {{fWorlds}} worlds.</li>
+<li><strong>The variational autoencoder closes the gap.</strong> With the two terms of the lower bound that tie the codes to the prior, it ends at {{f_vae}} nats against wake–sleep's {{f_ws}} (wake–sleep lower in {{f_vae_wsWins}} of {{fWorlds}} worlds). With 128 distinct examples, reused: {{n_vae}} against {{n_ws}} (the VAE lower in {{n_vaeWins}} of {{fWorlds}}), while the baseline autoencoder ends at {{n_ae}} and wake–sleep without dreams at {{n_ws100}}.</li>
+</ul>
+<p>What the dreams give wake–sleep, the VAE gets from its objective: the lower bound asks that the codes given to data look like samples from the prior, and sleep trains the recognizer on samples from the prior. The VAE does it without generating anything, but it computes the probability of every code under the layer above and the entropy of every code, summing over all 64 × 16 configurations, and it learns by backpropagation. Wake–sleep needs no density and no sum over configurations, and every update is local. In this toy that is what the dreams buy, not sample efficiency.</p>
+</section>
+
+<section id="factorial">
+<h2>9. Without correlated causes <span class="new">new</span></h2>
+<p>In the world above, two top causes make the six causes correlated. Here the six causes are independent and uniform; rendering, noise, start and learners are the same, and the learner keeps its top layer of four units without being told that there is nothing for it to learn. {{fWorlds}} worlds, 2<sup>21</sup> fresh examples.</p>
+<figure class="widget" id="factBlock">
+<div class="chart-box"><h3>Independent causes: KL(world ‖ model) in nats ↓</h3><svg id="factKL" viewBox="0 0 560 330" role="img" aria-label="KL against the number of examples in a world of independent causes, for wake-sleep with and without dreams, the autoencoder baseline, the faster autoencoder and the variational autoencoder."></svg><div class="tooltip"></div></div>
+<div class="legend" id="factLegend"></div>
+</figure>
+<p class="small">Mean ± 1 standard error over {{fWorlds}} worlds.</p>
+<ul class="findings">
+<li><strong>The results do not depend on the correlations.</strong> Wake–sleep with 30% dreamed ends at {{x_ws}} nats. Without dreams it stays at {{x_ws100}} (with dreams lower in {{x_wsWinsNoGen}} of {{fWorlds}} worlds). The autoencoder baseline ends at {{x_ae}} (wake–sleep lower in {{x_wsWinsAE}} of {{fWorlds}}), and the VAE at {{x_vae}} (lower than wake–sleep in {{x_vaeWins}} of {{fWorlds}}).</li>
+<li><strong>The axes turn further:</strong> to {{x_ws_gen}} for wake–sleep, against {{f_ws_gen}} in the correlated world. Correlated causes make the turn harder; they are not what makes it possible.</li>
+<li><strong>The autoencoder fails here only at its prior.</strong> Its decoder aligns completely ({{x_ae_gen}}; {{x_ae_refit}} nats with the prior refitted), yet its top weights grow to {{x_ae_v}} where there are no correlations to learn (wake–sleep: {{x_ws_v}}), and it ends worse than it started.</li>
+<li><strong>Wake–sleep and the VAE first sit on a plateau.</strong> They stay near the starting error ({{x_kl0}} nats; wake–sleep {{x_plateau}} at 2<sup>14</sup> examples) and then drop within about two doublings of the examples.</li>
+</ul>
+</section>
+
 <section id="spec">
-<h2>8. Against the specification</h2>
+<h2>10. Against the specification</h2>
 <p>The requirements of the project's specification (tex/README.md), in its order. Numbers are from the sections above.</p>
 <h3>Desirable properties</h3>
 <div class="table-wrap"><table class="spec">
@@ -336,13 +431,13 @@ figure.widget{margin:16px 0}
 <tr><td>Hebb-like or three-factor learning rule; locality</td><td><span class="pill yes">✓ yes</span></td><td>Every update is the delta rule, a Hebbian term minus an anti-Hebbian one on the network's own prediction, in both layers and both phases. No backpropagation, no weight transport.</td></tr>
 <tr><td>Generation improves offline, without external feedback, through a repeated generation–recognition loop</td><td><span class="pill yes">✓ yes</span></td><td>Only unlabelled samples. The axes turn because reading (wake) and dreaming (sleep) alternate (sections 2–3).</td></tr>
 <tr><td>Without generation, worse than the same learner with it, and than as many fresh samples instead</td><td><span class="pill yes">✓ yes</span></td><td>At 2<sup>16</sup> examples: 70% supplied and 30% dreamed {{b16_ws70}} nats; all 2<sup>16</sup> supplied {{b16_ws100}} ({{b16_winsNoGen}}/{{bWorlds}} worlds). Also with 128 reused examples ({{n128_ws70}} vs {{n128_ws100}}).</td></tr>
-<tr><td>Outperform the autoencoding baseline (both parts trained end to end on supplied examples, no generated samples)</td><td><span class="pill yes">✓ yes</span></td><td>From {{beatFrom}} examples on: {{b16_ws70}} vs {{b16_ae100}} at 2<sup>16</sup>, {{b21_ws70}} vs {{b21_ae100}} at {{bMax}}; tie at 2<sup>13</sup> and below. The autoencoder's recognition rate was not tuned.</td></tr>
+<tr><td>Outperform the autoencoding baseline (both parts trained end to end on supplied examples, no generated samples)</td><td><span class="pill part">◐ partly</span></td><td>The plain autoencoder of section 1, and each variant, yes: from {{beatFrom}} examples on, {{b21_ws70}} vs {{b21_ae100}} at {{bMax}}; tie at 2<sup>13</sup> and below. A variational autoencoder, the same network trained on reconstruction plus the prior terms of the lower bound, ties it without dreams ({{f_vae}} vs {{f_ws}}, section 8).</td></tr>
 <tr><td>Recognition infers latent causes, not just whether samples resemble the data</td><td><span class="pill yes">✓ yes</span></td><td>The recognizer infers the causes \(\mathbf{z}\), and one layer up the top causes \(\mathbf{g}\).</td></tr>
 <tr><td>Depth, if needed</td><td><span class="pill part">◐ partly</span></td><td>Two layers by the same rule; the second is needed to learn the prior (section 4).</td></tr>
 <tr><td>Normative grounding: provably improving a likelihood or test risk from finite examples</td><td><span class="pill part">◐ partly</span></td><td>With an exact recognizer, wake is gradient ascent on the stored samples' log-likelihood (Fisher's identity); with the learned recognizer it carries a bias that sleep keeps small. No guarantee per update.</td></tr>
 <tr><td>Interpretable in terms of weights, their singular vectors, the formation of latents</td><td><span class="pill yes">✓ yes</span></td><td>The rotation angle of the axes, the recognizer's lag, the top layer's correlations.</td></tr>
 <tr><td>Analytically tractable</td><td><span class="pill part">◐ partly</span></td><td>Exact for two causes (the rotation speed in section 2); six causes are simulated.</td></tr>
-<tr><td>The benefit is not explained by better reconstruction of the data itself</td><td><span class="pill yes">✓ yes</span></td><td>The start already matches every mean and covariance, and the autoencoder, which minimises reconstruction error, plateaus at {{aeFloor}} nats.</td></tr>
+<tr><td>The benefit is not explained by better reconstruction of the data itself</td><td><span class="pill part">◐ partly</span></td><td>Reconstruction alone does not explain it: the start already matches every mean and covariance, and the autoencoder plateaus at {{aeFloor}} nats. Reconstruction plus the prior terms does: the VAE gets as far from supplied data alone, at the price of a density, a sum over all latent configurations and backpropagation (section 8).</td></tr>
 <tr><td>Maps onto in-context learning (attending to good own samples)</td><td><span class="pill part">◐ partly</span></td><td>For one layer, attention over the learner's own recent dreams can stand in for the recognizer (see the <a href="{{filesDir}}/practice_disentangle.tex">write-up</a>). Not built for two layers.</td></tr>
 <tr><td>Recognition and generation attach to the same space</td><td><span class="pill yes">✓ yes</span></td><td>Both live in \(\mathbf{x}\)-space.</td></tr>
 <tr><td>Two ways wake-only might fail: too few examples, or not making sense of them</td><td><span class="pill yes">✓ both</span></td><td>Not making sense: with recognition frozen, the axes stop partway (section 2) and more data do not help (section 5). Too few: with 32 supplied examples every learner memorises them (section 6).</td></tr>
@@ -352,32 +447,35 @@ figure.widget{margin:16px 0}
 <thead><tr><th>Intuition</th><th>Status</th><th>In this toy</th></tr></thead>
 <tbody>
 <tr><td>Latent representations improve with generation, and become clean</td><td><span class="pill yes">✓ yes</span></td><td>The world's causes are read right {{two_layer_acc0}} → {{two_layer_acc}} of the time; how cleanly each unit stands for one cause is the angle ({{two_layer_gen}} at the end).</td></tr>
-<tr><td>Deeper layers get learned with practice, which needs recognition to be updated</td><td><span class="pill yes">✓ yes</span></td><td>The top recognizer learns only in sleep; the top generator learns only from the codes the bottom recognizer assigns.</td></tr>
+<tr><td>Deeper layers get learned with practice, which needs recognition to be updated</td><td><span class="pill yes">✓ yes</span></td><td>The top recognizer learns only in sleep; without dreams it stays blank and the top weights stay at their start (size {{f_ws100_v}}), so no prior is learned (section 4).</td></tr>
+<tr><td>Deeper layers are learned emergently later than shallow ones</td><td><span class="pill no">✗ no</span></td><td>The top layer is held back by the bottom one, about {{dR_slow}} times slower than on its own, but not later: 90% of its improvement by update {{dR_top90}}, against {{dR_bot90}} for the bottom layer (section 4).</td></tr>
 <tr><td>Improving recognition is not crucial, though desirable</td><td><span class="pill no">✗ no</span></td><td>Here it is crucial: frozen recognition stops the turn at {{frozen}}, and without dreams wake–sleep stalls at {{stall}} nats.</td></tr>
 <tr><td>Recognition stays ahead of generation, emergently</td><td><span class="pill no">✗ no</span></td><td>Recognition trails generation by a few degrees in every layer (section 3).</td></tr>
 <tr><td>More supervision can make the model worse</td><td><span class="pill part">◐ at a fixed budget</span></td><td>Raising the supplied share above about 70% makes it worse (at 2<sup>16</sup>: {{b16_ws70}} at 70%, {{b16_ws100}} at 100%). More distinct supplied examples never hurt (section 6).</td></tr>
 <tr><td>Diminishing returns from foreign samples: 50 supplied + 50 generated beat 100 supplied</td><td><span class="pill yes">✓ yes</span></td><td>At 2<sup>16</sup> examples: {{b16_ws50}} at 50% supplied vs {{b16_ws100}} at 100% ({{b16_winsHalf}}/{{bWorlds}} worlds); at 2<sup>13</sup>: {{b13_ws50}} vs {{b13_ws100}} ({{b13_winsHalf}}/{{bWorlds}}).</td></tr>
 <tr><td>Own (intuitive) samples teach better, foreign ones are repelled</td><td><span class="pill part">◐ partly</span></td><td>Own dreams are read better than foreign samples at the start ({{own0}} vs {{two_layer_acc0}}), and practice closes the gap. No lasting own advantage once aligned.</td></tr>
-<tr><td>A computational, not an informational, benefit of offline replay</td><td><span class="pill yes">✓ yes</span></td><td>The exact-posterior reference gets as far without any dreams: the information is in the data, dreams are how a learner without exact inference gets at it.</td></tr>
+<tr><td>A computational, not an informational, benefit of offline replay</td><td><span class="pill yes">✓ yes</span></td><td>The exact-posterior reference and the VAE get as far without any dreams: the information is in the data, and dreams are how a learner that has no density and sums over no configurations gets at it.</td></tr>
 <tr><td>A misaligned encoder–decoder rectifies itself through its own samples, then makes sense of foreign ones</td><td><span class="pill yes">✓ yes</span></td><td>This is the toy.</td></tr>
 </tbody></table></div>
 </section>
 
 <section id="meaning">
-<h2>9. What this shows, and what it doesn't</h2>
+<h2>11. What this shows, and what it doesn't</h2>
 <div class="columns">
 <div class="panel"><h3>Shows</h3><ul>
 <li>A rotation of the latent space that no second-order statistic can see is undone by wake–sleep practice, because binary causes make the likelihood depend on orientation. Gaussian causes of any covariance do not.</li>
 <li>Local Hebbian updates suffice: wake turns generation, sleep keeps recognition matched to it, in every layer. A top layer trained by the same rule learns the prior and beats a learner handed the true one.</li>
-<li>At a fixed number of examples, spending about 30% on dreams beats spending none, and beats the autoencoding baseline, from {{beatFrom}} examples and from about {{crossRange}} distinct supplied examples on, for 16 to 256 latent configurations.</li>
+<li>At a fixed number of examples, spending about 30% on dreams beats spending none, and beats the autoencoding baseline, from {{beatFrom}} examples and from about {{crossRange}} distinct supplied examples on, for 16 to 256 latent configurations. The autoencoder fails at its prior, not at its axes.</li>
+<li>None of this needs correlated causes.</li>
 <li>Dreams act as exactly labelled training examples for recognition, drawn from the right latent distribution, not as exploration.</li>
 </ul></div>
 <div class="panel"><h3>Does not show</h3><ul>
-<li>That dreaming is necessary for every learner: one that computes exact posteriors needs none, and is {{b16_ratioTeach}} times better at 2<sup>16</sup> examples. It sums over all latent configurations, which does not scale.</li>
+<li>That dreaming is necessary for every learner: one that computes exact posteriors needs none, and is {{b16_ratioTeach}} times better at 2<sup>16</sup> examples; a variational autoencoder needs none either and ties wake–sleep. Both sum over all latent configurations, which does not scale; whether wake–sleep pulls ahead where they cannot is untested.</li>
+<li>A deep layer learned later than a shallow one: here the two keep pace.</li>
 <li>Perfect alignment: with {{N}} stored samples the axes stop at {{two_layer_gen}} on average.</li>
 <li>Correct labels: with a learned prior, which unit is which cause is arbitrary.</li>
 <li>Recognition running ahead of generation, or an own-versus-foreign advantage once aligned.</li>
-<li>Generality: one family of worlds (six binary causes from two top causes, rendered linearly in 12 dimensions), and a start that already hands the learner the world's subspace; a small random start is untested. The autoencoder's recognition rate was inherited from the first toy, not tuned.</li>
+<li>Generality: one family of worlds (six binary causes from two top causes, rendered linearly in 12 dimensions), and a start that already hands the learner the world's subspace; a random start was tried only for the timing of the layers (section 4). The baseline autoencoder's recognition rate was inherited from the first toy; tuning it does not change the picture (section 8).</li>
 </ul></div>
 </div>
 </section>
@@ -386,13 +484,13 @@ figure.widget{margin:16px 0}
 <h2>Files</h2>
 <ul class="paths">
 <li>This report, readable by all cluster users: <code>/ceph/scratch/jbauer/reports/generative-learning/toy_model_2_WS.html</code></li>
-<li>Code, copied next to this report when it was built: <a href="{{filesDir}}/practice_ws_layers.py">runs with weight snapshots</a> (sections 3–4) · <a href="{{filesDir}}/practice_ws_budget.py">budget, scarce-data and dream-source runs</a> (sections 5–7) · <a href="{{filesDir}}/toy_model_2_ws_sim.js">the two-cause simulation on this page</a> · <a href="{{filesDir}}/practice_disentangle.py">one-layer model</a> · <a href="{{filesDir}}/practice_disentangle_prior.py">learned priors</a> · <a href="{{filesDir}}/practice_disentangle_dreams.py">dream sources, one layer</a></li>
+<li>Code, copied next to this report when it was built: <a href="{{filesDir}}/practice_ws_layers.py">runs with weight snapshots</a> (sections 3–4) · <a href="{{filesDir}}/practice_ws_budget.py">budget, scarce-data and dream-source runs</a> (sections 5–7) · <a href="{{filesDir}}/toy_model_2_ws_sim.js">the two-cause simulation on this page</a> · <a href="{{filesDir}}/practice_disentangle.py">one-layer model</a> · <a href="{{filesDir}}/practice_disentangle_prior.py">learned priors</a> · <a href="{{filesDir}}/practice_disentangle_dreams.py">dream sources, one layer</a> · <a href="{{filesDir}}/practice_ws_ae_floor.py">autoencoder variants, VAE, independent causes</a> (sections 8–9) · <a href="{{filesDir}}/practice_ws_depth.py">timing of the layers</a> (section 4)</li>
 <li>Write-up of the one-layer toy, with its pre-registered confirmation: <a href="{{filesDir}}/practice_disentangle.tex">practice_disentangle.tex</a></li>
 <li>Builder (owner only): <code>/nfs/nhome/live/jbauer/generative-learning/experiments/toy_model_2_ws_report.py</code></li>
-<li>Run data (owner only, on u435d): <code>/var/tmp/jbauer/generative_practice_disentangle/</code> <code>layers/</code>, <code>budget/</code>, <code>dreams/</code>, <code>prior/</code></li>
+<li>Run data (owner only, on u435d): <code>/var/tmp/jbauer/generative_practice_disentangle/</code> <code>layers/</code>, <code>budget/</code>, <code>dreams/</code>, <code>prior/</code>, <code>ae_floor/</code>, <code>depth/</code></li>
 </ul>
 </section>
-<footer>Built {{built}}. Sources (SHA-256): {{sourceHash}}. Sections 3–4: {{worlds}} worlds, {{N}} stored samples, {{steps}} updates, top layer of {{H}} units. Sections 5–7: {{bWorlds}} worlds, batches of {{batch}}. All worlds are of the two-layer kind described in section 1.</footer>
+<footer>Built {{built}}. Sources (SHA-256): {{sourceHash}}. Sections 3–4: {{worlds}} worlds, {{N}} stored samples, {{steps}} updates, top layer of {{H}} units. Sections 5–9: {{bWorlds}} worlds, batches of {{batch}}. All worlds are of the two-layer kind described in section 1, except in section 9.</footer>
 </article>
 </main>
 <script id="report-data" type="application/json">__REPORT_DATA__</script>
@@ -560,8 +658,42 @@ function dreamChart() {
   lineChart($('dreamChart'), {series: DREAMS.map(d => ({...d, x: Dd.P, mean: Dd.lines[d.key].mean, sem: Dd.lines[d.key].sem})), x: EXAMPLES, y: KLY, xlabel: 'Examples (supplied + dreamed)', xtip: exTip});
 }
 
+// ---- Section 8: the autoencoder's floor; section 9: independent causes ----
+const FLOOR = [
+  {key: 'ws:x=0.7', label: 'Wake–sleep, 30% dreamed', color: 'var(--s1)'},
+  {key: 'ws:x=1', label: 'Wake–sleep, no dreams', color: 'var(--s1)', dash: '5 4'},
+  {key: 'ae:top=mf:s=0.05', label: 'Autoencoder baseline', color: 'var(--s3)'},
+  {key: 'ae:top=mf:s=1', label: 'Autoencoder, recognizer rate ×20', color: 'var(--s3)', dash: '5 4'},
+  {key: 'ae:top=bin:s=1', label: '… + binary top code', color: 'var(--s4)'},
+  {key: 'ae:top=mf:s=1:wd=0.01', label: '… + weight decay', color: 'var(--s4)', dash: '5 4'},
+  {key: 'vae:s=1', label: 'Variational autoencoder', color: 'var(--s7)'},
+];
+const EX8 = {min: 2 ** 8, max: 2 ** 21, log: true, ticks: [2 ** 9, 2 ** 13, 2 ** 17, 2 ** 21], fmt: pow2};
+const fser = (block, key) => FLOOR.filter(l => block[key][l.key]).map(l => ({...l, x: block.P, mean: block[key][l.key].mean, sem: block[key][l.key].sem}));
+function floorCharts() {
+  const F = D.floor;
+  lineChart($('floorKL'), {series: fser(F, 'kl'), x: EX8, y: KLY, xlabel: 'Examples', xtip: exTip});
+  lineChart($('floorGen'), {series: fser(F, 'gen'), x: EX8, y: {min: 0, max: 50, ticks: [0, 10, 20, 30, 40, 50], fmt: fmtDeg}, xlabel: 'Examples', xtip: exTip});
+  lineChart($('floorV'), {series: fser(F, 'v'), x: EX8, y: {min: 0, max: 25, ticks: [0, 5, 10, 15, 20, 25], fmt: (v, tip) => tip ? v.toFixed(1) : String(v)}, xlabel: 'Examples', xtip: exTip});
+}
+function factChart() { lineChart($('factKL'), {series: fser(D.fact, 'kl'), x: EX8, y: KLY, xlabel: 'Examples', xtip: exTip}); }
+
+// ---- Section 4: timing of the two layers ----
+const DEPTH = [
+  {key: 'gen_world', label: 'Bottom layer: generator against the world', color: 'var(--s1)'},
+  {key: 'top_world', label: 'Top layer: top weights against the world', color: 'var(--s2)'},
+  {key: 'oracle', label: "Top layer, bottom fixed at the world's", color: 'var(--muted)', dash: '5 4'},
+];
+function depthCharts() {
+  const Dp = D.depth, x = {min: 1, max: 40000, log: true, ticks: [1, 10, 100, 1000, 10000]};
+  for (const [id, start] of [['depthRot', 'rotated'], ['depthRand', 'random']]) {
+    const series = DEPTH.map(s => { const b = Dp.lines[s.key === 'oracle' ? 'oracle_bottom/top_world' : `${start}/${s.key}`]; return {...s, x: Dp.steps, mean: b.mean, sem: b.sem}; });
+    lineChart($(id), {series, x, y: {min: 0, max: 65, ticks: [0, 15, 30, 45, 60], fmt: fmtDeg}, xlabel: 'Updates (one wake and one sleep batch)'});
+  }
+}
+
 // ---- Section 2: two-cause simulation (live), with sleep and with recognition frozen ----
-const SIM = {seed: 1, theta: 30, sigma: .5, speed: 4, T: 3000, playing: false};
+const SIM = {seed: 1, theta: 30, sigma: .5, speed: 4, T: 3000, playing: false, aeRate: .05};
 const PLANE = 2.7, toPx = v => 150 + v / PLANE * 140, toPy = v => 150 - v / PLANE * 140;
 function planeSetup(svg, color) {
   svg.replaceChildren();
@@ -590,20 +722,21 @@ function simReset() {
   const th = SIM.theta * Math.PI / 180, r = WS.rng(9000 + SIM.seed);
   SIM.w = WS.world(SIM.seed, SIM.sigma);
   const draws = Array.from({length: 128}, () => [r() < .5 ? -1 : 1, r() < .5 ? -1 : 1, WS.normal(r), WS.normal(r)]);
-  simState = {t: 0, Lb: WS.learner(th, SIM.sigma), Lf: WS.learner(th, SIM.sigma), rb: WS.rng(100 + SIM.seed), rf: WS.rng(200 + SIM.seed), draws, trace: {bg: [], br: [], fg: [], fr: []}};
-  simState.Pb = planeSetup($('planeB'), 'var(--s1)'); simState.Pf = planeSetup($('planeF'), 'var(--s3)');
+  simState = {t: 0, Lb: WS.learner(th, SIM.sigma), Lf: WS.learner(th, SIM.sigma), La: WS.learner(th, SIM.sigma), rb: WS.rng(100 + SIM.seed), rf: WS.rng(200 + SIM.seed), ra: WS.rng(300 + SIM.seed), draws, trace: {bg: [], br: [], fg: [], fr: [], ag: [], ar: []}};
+  simState.Pb = planeSetup($('planeB'), 'var(--s1)'); simState.Pf = planeSetup($('planeF'), 'var(--s5)'); simState.Pa = planeSetup($('planeA'), 'var(--s3)');
   simState.thetas = Array.from({length: 91}, (_, i) => i - 45); simState.land = WS.landscape(SIM.sigma, simState.thetas).map(v => -v);
   record(); simCharts(); simDraw();
 }
-function record() { const S = simState, tr = S.trace; tr.bg.push(WS.genAngle(S.Lb)); tr.br.push(WS.recAngle(S.Lb)); tr.fg.push(WS.genAngle(S.Lf)); tr.fr.push(WS.recAngle(S.Lf)); }
+function record() { const S = simState, tr = S.trace; tr.bg.push(WS.genAngle(S.Lb)); tr.br.push(WS.recAngle(S.Lb)); tr.fg.push(WS.genAngle(S.Lf)); tr.fr.push(WS.recAngle(S.Lf)); tr.ag.push(WS.genAngle(S.La)); tr.ar.push(WS.recAngle(S.La)); }
 function simCharts() {  // static axes; the moving parts are kept and updated in simDraw
   const S = simState, deg = v => (v > 0 ? '+' : '') + v + '°';
-  S.A = frame($('simAngle'), {x: {min: 0, max: SIM.T, ticks: [0, 1000, 2000, 3000]}, y: {min: -45, max: 45, ticks: [-45, -30, -15, 0, 15, 30, 45], fmt: deg}, xlabel: 'Practice updates'});
-  S.lines = [['bg', 'var(--s1)', ''], ['br', 'var(--s1)', '5 4'], ['fg', 'var(--s3)', ''], ['fr', 'var(--s3)', '5 4']].map(([k, color, dash]) => [k, el($('simAngle'), 'polyline', {fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-dasharray': dash, 'stroke-linejoin': 'round'})]);
+  S.A = frame($('simAngle'), {x: {min: 0, max: SIM.T, ticks: [0, 1000, 2000, 3000]}, y: {min: -45, max: 45, ticks: [-45, -30, -15, 0, 15, 30, 45], fmt: deg}, xlabel: 'Updates (two batches each)'});
+  S.lines = [['bg', 'var(--s1)', ''], ['br', 'var(--s1)', '5 4'], ['fg', 'var(--s5)', ''], ['fr', 'var(--s5)', '5 4'], ['ag', 'var(--s3)', ''], ['ar', 'var(--s3)', '5 4']].map(([k, color, dash]) => [k, el($('simAngle'), 'polyline', {fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-dasharray': dash, 'stroke-linejoin': 'round'})]);
   const lmax = Math.max(.1, Math.ceil(Math.max(...S.land) * 10) / 10), step = lmax > .6 ? .2 : .1;
   const Lf = frame($('simLand'), {x: {min: -45, max: 45, ticks: [-45, -30, -15, 0, 15, 30, 45], fmt: deg}, y: {min: 0, max: lmax, ticks: Array.from({length: Math.round(lmax / step) + 1}, (_, i) => +(i * step).toFixed(1)), fmt: v => v.toFixed(1)}, xlabel: 'Angle of the generator from the world'});
   el($('simLand'), 'polyline', {points: S.thetas.map((t, i) => `${Lf.X(t)},${Lf.Y(S.land[i])}`).join(' '), fill: 'none', stroke: 'var(--ink2)', 'stroke-width': 2});
-  S.ballF = el($('simLand'), 'circle', {r: 7, fill: 'var(--s3)', stroke: 'var(--surface)', 'stroke-width': 2});
+  S.ballF = el($('simLand'), 'circle', {r: 7, fill: 'var(--s5)', stroke: 'var(--surface)', 'stroke-width': 2});
+  S.ballA = el($('simLand'), 'circle', {r: 7, fill: 'var(--s3)', stroke: 'var(--surface)', 'stroke-width': 2});
   S.ballB = el($('simLand'), 'circle', {r: 7, fill: 'var(--s1)', stroke: 'var(--surface)', 'stroke-width': 2});
   S.LandF = Lf;
 }
@@ -611,28 +744,29 @@ function simDraw() {
   const S = simState, A = S.A, n = S.trace.bg.length, stride = Math.max(1, Math.floor(n / 600));
   for (const [k, line] of S.lines) { const v = S.trace[k], pts = []; for (let i = 0; i < n; i += stride) pts.push(`${A.X(i).toFixed(1)},${A.Y(v[i]).toFixed(1)}`); pts.push(`${A.X(n - 1).toFixed(1)},${A.Y(v[n - 1]).toFixed(1)}`); line.setAttribute('points', pts.join(' ')); }
   const land = t => S.land[Math.max(0, Math.min(90, Math.round(t + 45)))];
-  for (const [ball, t] of [[S.ballB, S.trace.bg.at(-1)], [S.ballF, S.trace.fg.at(-1)]]) { ball.setAttribute('cx', S.LandF.X(t)); ball.setAttribute('cy', S.LandF.Y(land(t))); }
-  planeDraw(S.Pb, S.Lb, S.draws); planeDraw(S.Pf, S.Lf, S.draws);
+  for (const [ball, t] of [[S.ballB, S.trace.bg.at(-1)], [S.ballF, S.trace.fg.at(-1)], [S.ballA, S.trace.ag.at(-1)]]) { ball.setAttribute('cx', S.LandF.X(t)); ball.setAttribute('cy', S.LandF.Y(land(t))); }
+  planeDraw(S.Pb, S.Lb, S.draws); planeDraw(S.Pf, S.Lf, S.draws); planeDraw(S.Pa, S.La, S.draws);
   const read = (g, r) => `generator ${g.toFixed(1)}°, recognizer ${r.toFixed(1)}° from the world's axes<br>update ${S.t.toLocaleString('en-GB')}`;
-  $('readB').innerHTML = read(S.trace.bg.at(-1), S.trace.br.at(-1)); $('readF').innerHTML = read(S.trace.fg.at(-1), S.trace.fr.at(-1));
+  $('readB').innerHTML = read(S.trace.bg.at(-1), S.trace.br.at(-1)); $('readF').innerHTML = read(S.trace.fg.at(-1), S.trace.fr.at(-1)); $('readA').innerHTML = read(S.trace.ag.at(-1), S.trace.ar.at(-1));
 }
 function simTick() {
   const S = simState;
-  for (let k = 0; k < SIM.speed && S.t < SIM.T; k++) { WS.step(S.Lb, SIM.w, S.rb); WS.step(S.Lf, SIM.w, S.rf, {frozen: true}); S.t++; record(); }
+  for (let k = 0; k < SIM.speed && S.t < SIM.T; k++) { WS.step(S.Lb, SIM.w, S.rb); WS.step(S.Lf, SIM.w, S.rf, {frozen: true}); WS.aeStep(S.La, SIM.w, S.ra, {rate: SIM.aeRate}); S.t++; record(); }
   simDraw();
   if (S.t >= SIM.T) return simStop();
   raf = requestAnimationFrame(simTick);
 }
 function simStop() { if (raf) cancelAnimationFrame(raf); raf = null; SIM.playing = false; $('simPlay').textContent = 'Play'; }
 function setupSim() {
-  $('planeLegend').innerHTML = `<span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="3" fill="var(--world)"/></svg>stored world samples</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="8" cy="5" r="3" fill="var(--s1)"/><circle cx="18" cy="5" r="3" fill="var(--s3)"/></svg>the learner's dreams</span><span>${swatch('var(--s1)')}generator axes</span><span>${swatch('var(--ink)', '5 4')}recognizer axes</span><span>${swatch('var(--world)')}world's axes</span>`;
-  $('simLegend').innerHTML = `<span>${swatch('var(--s1)')}wake–sleep, generator</span><span>${swatch('var(--s1)', '5 4')}wake–sleep, recognizer</span><span>${swatch('var(--s3)')}recognition frozen, generator</span><span>${swatch('var(--s3)', '5 4')}recognition frozen, recognizer</span>`;
+  $('planeLegend').innerHTML = `<span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="3" fill="var(--world)"/></svg>stored world samples</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="5" cy="5" r="3" fill="var(--s1)"/><circle cx="13" cy="5" r="3" fill="var(--s5)"/><circle cx="21" cy="5" r="3" fill="var(--s3)"/></svg>samples from each learner's generator</span><span>${swatch('var(--s1)')}generator axes</span><span>${swatch('var(--ink)', '5 4')}recognizer axes</span><span>${swatch('var(--world)')}world's axes</span>`;
+  $('simLegend').innerHTML = `<span>${swatch('var(--s1)')}wake–sleep, generator</span><span>${swatch('var(--s1)', '5 4')}wake–sleep, recognizer</span><span>${swatch('var(--s5)')}recognition frozen, generator</span><span>${swatch('var(--s5)', '5 4')}recognition frozen, recognizer</span><span>${swatch('var(--s3)')}autoencoder, generator</span><span>${swatch('var(--s3)', '5 4')}autoencoder, recognizer</span>`;
   $('simPlay').onclick = () => { if (SIM.playing) return simStop(); if (simState.t >= SIM.T) simReset(); SIM.playing = true; $('simPlay').textContent = 'Pause'; raf = requestAnimationFrame(simTick); };
   $('simReset').onclick = simReset;
   $('simNew').onclick = () => { SIM.seed += 1; simReset(); };
   $('simTheta').oninput = e => { SIM.theta = +e.target.value; $('simThetaOut').textContent = SIM.theta + '°'; simReset(); };
   $('simSigma').oninput = e => { SIM.sigma = +e.target.value; $('simSigmaOut').textContent = SIM.sigma.toFixed(2); simReset(); };
   $('simSpeed').onchange = e => { SIM.speed = +e.target.value; };
+  $('simAeRate').onchange = e => { SIM.aeRate = +e.target.value; simReset(); };
   simReset();
 }
 
@@ -671,8 +805,11 @@ const BLOCKS = {
   scarceBlock: () => { legend($('scarceLegend'), LINES); scarceCharts(); },
   kBlock: kChart,
   dreamBlock: () => { legend($('dreamLegend'), DREAMS); dreamChart(); },
+  floorBlock: () => { legend($('floorLegend'), FLOOR); floorCharts(); },
+  factBlock: () => { legend($('factLegend'), FLOOR.filter(l => D.fact.kl[l.key])); factChart(); },
+  depthBlock: () => { legend($('depthLegend'), DEPTH); depthCharts(); },
 };
-const REDRAW = {alignBlock: alignCharts, priorBlock: priorCharts, budgetBlock: budgetCharts, scarceBlock: scarceCharts, kBlock: kChart, dreamBlock: dreamChart, simBlock: () => { simCharts(); simDraw(); }};
+const REDRAW = {alignBlock: alignCharts, priorBlock: priorCharts, budgetBlock: budgetCharts, scarceBlock: scarceCharts, kBlock: kChart, dreamBlock: dreamChart, floorBlock: floorCharts, factBlock: factChart, depthBlock: depthCharts, simBlock: () => { simCharts(); simDraw(); }};
 function start() {
   // in an OverLyX block frame the runtime has hidden every other block by now (its DOMContentLoaded handler runs first)
   for (const [id, init] of Object.entries(BLOCKS)) { const b = $(id); if (b && !b.closest('[data-ol-embed-hidden]')) { init(); live.add(id); } }

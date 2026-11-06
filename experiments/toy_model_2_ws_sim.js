@@ -1,4 +1,4 @@
-// Two-cause wake-sleep in the plane, with sleep and with recognition frozen. Shared by the report page (inlined by
+// Two-cause wake-sleep in the plane, with sleep, with recognition frozen, and the autoencoder baseline. Shared by the report page (inlined by
 // toy_model_2_ws_report.py) and its node check. World: z uniform on {-1,+1}^2, x = z + sigma*eps (A = I).
 // Matrices are 2x2 arrays [m00, m01, m10, m11] (row-major); the generator maps z to x = W z + c, the recognizer x to R x + b.
 const WS = (() => {
@@ -53,6 +53,29 @@ const WS = (() => {
     if (frozen) wake(L, w, r, lr, batch); else sleep(L, w.sigma, r, lr * sleepScale, batch);
   }
 
+  // The autoencoder baseline (practice_disentangle.ae_step 'bae'): mean-field code m = tanh(R x + b), loss = the expected
+  // squared error under the factorial code, ||x - W m - c||^2 + sum_k (1 - m_k^2) ||w_k||^2; gradient steps on W, c (rate lr)
+  // and, backpropagated through the code (scaled by 1 / sigma^2), on R, b (rate lr * rate). Never dreams.
+  function aeBatch(L, w, r, lr, rate, batch) {
+    const dW = [0, 0, 0, 0], dc = [0, 0], dR = [0, 0, 0, 0], db = [0, 0], v = [0, 0], s2 = w.sigma ** 2;
+    const n2 = [L.W[0] ** 2 + L.W[2] ** 2, L.W[1] ** 2 + L.W[3] ** 2];  // squared lengths of the generator's columns
+    for (let n = 0; n < batch; n++) {
+      const x = w.X[Math.floor(r() * w.X.length)];
+      const m = [Math.tanh(L.R[0] * x[0] + L.R[1] * x[1] + L.b[0]), Math.tanh(L.R[2] * x[0] + L.R[3] * x[1] + L.b[1])];
+      const e0 = x[0] - L.W[0] * m[0] - L.W[1] * m[1] - L.c[0], e1 = x[1] - L.W[2] * m[0] - L.W[3] * m[1] - L.c[1];
+      dW[0] += e0 * m[0]; dW[1] += e0 * m[1]; dW[2] += e1 * m[0]; dW[3] += e1 * m[1]; dc[0] += e0; dc[1] += e1;
+      for (let k = 0; k < 2; k++) {
+        const vk = 1 - m[k] ** 2, g = (L.W[k] * e0 + L.W[2 + k] * e1 + m[k] * n2[k]) / s2 * vk;
+        v[k] += vk; dR[2 * k] += g * x[0]; dR[2 * k + 1] += g * x[1]; db[k] += g;
+      }
+    }
+    for (let i = 0; i < 4; i++) L.W[i] += lr * (dW[i] - L.W[i] * v[i % 2]) / batch;
+    for (let i = 0; i < 4; i++) L.R[i] += lr * rate * dR[i] / batch;
+    for (let k = 0; k < 2; k++) { L.c[k] += lr * dc[k] / batch; L.b[k] += lr * rate * db[k] / batch; }
+  }
+  // One update of the autoencoder: two batches of supplied samples, the same number of batches as a practice update.
+  function aeStep(L, w, r, {lr = 0.02, rate = 0.05, batch = 32} = {}) { aeBatch(L, w, r, lr, rate, batch); aeBatch(L, w, r, lr, rate, batch); }
+
   // Rotation angle (degrees) of the nearest rotation to the columns of M, folded to (-45, 45]: every multiple of 90 degrees,
   // and every sign flip, leaves the binary prior unchanged, so all of them count as aligned.
   function angle(M) {
@@ -82,6 +105,6 @@ const WS = (() => {
     return thetas.map(t => ll(t * Math.PI / 180) - ref);
   }
 
-  return {rng, normal, world, learner, step, genAngle, recAngle, landscape};
+  return {rng, normal, world, learner, step, aeStep, genAngle, recAngle, landscape};
 })();
 if (typeof module !== 'undefined') module.exports = WS;

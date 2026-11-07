@@ -2,7 +2,7 @@
 Progress = (score - score at step 0) / (1 - score at step 0), per world; for the likelihood, the share of level h's information
 log N_(h-1) - log N_h (N_h: strings valid up to height h) that the held-out bound has gone below; median and IQR over worlds. Onset: first evaluated
 step at which a world's progress reaches 1/2 (median over worlds).
-Evaluations after a world's run diverged (held-out loss excess more than twice its best so far) are dropped.
+Evaluations after a world's run diverged (held-out loss excess more than twice its best so far, and 0.5 nats above it) are dropped.
 Usage: python practice_rhm_unet_plot.py RUN_DIR [P] -> reports/rhm-unet-read-write.png"""
 
 import json
@@ -15,6 +15,7 @@ import numpy as np
 
 MEASURES = [  # key, height offset, label, colour, line style
     ("writes", 0, "writes: own strings valid up to h", "#2a78d6", "-"),
+    ("writes_node", 0, "writes: own height-h nodes valid", "#7fb2ea", "-"),
     ("kl", 0, "likelihood has level h (held-out bound below log N_h)", "#0b3a75", "-"),
     ("fills", 0, "fills: one masked leaf of a world string", "#1baf7a", "--"),
     ("verifies", 0, "verifies: prefers a world string over it broken at h", "#d13b7a", "--"),
@@ -31,8 +32,8 @@ def log_counts(a, L):
 
 def stable(r):
     """False from the first evaluation at which the held-out loss excess over the true entropy exceeds twice its best so far
-    (Adam divergence late in a run); those points are dropped."""
-    e = np.array([c["nll"] for c in r["curve"]]) - r["entropy"]; bad = e > 2 * np.minimum.accumulate(e); return ~np.logical_or.accumulate(bad)
+    and by more than 0.5 nats (Adam divergence late in a run); those points are dropped."""
+    e = np.array([c["nll"] for c in r["curve"]]) - r["entropy"]; b = np.minimum.accumulate(e); return ~np.logical_or.accumulate((e > 2 * b) & (e - b > 0.5))
 
 
 def progress(r, key, h):

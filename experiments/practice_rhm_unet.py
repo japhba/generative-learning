@@ -14,12 +14,17 @@ Measures per height h, at log-spaced steps:
   writes       share of the learner's own strings (unmasked one position at a time, random order, from all-masked) that
                parse under the world's grammar up to height h.
   writes_node  share of height-h nodes in own strings whose subtree parses up to h (no conjunction over nodes).
+  coverage     how evenly those valid own nodes use the height-h symbols (exp entropy / number of symbols; world ~1).
   fills        a world string with one random leaf masked: the learner's probability mass on leaf values that keep the
                string valid up to height h (the exact posterior puts all its mass there). One step of generation in a
                valid context: inference of a missing part.
   abstracts    synonym invariance of the encoder's height-h node representation on clean world strings: one height-h
                node's subtree is redrawn from the same symbol (D_same) or a different one (D_diff); 1 - D_same/D_diff
                (1: the node codes only its symbol; Favero et al.'s relative sensitivity, inverted).
+  verifies     a world string against the same string broken at height h (one child subtree regrown from a symbol that
+               makes the height-h tuple invalid): share of pairs where the learner's own log-likelihood (along random
+               unmasking orders, the factorisation it samples with) prefers the world string (chance 1/2). Judging
+               correctness with the learner's own model, no extra training. verifies_local: the same by pseudo-likelihood.
   reads        linear read-out (ridge) of the height-h symbol from the encoder's height-h node, fitted on nodes produced by
                half of each symbol's synonymous productions and tested on the other half (chance 1/v; 1/nc at the root).
 Usage: python practice_rhm_unet.py --tag NAME --L 3 --steps 60000 -> /var/tmp/jbauer/generative_practice_rhm/unet/NAME/L3_P0.json"""
@@ -88,13 +93,15 @@ def generate(net, W, n, d, v, gen, device):
     return X.cpu().numpy()
 
 
-def node_valid(rhm, x):
-    """Share of height-h nodes whose subtree parses up to height h, per h = 1..L."""
-    ok, a, out = np.ones(x.shape, bool), x, []
+def node_stats(rhm, x):
+    """Per height h = 1..L: share of height-h nodes whose subtree parses up to h, and the coverage of the symbols those valid
+    nodes parse to (exp of their entropy over the number of symbols; ~1 for the world)."""
+    ok, a, valid, cover = np.ones(x.shape, bool), x, [], []
     for k in reversed(range(rhm.L)):
         p = rhm.parent[k][np.ravel_multi_index(a.reshape(len(a), -1, rhm.s).transpose(2, 0, 1), (rhm.v,) * rhm.s)]
-        ok = ok.reshape(len(a), -1, rhm.s).all(2) & (p >= 0); out.append(float(ok.mean())); a = np.maximum(p, 0)
-    return out
+        ok = ok.reshape(len(a), -1, rhm.s).all(2) & (p >= 0); q = np.bincount(p[ok], minlength=rhm.nc if k == 0 else rhm.v) / max(ok.sum(), 1)
+        valid.append(float(ok.mean())); cover.append(float(np.exp(-(q[q > 0] * np.log(q[q > 0])).sum()) / len(q))); a = np.maximum(p, 0)
+    return valid, cover
 
 
 def subtree(rhm, a, k, rng):
@@ -133,6 +140,57 @@ def reads(net, rhms, X, rng, device, ridge=1e-2):
         acc = ((Fte @ B).argmax(-1) == labels[1]).double().mean(1)
         for w in range(W): out[w].append(float(acc[w]))
     return out
+
+
+@torch.no_grad()
+def pll(net, X, v, device):
+    """Pseudo-log-likelihood sum_i log p(x_i | x_-i) of strings X (W, n, d): (W, n)."""
+    Xt = torch.as_tensor(X, device=device); W, n, d = Xt.shape; out = torch.zeros(W, n, device=device, dtype=torch.float64)
+    for i in range(d):
+        Xm = Xt.clone(); Xm[:, :, i] = v; out += net(Xm)[:, :, i].log_softmax(-1).gather(-1, Xt[:, :, i, None])[..., 0].double()
+    return out.cpu().numpy()
+
+
+@torch.no_grad()
+def ao_loglik(net, X, orders, v, device):
+    """log q(x) of strings X (W, n, d) along the given unmasking orders (each (W, n, d)), the factorisation the sampler
+    uses; mean over orders: (W, n)."""
+    Xt = torch.as_tensor(X, device=device); W, n, d = Xt.shape; tot = torch.zeros(W, n, device=device, dtype=torch.float64)
+    for o in orders:
+        cur = torch.full_like(Xt, v)
+        for i in range(d):
+            pos = o[..., i:i + 1]; tok = torch.gather(Xt, 2, pos); lp = net(cur).log_softmax(-1)
+            tot += torch.gather(lp, 2, pos[..., None].expand(W, n, 1, lp.shape[-1]))[:, :, 0].gather(-1, tok)[..., 0].double(); cur.scatter_(2, pos, tok)
+    return (tot / len(orders)).cpu().numpy()
+
+
+def corrupt(rhm, tree, h, rng):
+    """World strings with one height-h node broken: one of its children's subtrees regrown from a symbol that makes the
+    node's tuple invalid. Valid up to height h-1, invalid from h on; under the world all subtrees below are equally likely,
+    so only the break at h separates the pair. Returns the strings and a mask of rows where such a symbol exists."""
+    L, s, v = rhm.L, rhm.s, rhm.v; X = tree[-1].copy(); n = len(X); ar = np.arange(n); k = L - h
+    j = rng.integers(s ** k, size=n); c = rng.integers(s, size=n); kids = tree[k + 1][ar[:, None], j[:, None] * s + np.arange(s)]
+    cand = np.repeat(kids[:, None], v, 1); cand[ar, :, c] = np.arange(v)
+    bad = rhm.parent[k][np.ravel_multi_index(cand.transpose(2, 0, 1), (v,) * s)] < 0
+    b = (rng.random((n, v)) * bad).argmax(1); w = s ** (h - 1)
+    X[ar[:, None], (j * s + c)[:, None] * w + np.arange(w)] = subtree(rhm, b, k + 1, rng)
+    return X, bad.any(1)
+
+
+@torch.no_grad()
+def verifies(net, rhms, trees, rng, gen, device, n_orders=4):
+    """Per world, h = 1..L: share of pairs (world string, the same broken at height h) in which the learner prefers the world
+    string (ties 1/2; chance 1/2), by its own log-likelihood along 4 random unmasking orders shared by the pair (joint),
+    and by its pseudo-likelihood (local: each token given all others)."""
+    X = np.stack([t[-1] for t in trees]); W, n, d = X.shape; L, v = rhms[0].L, rhms[0].v
+    orders = [torch.rand(W, n, d, device=device, generator=gen).argsort(-1) for _ in range(n_orders)]
+    j0, l0 = ao_loglik(net, X, orders, v, device), pll(net, X, v, device); joint, local = [[] for _ in range(W)], [[] for _ in range(W)]
+    for h in range(1, L + 1):
+        bro = [corrupt(r, t, h, rng) for r, t in zip(rhms, trees)]; Xb = np.stack([b[0] for b in bro]); j1, l1 = ao_loglik(net, Xb, orders, v, device), pll(net, Xb, v, device)
+        for w in range(W):
+            ok = bro[w][1]; pref = lambda a, b: float(np.mean((a[w] > b[w])[ok] + 0.5 * (a[w] == b[w])[ok]))
+            joint[w].append(pref(j0, j1)); local[w].append(pref(l0, l1))
+    return joint, local
 
 
 @torch.no_grad()
@@ -185,17 +243,17 @@ def main():
     train_sets = [{r.tobytes() for r in train[w].cpu().numpy()} for w in range(W)] if args.P else None
     ev_trees = [r.sample(args.n_eval, rng) for r in rhms]; ev_np = np.stack([t[-1] for t in ev_trees]); ev_X = torch.as_tensor(ev_np, device=device)
     U = rng.integers(args.v, size=(100000, d))
-    res = [dict(world=w, L=args.L, entropy=float(r.entropy()), chance_write=[float(z) for z in r.valid(U)], chance_node=node_valid(r, U), curve=[]) for w, r in enumerate(rhms)]
+    res = [dict(world=w, L=args.L, entropy=float(r.entropy()), chance_write=[float(z) for z in r.valid(U)], chance_node=node_stats(r, U)[0], curve=[]) for w, r in enumerate(rhms)]
     evals = set(np.round(np.geomspace(1, args.steps, args.n_points)).astype(int).tolist()) | {0}; loss_sum, n_loss, buf = torch.zeros(W, device=device), 0, []
     for step in tqdm(range(args.steps + 1), desc=f"L{args.L} P{args.P}", mininterval=10):
         if step in evals:
             net.eval()
             with torch.no_grad(): nll = torch.stack([masked_loss(net, ev_X, args.v, gen) for _ in range(4)]).mean(0).cpu().numpy()
-            Xg = generate(net, W, args.n_eval, d, args.v, gen, device); fl = fills(net, rhms, ev_np, rng, device); ab = abstracts(net, rhms, ev_trees, rng, device); rd = reads(net, rhms, ev_np, rng, device)
+            Xg = generate(net, W, args.n_eval, d, args.v, gen, device); fl = fills(net, rhms, ev_np, rng, device); ab = abstracts(net, rhms, ev_trees, rng, device); rd = reads(net, rhms, ev_np, rng, device); vf, vl = verifies(net, rhms, ev_trees, rng, gen, device)
             tl = (loss_sum / n_loss).cpu().numpy() if n_loss else None
             for w, r in enumerate(rhms):
                 rec = dict(step=step, nll=float(nll[w]), train_loss=None if tl is None else float(tl[w]), writes=[float(z) for z in r.valid(Xg[w])],
-                           writes_node=node_valid(r, Xg[w]), fills=fl[w][0], fills_chance=fl[w][1], abstracts=ab[w], reads=rd[w])
+                           writes_node=node_stats(r, Xg[w])[0], coverage=node_stats(r, Xg[w])[1], fills=fl[w][0], fills_chance=fl[w][1], abstracts=ab[w], reads=rd[w], verifies=vf[w], verifies_local=vl[w])
                 if args.P: rec["copies"] = float(np.mean([x.tobytes() in train_sets[w] for x in Xg[w]]))
                 res[w]["curve"].append(rec)
             loss_sum, n_loss = torch.zeros(W, device=device), 0; net.train()

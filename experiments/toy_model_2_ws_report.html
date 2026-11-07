@@ -90,6 +90,8 @@ footer code{overflow-wrap:anywhere}
 .plane-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center;min-width:0}
 .plane-box h3{margin:0 0 2px;font-size:.95rem}
 .plane-box svg{width:100%;max-width:300px;height:auto;display:block;margin:0 auto}
+.plane-wrap{position:relative;max-width:300px;margin:0 auto}.plane-wrap svg{max-width:none}
+.pl{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-size:.8rem;line-height:1;white-space:nowrap;pointer-events:none;color:var(--ink);text-shadow:0 0 2px var(--surface),0 0 4px var(--surface),0 0 6px var(--surface)}.pl-axis,.pl-space{color:var(--ink2)}
 .plane-box .small{font-variant-numeric:tabular-nums;min-height:2.8em}
 .heat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 10px 8px;position:relative;min-width:0}
 .heat-box h3{margin:0 6px 4px;font-size:.95rem}
@@ -210,18 +212,18 @@ figure.widget{margin:16px 0}
 <label>Speed <select id="simSpeed"><option value="1">1×</option><option value="4" selected>4×</option><option value="12">12×</option></select></label>
 </div>
 <div class="planes">
-<div class="plane-box"><h3>Wake–sleep</h3><svg id="planeB" viewBox="0 0 300 300" role="img" aria-label="The practising learner: world samples in four grey clusters, the learner's dreams, and its generator and recognizer axes."></svg><div class="small" id="readB"></div></div>
-<div class="plane-box"><h3>Recognition frozen</h3><svg id="planeF" viewBox="0 0 300 300" role="img" aria-label="The learner with frozen recognition: world samples, its dreams, and its generator and recognizer axes."></svg><div class="small" id="readF"></div></div>
-<div class="plane-box"><h3>Autoencoder</h3><svg id="planeA" viewBox="0 0 300 300" role="img" aria-label="The autoencoder baseline: world samples, samples from its generator, and its generator and recognizer axes."></svg><div class="small" id="readA"></div></div>
+<div class="plane-box"><h3>Wake–sleep</h3><div class="plane-wrap"><svg id="planeB" viewBox="0 0 300 300" role="img" aria-label="The practising learner: world samples in four grey clusters, the learner's dreams, and its generator and recognizer axes."></svg><span class="pl pl-axis" data-k="x1">\(x_1\)</span><span class="pl pl-axis" data-k="x2">\(x_2\)</span><span class="pl pl-space" data-k="space">\(\mathbf{x}\in\mathbb{R}^2\)</span><span class="pl" data-k="w1">\(\mathbf{w}_1\)</span><span class="pl" data-k="w2">\(\mathbf{w}_2\)</span><span class="pl" data-k="r1">\(\mathbf{r}_1\)</span><span class="pl" data-k="r2">\(\mathbf{r}_2\)</span><span class="pl" data-k="th">\(\theta\)</span></div><div class="small" id="readB"></div></div>
+<div class="plane-box"><h3>Recognition frozen</h3><div class="plane-wrap"><svg id="planeF" viewBox="0 0 300 300" role="img" aria-label="The learner with frozen recognition: world samples, its dreams, and its generator and recognizer axes."></svg><span class="pl pl-axis" data-k="x1">\(x_1\)</span><span class="pl pl-axis" data-k="x2">\(x_2\)</span><span class="pl pl-space" data-k="space">\(\mathbf{x}\in\mathbb{R}^2\)</span><span class="pl" data-k="w1">\(\mathbf{w}_1\)</span><span class="pl" data-k="w2">\(\mathbf{w}_2\)</span><span class="pl" data-k="r1">\(\mathbf{r}_1\)</span><span class="pl" data-k="r2">\(\mathbf{r}_2\)</span><span class="pl" data-k="th">\(\theta\)</span></div><div class="small" id="readF"></div></div>
+<div class="plane-box"><h3>Autoencoder</h3><div class="plane-wrap"><svg id="planeA" viewBox="0 0 300 300" role="img" aria-label="The autoencoder baseline: world samples, samples from its generator, and its generator and recognizer axes."></svg><span class="pl pl-axis" data-k="x1">\(x_1\)</span><span class="pl pl-axis" data-k="x2">\(x_2\)</span><span class="pl pl-space" data-k="space">\(\mathbf{x}\in\mathbb{R}^2\)</span><span class="pl" data-k="w1">\(\mathbf{w}_1\)</span><span class="pl" data-k="w2">\(\mathbf{w}_2\)</span><span class="pl" data-k="r1">\(\mathbf{r}_1\)</span><span class="pl" data-k="r2">\(\mathbf{r}_2\)</span><span class="pl" data-k="th">\(\theta\)</span></div><div class="small" id="readA"></div></div>
 </div>
-<div class="legend" id="planeLegend"></div>
+<div class="legend" id="planeLegend"><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="3" fill="var(--world)"/></svg>stored world samples \(\mathbf{x}=\mathbf{z}+\sigma\boldsymbol{\epsilon}\), \(\mathbf{z}\in\{\pm1\}^2\)</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="5" cy="5" r="3" fill="var(--s1)"/><circle cx="13" cy="5" r="3" fill="var(--s5)"/><circle cx="21" cy="5" r="3" fill="var(--s3)"/></svg>samples from each learner’s generator, \(\mathbf{W}\mathbf{z}+\mathbf{c}+\sigma\boldsymbol{\epsilon}\)</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="var(--s1)" stroke-width="2.5" stroke-dasharray=""/></svg>generator axes: columns \(\mathbf{w}_1,\mathbf{w}_2\) of \(\mathbf{W}\)</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="5 4"/></svg>recognizer axes: rows \(\mathbf{r}_1,\mathbf{r}_2\) of \(\mathbf{R}\)</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="var(--world)" stroke-width="2.5" stroke-dasharray=""/></svg>world’s axes \(x_1,x_2\)</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><path d="M4 9 A12 12 0 0 1 14 2" fill="none" stroke="var(--ink2)" stroke-width="1.5"/></svg>\(\theta\): angle of \(\mathbf{w}_1\) from the nearest world axis</span></div>
 <div class="charts" style="margin-top:14px">
-<div class="chart-box"><h3>Angle of the axes from the world's</h3><svg id="simAngle" viewBox="0 0 560 330" role="img" aria-label="Angle of the generator and recognizer axes over updates, with sleep, with recognition frozen, and for the autoencoder."></svg><div class="tooltip"></div></div>
-<div class="chart-box"><h3>Misfit against the angle, nats per sample ↓</h3><svg id="simLand" viewBox="0 0 560 330" role="img" aria-label="Loss in nats per sample against the generator's angle: a valley at zero degrees."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Angle \(\theta\) of the axes from the world's</h3><svg id="simAngle" viewBox="0 0 560 330" role="img" aria-label="Angle of the generator and recognizer axes over updates, with sleep, with recognition frozen, and for the autoencoder."></svg><div class="tooltip"></div></div>
+<div class="chart-box"><h3>Misfit \(\mathbb{E}\big[\log p_0(\mathbf{x})-\log p_\theta(\mathbf{x})\big]\), nats per sample ↓</h3><svg id="simLand" viewBox="0 0 560 330" role="img" aria-label="Loss in nats per sample against the generator's angle: a valley at zero degrees."></svg><div class="tooltip"></div></div>
 </div>
 <div class="legend" id="simLegend"></div>
 </figure>
-<p class="small">This runs the learners live in your browser, with the rules of section 1 and the rates of the six-cause runs. Angles are folded to ±45°, because a turn by 90° or a sign flip only relabels the causes. Left chart: solid lines are generators, dashed lines recognizers. Right chart: the average negative log-likelihood of a world sample under a generator turned by that angle, relative to the aligned one; the dots are the two learners.</p>
+<p class="small">Each plane is the space of samples, \(\mathbf{x}=(x_1,x_2)\in\mathbb{R}^2\). A generator column \(\mathbf{w}_k\) is the direction in which cause \(k\) moves a sample, and a recognizer row \(\mathbf{r}_k\) the direction along which the recognizer reads that cause off, \(q(z_k=1\mid\mathbf{x})=\sigma\big(2(\mathbf{r}_k^{\mathsf T}\mathbf{x}+b_k)\big)\). This runs the learners live in your browser, with the rules of section 1 and the rates of the six-cause runs. Angles are folded to ±45°, because a turn by 90° or a sign flip only relabels the causes. Left chart: solid lines are generators, dashed lines recognizers. Right chart: the average negative log-likelihood of a world sample under a generator turned by that angle, relative to the aligned one; the dots are the two learners.</p>
 
 <h3>Why the axes turn</h3>
 <p>Write \(\mathbf{u}=\mathbf{W}^{\mathsf T}\mathbf{x}\) for what the generator's axes see in a sample, and \(\varphi(u)=\mathbb E[z\mid u]\) for the posterior mean of a cause. Put the exact posterior into the wake update and keep only the part that rotates \(\mathbf{W}\). The rotation speed is then</p>
@@ -705,8 +707,14 @@ function planeSetup(svg, color) {
   for (let i = 0; i < 128; i++) dots.push(el(dreams, 'circle', {r: 2.2}));
   const gen = [0, 1].map(() => el(svg, 'line', {stroke: color, 'stroke-width': 3, 'stroke-linecap': 'round'}));
   const rec = [0, 1].map(() => el(svg, 'line', {stroke: 'var(--ink)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4'}));
-  return {dots, gen, rec};
+  const arc = el(svg, 'path', {fill: 'none', stroke: 'var(--ink2)', 'stroke-width': 1.5});
+  // KaTeX labels (typeset at build time) laid over the plane: the coordinates of the sample space, and names that follow the axes
+  const lab = Object.fromEntries([...svg.parentElement.querySelectorAll('.pl')].map(e => [e.dataset.k, e]));
+  placeLabel(lab.x1, 2.45, -.22); placeLabel(lab.x2, .24, 2.45); placeLabel(lab.space, -1.95, 2.42);
+  lab.w1.style.color = lab.w2.style.color = color;
+  return {dots, gen, rec, arc, lab};
 }
+function placeLabel(e, x, y) { e.style.left = toPx(x) / 3 + '%'; e.style.top = toPy(y) / 3 + '%'; }
 function planeDraw(P, L, draws) {
   const s = SIM.sigma;
   draws.forEach(([z0, z1, e0, e1], i) => { const x0 = L.W[0] * z0 + L.W[1] * z1 + L.c[0] + s * e0, x1 = L.W[2] * z0 + L.W[3] * z1 + L.c[1] + s * e1; P.dots[i].setAttribute('cx', toPx(x0)); P.dots[i].setAttribute('cy', toPy(x1)); });
@@ -714,7 +722,14 @@ function planeDraw(P, L, draws) {
     const gx = L.W[k], gy = L.W[2 + k], gl = Math.hypot(gx, gy), rx = L.R[2 * k], ry = L.R[2 * k + 1], rl = Math.hypot(rx, ry), len = 2.35;
     P.gen[k].setAttribute('x1', toPx(L.c[0] - len * gx / gl)); P.gen[k].setAttribute('y1', toPy(L.c[1] - len * gy / gl)); P.gen[k].setAttribute('x2', toPx(L.c[0] + len * gx / gl)); P.gen[k].setAttribute('y2', toPy(L.c[1] + len * gy / gl));
     P.rec[k].setAttribute('x1', toPx(L.c[0] - len * rx / rl)); P.rec[k].setAttribute('y1', toPy(L.c[1] - len * ry / rl)); P.rec[k].setAttribute('x2', toPx(L.c[0] + len * rx / rl)); P.rec[k].setAttribute('y2', toPy(L.c[1] + len * ry / rl));
+    // w_k beside the positive end of its axis, r_k beside the negative end of its own, so the two names stay apart once the axes coincide
+    placeLabel(P.lab[`w${k + 1}`], L.c[0] + 1.95 * gx / gl - .3 * gy / gl, L.c[1] + 1.95 * gy / gl + .3 * gx / gl);
+    placeLabel(P.lab[`r${k + 1}`], L.c[0] - 1.95 * rx / rl - .3 * ry / rl, L.c[1] - 1.95 * ry / rl + .3 * rx / rl);
   }
+  // theta: the arc from the nearest world axis to w_1
+  const phi = Math.atan2(L.W[2], L.W[0]), base = Math.round(phi / (Math.PI / 2)) * Math.PI / 2, rho = .8, R = rho / PLANE * 140, mid = (phi + base) / 2;
+  P.arc.setAttribute('d', `M${toPx(L.c[0] + rho * Math.cos(base))},${toPy(L.c[1] + rho * Math.sin(base))} A${R},${R} 0 0 ${phi > base ? 0 : 1} ${toPx(L.c[0] + rho * Math.cos(phi))},${toPy(L.c[1] + rho * Math.sin(phi))}`);
+  placeLabel(P.lab.th, L.c[0] + 1.1 * Math.cos(mid), L.c[1] + 1.1 * Math.sin(mid));
 }
 let simState = null, raf = null;
 function simReset() {
@@ -758,7 +773,6 @@ function simTick() {
 }
 function simStop() { if (raf) cancelAnimationFrame(raf); raf = null; SIM.playing = false; $('simPlay').textContent = 'Play'; }
 function setupSim() {
-  $('planeLegend').innerHTML = `<span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="13" cy="5" r="3" fill="var(--world)"/></svg>stored world samples</span><span><svg viewBox="0 0 26 10" aria-hidden="true"><circle cx="5" cy="5" r="3" fill="var(--s1)"/><circle cx="13" cy="5" r="3" fill="var(--s5)"/><circle cx="21" cy="5" r="3" fill="var(--s3)"/></svg>samples from each learner's generator</span><span>${swatch('var(--s1)')}generator axes</span><span>${swatch('var(--ink)', '5 4')}recognizer axes</span><span>${swatch('var(--world)')}world's axes</span>`;
   $('simLegend').innerHTML = `<span>${swatch('var(--s1)')}wake–sleep, generator</span><span>${swatch('var(--s1)', '5 4')}wake–sleep, recognizer</span><span>${swatch('var(--s5)')}recognition frozen, generator</span><span>${swatch('var(--s5)', '5 4')}recognition frozen, recognizer</span><span>${swatch('var(--s3)')}autoencoder, generator</span><span>${swatch('var(--s3)', '5 4')}autoencoder, recognizer</span>`;
   $('simPlay').onclick = () => { if (SIM.playing) return simStop(); if (simState.t >= SIM.T) simReset(); SIM.playing = true; $('simPlay').textContent = 'Pause'; raf = requestAnimationFrame(simTick); };
   $('simReset').onclick = simReset;

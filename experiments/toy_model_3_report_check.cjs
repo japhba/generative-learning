@@ -29,7 +29,7 @@ const url = 'http://127.0.0.1:8095/toy_model_3_chain.html';
     console.log(name, JSON.stringify(state));
     assert.deepEqual(errors, []); assert.deepEqual(external, []);
     assert(state.katex > 20); assert.equal(state.katexErrors, 0); assert(!state.rawMath); assert(!state.placeholders); assert(state.overflow <= 0, 'horizontal scroll');
-    assert.equal(state.images.length, 10); for (const [src, w] of state.images) assert(w > 900, src);
+    assert.equal(state.images.length, 12); for (const [src, w] of state.images) assert(w > 900, src);
     for (const id of state.sections) await page.locator('#' + id).screenshot({ path: `${out}/${name}-section-${id}.png` });
     await page.locator('header').screenshot({ path: `${out}/${name}-header.png` });
     await page.close();

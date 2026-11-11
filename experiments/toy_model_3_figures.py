@@ -151,6 +151,17 @@ def supervision():
     save(fig, "toy3-supervision.png")
 
 
+# ------------------------------------------------------------------ a generator with wrong entries: whose examples to judge
+def judge():
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(10, 5.4), constrained_layout=True)
+    arms = [("teacher", TEACH, "-", "more teacher chains, taken as shown"), ("teacher_judged", TEACH, "--", "more teacher chains, judged"), ("own", OWN, "-", "own samples, judged"), ("own_drop", OWN, "--", "own samples, judged, wrong entries dropped")]
+    for mode, color, ls, label in arms:
+        rs = runs("judge", mode=mode); T = xs(rs, "tokens")[1:]; band(ax, T, arr(rs, f"own{L}")[:, 1:], color, label, ls, mid=np.median); band(bx, T, arr(rs, "write2")[:, 1:], color, None, ls, mid=np.median)
+        for key in [f"own{L}", "write2", f"write{L}", f"wrong{L}"]: nums[f"judge_{mode}_{key}"] = float(np.median(arr(rs, key)[:, -1])); nums[f"judge_start_{key}"] = float(np.median(arr(rs, key)[:, 0]))
+    for a_, t in [(ax, f"Own chains of {2 ** L} links that are valid"), (bx, "Population spans of 4 links written")]: a_.set_xscale("log"); a_.set_xlabel("further tokens (states shown or written)"); a_.set_ylabel("share"); a_.set_title(t)
+    fig.legend(loc="outside lower center", frameon=False, ncol=2); nums["judge_wrong_pairs"] = float(np.median(arr(runs("judge", mode="own"), "wrong0")[:, 0])); save(fig, "toy3-judge.png")
+
+
 # ------------------------------------------------------------------ what the check is for
 def checks():
     fig, (ax, bx) = plt.subplots(1, 2, figsize=(10, 5.6), constrained_layout=True)
@@ -207,6 +218,36 @@ def own_foreign():
     dx.set_xlabel("share of the examples that are own"); dx.set_ylabel("share of the states in the map at the end"); dx.set_title("A fixed number of examples, split"); below(dx); save(fig, "toy3-own-foreign.png")
 
 
+# ------------------------------------------------------------------ practice that skips what the Oracle holds, against fresh teacher chains
+def aim():
+    fig, axes = plt.subplots(2, 2, figsize=(10, 10.4), constrained_layout=True); (ax, bx), (cx, dx) = axes
+    modes = [("fresh", TEACH, "-", "fresh teacher chains only"), ("blind", OWN, "--", "{N0} teacher chains, then blind practice"), ("aim", OWN, "-", "{N0} teacher chains, then practice that skips what it holds")]
+    for axis, rare, N0, tag, title in [(ax, None, 2 ** 12, "u", "All steps equally likely"), (bx, 0.1, 2 ** 13, "r", "Common and rare steps (9 to 1)")]:
+        for mode, color, ls, label in modes:
+            rs = runs("aim_curve", mode=mode, rare=rare); T = xs(rs, "tokens"); y = arr(rs, "write3"); band(axis, T, y, color, label.format(N0=f"{N0:,}"), ls, mid=np.median)
+            for lev in [0.5, 0.9, 0.98]: nums[f"aim_{tag}_{mode}_t{round(100 * lev)}"] = med([cross(T, v, lev) for v in y])
+            for e in [19, 20, 21, 23]: nums[f"aim_{tag}_{mode}_w3_{e}"] = float(np.median(y[:, np.argmin(np.abs(T - 2 ** e))])); nums[f"aim_{tag}_{mode}_miss_{e}"] = 1 - nums[f"aim_{tag}_{mode}_w3_{e}"]
+        nums[f"aim_{tag}_N0"] = f"{N0:,}"
+        used, looked = arr(rs, "used")[:, -1], arr(rs, "looked")[:, -1]; nums[f"aim_{tag}_stop_used"] = med(used); nums[f"aim_{tag}_stop_w3"] = float(np.median(y[:, -1])); nums[f"aim_{tag}_looks"] = med(looked / (used - N0 * n))
+        for lev in [0.5, 0.9]: nums[f"aim_{tag}_aim_t{round(100 * lev)}_alt"] = med([cross(u + k, v, lev) for u, k, v in zip(arr(rs, "used"), arr(rs, "looked"), y)])  # if every look-up cost one token
+        for e in [20, 21]: nums[f"aim_{tag}_fail{e}"] = (1 - nums[f"aim_{tag}_fresh_w3_{e}"]) / (1 - nums[f"aim_{tag}_aim_w3_{e}"])
+        for lev in [50, 90]: nums[f"aim_{tag}_gain{lev}"] = nums[f"aim_{tag}_fresh_t{lev}"] / nums[f"aim_{tag}_aim_t{lev}"]
+        f, a = arr(runs("aim_curve", mode="fresh", rare=rare), "write3"), y; nums[f"aim_{tag}_cross"] = med([T[np.flatnonzero((av > fv) & (T > N0 * n))[0]] for fv, av in zip(np.array([np.interp(T, xs(runs("aim_curve", mode="fresh", rare=rare), "tokens"), v) for v in f]), a)])
+        axis.set_xscale("log"); axis.set_xlabel("tokens (states shown or written)"); axis.set_ylabel("share of the population's spans of 8 links written"); axis.set_title(title); below(axis)
+    rs = runs("aim_curve", mode="aim", rare=None); T = xs(rs, "tokens"); lv = np.stack([arr(rs, f"lvl{l}") for l in range(1, L + 1)]); d = np.diff(lv, axis=2); tot = d.sum(0)
+    for l in range(L): cx.plot(T[1:], np.nanmedian(np.where(tot > 0, d[l] / np.where(tot > 0, tot, 1), np.nan), 0), color=LEVEL[l], label=f"joins for {SPAN[l]}")
+    nums["aim_u_lvl2_first"] = float(np.median(d[1, :, 0] / tot[:, 0])); nums["aim_u_lvl3_last"] = float(np.nanmedian(np.where(tot > 0, d[2] / np.where(tot > 0, tot, 1), np.nan)[:, np.argmin(np.abs(T[1:] - 2 ** 20))]))
+    cx.set_xscale("log"); cx.set_xlabel("tokens"); cx.set_ylabel("share of the practice tokens written since the last point"); cx.set_title("The practice moves up the levels by itself"); below(cx)
+    for rare, tag in [(None, "u"), (0.1, "r")]:
+        sp = runs("aim", rare=rare); shares = sorted({r["args"]["share"] for r in sp})
+        for i, t in enumerate([2 ** 19, 2 ** 21, 2 ** 23]):
+            y = {a: np.array([[r["out"]["write3"] for r in sp if r["args"]["tokens"] == t and r["args"]["share"] == x and r["args"]["aim"] == a] for x in shares]).T for a in [True, False]}; e = round(np.log2(t)); best = int(np.argmax(np.median(y[True], 0)))
+            nums[f"asplit_{tag}_{e}_best"] = f"{100 * shares[best]:.0f}%"; nums[f"asplit_{tag}_{e}_aim"] = float(np.median(y[True][:, best])); nums[f"asplit_{tag}_{e}_fresh"] = float(np.median(y[True][:, -1])); nums[f"asplit_{tag}_{e}_blind"] = float(np.median(y[False], 0).max())
+            nums[f"asplit_{tag}_{e}_wins"] = int((y[True][:, best] > y[True][:, -1]).sum())
+            if rare is None: band(dx, shares, y[True], plt.cm.Greys(0.4 + 0.25 * i), f"$2^{{{e}}}$ tokens in total", mid=np.median); dx.plot(shares, np.median(y[False], 0), color=plt.cm.Greys(0.4 + 0.25 * i), ls="--")
+    dx.plot([], [], color=REF, ls="--", label="dashed: blind practice"); dx.set_xscale("log"); dx.set_xlabel("share of the tokens spent on fresh teacher chains"); dx.set_ylabel("share of the population's spans of 8 links written"); dx.set_title("A token budget, split (all steps equally likely)"); below(dx, ncol=2); save(fig, "toy3-aim.png")
+
+
 # ------------------------------------------------------------------ own versus foreign with nothing granted: a learner at home in one of 16 regions
 def reach():
     fig, axes = plt.subplots(2, 2, figsize=(10, 10.4), constrained_layout=True); (ax, bx), (cx, dx) = axes; B = 1 / 64
@@ -236,5 +277,5 @@ def reach():
 
 
 if __name__ == "__main__":
-    for f in [scheme, headstart, practice, staircase, tradeoff, supervision, checks, bridge, own_foreign, reach]: f()
+    for f in [scheme, headstart, practice, staircase, tradeoff, aim, supervision, judge, checks, bridge, own_foreign, reach]: f()
     nums.update({"S": S, "m": M, "n": n, "L": L}); (OUT / "numbers.json").write_text(json.dumps(nums, indent=1)); print(OUT / "numbers.json")

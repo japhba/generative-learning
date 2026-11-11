@@ -15,6 +15,7 @@ Its two ways of learning use the same counting rule:
   practise    pick a level k, join two units of k links that the Oracle holds at a shared state (a -> c -> b), write the
               2k + 1 states in one pass, check every link, and count (a, c, b) at level k if all links pass. No teacher data.
               A unit of 1 link is an accepted pair; a unit of 2k links is a span the level-k table has an entry for.
+  aimed       practice that looks a drawn join up first and writes it only if the table lacks it (`run_aim`, `run_curve`).
 
 Own-versus-foreign extension, nothing given (`run_reach`): a world of regions. The Oracle is taught in one region, reads a
 link only if it has learned it, and can take in a teacher chain only if the chain touches a state it knows.
@@ -54,10 +55,11 @@ def world(S, m, rng):
         if (succ != np.arange(S)[:, None]).all() and all((succ[:, g] != succ[:, h]).all() for g in range(m) for h in range(g)): return succ
 
 
-def chains(succ, N, n, rng, noise=0.0, start=None):
-    """N population chains of n states; with noise, each state is replaced by a random one with that probability (a slip)."""
+def chains(succ, N, n, rng, noise=0.0, start=None, p=None):
+    """N population chains of n states; with noise, each state is replaced by a random one with that probability (a slip).
+    p: the probabilities of the m step types (default: uniform)."""
     S, m = succ.shape; x = np.empty((N, n), np.int64); x[:, 0] = rng.integers(S, size=N) if start is None else start
-    for t in range(1, n): x[:, t] = succ[x[:, t - 1], rng.integers(m, size=N)]
+    for t in range(1, n): x[:, t] = succ[x[:, t - 1], rng.integers(m, size=N) if p is None else rng.choice(m, size=N, p=p)]
     if noise: s = rng.random(x.shape) < noise; x[s] = rng.integers(S, size=s.sum())
     return x
 
@@ -79,9 +81,12 @@ class Oracle:
         if self.acc is not None: return self.acc[a, b]
         key = a * self.S + b; return self.code[0][np.minimum(np.searchsorted(self.code[0], key), len(self.code[0]) - 1)] == key
 
-    def merge(self, k, keys):
-        new, n = np.unique(keys, return_counts=True); code, inv = np.unique(np.r_[self.code[k], new], return_inverse=True)
-        self.code[k], self.cnt[k] = code, np.bincount(inv, np.r_[self.cnt[k], n], len(code)).astype(np.int64); self.cum[k] = np.r_[0, np.cumsum(self.cnt[k])]
+    def merge(self, k, keys, w=None):
+        """Add the keys to table k, each with count 1, or with the weights w (the table's counts then become real numbers)."""
+        if w is None: new, n = np.unique(keys, return_counts=True)
+        else: new, inv = np.unique(keys, return_inverse=True); n = np.bincount(inv, w, len(new))
+        code, inv = np.unique(np.r_[self.code[k], new], return_inverse=True); cnt = np.bincount(inv, np.r_[self.cnt[k], n], len(code))
+        self.code[k], self.cnt[k] = code, cnt.astype(np.int64) if w is None and self.cnt[k].dtype == np.int64 else cnt; self.cum[k] = np.r_[0, np.cumsum(self.cnt[k])]
 
     def add(self, k, a, c, b): self.merge(k, (a * self.S + b) * self.S + c)
 
@@ -138,6 +143,37 @@ class Oracle:
         if slip: s = rng.random(x[:, 1:-1].shape) < slip; x[:, 1:-1][s] = rng.integers(self.S, size=s.sum())  # the hand slips on an interior state
         good = self.passes(x[:, :-1], x[:, 1:]).all(1) if gate else np.ones(len(x), bool)
         self.add(k, x[good, 0], x[good, k], x[good, -1])
+
+    def total(self, j, a, b):
+        """The count of the unit (a, b) in table j: the pair itself (j = 0), or the span summed over its midpoints."""
+        code, cum, key = self.code[j], self.cum[j], a * self.S + b
+        return cum[np.searchsorted(code, key + 1)] - cum[np.searchsorted(code, key)] if j == 0 else cum[np.searchsorted(code, (key + 1) * self.S)] - cum[np.searchsorted(code, key * self.S)]
+
+    def aimed(self, tokens, rng, draws=2 ** 14):
+        """Practice that skips what the Oracle already holds. A join is drawn as in practise and looked up; it is written and
+        checked only if the table lacks it, and only written joins cost tokens (2k + 1 states). A new join is filed with the count
+        that blind practice would give it in the long run, count(a, c) count(c, b) / count(c, .). Levels are swept bottom-up; a level
+        gets fewer draws when its last draws found little, so the tokens go to whichever levels still have gaps, and practice
+        stops by itself when it finds nothing new. Returns the tokens written per level and the number of joins looked up."""
+        spent = {k: 0 for k in self.ks}; d = {k: draws for k in self.ks}; looked = idle = 0
+        while sum(spent.values()) < tokens and idle < 4:
+            found = 0
+            for k in self.ks:
+                j = 0 if k == 1 else k // 2; w = self.S if j == 0 else self.S ** 2
+                if len(self.code[j]) == 0: continue
+                a, c = self.ends(j, np.searchsorted(self.cum[j], rng.random(d[k]) * self.cum[j][-1], side="right") - 1); b, held = self.unit(k, c, rng); looked += int(held.sum())
+                key = np.unique(((a * self.S + b) * self.S + c)[held]); code = self.code[k]
+                if len(code): key = key[code[np.minimum(np.searchsorted(code, key), len(code) - 1)] != key]
+                d[k] = int(np.clip(8 * len(key) + 256, 256, draws))
+                key = key[rng.permutation(len(key))[: max(0, int((tokens - sum(spent.values())) // (2 * k + 1)))]]
+                if len(key) == 0: continue
+                a, b, c = key // self.S ** 2, key // self.S % self.S, key % self.S; spent[k] += (2 * k + 1) * len(key); found += len(key)
+                x = np.stack([a, c, b], 1) if k == 1 else np.c_[self.write(a, c, k // 2, rng), self.write(c, b, k // 2, rng)[:, 1:]]
+                good = self.passes(x[:, :-1], x[:, 1:]).all(1); a, c, b = a[good], c[good], b[good]
+                out = self.cum[j][np.searchsorted(self.code[j], (c + 1) * w)] - self.cum[j][np.searchsorted(self.code[j], c * w)]
+                self.merge(k, (a * self.S + b) * self.S + c, self.total(j, a, c) * self.total(j, c, b) / out)
+            idle = 0 if found else idle + 1
+        return spent, looked
 
     def rounds(self, B, rng, **kw):
         """B practice episodes, each at a level drawn uniformly; lower levels first, so that higher ones can use their new units."""
@@ -202,6 +238,74 @@ def run_split(seed, tokens, share):
     Mc = int((tokens - N * (2 ** L + 1)) / np.mean([2 * k + 1 for k in o.ks]))  # a join at level k writes 2k + 1 states
     for B in (np.diff(np.r_[0, grid(16, Mc, 40)]) if Mc >= 16 else []): o.rounds(int(B), rng)
     return {"tokens": tokens, "share": share, "N": N, "M": Mc, **o.score(test, T, rng)}
+
+
+def run_aim(seed, tokens, share, aim=True, rare=None):
+    """As run_split, with practice that skips what the Oracle already holds (aim=True) or blind practice (aim=False).
+    rare: the second step type is taken with this probability and the first with the rest (a world of common and rare steps)."""
+    rng, succ, T, _ = setup(seed, test=1); p = None if rare is None else [1 - rare, rare]; n = 2 ** L + 1; test = chains(succ, 8000, n, rng, p=p); o = Oracle(S, L)
+    N = int(round(share * tokens / n)); o.watch(chains(succ, N, n, rng, p=p)); left = tokens - N * n; row = {"tokens": tokens, "share": share, "N": N}
+    if aim: spent, looked = o.aimed(left, rng); row |= {"written": sum(spent.values()), "looked": looked}
+    else:
+        Mc = int(left / np.mean([2 * k + 1 for k in o.ks]))
+        for B in (np.diff(np.r_[0, grid(16, Mc, 40)]) if Mc >= 16 else []): o.rounds(int(B), rng)
+    return {**row, **o.score(test, T, rng)}
+
+
+def run_curve(seed, mode, rare=None, N0=2 ** 12, tokens=2 ** 23, points=44):
+    """Share of spans written against tokens. fresh: teacher chains only. blind, aim: N0 teacher chains (their tokens counted),
+    then practice only, blind or skipping what the Oracle holds."""
+    rng, succ, T, _ = setup(seed, test=1); p = None if rare is None else [1 - rare, rare]; n = 2 ** L + 1; test = chains(succ, 8000, n, rng, p=p); o = Oracle(S, L)
+    out, spent, used, looked, lvl = [], 0, 0, 0, {k: 0 for k in o.ks}; cost = np.mean([2 * k + 1 for k in o.ks])
+    if mode != "fresh": o.watch(chains(succ, N0, n, rng, p=p)); spent = used = N0 * n; out.append({"tokens": spent, "used": used, "looked": 0, **{f"lvl{l}": 0 for l in range(1, L + 1)}, **o.score(test, T, rng)})
+    for Tk in grid(2 ** 12, tokens, points):
+        if Tk <= spent: continue
+        if mode == "fresh": o.watch(chains(succ, int(Tk - spent) // n, n, rng, p=p)); used = int(Tk)
+        elif mode == "blind": o.rounds(int((Tk - spent) / cost), rng); used = int(Tk)
+        else:
+            sp, lk = o.aimed(int(Tk - spent), rng); used += sum(sp.values()); looked += lk
+            for k in o.ks: lvl[k] += sp[k]
+        spent = int(Tk); out.append({"tokens": spent, "used": used, "looked": looked, **{f"lvl{l}": lvl[k] for l, k in enumerate(o.ks, 1)}, **o.score(test, T, rng)})
+    return out
+
+
+def run_judge(seed, mode, N0=2 ** 14, noise=0.03, tokens=2 ** 21, points=28):
+    """A generator with wrong entries, and four ways to spend more tokens on it. Stage 1: N0 chains of a teacher who slips; the
+    recogniser accepts a pair seen twice and is then frozen; the generator takes every span as shown, slips included.
+    Stage 2 (the generator only):
+      teacher         more of the teacher's chains, taken as shown
+      teacher_judged  more of the teacher's chains, a span filed only if all its links pass
+      own             chains drawn from the Oracle's own generator (ends from its top table, one pass) and judged: the entries
+                      that wrote a chain which passes are counted once more
+      own_drop        the same, and an entry is dropped when the state it wrote fits neither of its neighbours
+    Every chain shown or written costs its 9 tokens; nothing is looked up first."""
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L, theta=2); o.watch(chains(succ, N0, n, rng, noise)); out, spent = [], 0
+    R = {}; P = T.astype(np.float32)
+    for k in o.ks: R[k] = P > 0; P = (P @ P > 0).astype(np.float32)  # R[k][a, c]: c can be reached from a in k links
+    def score():
+        row = {"tokens": spent, **o.score(test, T, rng)}
+        for l, k in enumerate(o.ks, 1): c = o.code[k]; a, b, mid = c // S ** 2, c // S % S, c % S; row[f"wrong{l}"] = float(o.cnt[k][~(R[k][a, mid] & R[k][mid, b])].sum() / o.cnt[k].sum())
+        return row
+    def own(B, drop):
+        k = o.ks[-1]; r = np.searchsorted(o.cum[k], rng.random(B) * o.cum[k][-1], side="right") - 1; c = o.code[k][r]
+        x = np.empty((B, 2 * k + 1), np.int64); x[:, 0], x[:, -1], x[:, k] = c // S ** 2, c // S % S, c % S; nodes = [(k, k, r, np.ones(B, bool))]  # level, position of the midpoint, table row, held
+        for kk in o.ks[-2::-1]:
+            for i in range(0, 2 * k, 2 * kk):
+                key = (x[:, i] * S + x[:, i + 2 * kk]) * S; r, held = o.pick(kk, np.searchsorted(o.code[kk], key), np.searchsorted(o.code[kk], key + S), rng)
+                x[:, i + kk] = np.where(held, o.code[kk][r] % S, rng.integers(S, size=B)); nodes.append((kk, i + kk, r, held))
+        ok = o.passes(x[:, :-1], x[:, 1:]); good = ok.all(1)
+        for kk, p, r, held in nodes:
+            np.add.at(o.cnt[kk], r[good & held], 1)
+            if drop: np.subtract.at(o.cnt[kk], r[held & ~ok[:, p - 1] & ~ok[:, p]], 1)
+        for kk in o.ks: keep = o.cnt[kk] > 0; o.code[kk], o.cnt[kk] = o.code[kk][keep], o.cnt[kk][keep]; o.cum[kk] = np.r_[0, np.cumsum(o.cnt[kk])]
+    out.append(score())
+    for Tk in grid(2 ** 12, tokens, points):
+        B = int(Tk - spent) // n
+        if mode in ["teacher", "teacher_judged"]: o.file(chains(succ, B, n, rng, noise), gate=mode == "teacher_judged")
+        else:
+            for b in np.diff(np.r_[0, np.linspace(0, B, 9)[1:].astype(int)]): own(int(b), mode == "own_drop")  # in 8 parts, so that the tables are up to date
+        spent = int(Tk); out.append(score())
+    return out
 
 
 def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
@@ -295,6 +399,9 @@ JOBS = {
     "map": [(run_map, dict(seed=s, own_share=x)) for x in [0.0, 0.5, 1.0] for s in range(WORLDS)],
     "map_big": [(run_map, dict(seed=s, own_share=x, S=2 ** 16, P_max=2 ** 16)) for x in [0.0, 1.0] for s in range(WORLDS)],
     "map_split": [(run_map, dict(seed=s, own_share=x, P_max=P, points=4)) for P in [256, 1024, 4096] for x in [0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0] for s in range(WORLDS)],
+    "aim": [(run_aim, dict(seed=s, tokens=t, share=x, aim=a, rare=r)) for r in [None, 0.1] for a in [True, False] for t in [2 ** 19, 2 ** 21, 2 ** 23] for x in [0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0] for s in range(WORLDS)],
+    "aim_curve": [(run_curve, dict(seed=s, mode=mo, rare=r, N0=N0)) for r, N0 in [(None, 2 ** 12), (0.1, 2 ** 13)] for mo in ["fresh", "blind", "aim"] for s in range(WORLDS)],
+    "judge": [(run_judge, dict(seed=s, mode=mo)) for mo in ["teacher", "teacher_judged", "own", "own_drop"] for s in range(WORLDS)],
     "reach": [(run_reach, dict(seed=s, share=x, bridge=b)) for b in [0.0, 1 / 1024, 1 / 64] for x in [0.0, 0.5, 1.0] for s in range(WORLDS)]
     + [(run_reach, dict(seed=s, share=x, bridge=1 / 64, attach=False)) for x in [0.0, 0.5] for s in range(WORLDS)]
     + [(run_reach, dict(seed=s, share=x, K=1, S_r=16 * S)) for x in [0.0, 0.5, 1.0] for s in range(WORLDS)],

@@ -25,12 +25,13 @@ SHARED = Path('/ceph/scratch/jbauer/reports/generative-learning')
 PROJECT = 'tex/practice-loop'  # in the clone of the OverLyX project jan/generative-learning
 NAME = 'toy_model_3_chain'
 RUNS = Path('/var/tmp/jbauer/generative_practice_chain')
-FIGS = ['scheme', 'headstart', 'practice', 'staircase', 'tradeoff', 'supervision', 'checks', 'bridge', 'reach', 'own-foreign']
+FIGS = ['scheme', 'headstart', 'practice', 'staircase', 'tradeoff', 'aim', 'supervision', 'judge', 'checks', 'bridge', 'reach', 'own-foreign']
 CODE = ['experiments/toy_model_3_oracle.py', 'experiments/toy_model_3_figures.py', 'experiments/toy_model_3_report.py', 'experiments/toy_model_3_report.html']
-COUNT = r'half_.*|stair12_\d|gain_peak_N\d|sched_[NM]|map_\w+_(10|lo10|hi10|w1)|big_\w+_10|noisy_\w+_(wrong|half|wins)|bridge_entries|split\d+_wins|reach_(half|most|never)_\w+|reach_\w+_half_\w+'  # whole numbers
-TIMES = r'lead(_theory)?\d|saving'  # factors
+COUNT = r'half_.*|stair12_\d|gain_peak_N\d|sched_[NM]|map_\w+_(10|lo10|hi10|w1)|big_\w+_10|noisy_\w+_(wrong|half|wins)|bridge_entries|split\d+_wins|reach_(half|most|never)_\w+|reach_\w+_half_\w+|aim_[ur]_\w+_t\d+(_alt)?|aim_[ur]_(stop_used|cross)|asplit_\w+_wins|judge_wrong_pairs'  # whole numbers
+TIMES = r'lead(_theory)?\d|saving|aim_[ur]_(looks|fail\d+|gain\d+)'  # factors
 SHARE = (r'multi_route\d|n\d+_\w+|gain_peak\d|sched_(watch_first|alternate|practise_first)|noisy_\w+_own0?|slip_\w+|false\d+_(\d|pred3)|usable_(at|pred)_10|msplit\w+|split\d+_(all|half)|stair_q\d+|bridge_multi|pairs_only_gap|read_write_gap'
-         r'|reach_(use|lost|start|stage1)\w+|reach_(own|mix|fresh)_(home\d|pop\d|map)_\d+(_b0)?|reach_keep_home3_23|mixed_\w+')
+         r'|reach_(use|lost|start|stage1)\w+|reach_(own|mix|fresh)_(home\d|pop\d|map)_\d+(_b0)?|reach_keep_home3_23|mixed_\w+'
+         r'|aim_[ur]_\w+_(w3|miss)_\d+|aim_[ur]_stop_w3|aim_u_lvl\w+|asplit_[ur]_\d+_(aim|fresh|blind)|judge_\w+_(own|write|wrong)\d')
 
 
 def count(x): return f'{x:,.0f}'
@@ -47,7 +48,7 @@ def main():
     nums |= {'S': count(v['S']), 'm': str(v['m']), 'n': str(v['n']), 'pairs_total': count(v['S'] * v['m']), 'spans_total': count(v['S'] * v['m'] ** (v['n'] - 1)), 'm_max': million(M_MAX), 'bridge_M': million(2 ** 22),
              'map_ratio_10': times(v['map_foreign_10'] / v['map_own_10']), 'reach_tokens': million(2 ** 23), 'reach_tokens_20': million(2 ** 20), 'reach_fresh_total': count(2 ** 23 // v['n']), 'bridge_cond1': f"{v['bridge_cond1']:.2g}", 'bridge_cond2': f"{v['bridge_cond2']:.2g}", 'bridge_corr': f"{v['bridge_corr']:.3f}", 'filesDir': f'{NAME}-files',
              'built': datetime.now(ZoneInfo('Europe/London')).strftime('%d %B %Y, %H:%M %Z'),
-             'sourceHash': ' · '.join(f'{p.name} {hashlib.sha256(p.read_bytes()).hexdigest()[:12]}' for p in [RUNS / 'watch.json', RUNS / 'practice.json', RUNS / 'reach.json', RUNS / 'map.json', RUNS / 'numbers.json'])}
+             'sourceHash': ' · '.join(f'{p.name} {hashlib.sha256(p.read_bytes()).hexdigest()[:12]}' for p in [RUNS / 'watch.json', RUNS / 'practice.json', RUNS / 'aim_curve.json', RUNS / 'judge.json', RUNS / 'reach.json', RUNS / 'map.json', RUNS / 'numbers.json'])}
     html = (root / 'experiments/toy_model_3_report.html').read_text()
     for key in sorted(set(re.findall(r'\{\{(\w+)\}\}', html))): assert nums.get(key) is not None, f'no value for {key}'; html = html.replace('{{' + key + '}}', nums[key])
     head, rest = html.split('<main>', 1); body, tail = rest.split('</main>', 1)

@@ -177,6 +177,25 @@ def spur():
     fig.legend(loc="outside lower center", frameon=False, ncol=2); save(fig, "toy3-spurious.png")
 
 
+# ------------------------------------------------------------------ a generator that starts from random entries, and one signed rule
+def tandem():
+    fig, axes = plt.subplots(1, 3, figsize=(10, 4.6), constrained_layout=True); R = 2 ** 13
+    arms = [("signed", OWN, "-", "practice with the signed rule"), ("plus", OWN, "--", "practice, failures ignored"), ("teacher", TEACH, "-", "teacher chains")]
+    for mode, color, ls, label in arms:
+        for rows, tag in [(R, ""), (2 ** 16, "big_")]:
+            rs = runs("tandem", mode=mode, rows=rows); T = xs(rs, "tokens")[1:]; left = {l: arr(rs, f"nwrong{l}") / arr(rs, f"nwrong{l}")[:, :1] for l in range(1, L + 1)}
+            for e in [20, 23]:
+                i = int(np.argmin(np.abs(xs(rs, "tokens") - 2 ** e)))
+                for key in [f"own{L}", f"write{L}", "write2"]: nums[f"tandem_{tag}{mode}_{key}_{e}"] = float(np.median(arr(rs, key)[:, i]))
+                for l in range(1, L + 1): nums[f"tandem_{tag}{mode}_left{l}_{e}"] = float(np.median(left[l][:, i])); nums[f"tandem_{tag}{mode}_nleft{l}_{e}"] = float(np.median(arr(rs, f"nwrong{l}")[:, i]))
+            if rows == R:
+                for axis, y in zip(axes, [left[L][:, 1:], arr(rs, f"own{L}")[:, 1:], arr(rs, f"write{L}")[:, 1:]]): band(axis, T, y, color, label if axis is axes[0] else None, ls, mid=np.median)
+                nums[f"tandem_{mode}_t99"] = med([cross(T, v, 0.99) for v in arr(rs, f"own{L}")[:, 1:]])
+    nums["tandem_rows"] = f"{R:,}"; nums["tandem_start"] = float(np.median(arr(runs("tandem", mode="signed", rows=R), f"nwrong{L}")[:, 0]))
+    for axis, title in zip(axes, ["Random entries left", "Own chains valid", "Population spans written"]): axis.set_xscale("log"); axis.set_xlabel("tokens"); axis.set_title(title); axis.set_ylim(-0.03, 1.03)
+    axes[0].set_ylabel("share (top table, spans of 8 links)"); fig.legend(loc="outside lower center", frameon=False, ncol=3); save(fig, "toy3-tandem.png")
+
+
 # ------------------------------------------------------------------ what the check is for
 def checks():
     fig, (ax, bx) = plt.subplots(1, 2, figsize=(10, 5.6), constrained_layout=True)
@@ -292,5 +311,5 @@ def reach():
 
 
 if __name__ == "__main__":
-    for f in [scheme, headstart, practice, staircase, tradeoff, aim, supervision, judge, spur, checks, bridge, own_foreign, reach]: f()
+    for f in [scheme, headstart, practice, staircase, tandem, tradeoff, aim, supervision, judge, spur, checks, bridge, own_foreign, reach]: f()
     nums.update({"S": S, "m": M, "n": n, "L": L}); (OUT / "numbers.json").write_text(json.dumps(nums, indent=1)); print(OUT / "numbers.json")

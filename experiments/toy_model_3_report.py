@@ -1,6 +1,8 @@
 """Build toy_model_3_chain.html: the Oracle (a learner made of tables) on a chain world. Checking a chain is one lookup of a
 pair table per link; writing one in a single pass needs a tree of bridge tables. The pair table is learned from few teacher
-chains; practice (joining held units, writing in one pass, checking, counting) fills the bridge tables without teacher data.
+chains; practice (joining held units and rehearsing held entries, written in one pass and judged by the pair table, with one
+signed counting rule) fills the bridge tables without teacher data and removes the random entries the generator starts with.
+The page has five sections; the runs it only cites (regions, look-up practice, a teacher who slips) stay in the code.
 
 Every number in the page comes from /var/tmp/jbauer/generative_practice_chain/numbers.json (toy_model_3_figures.py, from the
 runs of toy_model_3_oracle.py); nothing is typed in by hand. The page goes to the world-readable ceph reports folder with its
@@ -25,13 +27,13 @@ SHARED = Path('/ceph/scratch/jbauer/reports/generative-learning')
 PROJECT = 'tex/practice-loop'  # in the clone of the OverLyX project jan/generative-learning
 NAME = 'toy_model_3_chain'
 RUNS = Path('/var/tmp/jbauer/generative_practice_chain')
-FIGS = ['scheme', 'headstart', 'practice', 'staircase', 'tradeoff', 'aim', 'supervision', 'judge', 'spurious', 'checks', 'bridge', 'reach', 'own-foreign']
+FIGS = ['scheme', 'headstart', 'practice', 'staircase', 'tandem']
 CODE = ['experiments/toy_model_3_oracle.py', 'experiments/toy_model_3_figures.py', 'experiments/toy_model_3_report.py', 'experiments/toy_model_3_report.html']
-COUNT = r'half_.*|stair12_\d|gain_peak_N\d|sched_[NM]|map_\w+_(10|lo10|hi10|w1)|big_\w+_10|noisy_\w+_(wrong|half|wins)|bridge_entries|split\d+_wins|reach_(half|most|never)_\w+|reach_\w+_half_\w+|aim_[ur]_\w+_t\d+(_alt)?|aim_[ur]_(stop_used|cross)|asplit_\w+_wins|judge_wrong_pairs|judge_\w+_left|spur_\w+_left'  # whole numbers
+COUNT = r'half_.*|stair12_\d|gain_peak_N\d|sched_[NM]|map_\w+_(10|lo10|hi10|w1)|big_\w+_10|noisy_\w+_(wrong|half|wins)|bridge_entries|split\d+_wins|reach_(half|most|never)_\w+|reach_\w+_half_\w+|aim_[ur]_\w+_t\d+(_alt)?|aim_[ur]_(stop_used|cross)|asplit_\w+_wins|judge_wrong_pairs|judge_\w+_left|spur_\w+_left|tandem_\w+_t99|tandem_start|tandem_\w+_nleft\d_\d+'  # whole numbers
 TIMES = r'lead(_theory)?\d|saving|aim_[ur]_(looks|fail\d+|gain\d+)'  # factors
 SHARE = (r'multi_route\d|n\d+_\w+|gain_peak\d|sched_(watch_first|alternate|practise_first)|noisy_\w+_own0?|slip_\w+|false\d+_(\d|pred3)|usable_(at|pred)_10|msplit\w+|split\d+_(all|half)|stair_q\d+|bridge_multi|pairs_only_gap|read_write_gap'
          r'|reach_(use|lost|start|stage1)\w+|reach_(own|mix|fresh)_(home\d|pop\d|map)_\d+(_b0)?|reach_keep_home3_23|mixed_\w+'
-         r'|aim_[ur]_\w+_(w3|miss)_\d+|aim_[ur]_stop_w3|aim_u_lvl\w+|asplit_[ur]_\d+_(aim|fresh|blind)|judge_\w+_(own|write|wrong)\d|spur_\w+_(own|own14|share)')
+         r'|aim_[ur]_\w+_(w3|miss)_\d+|aim_[ur]_stop_w3|aim_u_lvl\w+|asplit_[ur]_\d+_(aim|fresh|blind)|judge_\w+_(own|write|wrong)\d|spur_\w+_(own|own14|share)|tandem_\w+_(own\d|write\d|left\d)_\d+')
 
 
 def count(x): return f'{x:,.0f}'
@@ -45,10 +47,10 @@ def main():
     root = Path(__file__).resolve().parents[1]; v = json.loads((RUNS / 'numbers.json').read_text()); nums = {}
     for k, x in v.items():
         nums[k] = x if isinstance(x, str) else count(x) if re.fullmatch(COUNT, k) else times(x) if re.fullmatch(TIMES, k) else share(x) if re.fullmatch(SHARE, k) else None
-    nums |= {'S': count(v['S']), 'm': str(v['m']), 'n': str(v['n']), 'pairs_total': count(v['S'] * v['m']), 'spans_total': count(v['S'] * v['m'] ** (v['n'] - 1)), 'm_max': million(M_MAX), 'bridge_M': million(2 ** 22),
+    nums |= {'S': count(v['S']), 'm': str(v['m']), 'n': str(v['n']), 'pairs_total': count(v['S'] * v['m']), 'spans1': count(v['S'] * v['m'] ** 2), 'spans2': count(v['S'] * v['m'] ** 4), 'spans_total': count(v['S'] * v['m'] ** (v['n'] - 1)), 'm_max': million(M_MAX), 'bridge_M': million(2 ** 22),
              'map_ratio_10': times(v['map_foreign_10'] / v['map_own_10']), 'reach_tokens': million(2 ** 23), 'reach_tokens_20': million(2 ** 20), 'reach_fresh_total': count(2 ** 23 // v['n']), 'judge_thin': times(v['judge_start_wrong3'] / v['judge_teacher_judged_wrong3']), 'spur_tokens': million(2 ** 21), 'bridge_cond1': f"{v['bridge_cond1']:.2g}", 'bridge_cond2': f"{v['bridge_cond2']:.2g}", 'bridge_corr': f"{v['bridge_corr']:.3f}", 'filesDir': f'{NAME}-files',
              'built': datetime.now(ZoneInfo('Europe/London')).strftime('%d %B %Y, %H:%M %Z'),
-             'sourceHash': ' · '.join(f'{p.name} {hashlib.sha256(p.read_bytes()).hexdigest()[:12]}' for p in [RUNS / 'watch.json', RUNS / 'practice.json', RUNS / 'aim_curve.json', RUNS / 'judge.json', RUNS / 'spur.json', RUNS / 'reach.json', RUNS / 'map.json', RUNS / 'numbers.json'])}
+             'sourceHash': ' · '.join(f'{p.name} {hashlib.sha256(p.read_bytes()).hexdigest()[:12]}' for p in [RUNS / 'watch.json', RUNS / 'practice.json', RUNS / 'tandem.json', RUNS / 'numbers.json'])}
     html = (root / 'experiments/toy_model_3_report.html').read_text()
     for key in sorted(set(re.findall(r'\{\{(\w+)\}\}', html))): assert nums.get(key) is not None, f'no value for {key}'; html = html.replace('{{' + key + '}}', nums[key])
     head, rest = html.split('<main>', 1); body, tail = rest.split('</main>', 1)
@@ -58,6 +60,8 @@ def main():
     files = SHARED / f'{NAME}-files'; files.mkdir(parents=True, exist_ok=True)
     for src in CODE: shutil.copy2(root / src, files / Path(src).name)
     for f in FIGS: shutil.copy2(root / 'reports' / f'toy3-{f}.png', files / f'toy3-{f}.png')
+    for f in files.glob('toy3-*.png'):  # copies of figures that the page no longer shows (the originals stay in reports/)
+        if f.stem[5:] not in FIGS: f.unlink()
     out = SHARED / f'{NAME}.html'; out.write_text(html)
     for p in [SHARED.parent, SHARED, files]: p.chmod(0o755)
     for p in [out, *files.iterdir()]: p.chmod(0o644)
@@ -69,6 +73,8 @@ def main():
     if args.project:
         page = root / PROJECT / f'{NAME}.html'; (page.parent / files.name).mkdir(exist_ok=True)
         for f in files.iterdir(): shutil.copy2(f, page.parent / files.name / f.name)
+        for f in (page.parent / files.name).glob('toy3-*.png'):
+            if not (files / f.name).exists(): f.unlink()
         page.write_text(html); print(page)
 
 

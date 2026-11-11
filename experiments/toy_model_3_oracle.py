@@ -15,6 +15,9 @@ Its two ways of learning use the same counting rule:
   practise    pick a level k, join two units of k links that the Oracle holds at a shared state (a -> c -> b), write the
               2k + 1 states in one pass, check every link, and count (a, c, b) at level k if all links pass. No teacher data.
               A unit of 1 link is an accepted pair; a unit of 2k links is a span the level-k table has an entry for.
+  rehearse    draw an entry the Oracle holds, write its span in one pass, judge it: the count goes up by one if every link passes
+              and down by one if not. With joins this is the one signed rule of the write-up; `run_tandem` starts the generator
+              from random entries and compares it with teacher chains.
   aimed       practice that looks a drawn join up first and writes it only if the table lacks it (`run_aim`, `run_curve`).
 
 Own-versus-foreign extension, nothing given (`run_reach`): a world of regions. The Oracle is taught in one region, reads a
@@ -174,6 +177,16 @@ class Oracle:
                 self.merge(k, (a * self.S + b) * self.S + c, self.total(j, a, c) * self.total(j, c, b) / out)
             idle = 0 if found else idle + 1
         return spent, looked
+
+    def rehearse(self, k, B, rng, signed=True):
+        """B rehearsals at level k: an entry the Oracle holds is drawn in proportion to its count, the span it stands for is written
+        in one pass and judged. The entry's count goes up by one if every link passes and, with signed, down by one if not."""
+        if len(self.code[k]) == 0 or B == 0: return
+        r = np.searchsorted(self.cum[k], rng.random(B) * self.cum[k][-1], side="right") - 1; c = self.code[k][r]; a, b, c = c // self.S ** 2, c // self.S % self.S, c % self.S
+        x = np.stack([a, c, b], 1) if k == 1 else np.c_[self.write(a, c, k // 2, rng), self.write(c, b, k // 2, rng)[:, 1:]]
+        good = self.passes(x[:, :-1], x[:, 1:]).all(1); np.add.at(self.cnt[k], r[good], 1)
+        if signed: np.subtract.at(self.cnt[k], r[~good], 1); keep = self.cnt[k] > 0; self.code[k], self.cnt[k] = self.code[k][keep], self.cnt[k][keep]
+        self.cum[k] = np.r_[0, np.cumsum(self.cnt[k])]
 
     def rounds(self, B, rng, **kw):
         """B practice episodes, each at a level drawn uniformly; lower levels first, so that higher ones can use their new units."""
@@ -343,6 +356,26 @@ def run_spur(seed, mode, rows=64, share=0.2, N0=2 ** 12, M0=2 ** 20, tokens=2 **
     return out
 
 
+def run_tandem(seed, mode, rows=2 ** 16, N0=2 ** 12, tokens=2 ** 23, points=40):
+    """A generator that starts from random entries, and one signed rule. The teacher (no slips) first shows N0 chains, which fill
+    the pair table only. Every table of the generator starts with `rows` random entries of count 1. Then, at equal tokens:
+      signed   practice. An episode picks a level and either joins two held units into a new entry or rehearses an entry it
+               holds; the span is written in one pass and judged; the entry's count goes up by one if it passes, down by one if not
+      plus     the same, but a failure changes nothing
+      teacher  further teacher chains; every span of a chain is counted
+    Every chain shown or written costs its tokens."""
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L); o.watch(chains(succ, N0, n, rng), levels=False); out, spent = [], 0; R = reachable(T, o.ks); cost = np.mean([2 * k + 1 for k in o.ks])
+    for k in o.ks: a, b, c = rng.integers(S, size=(3, rows)); o.add(k, a, c, b)
+    out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
+    for Tk in grid(2 ** 10, tokens, points):
+        if mode == "teacher": o.file(chains(succ, int(Tk - spent) // n, n, rng), gate=False)
+        else:
+            for B in np.diff(np.r_[0, np.linspace(0, (Tk - spent) / cost, 9)[1:].astype(int)]):  # in 8 parts, so that the tables are up to date
+                for k, Bk in zip(o.ks, rng.multinomial(int(B), np.ones(L) / L)): j = rng.binomial(Bk, 0.5); o.practise(k, j, rng); o.rehearse(k, Bk - j, rng, signed=mode == "signed")
+        spent = int(Tk); out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
+    return out
+
+
 def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
     """Do practised tables converge to the exact bridge conditional? Small world with many routes; the teacher chains fill the pair
     table only. Target: Chapman-Kolmogorov composition of the Oracle's own pair counts, level by level."""
@@ -437,6 +470,7 @@ JOBS = {
     "aim": [(run_aim, dict(seed=s, tokens=t, share=x, aim=a, rare=r)) for r in [None, 0.1] for a in [True, False] for t in [2 ** 19, 2 ** 21, 2 ** 23] for x in [0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0] for s in range(WORLDS)],
     "aim_curve": [(run_curve, dict(seed=s, mode=mo, rare=r, N0=N0)) for r, N0 in [(None, 2 ** 12), (0.1, 2 ** 13)] for mo in ["fresh", "blind", "aim"] for s in range(WORLDS)],
     "judge": [(run_judge, dict(seed=s, mode=mo)) for mo in ["teacher", "teacher_judged", "own", "own_drop"] for s in range(WORLDS)],
+    "tandem": [(run_tandem, dict(seed=s, mode=mo, rows=r)) for r in [2 ** 16, 2 ** 13] for mo in ["signed", "plus", "teacher"] for s in range(WORLDS)],
     "spur": [(run_spur, dict(seed=s, mode=mo, rows=r)) for r in [64, 2 ** 15] for mo in ["teacher", "own", "own_drop", "own_delete"] for s in range(WORLDS)],
     "reach": [(run_reach, dict(seed=s, share=x, bridge=b)) for b in [0.0, 1 / 1024, 1 / 64] for x in [0.0, 0.5, 1.0] for s in range(WORLDS)]
     + [(run_reach, dict(seed=s, share=x, bridge=1 / 64, attach=False)) for x in [0.0, 0.5] for s in range(WORLDS)]

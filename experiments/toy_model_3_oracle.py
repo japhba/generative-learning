@@ -1,0 +1,270 @@
+"""Toy model 3: the Oracle on a chain world (plan agreed with the user, 10-11 Nov 2026).
+
+World: S states, each with m allowed successors (m permutations of the states, no fixed point, no shared arc). The
+population is the valid chains of n = 2^L + 1 states: uniform start, uniform allowed step. Every state has to fit both
+of its neighbours.
+
+The Oracle is the learner, made of tables and counts only:
+  recogniser  pairs[a, b]: how often b was seen right after a. A link passes once its pair was seen theta times.
+              Checking a chain is one lookup per link, at any length.
+  generator   bridge[k]: counts of (a, b) -> c, the midpoint c of a span of 2k links from a to b, k = 1, 2, 4, ..., 2^(L-1).
+              Writing is one top-down pass: a node holding (a, b) draws c from its table (a uniform guess if it has no
+              entry) and hands (a, c) and (c, b) to its two children.
+Its two ways of learning use the same counting rule:
+  watch       a teacher chain adds its adjacent pairs to the recogniser and each of its spans (a, c, b) to the generator.
+  practise    pick a level k, join two units of k links that the Oracle holds at a shared state (a -> c -> b), write the
+              2k + 1 states in one pass, check every link, and count (a, c, b) at level k if all links pass. No teacher data.
+              A unit of 1 link is an accepted pair; a unit of 2k links is a span the level-k table has an entry for.
+
+Own-versus-foreign extension (`run_map`): the step types are given (the same few steps act everywhere), the world has
+many states, and the Oracle can only file a chain that touches its map, the set of states it has produced or reached.
+
+Scores, on held-out population chains (level l has spans of 2^l links):
+  read0       share of population links the recogniser accepts
+  read<l>     share of population spans the Oracle holds as one unit (one lookup)
+  write<l>    share of population spans (a, b) for which one pass from (a, b) gives a chain with only allowed links
+  allow<l>    share of population spans whose own links are all accepted (what the pair table already permits)
+  reach<l>    share of population spans joined by some route of accepted links (the ceiling of practice; where computed)
+  own<l>      share of the Oracle's own samples at level l (ends drawn from its table) with only allowed links
+
+Usage: python toy_model_3_oracle.py [--only watch practice ...] -> /var/tmp/jbauer/generative_practice_chain/<name>.json
+       python toy_model_3_figures.py -> reports/toy3-*.png"""
+
+import os; os.environ.setdefault("OMP_NUM_THREADS", "1"); os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+import argparse
+import json
+from multiprocessing import Pool
+from pathlib import Path
+
+import numpy as np
+from tqdm.auto import tqdm
+
+OUT = Path("/var/tmp/jbauer/generative_practice_chain")
+S, M, L, WORLDS = 1024, 2, 3, 16  # the main world: 1024 states, 2 allowed successors, chains of 9 states, 16 random worlds
+N_GRID = [2 ** e for e in range(6, 21)]  # numbers of teacher chains for the practice experiments
+M_MAX = 2 ** 23  # practice episodes (joins)
+
+
+def world(S, m, rng):
+    """succ[z, g]: the g-th allowed successor of state z."""
+    while True:
+        succ = np.stack([rng.permutation(S) for _ in range(m)], 1)
+        if (succ != np.arange(S)[:, None]).all() and all((succ[:, g] != succ[:, h]).all() for g in range(m) for h in range(g)): return succ
+
+
+def chains(succ, N, n, rng, noise=0.0, start=None):
+    """N population chains of n states; with noise, each state is replaced by a random one with that probability (a slip)."""
+    S, m = succ.shape; x = np.empty((N, n), np.int64); x[:, 0] = rng.integers(S, size=N) if start is None else start
+    for t in range(1, n): x[:, t] = succ[x[:, t - 1], rng.integers(m, size=N)]
+    if noise: s = rng.random(x.shape) < noise; x[s] = rng.integers(S, size=s.sum())
+    return x
+
+
+def grid(lo, hi, points): return np.unique(np.round(np.geomspace(lo, hi, points)).astype(np.int64))
+
+
+class Oracle:
+    """code[0], cnt[0]: the accepted pairs a S + b and their counts. code[k], cnt[k], k >= 1: sorted (a S + b) S + c and counts."""
+
+    def __init__(self, S, L, theta=1, succ=None):
+        self.S, self.L, self.theta, self.succ = S, L, theta, succ; self.ks = [2 ** l for l in range(L)]  # succ given: the step types are known
+        self.pairs = None if succ is not None else np.zeros(S * S, np.int64)
+        self.code = {k: np.empty(0, np.int64) for k in [0] + self.ks}; self.cnt = {k: np.empty(0, np.int64) for k in [0] + self.ks}
+        self.cum = {k: np.zeros(1, np.int64) for k in [0] + self.ks}; self.acc = np.zeros((S, S), bool) if succ is None else None
+
+    def passes(self, a, b): return self.acc[a, b] if self.succ is None else (self.succ[a] == b[..., None]).any(-1)
+
+    def add(self, k, a, c, b):
+        new, n = np.unique((a * self.S + b) * self.S + c, return_counts=True)
+        code, inv = np.unique(np.r_[self.code[k], new], return_inverse=True)
+        self.code[k], self.cnt[k] = code, np.bincount(inv, np.r_[self.cnt[k], n], len(code)).astype(np.int64); self.cum[k] = np.r_[0, np.cumsum(self.cnt[k])]
+
+    def file(self, x, gate):
+        """The generator's counting rule: (ends, midpoint) of every span of every chain; with the gate, only spans whose links all pass."""
+        if gate: bad = np.c_[np.zeros(len(x), np.int64), np.cumsum(~self.passes(x[:, :-1], x[:, 1:]), 1)]
+        for k in self.ks:
+            i = np.arange(x.shape[1] - 2 * k)
+            if len(i) == 0: break
+            keep = bad[:, i + 2 * k] == bad[:, i] if gate else np.ones((len(x), len(i)), bool)
+            self.add(k, x[:, i][keep], x[:, i + k][keep], x[:, i + 2 * k][keep])
+
+    def watch(self, x, levels=True, gate=False):
+        """Teacher chains: count the adjacent pairs; with levels, also every span (through the gate if asked)."""
+        self.pairs += np.bincount(x[:, :-1].ravel() * self.S + x[:, 1:].ravel(), minlength=self.S ** 2)
+        self.code[0] = np.flatnonzero(self.pairs >= self.theta); self.cnt[0] = self.pairs[self.code[0]]; self.cum[0] = np.r_[0, np.cumsum(self.cnt[0])]
+        self.acc = (self.pairs >= self.theta).reshape(self.S, self.S)
+        if levels: self.file(x, gate)
+
+    def pick(self, k, lo, hi, rng):
+        """A row of table k in [lo, hi), with probability proportional to its count; held is False where the range is empty."""
+        cum = self.cum[k]; r = np.searchsorted(cum, cum[lo] + rng.random(len(lo)) * (cum[hi] - cum[lo]), side="right") - 1
+        return np.minimum(np.clip(r, lo, np.maximum(hi - 1, lo)), len(self.code[k]) - 1), hi > lo
+
+    def ends(self, k, r): c = self.code[k][r]; return (c // self.S, c % self.S) if k == 0 else (c // self.S ** 2, c // self.S % self.S)
+
+    def mid(self, a, b, k, rng):
+        """A node's draw: the midpoint of the span (a, b) of 2k links; a uniform guess if the node has no entry."""
+        guess = rng.integers(self.S, size=len(a)); code = self.code[k]
+        if len(code) == 0: return guess
+        key = (a * self.S + b) * self.S; r, held = self.pick(k, np.searchsorted(code, key), np.searchsorted(code, key + self.S), rng)
+        return np.where(held, code[r] % self.S, guess)
+
+    def write(self, a, b, k, rng):
+        """One top-down pass from the ends (a, b) of a span of 2k links to its 2k + 1 states."""
+        c = self.mid(a, b, k, rng)
+        return np.stack([a, c, b], 1) if k == 1 else np.c_[self.write(a, c, k // 2, rng), self.write(c, b, k // 2, rng)[:, 1:]]
+
+    def unit(self, k, a, rng):
+        """The end of a held unit of k links that starts at a (count-weighted), and whether the Oracle holds one."""
+        j = 0 if k == 1 else k // 2; code = self.code[j]; w = self.S if j == 0 else self.S ** 2
+        if len(code) == 0: return a, np.zeros(len(a), bool)
+        r, held = self.pick(j, np.searchsorted(code, a * w), np.searchsorted(code, (a + 1) * w), rng)
+        return self.ends(j, r)[1], held
+
+    def practise(self, k, B, rng, slip=0.0, gate=True):
+        """B joins at level k: two held units of k links end to end, written in one pass, checked, and counted if every link passes."""
+        j = 0 if k == 1 else k // 2
+        if len(self.code[j]) == 0 or B == 0: return
+        a, c = self.ends(j, np.searchsorted(self.cum[j], rng.random(B) * self.cum[j][-1], side="right") - 1); b, held = self.unit(k, c, rng); a, c, b = a[held], c[held], b[held]
+        x = np.stack([a, c, b], 1) if k == 1 else np.c_[self.write(a, c, k // 2, rng), self.write(c, b, k // 2, rng)[:, 1:]]
+        if slip: s = rng.random(x[:, 1:-1].shape) < slip; x[:, 1:-1][s] = rng.integers(self.S, size=s.sum())  # the hand slips on an interior state
+        good = self.passes(x[:, :-1], x[:, 1:]).all(1) if gate else np.ones(len(x), bool)
+        self.add(k, x[good, 0], x[good, k], x[good, -1])
+
+    def rounds(self, B, rng, **kw):
+        """B practice episodes, each at a level drawn uniformly; lower levels first, so that higher ones can use their new units."""
+        for k, Bk in zip(self.ks, rng.multinomial(B, np.ones(self.L) / self.L)): self.practise(k, Bk, rng, **kw)
+
+    def score(self, test, T, rng, own=2000):
+        S = self.S; valid = lambda x: T[x[:, :-1], x[:, 1:]].all(1); out = {"read0": float(self.passes(test[:, :-1], test[:, 1:]).mean()), "wrong0": int((self.acc & ~T).sum())}
+        for l, k in enumerate(self.ks, 1):
+            a, b = test[:, 0], test[:, 2 * k]; key = (a * S + b) * S; code = self.code[k]
+            out[f"read{l}"] = float((np.searchsorted(code, key + S) > np.searchsorted(code, key)).mean()); out[f"write{l}"] = float(valid(self.write(a, b, k, rng)).mean())
+            out[f"allow{l}"] = float(self.passes(test[:, :2 * k], test[:, 1:2 * k + 1]).all(1).mean()); out[f"size{l}"] = len(code)
+            if len(code): ao, bo = self.ends(k, np.searchsorted(self.cum[k], rng.random(own) * self.cum[k][-1], side="right") - 1); out[f"own{l}"] = float(valid(self.write(ao, bo, k, rng)).mean())
+        return out
+
+    def reach(self, test):
+        """Share of population spans joined by some route of accepted links: what practice can reach with this pair table."""
+        R = self.acc.astype(np.float32); out = {}
+        for l, k in enumerate(self.ks, 1): R = (R @ R > 0).astype(np.float32); out[f"reach{l}"] = float(R[test[:, 0], test[:, 2 * k]].mean())
+        return out
+
+
+def setup(seed, S=S, m=M, L=L, test=8000, dense=True):
+    rng = np.random.default_rng(seed); succ = world(S, m, rng); T = np.zeros((S, S), bool) if dense else None
+    if dense: T[np.arange(S)[:, None], succ] = True
+    return rng, succ, T, chains(succ, test, 2 ** L + 1, rng)
+
+
+# ---------------------------------------------------------------------------------------------- core experiments
+
+
+def run_watch(seed, N_max=2 ** 22, points=72, S=S, m=M, L=L):
+    """Watching only: the same teacher chains fill the pair table and, by the same counting rule, every level of the generator."""
+    rng, succ, T, test = setup(seed, S, m, L); o = Oracle(S, L); out, done = [], 0
+    for N in grid(8, N_max, points): o.watch(chains(succ, N - done, 2 ** L + 1, rng)); done = N; out.append({"N": int(N), **o.score(test, T, rng)})
+    return out
+
+
+def run_practice(seed, N, levels=True, M_max=M_MAX, points=64, theta=1, noise=0.0, gate_teacher=False, slip=0.0, gate=True, false_pairs=0, S=S, m=M, L=L):
+    """Watch N teacher chains, then practise. levels=False: the teacher chains fill the pair table only."""
+    rng, succ, T, test = setup(seed, S, m, L); o = Oracle(S, L, theta); o.watch(chains(succ, N, 2 ** L + 1, rng, noise), levels, gate_teacher)
+    if false_pairs:  # a checker with false accepts: wrong pairs, each as strong as an average right one
+        a, b = rng.integers(S, size=false_pairs), rng.integers(S, size=false_pairs); o.pairs[a * S + b] += int(np.ceil(o.pairs[o.pairs > 0].mean())); o.watch(np.empty((0, 2), np.int64), False)
+    out, done = [{"M": 0, **o.score(test, T, rng), **o.reach(test)}], 0
+    for Mc in grid(16, M_max, points): o.rounds(Mc - done, rng, slip=slip, gate=gate); done = Mc; out.append({"M": int(Mc), **o.score(test, T, rng)})
+    return out
+
+
+def run_schedule(seed, order, N=2 ** 12, M_tot=2 ** 21, blocks=64):
+    """The same N teacher chains and M practice episodes in three orders: watch first, practise first, or alternating blocks."""
+    rng, succ, T, test = setup(seed); o = Oracle(S, L); out, seen, done = [{"examples": 0, "N": 0, "M": 0, **o.score(test, T, rng)}], 0, 0
+    w, p = [("w", N // blocks)] * blocks, [("p", M_tot // blocks)] * blocks
+    for kind, B in {"watch_first": w + p, "practise_first": p + w, "alternate": [s for pair in zip(w, p) for s in pair]}[order]:
+        if kind == "w": o.watch(chains(succ, B, 2 ** L + 1, rng)); seen += B
+        else: o.rounds(B, rng); done += B
+        out.append({"examples": seen + done, "N": seen, "M": done, **o.score(test, T, rng)})
+    return out
+
+
+def run_split(seed, tokens, share):
+    """A fixed budget of tokens (states shown or written): a share for fresh teacher chains (9 tokens each), the rest for practice."""
+    rng, succ, T, test = setup(seed); o = Oracle(S, L); N = int(round(share * tokens / (2 ** L + 1))); o.watch(chains(succ, N, 2 ** L + 1, rng))
+    Mc = int((tokens - N * (2 ** L + 1)) / np.mean([2 * k + 1 for k in o.ks]))  # a join at level k writes 2k + 1 states
+    for B in (np.diff(np.r_[0, grid(16, Mc, 40)]) if Mc >= 16 else []): o.rounds(int(B), rng)
+    return {"tokens": tokens, "share": share, "N": N, "M": Mc, **o.score(test, T, rng)}
+
+
+def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
+    """Do practised tables converge to the exact bridge conditional? Small world with many routes; the teacher chains fill the pair
+    table only. Target: Chapman-Kolmogorov composition of the Oracle's own pair counts, level by level."""
+    rng, succ, T, test = setup(seed, S, m, L); o = Oracle(S, L); o.watch(chains(succ, N, 2 ** L + 1, rng), levels=False)
+    C = o.pairs.reshape(S, S).astype(float); target, world_target = {}, {}  # C / C.sum(): how often the Oracle draws the unit (a, c)
+    for tgt, U in [(target, C / C.sum()), (world_target, T / T.sum())]:
+        for k in o.ks: P = U[:, :, None] * (U / U.sum(1, keepdims=True))[None]; tgt[k] = P; U = P.sum(1)  # P[a, c, b] = U(a, c) U(b | c); the next level's units are (a, b)
+    def tv(k, tgt):
+        P = np.zeros(S ** 3); c = o.code[k]; P[(c // S ** 2) * S ** 2 + (c % S) * S + c // S % S] = o.cnt[k]; P = P.reshape(S, S, S) / max(o.cnt[k].sum(), 1); Q = tgt[k]
+        pb, qb = P.sum(1, keepdims=True), Q.sum(1, keepdims=True); cond = np.abs(np.divide(P, pb, out=np.zeros_like(P), where=pb > 0) - np.divide(Q, qb, out=np.zeros_like(Q), where=qb > 0)).sum(1)
+        return float(0.5 * np.abs(P - Q).sum()), float(0.5 * (cond * qb[:, 0]).sum())  # joint TV; population-weighted TV of p(c | a, b), 1 where the Oracle has no entry
+    out, done = [], 0
+    for Mc in grid(64, M_max, points):
+        o.rounds(Mc - done, rng); done = Mc; row = {"M": int(Mc)}
+        for l, k in enumerate(o.ks, 1): row[f"joint{l}"], row[f"cond{l}"] = tv(k, target); row[f"wjoint{l}"], row[f"wcond{l}"] = tv(k, world_target)
+        out.append(row)
+    return out
+
+
+# ---------------------------------------------------------------------------------------------- own versus foreign
+
+
+def run_map(seed, own_share, P_max=2 ** 15, points=56, S=2 ** 14, m=M, L=L, seed_chains=1):
+    """The step types are known and act everywhere; the Oracle can file a chain only if it touches its map (the states it has
+    produced or reached). Own chain: starts at a state of the map, applies known steps. Foreign chain: a population chain.
+    own_share of the examples are own, the rest foreign, in random order."""
+    rng, succ, _, test = setup(seed, S, m, L, test=4000, dense=False); n = 2 ** L + 1; o = Oracle(S, L, succ=succ); valid = lambda x: (succ[x[:, :-1]] == x[:, 1:, None]).any(-1).all(1)
+    first = chains(succ, seed_chains, n, rng); known = np.zeros(S, bool); known[first] = True; o.file(first, False); out, done, used, seen = [], 0, 0, 0
+    def score():
+        row = {"P": done, "map": float(known.mean()), "usable": float(known[test].any(1).mean()), "predicted": float(1 - (1 - known.mean()) ** n), "used": used, "foreign_seen": seen}
+        for l, k in enumerate(o.ks, 1):
+            a, b = test[:, 0], test[:, 2 * k]; key = (a * S + b) * S; row[f"read{l}"] = float((np.searchsorted(o.code[k], key + S) > np.searchsorted(o.code[k], key)).mean()); row[f"write{l}"] = float(valid(o.write(a, b, k, rng)).mean())
+        return row
+    out.append(score())
+    for P in grid(1, P_max, points):
+        while done < P:  # small batches (at most 1/32 of the examples so far), so that the map is up to date for every example
+            B = int(min(P - done, max(1, done // 32))); own = rng.binomial(B, own_share); x = chains(succ, B - own, n, rng); seen += B - own; x = x[known[x].any(1)]; used += len(x)
+            x = np.r_[x, chains(succ, own, n, rng, start=rng.choice(np.flatnonzero(known), own))]; known[x] = True; o.file(x, False); done += B
+        out.append(score())
+    return out
+
+
+# ---------------------------------------------------------------------------------------------- runner
+
+JOBS = {
+    "watch": [(run_watch, dict(seed=s)) for s in range(WORLDS)],
+    "practice": [(run_practice, dict(seed=s, N=N)) for N in N_GRID for s in range(WORLDS)],
+    "pairs_only": [(run_practice, dict(seed=s, N=N, levels=False)) for N in N_GRID for s in range(WORLDS)],
+    "schedule": [(run_schedule, dict(seed=s, order=o)) for o in ["watch_first", "practise_first", "alternate"] for s in range(WORLDS)],
+    "split": [(run_split, dict(seed=s, tokens=t, share=x)) for t in [2 ** 15, 2 ** 17, 2 ** 19, 2 ** 21] for x in [0.05, 0.1, 0.2, 0.35, 0.5, 0.65, 0.8, 0.9, 1.0] for s in range(WORLDS)],
+    "slip": [(run_practice, dict(seed=s, N=2 ** 12, levels=False, slip=0.1, gate=g, M_max=2 ** 22)) for g in [True, False] for s in range(WORLDS)],
+    "false": [(run_practice, dict(seed=s, N=2 ** 12, levels=False, false_pairs=f, M_max=2 ** 22)) for f in [0, 32, 128, 512] for s in range(WORLDS)],
+    "noisy": [(run_practice, dict(seed=s, N=N, noise=0.03, M_max=2 ** 22, **arm)) for arm in [dict(theta=1), dict(theta=2), dict(theta=2, levels=False)] for N in [2 ** e for e in range(8, 18)] for s in range(WORLDS)],
+    "watch_scale": [(run_watch, dict(seed=s, S=Sx, m=mx, L=Lx, N_max=Nx)) for Sx, mx, Lx, Nx in [(4096, 2, 3, 2 ** 24), (1024, 3, 2, 2 ** 21), (1024, 4, 2, 2 ** 22), (256, 2, 2, 2 ** 17)] for s in range(4)],
+    "bridge": [(run_bridge, dict(seed=s)) for s in range(WORLDS)],
+    "map": [(run_map, dict(seed=s, own_share=x)) for x in [0.0, 0.5, 1.0] for s in range(WORLDS)],
+    "map_big": [(run_map, dict(seed=s, own_share=x, S=2 ** 16, P_max=2 ** 16)) for x in [0.0, 1.0] for s in range(WORLDS)],
+    "map_split": [(run_map, dict(seed=s, own_share=x, P_max=P, points=4)) for P in [256, 1024, 4096] for x in [0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0] for s in range(WORLDS)],
+}
+
+
+def call(job): f, kw = job; return {"args": kw, "out": f(**kw)}
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__.split("\n")[0]); p.add_argument("--only", nargs="*", default=list(JOBS)); p.add_argument("--procs", type=int, default=28); args = p.parse_args(); OUT.mkdir(parents=True, exist_ok=True)
+    for name in tqdm(args.only, desc="experiments"):
+        with Pool(args.procs) as pool: res = list(tqdm(pool.imap(call, JOBS[name]), total=len(JOBS[name]), desc=name, leave=False))
+        (OUT / f"{name}.json").write_text(json.dumps({"world": dict(S=S, m=M, L=L, worlds=WORLDS), "runs": res})); print(OUT / f"{name}.json")
+
+
+if __name__ == "__main__": main()

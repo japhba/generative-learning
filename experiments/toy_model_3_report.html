@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="overlyx" content="article">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>Toy model 3: the Oracle on a chain</title>
+<style>/*__KATEX_CSS__*/</style>
+<style>
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--yes:#0c7a0c;--part:#7a5300;--no:#b4302f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--yes:#5fc25f;--part:#e0b04a;--no:#e66767}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--yes:#5fc25f;--part:#e0b04a;--no:#e66767}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:900px;margin:0 auto;padding:0 16px 64px}
+header{padding:48px 0 8px}
+h1{font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
+h3{font-size:1.05rem;margin:22px 0 6px}
+p{margin:0 0 14px}
+a{color:var(--link)}
+section{padding-top:44px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
+.lede{font-size:1.1rem;color:var(--ink2)}
+.small{font-size:.88rem;color:var(--ink2)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.tile strong{display:block;font-size:1.5rem;line-height:1.2;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.tile span{font-size:.88rem;color:var(--ink2)}
+.takeaways{padding-left:22px;margin:0}.takeaways li{margin-bottom:10px}
+.findings{padding-left:22px}.findings li{margin-bottom:8px}
+.callout{background:var(--note);border-radius:10px;padding:14px 18px;margin:18px 0}
+.callout p:last-child{margin-bottom:0}
+.eq{overflow-x:auto;overflow-y:hidden;margin:6px 0 12px}
+figure{margin:18px 0}
+figure img{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:12px}
+figcaption{font-size:.88rem;color:var(--ink2);margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-space:nowrap}
+.table-wrap{overflow-x:auto}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.columns ul{padding-left:20px;margin:0}.columns li{margin-bottom:8px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;min-width:0}
+.panel h3{margin-top:0}
+.paths code{font-size:.82rem;overflow-wrap:anywhere}
+.paths li{margin-bottom:8px}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
+footer code{overflow-wrap:anywhere}
+.pill{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:1px 9px;border:1.5px solid currentColor;white-space:nowrap}
+.pill.yes{color:var(--yes)}.pill.part{color:var(--part)}.pill.no{color:var(--no)}
+.spec td:first-child{width:36%}.spec td:nth-child(2){width:1%;white-space:nowrap}
+@media (max-width:720px){body{font-size:16px}.tiles,.columns{grid-template-columns:1fr}header{padding-top:28px}section{padding-top:34px}}
+@media print{body{background:#fff}}
+</style>
+</head>
+<body>
+<main>
+<article>
+<header>
+<div class="eyebrow">Generative learning · toy model 3 · the Oracle on a chain</div>
+<h1>A learner that can check a chain long before it can write one, and closes the gap by practice</h1>
+<p class="abstract lede">The world is a set of chains of {{n}} states in which every state has to fit both of its neighbours. Checking a chain needs one table of allowed pairs. Writing a chain in a single pass needs more: a tree of tables that say, for the two ends of a span, which state lies in the middle. The Oracle, a learner made only of such tables, fills all of them from the same teacher chains by the same counting rule. Its pair table is complete after a few hundred chains, while its top table needs about {{lead3}} times as many. Practice closes the gap without further teacher chains: the Oracle joins pieces it already holds, writes the result in one pass, checks every link against its pair table, and counts what passes.</p>
+<div class="tiles">
+<div class="tile"><strong>{{half_read0}} → {{half_watch3}}</strong> <span>teacher chains until the Oracle accepts half of the population's links, and until it writes half of the population's spans of 8 links, by watching alone</span></div>
+<div class="tile"><strong>{{half_practice}} chains</strong> <span>teacher chains for the same once the Oracle practises: {{saving}} times fewer</span></div>
+<div class="tile"><strong>{{map_own_10}} vs {{map_foreign_10}}</strong> <span>own against foreign examples until a tenth of a large world is in the Oracle's map (the own-versus-foreign extension, section 8)</span></div>
+</div>
+</header>
+
+<section id="summary">
+<h2>Summary</h2>
+<ol class="takeaways">
+<li><strong>The setup.</strong> {{S}} states, each with {{m}} allowed successors; the population is the valid chains of {{n}} states. The Oracle is our name for the learner: a recogniser (one table of pairs) and a generator (a tree of three tables, for spans of 2, 4 and 8 links). It learns by counting, either from teacher chains (watching) or from chains it has assembled, written and checked itself (practice). All results are over 16 random worlds.</li>
+<li><strong>Recognition leads, on equal footing.</strong> The same chains and the same counting rule fill the recogniser {{lead1}}, {{lead2}} and {{lead3}} times sooner than the generator's three levels. A counting argument predicts {{lead_theory1}}, {{lead_theory2}} and {{lead_theory3}}, and the delay grows with the length of the span in four other worlds as predicted (section 2).</li>
+<li><strong>Practice closes the gap without teacher data.</strong> After 4,096 teacher chains the Oracle accepts every link but writes only {{n12_w3}} of the population's spans of 8 links. Practice alone brings that to {{n12_p3}}. Counted in teacher chains, half of the spans are written after {{half_practice}} chains instead of {{half_watch3}} (section 3). The practised tables converge to the exact ones (section 7).</li>
+<li><strong>Reading and writing rise together, level by level.</strong> In practice, spans of 2 links come first, then 4, then 8 (half-way after {{stair12_1}}, {{stair12_2}} and {{stair12_3}} episodes). A span the Oracle can write is also one it holds as a single unit and can check in one lookup, so its reading grows with its writing (section 4).</li>
+<li><strong>Watch first, then practise.</strong> Practice pays in a window: too few teacher chains and the pair table has gaps that practice cannot fill, too many and watching alone suffices. The same examples in the order watch-then-practise give {{sched_watch_first}}, alternating {{sched_alternate}}, practise-then-watch {{sched_practise_first}} (section 5).</li>
+<li><strong>Practice does not beat fresh teacher chains.</strong> Token for token, spending the whole budget on fresh teacher chains was best at every budget we tried. Practice is what the Oracle can do when no more teacher chains come (section 5).</li>
+<li><strong>Supervising every level adds nothing.</strong> A teacher who supplies only the pair table does as well as one who fills every level. With a teacher who slips, a recogniser that accepts every pair it sees ruins the generator ({{noisy_trust_own}} of own chains valid), and a careful one keeps it ({{noisy_left_own}}) (section 6).</li>
+<li><strong>Own against foreign examples.</strong> In an extension with many states and a few step types that act everywhere, the Oracle can file only chains that touch its map of known states. Own chains always do. Foreign chains are exact samples of the population and mostly do not, until the map has grown. A tenth of the world is mapped after {{map_own_10}} own examples or {{map_foreign_10}} foreign ones. This advantage rests on that filing rule, which is an assumption (section 8).</li>
+</ol>
+</section>
+
+<section id="model">
+<h2>1. The model</h2>
+<h3>World</h3>
+<p>There are \(S\) states. Each state has \(m\) allowed successors, which gives a table \(\mathbf{T}\) of allowed pairs, \(T_{ab}=1\) if \(b\) may follow \(a\). The population is the set of chains \(\mathbf{x}=(x_1,\dots,x_n)\) in which every link \((x_t,x_{t+1})\) is allowed, with a uniform first state and a uniform choice among the allowed successors at every step. So every state has to fit the one before it and the one after it. The main world has \(S\) = {{S}}, \(m\) = {{m}} and \(n\) = {{n}}, so a chain has 8 links.</p>
+<h3>The Oracle</h3>
+<p>The Oracle is the learner. It holds tables of counts and nothing else, which makes it the reference against which a network version can later be compared.</p>
+<ul class="findings">
+<li><strong>Recogniser.</strong> A pair table \(\hat{\mathbf{T}}\): how often \(b\) was seen right after \(a\). A link passes once its pair has been seen. A chain passes if all of its links do. This is one lookup per link and one AND, at any length.</li>
+<li><strong>Generator.</strong> A binary tree with one table per level. A node holds the two ends \((a,b)\) of a span of \(2k\) links and draws the state \(c\) in the middle from its table. Its two children then hold \((a,c)\) and \((c,b)\). With \(k=4,2,1\) the tree writes the 9 states in one top-down pass, with no loop. A node without an entry for its ends guesses uniformly.</li>
+</ul>
+<figure><img src="{{filesDir}}/toy3-scheme.png" alt="A chain of nine states. Below it, brackets under each pair of neighbours: the recogniser checks each link. Above it, three levels of arcs: the generator's nodes, each spanning two ends and drawing the midpoint."><figcaption>The recogniser looks at one link at a time. The generator has to commit to the middle of a span before anything in between exists, so it needs to know which ends can be joined at all.</figcaption></figure>
+<p>The table a node of half-length \(k\) should hold is the bridge of the chain,</p>
+<div class="eq">\[\begin{gathered}p_k(c\mid a,b)=\frac{T^{k}(c\mid a)\,T^{k}(b\mid c)}{T^{2k}(b\mid a)},\\ T^{2k}(b\mid a)=\sum_c T^{k}(c\mid a)\,T^{k}(b\mid c),\end{gathered}\]</div>
+<p>where \(T^{k}(c\mid a)\) is the probability of being at \(c\) after \(k\) steps from \(a\). The recogniser needs \(\mathbf{T}\) only. The generator needs its powers. They are fixed by \(\mathbf{T}\), but a network that writes in one pass has to store them.</p>
+<h3>Two ways of learning, one counting rule</h3>
+<ul class="findings">
+<li><strong>Watching.</strong> A teacher chain adds its 8 adjacent pairs to the recogniser. It also adds every span it contains to the generator: for each \(k\) and each position, a count for (ends, midpoint). This is the maximum-likelihood fit of every table to the supplied chains, the Oracle's version of an autoencoder trained end to end.</li>
+<li><strong>Practice.</strong> No teacher data. One episode picks a level \(k\) at random, takes a unit of \(k\) links that the Oracle holds, \(a\to c\), and a second one that starts where the first ends, \(c\to b\). The Oracle writes the \(2k+1\) states in one pass, checks every link with the recogniser, and adds a count for \((a,b)\to c\) if all links pass. A unit of one link is an accepted pair. A unit of \(2k\) links is a span for which the level-\(k\) table has an entry.</li>
+</ul>
+<div class="callout"><p><strong>Why this is not learning from what the Oracle already believes.</strong> Practice applies the same counting rule as watching, to the Oracle's own chains. A learner that counts plain samples of its own generator learns nothing on average. Here the span is assembled from the levels below and filed in the level above, so the upper table is trained on what the lower tables imply, and that is the second formula above. All information comes from the pair table, which came from the teacher.</p></div>
+<h3>What is measured</h3>
+<p>All scores are on 8,000 held-out population chains per world. A span of the population is <em>written</em> if one pass of the generator from its two ends gives a chain with allowed links only (judged by the world's \(\mathbf{T}\)). It is <em>read as a unit</em> if the Oracle holds an entry for its ends, so that it could check a chain that shows only those two states. A link is <em>accepted</em> if its pair is in the recogniser.</p>
+<h3>The counting argument</h3>
+<p>A chain shows \(n-1\) of the \(Sm\) allowed pairs, and \(n-2k\) of about \(S\,m^{2k}\) spans of \(2k\) links. After \(N\) chains the shares seen at least once are about</p>
+<div class="eq">\[\begin{gathered}q(N)=1-e^{-N(n-1)/(Sm)},\\ r_k(N)=1-e^{-N(n-2k)/(S\,m^{2k})},\end{gathered}\]</div>
+<p>so the generator's level \(k\) is half full later than the recogniser by a factor \(m^{2k-1}(n-1)/(n-2k)\). Practice needs every link of a span to be accepted, which happens for a share of about \(q^{2k}\) of the spans.</p>
+</section>
+
+<section id="lead">
+<h2>2. Watching only: the recogniser leads</h2>
+<figure><img src="{{filesDir}}/toy3-headstart.png" alt="Left: share of the population's links accepted, and of its spans of 2, 4 and 8 links written, against the number of teacher chains watched. The four curves rise one after the other. Right: measured against predicted delay of the generator for five worlds, on the diagonal."><figcaption>Left: the main world, mean and range over 16 worlds; dotted lines are the counting argument with the worlds' exact route counts. Right: how many times more teacher chains each level of the generator needs than the recogniser, to be half complete, in five worlds (4 worlds each for the additional ones).</figcaption></figure>
+<ul class="findings">
+<li><strong>The recogniser is half complete after {{half_read0}} chains</strong> (predicted {{half_read0_theory}}). The generator's levels follow after {{half_watch1}}, {{half_watch2}} and {{half_watch3}} chains.</li>
+<li><strong>Nothing favours the recogniser except the task.</strong> Both are counts of what the same chains show. A pair is one of {{pairs_total}} things to see, a span of 8 links one of about {{spans_total}}.</li>
+<li><strong>The delay grows with the span, as predicted.</strong> For a single link the generator's table is the pair table, and there is no delay. Table below: measured delay, with the prediction in brackets.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead><tr><th>World</th><th>Delay of the levels, shortest span first</th></tr></thead>
+<tbody>
+<tr><td>1,024 states, 2 successors, chains of 9 (main)</td><td>{{scale_1024_2_3}}</td></tr>
+<tr><td>4,096 states, 2 successors, chains of 9</td><td>{{scale_4096_2_3}}</td></tr>
+<tr><td>1,024 states, 3 successors, chains of 5</td><td>{{scale_1024_3_2}}</td></tr>
+<tr><td>1,024 states, 4 successors, chains of 5</td><td>{{scale_1024_4_2}}</td></tr>
+<tr><td>256 states, 2 successors, chains of 5</td><td>{{scale_256_2_2}}</td></tr>
+</tbody></table></div>
+<p class="small">The top level falls a little short of the prediction where two routes often join the same ends (1,024 states and 256 routes of 8 links per start), because such spans are seen sooner.</p>
+</section>
+
+<section id="practice">
+<h2>3. Practice closes the gap</h2>
+<figure><img src="{{filesDir}}/toy3-practice.png" alt="Left: share of spans of 8 links written against teacher chains, for watching only (rises near 150,000 chains) and for watching followed by practice (rises near 600 chains). Right: the gain from practice against the number of teacher chains, a hump for each level."><figcaption>Left: spans of 8 links written, after watching only and after watching followed by {{m_max}} practice episodes; mean and range over 16 worlds. Right: what practice adds at each level.</figcaption></figure>
+<ul class="findings">
+<li><strong>Far fewer teacher chains.</strong> With practice, half of the spans of 8 links are written after {{half_practice}} teacher chains, against {{half_watch3}} by watching alone: {{saving}} times fewer. The counting argument for a single route gives {{half_practice_theory}}; the Oracle needs slightly fewer because some ends are joined by a second route.</li>
+<li><strong>Practice reaches what the pair table allows.</strong> The dotted line is the share of spans whose ends are joined by accepted links. Practice ends on it.</li>
+<li><strong>The teacher only has to supply the pair table.</strong> A learner whose generator gets nothing from the teacher ends within {{pairs_only_gap}} of the one whose generator also watched (dashed line).</li>
+<li><strong>Practice pays in a window.</strong> For spans of 8 links it adds more than half of all spans between {{gain_window3}} teacher chains, and {{gain_peak3}} of them at {{gain_peak_N3}} chains. Below the window the pair table has gaps. Above it watching alone has filled the table.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead><tr><th>Teacher chains</th><th class="num">Links accepted</th><th class="num">8-link spans written, watching only</th><th class="num">after practice</th><th class="num">joined by accepted links</th></tr></thead>
+<tbody>
+<tr><td>64</td><td class="num">{{n6_read0}}</td><td class="num">{{n6_w3}}</td><td class="num">{{n6_p3}}</td><td class="num">{{n6_reach}}</td></tr>
+<tr><td>512</td><td class="num">{{n9_read0}}</td><td class="num">{{n9_w3}}</td><td class="num">{{n9_p3}}</td><td class="num">{{n9_reach}}</td></tr>
+<tr><td>1,024</td><td class="num">{{n10_read0}}</td><td class="num">{{n10_w3}}</td><td class="num">{{n10_p3}}</td><td class="num">{{n10_reach}}</td></tr>
+<tr><td>4,096</td><td class="num">{{n12_read0}}</td><td class="num">{{n12_w3}}</td><td class="num">{{n12_p3}}</td><td class="num">{{n12_reach}}</td></tr>
+<tr><td>32,768</td><td class="num">{{n15_read0}}</td><td class="num">{{n15_w3}}</td><td class="num">{{n15_p3}}</td><td class="num">{{n15_reach}}</td></tr>
+<tr><td>262,144</td><td class="num">{{n18_read0}}</td><td class="num">{{n18_w3}}</td><td class="num">{{n18_p3}}</td><td class="num">{{n18_reach}}</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="tandem">
+<h2>4. Reading and writing rise together, level by level</h2>
+<figure><img src="{{filesDir}}/toy3-staircase.png" alt="Two panels of learning curves against practice episodes. Spans of 2, 4 and 8 links rise one after the other; open circles for reading lie on the lines for writing. Right panel: with an incomplete pair table the curves stop at lower ceilings."><figcaption>Practice from a pair table only (the generator starts empty). Lines: spans written in one pass. Circles: the same spans held as one unit. Left: complete pair table. Right: {{stair_q9}} of the links accepted, so each level stops at the share of spans that accepted links can join.</figcaption></figure>
+<ul class="findings">
+<li><strong>The levels arrive in order.</strong> Spans of 2 links are half written after {{stair12_1}} practice episodes, spans of 4 after {{stair12_2}}, spans of 8 after {{stair12_3}}. Nothing schedules this. A level can only join units that the level below has produced.</li>
+<li><strong>Writing a span makes it readable as a unit.</strong> The share of spans held as one unit and the share written in one pass never differ by more than {{read_write_gap}} in any run (the difference is an occasional lucky guess of a midpoint). In the Oracle they are the same table.</li>
+<li><strong>The order is a ratchet.</strong> Links are accepted first, from the teacher. Checked links certify written spans of 2 links. Those become units of 2 links, which the next level joins, and so on. Recognition is ahead at the bottom only. Above it, each level of reading is made by writing at that level.</li>
+<li><strong>What the larger units are good for.</strong> A chain that shows only every second, fourth or eighth state can then be checked with one lookup per shown link. Before practice the Oracle could check such a chain only where it had watched the very same span.</li>
+<li><strong>Different routes, one unit.</strong> A unit is filed under its two ends. In this world {{multi_route3}} of the spans of 8 links have ends that more than one route joins, and the Oracle holds each of them as a single unit with several midpoints. It finds this out by writing the routes, not by seeing them side by side in the teacher's chains.</li>
+</ul>
+</section>
+
+<section id="budget">
+<h2>5. How much to watch, how much to practise</h2>
+<figure><img src="{{filesDir}}/toy3-tradeoff.png" alt="Top: heat map of the share of spans of 8 links written, against teacher chains watched and practice episodes afterwards. Bottom left: three learning curves for three orders of the same examples. Bottom right: share written against the share of a token budget spent on teacher chains, for four budgets; all rise towards the right."><figcaption>Top: mean over 16 worlds. Bottom left: {{sched_N}} teacher chains and {{sched_M}} practice episodes in three orders. Bottom right: a budget of tokens (states shown by the teacher or written by the Oracle) split between fresh teacher chains and practice.</figcaption></figure>
+<ul class="findings">
+<li><strong>Practice needs a period of watching first.</strong> With the same examples, watching and then practising ends at {{sched_watch_first}} of the spans of 8 links, alternating in 64 blocks at {{sched_alternate}}, practising and then watching at {{sched_practise_first}}. Practice on an empty pair table has nothing to join.</li>
+<li><strong>Teacher chains and practice replace each other only in one direction.</strong> Along the bottom row of the heat map (no practice), {{half_watch3}} teacher chains are needed for half of the spans. With a few million practice episodes, {{half_practice}} are. No amount of practice makes up for a pair the teacher has not shown.</li>
+<li><strong>Token for token, fresh teacher chains are better.</strong> With a budget of \(2^{19}\) tokens, spending all of it on teacher chains gives {{split19_all}}, half of it {{split19_half}}. The whole budget for the teacher was best at all four budgets (in {{split15_wins}}, {{split17_wins}}, {{split19_wins}} and {{split21_wins}} of 16 worlds). A teacher chain of 9 states brings spans at every level and new pairs. A practice episode brings one span, and even an episode at the top level, which also writes 9 states, brings only one.</li>
+</ul>
+<p>So the benefit of practice in this model is not that own examples are better than the teacher's. It is that they cost no teacher.</p>
+</section>
+
+<section id="supervision">
+<h2>6. Supervision at every level, and a teacher who slips</h2>
+<p>Section 3 already showed one half of this: a teacher who fills every level of the generator achieves nothing that a teacher who supplies only the pair table does not. Here the teacher also slips: 3% of the states in its chains are replaced by random ones. Three learners watch the same chains and then practise.</p>
+<figure><img src="{{filesDir}}/toy3-supervision.png" alt="Left: share of the Oracle's own chains that are valid after practice, against teacher chains, for three learners. The learner that accepts every pair stays near 0.7; the two careful learners are near 1. Right: share of population spans of 8 links written, similar for the three."><figcaption>After practice; mean and range over 16 worlds. Grey dotted: the second learner before practice, when its generator holds only what the teacher put there.</figcaption></figure>
+<ul class="findings">
+<li><strong>Trusting every pair is costly.</strong> A recogniser that accepts a pair seen once has accepted {{noisy_trust_wrong}} wrong pairs after 8,192 chains, next to the {{pairs_total}} right ones. Practice builds on them: only {{noisy_trust_own}} of the Oracle's own chains of 9 states are valid.</li>
+<li><strong>A careful recogniser protects practice.</strong> Accepting a pair only when seen twice leaves {{noisy_forced_wrong}} wrong pairs, and {{noisy_forced_own}} of own chains are valid after practice.</li>
+<li><strong>Letting the teacher fill every level costs a little.</strong> The teacher's slips go straight into the generator's tables: before practice only {{noisy_forced_own0}} of own chains are valid. Practice dilutes them. Leaving the levels to practice ends at {{noisy_left_own}}, higher in {{noisy_left_wins}} of 16 worlds.</li>
+<li><strong>Care costs teacher chains.</strong> Half of the spans of 8 links are written after {{noisy_left_half}} chains by the careful learners, {{noisy_trust_half}} by the trusting one.</li>
+</ul>
+</section>
+
+<section id="checks">
+<h2>7. What the check is for, and what practice converges to</h2>
+<figure><img src="{{filesDir}}/toy3-checks.png" alt="Left: share of the Oracle's own samples that are valid against practice episodes, with and without the check, for spans of 2, 4 and 8 links. With the check all stay at 1; without it they fall to about 0.9, 0.73 and 0.48. Right: share of valid own samples against the number of links, for 0, 32, 128 and 512 wrong pairs in the recogniser, falling with the number of links."><figcaption>Left: the Oracle's hand slips on one written state in ten; counted spans are either checked first or not. Right: wrong pairs added to a complete recogniser, each as strong as a right one; points are the mean and range over 16 worlds after practice.</figcaption></figure>
+<ul class="findings">
+<li><strong>The check keeps slips out.</strong> With the check, all own samples stay valid. Without it, {{slip_nogate1}}, {{slip_nogate2}} and {{slip_nogate3}} of own samples of 2, 4 and 8 links are valid at the end: an error at one level is built into the next.</li>
+<li><strong>The check is only as good as the recogniser.</strong> With 128 wrong pairs accepted, {{false128_3}} of own chains of 8 links are valid (a product over the links predicts {{false128_pred3}}); with 512, {{false512_3}} ({{false512_pred3}}). Practice never removes a wrong pair. Only teacher chains can.</li>
+</ul>
+<figure><img src="{{filesDir}}/toy3-bridge.png" alt="Left: total variation distance between the practised tables and the exact ones against practice episodes, falling on a log-log plot. Right: the Oracle's midpoint probabilities against the exact ones, on the diagonal."><figcaption>A small world with many routes (64 states, 3 successors, chains of 5), pair table from the teacher, generator from practice only. Left: distance to the exact composition of the Oracle's own pair counts; mean and range over 16 worlds. Right: one world, every entry of the top table.</figcaption></figure>
+<ul class="findings">
+<li><strong>Practice converges to the exact tables.</strong> After {{bridge_M}} episodes the midpoint distributions differ from the exact bridge by {{bridge_cond1}} and {{bridge_cond2}} in total variation (spans of 2 and 4 links), and the distance keeps falling with the square root of the number of episodes. In the right panel, {{bridge_multi}} of the {{bridge_entries}} entries have more than one possible midpoint; the correlation with the exact probabilities is {{bridge_corr}}.</li>
+<li><strong>So practice has an exact target.</strong> It is a sampled version of the composition rule in section 1.</li>
+</ul>
+</section>
+
+<section id="own">
+<h2>8. Extension: own against foreign examples</h2>
+<p>In the core model a teacher chain can always be filed, so it is never worse than an own chain. This extension changes three things.</p>
+<ul class="findings">
+<li><strong>Many states, a few step types.</strong> The world has 16,384 states. The {{m}} step types act in the same way everywhere, and the Oracle knows them (from a small seed, which we do not model). So it can check any single step, anywhere.</li>
+<li><strong>A map.</strong> The Oracle's tables are keyed by states it knows: those it has produced itself, or reached from a known state by a checked step. It starts with the 9 states of one chain.</li>
+<li><strong>The filing rule (an assumption).</strong> The Oracle can file a chain only if at least one of its states is in the map. The other states of that chain are then reached link by link and join the map. A chain that touches the map nowhere can be checked step by step but not used.</li>
+</ul>
+<p>An own example starts at a state of the map and applies 8 known steps. A foreign example is a chain of the population. Both have 9 states and are filed by the same counting rule. Foreign examples are exact samples of the population. Own examples start only inside the map, so they are further from the population.</p>
+<figure><img src="{{filesDir}}/toy3-own-foreign.png" alt="Four panels. Top left: share of states in the map against examples; own chains rise from the start, foreign chains only after about 2,000 examples. Top right: share of foreign chains that touch the map against map size, below the prediction for a scattered map. Bottom left: share of spans written against examples. Bottom right: final map size against the share of own examples, for three budgets."><figcaption>Median and range over 16 worlds. Top left and bottom left: all examples own, all foreign, or half and half in random order. Top right: every evaluation of every run. Bottom right: a fixed number of examples, split.</figcaption></figure>
+<ul class="findings">
+<li><strong>Own examples teach from the start, foreign ones only later.</strong> A tenth of the states is in the map after {{map_own_10}} own examples ({{map_own_lo10}}–{{map_own_hi10}} over worlds) or {{map_foreign_10}} foreign ones ({{map_foreign_lo10}}–{{map_foreign_hi10}}), {{map_ratio_10}} times as many. In a world of 65,536 states it is {{big_own_10}} against {{big_foreign_10}}.</li>
+<li><strong>Foreign chains become usable as the map grows.</strong> With a tenth of the states mapped, {{usable_at_10}} of foreign chains touch the map. A map of scattered states would give {{usable_pred_10}}; the real map is made of chains, so its states sit next to each other and are hit together.</li>
+<li><strong>Writing follows reading.</strong> Half of the population's spans of 2 links are written after {{map_own_w1}} own or {{map_foreign_w1}} foreign examples.</li>
+<li><strong>With few examples, own ones are worth more.</strong> Of 256 examples, all own leave {{msplit256_100}} of the states mapped, half and half {{msplit256_50}}, all foreign {{msplit256_0}}. Of 4,096 examples: {{msplit4096_100}}, {{msplit4096_50}} and {{msplit4096_0}}. Once most foreign chains are usable, the two kinds are worth the same.</li>
+</ul>
+<div class="callout"><p><strong>What this does and does not show.</strong> The advantage of own examples follows from the filing rule. The run shows its size and its time course, and that the map's shape matters. It does not show that a learner must be unable to store what it cannot read: a learner with spare codes could keep unreadable chains and connect them later. Also, with the step types given, a foreign chain contains nothing the Oracle could not derive. A network version would have to earn both, by reading states it has not produced poorly, and by learning the steps.</p></div>
+</section>
+
+<section id="limits">
+<h2>9. What the model shows, and what it does not</h2>
+<div class="columns">
+<div class="panel"><h3>Shows</h3><ul>
+<li>A recogniser and a generator trained on the same data by the same rule, in which the recogniser is ahead, by a factor that grows with depth and follows a counting law.</li>
+<li>Generation that improves offline, through generating and checking, to an exact target.</li>
+<li>Deeper levels arriving later, without a schedule.</li>
+<li>A check whose errors compound over a span, and practice that cannot repair them.</li>
+</ul></div>
+<div class="panel"><h3>Does not show</h3><ul>
+<li><strong>Better than fresh data.</strong> Fresh teacher chains beat practice token for token.</li>
+<li><strong>That writing is hard in general.</strong> A learner that may iterate its pair table already writes valid chains, one link at a time. The difficulty is specific to writing in one pass, and practice compiles the iteration into the tables.</li>
+<li><strong>Generalisation.</strong> Tables do not generalise across states. The Oracle is the reference for a network, not a model of one.</li>
+<li><strong>A hidden cause.</strong> The recogniser judges correctness; it infers no latent variable.</li>
+<li><strong>An own advantage without the filing rule</strong> (section 8), or any mapping to in-context learning.</li>
+</ul></div>
+</div>
+</section>
+
+<section id="spec">
+<h2>10. Against the specification</h2>
+<p>The requirements of the project's specification (tex/README.md), and the figures asked for in proposal.tex.</p>
+<div class="table-wrap"><table class="spec">
+<thead><tr><th>Requirement</th><th>Met</th><th>Where, and how far</th></tr></thead>
+<tbody>
+<tr><td>Local, Hebb-like or three-factor rule</td><td><span class="pill yes">yes</span></td><td>Every update is a count for (ends of a span, midpoint), with the check as the third factor.</td></tr>
+<tr><td>Generation improves offline, through a generate–recognise loop</td><td><span class="pill yes">yes</span></td><td>Section 3: {{n12_w3}} to {{n12_p3}} of spans of 8 links with no teacher data.</td></tr>
+<tr><td>Better than the same learner without practice</td><td><span class="pill yes">yes</span></td><td>Sections 3 and 5.</td></tr>
+<tr><td>Better than as many fresh examples</td><td><span class="pill no">no</span></td><td>Section 5: fresh teacher chains win at every budget.</td></tr>
+<tr><td>Beats the same learner fitted end to end to the supplied examples</td><td><span class="pill yes">yes</span></td><td>Watching only is that fit. Practice needs {{saving}} times fewer teacher chains.</td></tr>
+<tr><td>Recognition infers latent causes or judges correctness</td><td><span class="pill part">partly</span></td><td>It judges correctness. There is no hidden cause.</td></tr>
+<tr><td>Depth, with deeper layers emergently later</td><td><span class="pill yes">yes</span></td><td>Sections 2 and 4.</td></tr>
+<tr><td>Normative grounding</td><td><span class="pill yes">yes</span></td><td>Practice samples the composition rule and converges to the exact bridge (section 7).</td></tr>
+<tr><td>Interpretable in terms of weights; analytically tractable</td><td><span class="pill yes">yes</span></td><td>The tables are \(\mathbf{T}\) and its compositions; the delays follow a counting law.</td></tr>
+<tr><td>Benefit not explained by reconstruction error on the data</td><td><span class="pill yes">yes</span></td><td>Practice uses no data.</td></tr>
+<tr><td>Recognition and generation in the same space</td><td><span class="pill yes">yes</span></td><td>Both act on chains.</td></tr>
+<tr><td>Recognition stays ahead of generation, emergently</td><td><span class="pill part">partly</span></td><td>Ahead at the level of links. Above it, reading a span as a unit and writing it are the same table.</td></tr>
+<tr><td>Latent representations improve with generation</td><td><span class="pill part">partly</span></td><td>Larger units become readable (section 4). No hidden cause to clean up.</td></tr>
+<tr><td>More supervision can make the learner worse</td><td><span class="pill part">partly</span></td><td>Only with a teacher who slips (section 6). Otherwise it adds nothing.</td></tr>
+<tr><td>Own examples better than foreign ones of at least equal quality</td><td><span class="pill part">partly</span></td><td>Section 8, under the filing rule.</td></tr>
+<tr><td>Mapping to in-context learning</td><td><span class="pill no">no</span></td><td>Not addressed.</td></tr>
+</tbody></table></div>
+<h3>The figures asked for in proposal.tex</h3>
+<div class="table-wrap"><table class="spec">
+<thead><tr><th>Figure</th><th>Result</th><th>Where</th></tr></thead>
+<tbody>
+<tr><td>Practising is more sample-efficient than passive supervision</td><td><span class="pill yes">yes</span></td><td>Section 3, counted in teacher chains: {{saving}} times fewer.</td></tr>
+<tr><td>Practising does not help early; a period of passive learning is needed</td><td><span class="pill yes">yes</span></td><td>Section 3 (the window) and section 5 (the order).</td></tr>
+<tr><td>Lots of supervision does not always help</td><td><span class="pill part">partly</span></td><td>Sections 3 and 6: supervising every level adds nothing, and costs a little when the teacher slips.</td></tr>
+<tr><td>Own against foreign samples</td><td><span class="pill part">partly</span></td><td>Section 8, under the filing rule.</td></tr>
+<tr><td>Trade-off between supervised and imagined samples</td><td><span class="pill yes">yes</span></td><td>Section 5: the heat map and the split of a token budget.</td></tr>
+<tr><td>Mapping to schema learning</td><td><span class="pill no">no</span></td><td>Not addressed. The units of 2, 4 and 8 links are reusable pieces, which may be a place to start.</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="code">
+<h2>11. Code and data</h2>
+<ul class="paths">
+<li><a href="{{filesDir}}/toy_model_3_oracle.py"><code>toy_model_3_oracle.py</code></a>: the world, the Oracle and every experiment. Runs in about 12 minutes on 28 cores.</li>
+<li><a href="{{filesDir}}/toy_model_3_figures.py"><code>toy_model_3_figures.py</code></a>: the figures and every number quoted here.</li>
+<li><a href="{{filesDir}}/toy_model_3_report.py"><code>toy_model_3_report.py</code></a> and <a href="{{filesDir}}/toy_model_3_report.html"><code>toy_model_3_report.html</code></a>: this page.</li>
+<li>Runs: <code>/var/tmp/jbauer/generative_practice_chain/</code> on u435d.</li>
+</ul>
+</section>
+
+<footer>Built {{built}}. Sources (SHA-256): {{sourceHash}}. Main world: {{S}} states, {{m}} successors, chains of {{n}} states, 16 random worlds, 8,000 held-out chains each. Practice: up to {{m_max}} episodes, each at a level drawn uniformly.</footer>
+</article>
+</main>
+</body>
+</html>

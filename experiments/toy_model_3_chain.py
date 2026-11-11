@@ -19,6 +19,8 @@ Its two ways of learning use the same counting rule:
               and down by one if not. With joins this is the one signed rule of the write-up; `run_tandem` starts the generator
               from random entries and compares it with teacher chains.
   aimed       practice that looks a drawn join up first and writes it only if the table lacks it (`run_aim`, `run_curve`).
+The write-up calls reading recognition and writing generation, and describes learning in stages (`run_stages`): a teacher
+set (pairs counted = recognition; every span counted = wake), then practice; scores on the teacher set and on the population.
 
 Own-versus-foreign extension, nothing given (`run_reach`): a world of regions. The learner is taught in one region, reads a
 link only if it has learned it, and can take in a teacher chain only if the chain touches a state it knows.
@@ -217,10 +219,19 @@ def setup(seed, S=S, m=M, L=L, test=8000, dense=True):
 # ---------------------------------------------------------------------------------------------- core experiments
 
 
+def train_score(o, sample, T, rng):
+    """The same scores on chains of the teacher's training set: share of their links accepted, share of their spans generated."""
+    valid = lambda x: T[x[:, :-1], x[:, 1:]].all(1); out = {"train_read0": float(o.passes(sample[:, :-1], sample[:, 1:]).mean()) if len(sample) else 0.0}
+    for l, k in enumerate(o.ks, 1): out[f"train_write{l}"] = float(valid(o.write(sample[:, 0], sample[:, 2 * k], k, rng)).mean()) if len(sample) else 0.0
+    return out
+
+
 def run_watch(seed, N_max=2 ** 22, points=72, S=S, m=M, L=L):
-    """Watching only: the same teacher chains fill the pair table and, by the same counting rule, every level of the generator."""
-    rng, succ, T, test = setup(seed, S, m, L); o = Learner(S, L); out, done = [], 0
-    for N in grid(8, N_max, points): o.watch(chains(succ, N - done, 2 ** L + 1, rng)); done = N; out.append({"N": int(N), **o.score(test, T, rng)})
+    """Watching only: the same teacher chains fill the pair table and, by the same counting rule, every level of the generator.
+    Scores on held-out population chains, and (train_*) on the first 2,000 chains of the teacher set, with a generator of their own."""
+    rng, succ, T, test = setup(seed, S, m, L); o = Learner(S, L); out, done = [], 0; rng2 = np.random.default_rng(10 ** 6 + seed); sample = np.empty((0, 2 ** L + 1), np.int64)
+    for N in grid(8, N_max, points):
+        x = chains(succ, N - done, 2 ** L + 1, rng); o.watch(x); done = N; sample = np.r_[sample, x][:2000]; out.append({"N": int(N), **o.score(test, T, rng), **train_score(o, sample, T, rng2)})
     return out
 
 
@@ -376,6 +387,29 @@ def run_tandem(seed, mode, rows=2 ** 16, N0=2 ** 12, tokens=2 ** 23, points=40):
     return out
 
 
+def run_stages(seed, mode, rows=0, N=2 ** 12, tokens=2 ** 23, points=40, rehearse=0.5):
+    """The stages of learning, with scores on the population and on the teacher's training set.
+      start    the pair table is empty; every table of the generator holds `rows` random entries of count 1
+      stage 1  a teacher set of N chains: the pairs are counted (recognition), and every span is counted (wake)
+      stage 2  at equal tokens: signed   practice, each episode a join or (with probability rehearse) a rehearsal, count +1 / -1
+                                plus     the same, but a failure changes nothing
+                                teacher  fresh teacher chains instead, that is, a larger training set
+    x is the number of teacher chains in stage 1 and the number of tokens in stage 2."""
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Learner(S, L); R = reachable(T, o.ks); rng2 = np.random.default_rng(10 ** 6 + seed); cost = np.mean([2 * k + 1 for k in o.ks])
+    for k in o.ks[: L if rows else 0]: a, b, c = rng.integers(S, size=(3, rows)); o.add(k, a, c, b)
+    train = chains(succ, N, n, rng); sample = train[:2000]; out, done, spent = [], 0, 0
+    def score(stage, x): return {"stage": stage, "x": int(x), **o.score(test, T, rng), **(wrong(o, R) if all(len(o.code[k]) for k in o.ks) else {}), **train_score(o, sample, T, rng2)}
+    out.append(score(0, 0))
+    for Nk in grid(8, N, 14): o.watch(train[done:Nk]); done = int(Nk); out.append(score(1, done))
+    for Tk in grid(2 ** 10, tokens, points):
+        if mode == "teacher": o.watch(chains(succ, int(Tk - spent) // n, n, rng))
+        else:
+            for B in np.diff(np.r_[0, np.linspace(0, (Tk - spent) / cost, 9)[1:].astype(int)]):  # in 8 parts, so that the tables are up to date
+                for k, Bk in zip(o.ks, rng.multinomial(int(B), np.ones(L) / L)): j = rng.binomial(Bk, 1 - rehearse); o.practise(k, j, rng); o.rehearse(k, Bk - j, rng, signed=mode == "signed")
+        spent = int(Tk); out.append(score(2, spent))
+    return out
+
+
 def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
     """Do practised tables converge to the exact bridge conditional? Small world with many routes; the teacher chains fill the pair
     table only. Target: Chapman-Kolmogorov composition of the learner's own pair counts, level by level."""
@@ -470,6 +504,8 @@ JOBS = {
     "aim": [(run_aim, dict(seed=s, tokens=t, share=x, aim=a, rare=r)) for r in [None, 0.1] for a in [True, False] for t in [2 ** 19, 2 ** 21, 2 ** 23] for x in [0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0] for s in range(WORLDS)],
     "aim_curve": [(run_curve, dict(seed=s, mode=mo, rare=r, N0=N0)) for r, N0 in [(None, 2 ** 12), (0.1, 2 ** 13)] for mo in ["fresh", "blind", "aim"] for s in range(WORLDS)],
     "judge": [(run_judge, dict(seed=s, mode=mo)) for mo in ["teacher", "teacher_judged", "own", "own_drop"] for s in range(WORLDS)],
+    "stages": [(run_stages, dict(seed=s, mode="signed", rehearse=0.0, tokens=2 ** 26, points=48)) for s in range(WORLDS)],
+    "stages_random": [(run_stages, dict(seed=s, mode=mo, rows=r)) for r in [2 ** 13, 2 ** 16] for mo in ["signed", "plus", "teacher"] for s in range(WORLDS)],
     "tandem": [(run_tandem, dict(seed=s, mode=mo, rows=r)) for r in [2 ** 16, 2 ** 13] for mo in ["signed", "plus", "teacher"] for s in range(WORLDS)],
     "spur": [(run_spur, dict(seed=s, mode=mo, rows=r)) for r in [64, 2 ** 15] for mo in ["teacher", "own", "own_drop", "own_delete"] for s in range(WORLDS)],
     "reach": [(run_reach, dict(seed=s, share=x, bridge=b)) for b in [0.0, 1 / 1024, 1 / 64] for x in [0.0, 0.5, 1.0] for s in range(WORLDS)]

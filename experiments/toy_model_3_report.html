@@ -18,8 +18,6 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
 main{max-width:900px;margin:0 auto;padding:0 16px 64px}
 header{padding:48px 0 8px}
-header .table-wrap{margin-top:6px}
-header .small{margin:18px 0 0}
 h1{font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
 h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
 h3{font-size:1.05rem;margin:22px 0 6px}
@@ -28,7 +26,7 @@ a{color:var(--link)}
 section{padding-top:44px}
 .eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
 .lede{font-size:1.1rem;color:var(--ink2)}
-.small{font-size:.88rem;color:var(--ink2)}
+.small{font-size:.88rem;color:var(--ink2);margin:22px 0 6px}
 .takeaways{padding-left:22px;margin:0}.takeaways li{margin-bottom:10px}
 .findings{padding-left:22px}.findings li{margin-bottom:8px}
 .callout{background:var(--note);border-radius:10px;padding:14px 18px;margin:18px 0}
@@ -61,133 +59,141 @@ footer code{overflow-wrap:anywhere}
 <header>
 <div class="eyebrow">Generative learning · toy model 3 · practice on a chain</div>
 <h1>A learner that can check a chain long before it can write one, and closes the gap by practice</h1>
-<p class="abstract lede">The task is to write chains of {{n}} states in which every state fits both of its neighbours. Checking a chain needs one table of allowed pairs. Writing a chain in a single pass needs a tree of tables that say, for the two ends of a span, which state lies in the middle. A learner made of such tables fills its pair table from a few hundred teacher chains and needs about {{lead3}} times as many for its top table. Practice closes that gap and needs {{saving}} times fewer teacher chains: the learner writes spans itself, its pair table judges them, and one signed rule counts an entry up when its span passes and down when it fails. The same rule removes the random entries with which the generator starts. Teacher chains never do.</p>
+<p class="abstract lede">The task is to generate chains of {{n}} states in which every state fits both of its neighbours, after seeing a teacher's set of such chains. Recognising a valid chain needs one table of allowed pairs. Generating one in a single pass needs a tree of tables that say, for the two ends of a span, which state lies in the middle. A learner made of such tables recognises the whole population after a few hundred teacher chains, but it generates little beyond the chains it was shown: its top table needs about {{lead3}} times as many chains. Practice closes that gap and needs {{saving}} times fewer teacher chains: the learner generates spans itself, its pair table judges them, and one signed rule counts an entry up when its span is accepted and down when it is not. The same rule removes the random entries with which the generator starts. Teacher chains never do.</p>
+</header>
+<figure><img src="{{filesDir}}/toy3-lead.png" alt="Top: a chain of nine states; brackets under each pair of neighbours show recognition, link by link; three levels of arcs above show generation, each node spanning two ends and drawing the middle state. Bottom left: three boxes for the stages: start; stage 1, a teacher set, with recognition by counting pairs and wake of the generator; stage 2, practice without a teacher. Bottom right: scores on the population against scores on the teacher's training set; recognition rises along the diagonal in stage 1; generation moves to the right along the bottom in stage 1 and then straight up in stage 2."><figcaption><strong>Figure 1.</strong> Top: the two tasks. Recognition looks at one link at a time. Generation has to commit to the middle of a span before anything in between exists. Bottom left: the stages of learning. Bottom right: measured scores on the teacher's training set against scores on the population (median of 16 worlds, teacher set of 4,096 chains). Stage 1 makes recognition generalise and fits the generator to the teacher set. Stage 2 makes generation generalise: {{lead_pop1}} to {{lead_pop2}} of the population's spans of 8 links.</figcaption></figure>
 <p class="small">How far the model meets the requirements of the project's specification (tex/README.md):</p>
 <div class="table-wrap"><table class="spec">
 <thead><tr><th>Requirement</th><th>Met</th><th>Where, and how far</th></tr></thead>
 <tbody>
 <tr><td>Local, Hebb-like or three-factor rule</td><td>yes</td><td>One signed count per entry, with the recogniser's verdict as the third factor (section 1).</td></tr>
-<tr><td>Generation improves offline, through a generate–recognise loop</td><td>yes</td><td>Section 3: {{n12_w3}} to {{n12_p3}} of the spans of 8 links with no teacher data.</td></tr>
+<tr><td>Generation improves offline, through a generate–recognise loop</td><td>yes</td><td>Section 3: from {{n12_w3}} to {{n12_p3}} of the population's spans of 8 links, with a fixed teacher set.</td></tr>
 <tr><td>Better than the same learner without practice</td><td>yes</td><td>Section 3.</td></tr>
-<tr><td>Better than as many fresh examples</td><td>partly</td><td>For adding what is missing, no: fresh teacher chains win token for token (section 3). For removing what is wrong, yes (section 4).</td></tr>
-<tr><td>Beats the same learner fitted end to end to the supplied examples</td><td>yes</td><td>Watching only is that fit. Practice needs {{saving}} times fewer teacher chains (section 3).</td></tr>
-<tr><td>Recognition infers latent causes or judges correctness</td><td>partly</td><td>It judges correctness. There is no hidden cause.</td></tr>
+<tr><td>Better than as many fresh examples</td><td>partly</td><td>For adding what is missing, no: fresh teacher chains are more data and win token for token (sections 3 and 4). For removing what is wrong, yes (section 4).</td></tr>
+<tr><td>Beats the same learner fitted end to end to the supplied examples</td><td>yes</td><td>Stage 1 is that fit. Practice needs {{saving}} times fewer teacher chains (section 3).</td></tr>
+<tr><td>Recognition infers latent causes or judges correctness</td><td>partly</td><td>It infers for each link whether it is allowed, \(\hat z_t\). There is no hidden cause.</td></tr>
 <tr><td>Depth, with deeper layers emergently later</td><td>yes</td><td>Sections 2 and 3.</td></tr>
-<tr><td>Normative grounding</td><td>yes</td><td>Joins sample the composition rule of section 1, and the practised tables converge to the teacher's (section 5). Not checked with rehearsals.</td></tr>
+<tr><td>Normative grounding: better on the population from finite examples</td><td>yes</td><td>Joins sample the composition rule of section 1, and the practised tables converge to the teacher's (section 5). Not checked with rehearsals.</td></tr>
 <tr><td>Interpretable in terms of weights; analytically tractable</td><td>yes</td><td>The tables are \(\mathbf{T}\) and its powers, and the delays follow a counting law (section 2).</td></tr>
-<tr><td>Benefit not explained by reconstruction error on the data</td><td>yes</td><td>Practice uses no data.</td></tr>
+<tr><td>Benefit not explained by reconstruction error on the data</td><td>yes</td><td>The teacher set is reproduced perfectly after stage 1, and practice uses no data (sections 2 and 3).</td></tr>
 <tr><td>Recognition and generation in the same space</td><td>yes</td><td>Both act on chains.</td></tr>
-<tr><td>Recognition stays ahead of generation, emergently</td><td>partly</td><td>Ahead at the level of links (section 2). Above it, reading a span as a unit and writing it are the same table (section 3).</td></tr>
-<tr><td>Latent representations improve with generation</td><td>partly</td><td>Longer spans become readable as units (section 3). There is no hidden cause to clean up.</td></tr>
-<tr><td>More supervision can make the learner worse</td><td>partly</td><td>Only with a teacher who slips (section 5). Otherwise further teacher chains add little and never hurt.</td></tr>
+<tr><td>Recognition stays ahead of generation, emergently</td><td>partly</td><td>Ahead at the level of links (section 2). Above it, recognising a span as a unit and generating it are the same table (section 3).</td></tr>
+<tr><td>Latent representations improve with generation</td><td>partly</td><td>Longer spans become recognisable as units (section 3). There is no hidden cause to clean up.</td></tr>
+<tr><td>More supervision can make the learner worse</td><td>partly</td><td>Only with a teacher who slips (section 5). Otherwise further teacher chains never hurt.</td></tr>
 <tr><td>Own examples better than foreign ones of at least equal quality</td><td>partly</td><td>Own samples remove the generator's random entries, which exact samples of the population never do (section 4). The random start is an assumption, and teacher chains stay better at coverage.</td></tr>
 <tr><td>Mapping to in-context learning</td><td>no</td><td>Not addressed.</td></tr>
 </tbody></table></div>
-</header>
 
 <section id="model">
 <h2>1. Task, teacher and learner</h2>
 <h3>Task</h3>
-<p>There are \(S\) states. The world is a matrix \(\mathbf{T}\in\{0,1\}^{S\times S}\) with \(T_{ab}=1\) if state \(b\) may follow state \(a\). Every state has \(m\) allowed successors. Here \(S\) = {{S}} and \(m\) = {{m}}, and \(\mathbf{T}\) is drawn at random. A chain is \(\mathbf{x}=(x_1,\dots,x_n)\) with \(n=2^L+1\) states; here \(L=3\), so \(n\) = {{n}}. The population is the valid chains, with a uniform first state and a uniform choice among the allowed steps:</p>
-<div class="eq">\[\begin{gathered}\mathbf{x}\ \text{is valid}\iff\prod_{t=1}^{n-1}T_{x_t x_{t+1}}=1,\\ p(\mathbf{x})=\frac{1}{S}\prod_{t=1}^{n-1}\frac{T_{x_t x_{t+1}}}{m}.\end{gathered}\]</div>
+<p>There are \(S\) states. The world is a matrix \(\mathbf{T}\in\{0,1\}^{S\times S}\) with \(T_{ab}=1\) if state \(b\) may follow state \(a\). Every state has \(m\) allowed successors. Here \(S\) = {{S}} and \(m\) = {{m}}, and \(\mathbf{T}\) is drawn at random. A chain is \(\mathbf{x}=(x_1,\dots,x_n)\) with \(n=2^L+1\) states; here \(L=3\), so \(n\) = {{n}}. Each link has a latent \(z_t=T_{x_t x_{t+1}}\in\{0,1\}\), which says whether the link is allowed. A chain is valid if all its links are allowed. The population is the valid chains, with a uniform first state and a uniform choice among the allowed steps:</p>
+<div class="eq">\[\begin{gathered}\mathbf{x}\ \text{is valid}\iff\prod_{t=1}^{n-1}z_t=1,\\ z_t=T_{x_t x_{t+1}},\\ p(\mathbf{x})=\frac{1}{S}\prod_{t=1}^{n-1}\frac{T_{x_t x_{t+1}}}{m}.\end{gathered}\]</div>
 <p>Two things are asked of a learner.</p>
 <ul class="findings">
-<li><strong>Read.</strong> Say whether a given chain is valid.</li>
-<li><strong>Write.</strong> Given the two ends \((a,b)\) of a span of \(2k\) links taken from a population chain (\(k=1,2,4\)), produce the states in between in one pass: a fixed number of steps, in which nothing that was written is fed back in. The span counts as written if the result is valid.</li>
+<li><strong>Recognition.</strong> Given a chain \(\mathbf{x}\), infer for each link whether it is allowed, \(\hat z_t\), and so whether the chain is valid.</li>
+<li><strong>Generation.</strong> Given the two ends \(x_i=a\) and \(x_{i+2k}=b\) of a span of \(2k\) links taken from a population chain (\(k=1,2,4\)), produce the states in between, \(\tilde x_{i+1},\dots,\tilde x_{i+2k-1}\), in one pass: a fixed number of steps, in which nothing that was generated is fed back in. The span counts as generated if the result is valid.</li>
 </ul>
-<h3>Teacher</h3>
-<p>The teacher is the ground truth. It reads with \(\mathbf{T}\) itself, writes with the exact tables given below, and shows the learner chains drawn independently from \(p\). Cost is counted in tokens: one token is one state shown by the teacher or written by the learner.</p>
+<h3>Teacher, training set and population</h3>
+<p>The teacher is the ground truth. It recognises with \(\mathbf{T}\) itself and generates with the exact tables given below. It gives the learner a training set of \(N\) chains drawn independently from the population,</p>
+<div class="eq">\[\mathcal{D}_N=\{\mathbf{x}^{(1)},\dots,\mathbf{x}^{(N)}\},\qquad \mathbf{x}^{(j)}\sim p.\]</div>
+<p>Every score has two versions: on the chains of \(\mathcal{D}_N\), and on the population, measured on held-out chains. The second is generalisation. Cost is counted in tokens: one token is one state shown by the teacher or generated by the learner.</p>
 <h3>Learner</h3>
 <p>The learner consists of tables of counts and one rule.</p>
 <ul class="findings">
-<li><strong>Recogniser.</strong> A matrix \(\mathbf{C}\): \(C_{ab}\) is the number of times \(b\) followed \(a\) in the teacher's chains. The learner accepts a link \(a\to b\) if \(C_{ab}\ge 1\). Its verdict on a chain or span is \(v=+1\) if it accepts every link and \(v=-1\) otherwise. This is one look-up per link, at any length.</li>
-<li><strong>Generator.</strong> Tables \(n_k(a,b,c)\ge 0\) for \(k=1,2,4\). The entry \((a,b,c)\) of table \(k\) says that \(c\) is the middle state of a span of \(2k\) links from \(a\) to \(b\). To write the span \((a,b)\), a node draws \(c\) in proportion to its counts (below), or uniformly among all states if it holds no entry for \((a,b)\). It hands \((a,c)\) and \((c,b)\) to two nodes of table \(k/2\). Three levels write the {{n}} states in one top-down pass.</li>
+<li><strong>Recogniser.</strong> A matrix \(\mathbf{C}\): \(C_{ab}\) is the number of links in \(\mathcal{D}_N\) with \(x_t=a\) and \(x_{t+1}=b\). The learner accepts a link if it has seen its pair, \(\hat z_t=\mathbb{1}[C_{x_t x_{t+1}}\ge 1]\). Its verdict on a chain or span is \(v=+1\) if \(\hat z_t=1\) for every link and \(v=-1\) otherwise. This is one look-up per link, at any length.</li>
+<li><strong>Generator.</strong> Tables \(n_k(a,b,c)\ge 0\) for \(k=1,2,4\). The entry \((a,b,c)\) of table \(k\) stands for a span of \(2k\) links with ends \(x_i=a\), \(x_{i+2k}=b\) and middle state \(x_{i+k}=c\). To generate the span, a node draws the middle state in proportion to its counts (below), or uniformly among all states if it holds no entry for \((a,b)\). It hands \((a,c)\) and \((c,b)\) to two nodes of table \(k/2\). Three levels generate the {{n}} states in one top-down pass.</li>
 </ul>
-<div class="eq">\[q_k(c\mid a,b)=\frac{n_k(a,b,c)}{\sum_{c'}n_k(a,b,c')}\]</div>
-<figure><img src="{{filesDir}}/toy3-scheme.png" alt="A chain of nine states. Below it, brackets under each pair of neighbours: the recogniser checks each link. Above it, three levels of arcs: the generator's nodes, each spanning two ends and drawing the midpoint."><figcaption>The recogniser looks at one link at a time. The generator has to commit to the middle of a span before anything in between exists.</figcaption></figure>
-<p>The teacher's tables, which write the population exactly, are</p>
-<div class="eq">\[\begin{gathered}p_k(c\mid a,b)=\frac{(\mathbf{T}^{k})_{ac}\,(\mathbf{T}^{k})_{cb}}{(\mathbf{T}^{2k})_{ab}},\\ (\mathbf{T}^{2k})_{ab}=\sum_c(\mathbf{T}^{k})_{ac}\,(\mathbf{T}^{k})_{cb},\end{gathered}\]</div>
-<p>where \((\mathbf{T}^{k})_{ac}\) is the number of routes of \(k\) links from \(a\) to \(c\). To read, the learner has to learn \(\mathbf{T}\) itself, which has \(Sm\) = {{pairs_total}} allowed pairs. To write in one pass it has to learn the powers of \(\mathbf{T}\): table \(k\) has about \(Sm^{2k}\) spans to cover, which is {{spans1}}, {{spans2}} and {{spans_total}}.</p>
-<p><strong>One rule.</strong> An entry is <em>tested</em> when the span it stands for is written out and the recogniser gives its verdict \(v\). Then</p>
-<div class="eq">\[\begin{gathered}n_k(a,b,c)\;\leftarrow\;\max\{0,\;n_k(a,b,c)+v\},\\ v\in\{+1,-1\}.\end{gathered}\]</div>
-<p>Three things put entries to the test.</p>
+<div class="eq">\[\begin{gathered}q_k(\tilde x_{i+k}=c\mid x_i=a,\,x_{i+2k}=b)\\ =\frac{n_k(a,b,c)}{\sum_{c'}n_k(a,b,c')}\end{gathered}\]</div>
+<p>The teacher's tables, which generate the population exactly, are</p>
+<div class="eq">\[\begin{gathered}p(x_{i+k}=c\mid x_i=a,\,x_{i+2k}=b)\\ =\frac{(\mathbf{T}^{k})_{ac}\,(\mathbf{T}^{k})_{cb}}{(\mathbf{T}^{2k})_{ab}},\\ (\mathbf{T}^{2k})_{ab}=\sum_c(\mathbf{T}^{k})_{ac}\,(\mathbf{T}^{k})_{cb},\end{gathered}\]</div>
+<p>where \((\mathbf{T}^{k})_{ac}\) is the number of routes of \(k\) links from \(a\) to \(c\). To recognise, the learner has to learn \(\mathbf{T}\) itself, which has \(Sm\) = {{pairs_total}} allowed pairs. To generate in one pass it has to learn the powers of \(\mathbf{T}\): table \(k\) has about \(Sm^{2k}\) spans to cover, which is {{spans1}}, {{spans2}} and {{spans_total}}.</p>
+<p><strong>One rule.</strong> An entry is <em>tested</em> when the span it stands for is written out, \((\tilde x_i,\dots,\tilde x_{i+2k})\) with \(\tilde x_i=a\), \(\tilde x_{i+k}=c\) and \(\tilde x_{i+2k}=b\), and the recogniser gives its verdict \(v\) on it. Then</p>
+<div class="eq">\[\begin{gathered}n_k(a,b,c)\;\leftarrow\;\max\{0,\;n_k(a,b,c)+v\},\\ v=v(\tilde x_i,\dots,\tilde x_{i+2k})\in\{+1,-1\}.\end{gathered}\]</div>
+<h3>Stages of learning</h3>
 <ul class="findings">
-<li><strong>Watching.</strong> A teacher chain first adds its links to \(\mathbf{C}\). Each span it contains, with \(a=x_i\), \(c=x_{i+k}\) and \(b=x_{i+2k}\), is then an entry tested on the teacher's own writing. A teacher who makes no slips always passes.</li>
-<li><strong>Joining.</strong> The learner draws a unit of \(k\) links that it holds, \(a\to c\), and a second one that starts where the first ends, \(c\to b\), each in proportion to its count. A unit of one link is an accepted pair. A unit of \(k\) links is the pair of ends of an entry of table \(k/2\). The entry tested is \((a,b,c)\) of table \(k\), and the learner writes its \(2k+1\) states with its lower tables.</li>
-<li><strong>Rehearsing.</strong> The learner draws an entry it holds, in proportion to its count, and writes its span.</li>
+<li><strong>Start.</strong> \(\mathbf{C}=0\). The generator's tables are empty (sections 2 and 3) or hold random entries (section 4).</li>
+<li><strong>Stage 1, recognition.</strong> The learner counts the links of \(\mathcal{D}_N\) into \(\mathbf{C}\). No generator is involved. In effect this is contrastive: a pair is accepted if it occurs in the teacher set and rejected if it does not, which is what a classifier of the teacher's pairs against random pairs converges to. It is not a recognition-parametrised model, because no hidden cause is inferred; the only latent is \(\hat z_t\).</li>
+<li><strong>Stage 1, wake.</strong> Every span of every teacher chain, with \(a=x_i\), \(c=x_{i+k}\) and \(b=x_{i+2k}\), is an entry tested on the teacher's own writing, so \(v=+1\). The generator is thus fitted to the teacher's samples before any practice. When it fails on the population, it is not for lack of training.</li>
+<li><strong>Stage 2, practice.</strong> No teacher data. Each episode picks one of the three tables at random and tests one entry in one of two ways. <em>Joining</em>: the learner draws a span of \(k\) links that it holds, from \(a\) to \(c\), and a second one that starts where the first ends, from \(c\) to \(b\), each in proportion to its count (a span of one link is an accepted pair; a longer one is the pair of ends of an entry of table \(k/2\)). The entry tested is \((a,b,c)\) of table \(k\), and the learner generates its \(2k+1\) states with its lower tables. <em>Rehearsing</em>: the learner draws an entry it holds, in proportion to its count, and generates its span.</li>
 </ul>
-<p>Joining and rehearsing use no teacher data. Together they are <em>practice</em>; each episode picks one of the three tables at random.</p>
-<p><strong>Start.</strong> \(\mathbf{C}=0\). In sections 2 and 3 the generator's tables start empty and practice consists of joins only. In section 4 every table starts with random entries, and practice is half joins and half rehearsals.</p>
-<p><strong>Scores.</strong> All scores are medians or means over 16 random worlds, on 8,000 held-out population chains each. A population span is <em>written</em> if one pass from its ends gives a valid chain, judged by \(\mathbf{T}\). An <em>own chain</em> is a span of 8 links whose entry the learner draws from its own top table.</p>
+<p>In sections 2 and 3 the tables start empty, so there is nothing to prune, and practice consists of joins only. In section 4 practice is half joins and half rehearsals. All scores are medians or means over 16 random worlds, with 8,000 held-out population chains each. An <em>own chain</em> is a span of 8 links whose entry the learner draws from its own top table.</p>
 </section>
 
 <section id="lead">
-<h2>2. Watching alone: the recogniser leads</h2>
-<p>Here the learner only watches. Both of its parts learn from the same chains by the same rule. After \(N\) chains a given allowed pair has been seen with probability \(1-e^{-N(n-1)/(Sm)}\), and a given span of \(2k\) links with probability \(1-e^{-N(n-2k)/(Sm^{2k})}\), because a chain holds \(n-1\) links but only \(n-2k\) such spans, and there are \(m^{2k-1}\) times as many spans as pairs. So table \(k\) trails the pair table by the factor</p>
+<h2>2. Stage 1: recognition generalises, generation does not</h2>
+<p>Both parts of the learner are fitted to the same teacher set by the same rule. After \(N\) chains a given allowed pair is in the set with probability \(1-e^{-N(n-1)/(Sm)}\), and a given span of \(2k\) links with probability \(1-e^{-N(n-2k)/(Sm^{2k})}\), because a chain holds \(n-1\) links but only \(n-2k\) such spans, and there are \(m^{2k-1}\) times as many spans as pairs. So on the population, table \(k\) trails the pair table by the factor</p>
 <div class="eq">\[\frac{N^{(k)}_{1/2}}{N^{(0)}_{1/2}}=m^{2k-1}\,\frac{n-1}{n-2k},\]</div>
 <p>which is {{lead_theory1}}, {{lead_theory2}} and {{lead_theory3}} for spans of 2, 4 and 8 links.</p>
-<figure><img src="{{filesDir}}/toy3-headstart.png" alt="Left: share of the population's links accepted, and of its spans of 2, 4 and 8 links written, against the number of teacher chains watched. The four curves rise one after the other and lie on the dotted predictions. Right: measured against predicted delay of the generator for five worlds, on the diagonal."><figcaption>Left: mean over 16 worlds; dotted lines are the counting argument with the worlds' exact route counts. Right: the delay of each level in five worlds.</figcaption></figure>
+<figure><img src="{{filesDir}}/toy3-headstart.png" alt="Left: share of the population's links accepted, and of its spans of 2, 4 and 8 links generated, against the size of the teacher set. The four curves rise one after the other and lie on the dotted predictions. A dashed line at 100% shows that the spans of the teacher set itself are always generated. Right: measured against predicted delay of generation for five worlds, on the diagonal."><figcaption><strong>Figure 2.</strong> Left: mean over 16 worlds; dotted lines are the counting argument with the worlds' exact route counts. Right: the delay of each level in five worlds.</figcaption></figure>
 <ul class="findings">
-<li><strong>The recogniser is ahead on equal footing.</strong> The learner accepts half of the population's links after {{half_read0}} teacher chains. It writes half of the spans of 2, 4 and 8 links after {{half_watch1}}, {{half_watch2}} and {{half_watch3}} chains, which is {{lead1}}, {{lead2}} and {{lead3}} times later.</li>
-<li><strong>Nothing favours it except that it has less to learn.</strong> The delay follows the counting factor in four other worlds as well (right panel).</li>
+<li><strong>Recognition generalises first.</strong> The learner accepts half of the population's links after {{half_read0}} teacher chains.</li>
+<li><strong>Generation is trained, but does not generalise.</strong> At every size of the teacher set the learner generates {{watch_train_min}} of the teacher set's own spans (dashed line). Of the population's spans of 2, 4 and 8 links it generates half only after {{half_watch1}}, {{half_watch2}} and {{half_watch3}} chains, which is {{lead1}}, {{lead2}} and {{lead3}} times later than recognition.</li>
+<li><strong>Nothing favours recognition except that it has less to learn.</strong> The delay follows the counting factor in four other worlds as well (right panel).</li>
 </ul>
 </section>
 
 <section id="practice">
-<h2>3. Practice closes the gap, level by level</h2>
-<p>A join composes two spans that the learner holds into one that it does not. This samples the second formula of section 1, so practice derives the upper tables from the pair table and needs no teacher data.</p>
-<figure><img src="{{filesDir}}/toy3-practice.png" alt="Left: share of spans of 8 links written against teacher chains, for watching only (rises near 150,000 chains) and for watching followed by practice (rises near 600 chains). Right: the share of spans gained by practice against teacher chains watched before, a hump for each span length."><figcaption>Left: after practice to saturation; mean over 16 worlds. Right: what practice adds to watching, for each span length.</figcaption></figure>
+<h2>3. Stage 2: practice makes generation generalise</h2>
+<p>A join composes two spans that the learner holds into one that it does not. This samples the second formula for the teacher's tables in section 1, so practice derives the upper tables from the pair table and needs no teacher data.</p>
+<figure><img src="{{filesDir}}/toy3-practice.png" alt="Left: share of population spans of 8 links generated against the size of the teacher set, for stage 1 only (rises near 150,000 chains) and for stage 1 followed by practice, with or without wake (rises near 600 chains). Right: the share of population spans gained by practice against the size of the teacher set, a hump for each span length."><figcaption><strong>Figure 3.</strong> Left: after practice to saturation; mean over 16 worlds. Right: what practice adds to stage 1, for each span length.</figcaption></figure>
 <ul class="findings">
-<li><strong>Practice replaces teacher chains.</strong> After 4,096 teacher chains the learner accepts every link but writes only {{n12_w3}} of the population's spans of 8 links. Practice alone brings that to {{n12_p3}}. Half of the spans are written after {{half_practice}} teacher chains instead of {{half_watch3}}, {{saving}} times fewer.</li>
+<li><strong>Practice replaces teacher chains.</strong> With a teacher set of 4,096 chains the learner accepts every population link but generates only {{n12_w3}} of the population's spans of 8 links. Practice alone brings that to {{n12_p3}}. Half of the spans are generated with a teacher set of {{half_practice}} chains instead of {{half_watch3}}, {{saving}} times fewer.</li>
+<li><strong>The wake is not what makes practice work.</strong> If stage 1 fills the pair table only, practice ends within {{pairs_only_gap}} of the same value (dashed line).</li>
 </ul>
-<figure><img src="{{filesDir}}/toy3-staircase.png" alt="Two panels of learning curves against practice episodes. Spans of 2, 4 and 8 links rise one after the other; open circles for reading lie on the lines for writing. Left, with a complete pair table, all reach 100%. Right, with 86% of the pair table, they stop at lower ceilings."><figcaption>Practice only, after 4,096 teacher chains (left) or 512 (right); mean and range over 16 worlds.</figcaption></figure>
+<figure><img src="{{filesDir}}/toy3-staircase.png" alt="Two panels of learning curves against practice episodes. Spans of 2, 4 and 8 links rise one after the other; open circles for recognition as a unit lie on the lines for generation. Left, with a complete pair table, all reach 100%. Right, with 86% of the pair table, they stop at lower ceilings."><figcaption><strong>Figure 4.</strong> Practice only, with a teacher set of 4,096 chains (left) or 512 (right); mean and range over 16 worlds.</figcaption></figure>
 <ul class="findings">
-<li><strong>The levels arrive in order.</strong> Spans of 2, 4 and 8 links are half written after {{stair12_1}}, {{stair12_2}} and {{stair12_3}} episodes. No schedule is set: a join for table \(k\) needs units from table \(k/2\).</li>
-<li><strong>Reading grows with writing.</strong> An entry is also a unit that the learner can check in one look-up. So the spans it reads as one unit are the spans it writes (circles on the lines). The links it accepts do not change with practice.</li>
-<li><strong>Practice cannot supply a pair the teacher has not shown.</strong> After 512 teacher chains the learner accepts {{stair_q9}} of the links, and practice stops at {{n9_p1}}, {{n9_p2}} and {{n9_p3}} of the spans of 2, 4 and 8 links.</li>
-<li><strong>It needs watching first.</strong> The same examples give {{sched_watch_first}} of the spans of 8 links if the learner watches and then practises, and {{sched_practise_first}} in the opposite order.</li>
-<li><strong>It does not beat fresh teacher chains.</strong> Of \(2^{21}\) tokens, all spent on teacher chains give {{split21_all}} of the spans of 8 links, and half spent on practice give {{split21_half}}. A teacher chain of {{n}} states holds 13 spans, and a join holds one.</li>
+<li><strong>The levels arrive in order.</strong> Population spans of 2, 4 and 8 links are half generated after {{stair12_1}}, {{stair12_2}} and {{stair12_3}} episodes. No schedule is set: a join for table \(k\) needs spans from table \(k/2\).</li>
+<li><strong>Recognition of longer units grows with generation.</strong> An entry is also a unit that the learner can check in one look-up. So the spans it recognises as one unit are the spans it generates (circles on the lines). The links it accepts do not change with practice.</li>
+<li><strong>The learner generalises to new combinations of links, not to new links.</strong> With a teacher set of 512 chains it accepts {{stair_q9}} of the population's links, and practice stops at {{n9_p1}}, {{n9_p2}} and {{n9_p3}} of the spans of 2, 4 and 8 links.</li>
+<li><strong>Practice needs stage 1 first.</strong> The same examples give {{sched_watch_first}} of the spans of 8 links if the teacher set comes first, and {{sched_practise_first}} if practice comes first.</li>
+<li><strong>A larger teacher set is still better than practice.</strong> Of \(2^{21}\) tokens, all spent on fresh teacher chains give {{split21_all}} of the spans of 8 links, and half spent on practice give {{split21_half}}. A teacher chain of {{n}} states holds 13 spans, and a join tests one.</li>
 </ul>
 </section>
 
 <section id="prune">
-<h2>4. A generator that starts at random: only its own samples prune it</h2>
-<p>A generator has to start somewhere. Here every table starts with {{tandem_rows}} random entries of count 1. Almost all of them are wrong: \(c\) does not lie on a route from \(a\) to \(b\). The teacher shows 4,096 chains, which complete the pair table. Three learners then spend the same number of tokens.</p>
+<h2>4. A generator that starts at random</h2>
+<p>A generator has to start somewhere. Here every table starts with {{rand_rows}} random entries of count 1. Almost all of them are wrong: \(c\) does not lie on a route from \(a\) to \(b\). Stage 1 is a teacher set of 4,096 chains, with recognition and wake. After it the learner generates {{rand_stage1_train}} of the teacher set's spans of 8 links and {{rand_stage1_pop}} of the population's, and only {{rand_stage1_own}} of its own chains are valid, because the random entries hold most of the counts of its top table. Three learners then spend the same number of tokens in stage 2.</p>
 <ul class="findings">
-<li><strong>Practice with the signed rule.</strong> Half joins, half rehearsals, as defined in section 1.</li>
+<li><strong>Practice with the signed rule.</strong> Half joins, half rehearsals.</li>
 <li><strong>Practice, failures ignored.</strong> The same, but a failed test leaves the count as it is.</li>
-<li><strong>Teacher chains.</strong> The learner only watches.</li>
+<li><strong>Fresh teacher chains.</strong> No practice, and a teacher set that keeps growing.</li>
 </ul>
-<figure><img src="{{filesDir}}/toy3-tandem.png" alt="Three panels against tokens. Left: share of the random entries of the top table that are left; it falls to nearly zero for practice with the signed rule and stays at 100% for practice without the minus and for teacher chains. Middle: share of own chains that are valid; the signed rule reaches 100% first, teacher chains rise more slowly, practice without the minus is last. Right: share of population spans of 8 links written; teacher chains are far ahead of both kinds of practice."><figcaption>Median and range over 16 worlds; top table, spans of 8 links.</figcaption></figure>
+<figure><img src="{{filesDir}}/toy3-random.png" alt="Three panels against the tokens of stage 2. Left: share of the random entries of the top table that are left; it falls to about a tenth for practice with the signed rule and stays at 100% for practice without the minus and for fresh teacher chains. Middle: share of own chains that are valid; all rise from a third, the signed rule ends highest, practice without the minus lowest. Right: share of population spans of 8 links generated; fresh teacher chains reach nearly 100%, both kinds of practice about half; the dotted line for no practice stays at 2%."><figcaption><strong>Figure 5.</strong> Median and range over 16 worlds; top table, spans of 8 links. Dotted: the learner after stage 1, without practice.</figcaption></figure>
 <ul class="findings">
-<li><strong>The signed rule removes the random entries.</strong> A rehearsed random entry fails the check and loses its count. {{tandem_signed_left3_23}} of those in the top table are left at the end, and 99% of the learner's own chains are valid after {{tandem_signed_t99}} tokens.</li>
-<li><strong>Teacher chains never remove one.</strong> They do not come from the random entries, so they never test them. They add right entries, which makes the random ones a smaller share of what the learner draws. Own chains are {{tandem_teacher_own3_20}} valid after \(2^{20}\) tokens, and 99% valid only after {{tandem_teacher_t99}}.</li>
-<li><strong>Counting up is not enough.</strong> Without the minus all random entries stay, and {{tandem_plus_own3_20}} of own chains are valid after \(2^{20}\) tokens.</li>
-<li><strong>Teacher chains remain better at adding what is missing.</strong> At the end the watching learner writes {{tandem_teacher_write3_23}} of the population's spans of 8 links, and the practising one {{tandem_signed_write3_23}}.</li>
-<li><strong>A heavier random start widens the difference.</strong> With 65,536 random entries per table, {{tandem_big_signed_own3_23}} of own chains are valid at the end with the signed rule, {{tandem_big_teacher_own3_23}} with teacher chains and {{tandem_big_plus_own3_23}} without the minus.</li>
-<li><strong>Lower tables are pruned more slowly.</strong> {{tandem_signed_left1_23}} of the random entries of the bottom table are left at the end. The right entries there have large counts, so the random ones are rarely drawn.</li>
+<li><strong>The signed rule removes random entries.</strong> A rehearsed random entry is rejected and loses its count. {{rand_signed_left_end}} of those in the top table are left at the end, and they are rarely drawn: 99% of the learner's own chains are valid after {{rand_signed_t99}} tokens.</li>
+<li><strong>Teacher chains never remove one.</strong> They do not come from the random entries, so they never test them. They add right entries, which makes the random ones a smaller share of what the learner draws. Own chains are 99% valid only after {{rand_teacher_t99}} tokens.</li>
+<li><strong>Counting up is not enough.</strong> Without the minus all random entries stay, and {{rand_plus_own_end}} of own chains are valid at the end.</li>
+<li><strong>A heavier random start widens the difference.</strong> With 65,536 random entries per table, {{rand_big_signed_own_end}} of own chains are valid at the end with the signed rule, {{rand_big_teacher_own_end}} with fresh teacher chains and {{rand_big_plus_own_end}} without the minus.</li>
+<li><strong>Lower tables are pruned more slowly.</strong> {{rand_signed_left1_end}} of the random entries of the bottom table are left at the end. The right entries there have large counts, so the random ones are rarely drawn.</li>
+<li><strong>Fresh teacher chains generate more of the population because they are more data.</strong> With the teacher set fixed, practice lifts the population's spans of 8 links from {{rand_stage1_pop}} to {{rand_signed_pop_end}} here, and to {{lead_pop2}} with enough practice (Figure 1). The third learner ends at {{rand_teacher_pop_end}}, but its teacher set has grown from 4,096 to {{rand_teacher_set}} chains. Each chain holds 13 spans of the population, and a practice episode tests one entry. How the generator starts does not change this.</li>
 </ul>
-<div class="callout"><p><strong>What this rests on.</strong> The recogniser is complete after a few hundred chains, long before the generator (section 2), and it rejects whatever it has not seen. So it can judge the generator's samples from the start. The random entries are an assumption. A table has no bias of its own, and we put them in by hand. The same holds for wrong entries that come from the teacher: if the teacher slips on 3% of its states and the generator takes its chains as shown, {{judge_teacher_own3}} of own chains are valid, however many chains follow.</p></div>
+<div class="callout"><p><strong>What this rests on.</strong> Recognition is complete after a few hundred chains, long before generation (section 2), and it rejects whatever it has not seen. So it can judge the generator's samples from the start. The random entries are an assumption. A table has no bias of its own, and we put them in by hand.</p></div>
 </section>
 
-<section id="limits">
-<h2>5. What the model shows, and what it does not</h2>
-<div class="columns">
-<div class="panel"><h3>Shows</h3><ul>
-<li>A recogniser and a generator trained on the same data by the same rule, in which the recogniser is ahead by a factor that grows with depth and follows a counting law.</li>
-<li>Generation that improves offline, by writing and judging, towards an exact target. In a world with many routes the practised tables come within {{bridge_cond2}} of the exact ones in total variation.</li>
-<li>Deeper levels that arrive later without a schedule.</li>
-<li>One signed, local rule that builds the generator and prunes it.</li>
-</ul></div>
-<div class="panel"><h3>Does not show</h3><ul>
-<li><strong>Practice that beats fresh teacher chains.</strong> We found two exceptions, each with an added assumption. In a world of 16 regions, where most teacher chains lie outside what the learner reads, practice writes {{reach_own_home3_23}} of the home region's spans of 8 links and teacher chains {{reach_fresh_home3_23}}. And if the learner may skip, at no cost, the joins it already holds, nine in ten spans take {{aim_u_aim_t90}} tokens instead of {{aim_u_fresh_t90}}.</li>
-<li><strong>Where spurious entries come from.</strong> They are put in by hand.</li>
-<li><strong>More teacher chains that make the learner worse.</strong> This happens only with a teacher who slips.</li>
-<li><strong>A hidden cause.</strong> The recogniser judges correctness and infers no latent variable.</li>
-<li><strong>Generalisation.</strong> Tables do not generalise across states, and writing is hard only in one pass: a pair table applied link by link already writes valid chains.</li>
-<li><strong>A mapping to in-context learning.</strong></li>
-</ul></div>
-</div>
+<section id="network">
+<h2>5. A network realisation, and limits</h2>
+<h3>Proposed network version</h3>
+<p>This is a proposal; it has not been simulated. Each table becomes a small network, and the signed count becomes a signed gradient step.</p>
+<ul class="findings">
+<li><strong>States.</strong> Each state \(a\) has an embedding \(\mathbf{e}_a\in\mathbb{R}^d\), shared by all parts.</li>
+<li><strong>Recogniser.</strong> One network for a pair of neighbours, applied to every link in parallel: \(\hat z_t=\sigma\big(f_\phi(\mathbf{e}_{x_t},\mathbf{e}_{x_{t+1}})\big)\), and \(v=+1\) if \(\hat z_t>\tfrac12\) for every link. It is trained in stage 1 on the teacher set alone, by contrast with pairs whose second state \(b'\) is drawn at random (first formula below). The pair table is its limit, with \(f=+\infty\) for a pair in the teacher set and \(-\infty\) otherwise.</li>
+<li><strong>Generator.</strong> One network per table, shared across positions, with a softmax over the middle state (second formula). The \(L\) networks applied top-down are one pass. For practice the learner also has to propose ends, which the tables do by drawing a span they hold: a second softmax per span length, \(r_{\psi_\ell}(x_{i+\ell}=b\mid x_i=a)\) for \(\ell=1,2,4\) links, fitted by the same rule.</li>
+</ul>
+<div class="eq">\[\begin{gathered}\mathcal{L}_{\mathrm{rec}}=-\sum_{(a,b)\in\mathcal{D}_N}\Big[\log\sigma\big(f_\phi(\mathbf{e}_a,\mathbf{e}_b)\big)\\ \qquad\qquad{}+\log\big(1-\sigma(f_\phi(\mathbf{e}_a,\mathbf{e}_{b'}))\big)\Big],\\[6pt] q_{\theta_k}(\tilde x_{i+k}=c\mid x_i=a,\,x_{i+2k}=b)\\ =\mathrm{softmax}_c\,g_{\theta_k}(\mathbf{e}_a,\mathbf{e}_b).\end{gathered}\]</div>
+<p><strong>One rule.</strong> For every node of a generated span, with the verdict \(v\) on that node's span,</p>
+<div class="eq">\[\begin{gathered}\Delta\theta_k\;\propto\;v\,\nabla_{\theta_k}\log q_{\theta_k}(\tilde x_{i+k}=c\mid a,b),\\ \Delta\mathbf{w}_{c'}\;\propto\;v\,\big(\mathbb{1}[c'=c]-q_{\theta_k}(c'\mid a,b)\big)\,\mathbf{h}.\end{gathered}\]</div>
+<p>The second line is the rule for the output weights \(\mathbf{w}_{c'}\) with last hidden layer \(\mathbf{h}\): presynaptic activity, postsynaptic choice, and the verdict as a third factor. On the teacher's spans \(v=+1\), and the rule is maximum likelihood (wake). On own spans it ascends the probability that an own span is accepted, \(\nabla_\theta\,\mathbb{E}[v]\). The count rule of section 1 is its tabular counterpart. The stages are those of Figure 1. A join draws a start \(a\), proposes \(c\sim r_{\psi_k}(\cdot\mid a)\) and \(b\sim r_{\psi_k}(\cdot\mid c)\), generates the two halves, and updates table \(k\) and the proposal \(r_{\psi_{2k}}\) with the verdict.</p>
+<p>We expect three differences from the tables. Random initial weights give the generator spurious mass without our putting it in (section 4). Shared embeddings may let recogniser and generator generalise to pairs outside the teacher set, rightly or wrongly; the tables give the reference for that, namely the counting factors of section 2 and the ceilings of section 3. And if states are seen only through noisy observations, the recogniser needs a readout of the state, which is where a recognition-parametrised model would enter.</p>
+<h3>Limits of the table model</h3>
+<ul class="findings">
+<li><strong>Generalisation stops at the links of the teacher set.</strong> Tables do not generalise across states.</li>
+<li><strong>Practice does not beat a larger teacher set.</strong> We found two exceptions, each with an added assumption. In a world of 16 regions, where most teacher chains lie outside what the learner recognises, practice generates {{reach_own_home3_23}} of the home region's spans of 8 links and teacher chains {{reach_fresh_home3_23}}. And if the learner may skip, at no cost, the joins it already holds, nine in ten spans take {{aim_u_aim_t90}} tokens instead of {{aim_u_fresh_t90}}.</li>
+<li><strong>More teacher chains make the learner worse only if the teacher slips.</strong> If it slips on 3% of its states and the generator takes its chains as shown, {{judge_teacher_own3}} of own chains are valid, however many chains follow.</li>
+<li><strong>The practised tables converge to the teacher's</strong> in a world with many routes (within {{bridge_cond2}} in total variation), with joins only.</li>
+<li><strong>Generation is hard only in one pass.</strong> A pair table applied link by link already generates valid chains.</li>
+<li><strong>There is no hidden cause, and no mapping to in-context learning.</strong></li>
+</ul>
 <h3>Code and data</h3>
 <ul class="paths">
 <li><a href="{{filesDir}}/toy_model_3_chain.py"><code>toy_model_3_chain.py</code></a>: the world, the learner and every experiment, including those that this page only cites.</li>

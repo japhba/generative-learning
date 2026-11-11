@@ -34,17 +34,38 @@ def med(v): return float(np.nanmedian(v))
 def save(fig, name): fig.savefig(FIG / name, dpi=150); plt.close(fig); print(FIG / name)
 
 
-# ------------------------------------------------------------------ scheme: the chain, the checker, the tree decoder
-def scheme():
-    fig, ax = plt.subplots(figsize=(10, 4.4), constrained_layout=True); ax.set_xlim(-4.6, 9.7); ax.set_ylim(-1.45, 4.75); ax.set_aspect("equal"); ax.axis("off")
+# ------------------------------------------------------------------ the two tasks, the stages of learning, and what improves where
+def tasks(ax):
+    """The chain, recognition link by link, and generation as a tree."""
+    ax.set_xlim(-4.6, 9.7); ax.set_ylim(-1.45, 4.75); ax.set_aspect("equal"); ax.axis("off")
     for t in range(1, 10): ax.add_patch(plt.Circle((t, 0), 0.29, fc="white", ec=INK, zorder=3)); ax.text(t, 0, f"$x_{t}$", ha="center", va="center", zorder=4)
     for t in range(1, 9): ax.plot([t + 0.29, t + 0.71], [0, 0], color=INK, zorder=2); ax.plot([t + 0.12, t + 0.12, t + 0.88, t + 0.88], [-0.45, -0.62, -0.62, -0.45], color=TEACH)
-    ax.text(0.6, -0.55, "the recogniser checks:", ha="right", va="center"); ax.text(5, -1.15, "one lookup of the pair table per link", ha="center", va="center")
+    ax.text(0.6, -0.55, "recognition:", ha="right", va="center"); ax.text(5, -1.15, "is each link allowed? one look-up of the pair table per link", ha="center", va="center")
     for l, k in enumerate([1, 2, 4]):
         for a in range(1, 9, 2 * k): ax.add_patch(Arc((a + k, 0.34), 2 * k, 2.1 * (l + 1), theta1=0, theta2=180, color=LEVEL[l])); ax.plot([a + k, a + k], [0.34 + 1.05 * (l + 1), 0.34], color=LEVEL[l], ls=":")
-    for l, text in enumerate(["level 1 draws $x_2, x_4, x_6, x_8$", "level 2 draws $x_3$ and $x_7$", "level 3 draws $x_5$ from $(x_1, x_9)$"]): ax.text(0.6, 0.34 + 1.05 * (l + 1) - 0.25, text, ha="right", va="center", bbox=dict(fc="white", ec=LEVEL[l], boxstyle="round"))
-    ax.text(0.6, 0.34 + 1.05 * 4 - 0.25, "the generator writes, top-down:", ha="right", va="center"); ax.text(5, 4.5, "each node holds the two ends of a span and draws its midpoint", ha="center", va="center")
-    save(fig, "toy3-scheme.png")
+    for l, text in enumerate(["table 1 draws $x_2, x_4, x_6, x_8$", "table 2 draws $x_3$ and $x_7$", "table 4 draws $x_5$ given $(x_1, x_9)$"]): ax.text(0.6, 0.34 + 1.05 * (l + 1) - 0.25, text, ha="right", va="center", bbox=dict(fc="white", ec=LEVEL[l], boxstyle="round"))
+    ax.text(0.6, 0.34 + 1.05 * 4 - 0.25, "generation, top-down:", ha="right", va="center"); ax.text(5, 4.6, "each node holds the two ends of a span and draws its middle state", ha="center", va="center")
+
+
+def scheme(): fig, ax = plt.subplots(figsize=(10, 4.4), constrained_layout=True); tasks(ax); save(fig, "toy3-scheme.png")
+
+
+def lead():
+    fig = plt.figure(figsize=(10, 9.6), constrained_layout=True); gs = fig.add_gridspec(2, 2, height_ratios=[1, 1.15]); ax = fig.add_subplot(gs[0, :]); tasks(ax); ax.set_title("The two tasks")
+    sx = fig.add_subplot(gs[1, 0]); sx.axis("off"); sx.set_xlim(0, 1); sx.set_ylim(0, 1.04); sx.set_title("The stages of learning")
+    stages = [(1.0, 0.885, "Start", "pair table empty\ngenerator empty, or random entries", REF),
+              (0.725, 0.575, "Stage 1: a teacher set of $N$ chains", "recognition: count the pairs of neighbours\n(no generator is used)\nwake: count every span of the teacher's chains", TEACH),
+              (0.385, 0.19, "Stage 2: practice, no teacher", "generate a span: join two spans it holds,\nor rehearse one it holds\nrecognise it: is every link accepted?\ncount its entry up ($+1$) or down ($-1$)", OWN)]
+    for yh, yb, head, body, color in stages: sx.text(0.5, yh, head, ha="center", va="center", fontweight="bold"); sx.text(0.5, yb, body, ha="center", va="center", linespacing=1.5, bbox=dict(fc="white", ec=color, boxstyle="round,pad=0.7"))
+    for y0, y1 in [(0.805, 0.755), (0.47, 0.415)]: sx.annotate("", xy=(0.5, y1), xytext=(0.5, y0), arrowprops=dict(arrowstyle="->", color=INK))
+    bx = fig.add_subplot(gs[1, 1]); rs = runs("stages"); st = arr(rs, "stage")[0]; med_ = lambda key: np.median(arr(rs, key), 0); tr, po = med_(f"train_write{L}"), med_(f"write{L}"); one = st <= 1; two = st >= 1; two[np.flatnonzero(st == 1)[:-1]] = False
+    bx.plot([0, 1], [0, 1], color=REF, ls=":", label="the same on both")
+    bx.plot(med_("train_read0")[one], med_("read0")[one], color=REF, ls="--", marker=".", label="recognition of links, stage 1")
+    bx.plot(tr[one], po[one], color=TEACH, marker=".", label="generation, stage 1 (wake)"); bx.plot(tr[two], po[two], color=OWN, marker=".", label="generation, stage 2 (practice)")
+    i1 = int(np.flatnonzero(st == 1)[-1]); bx.annotate("stage 1", xy=(0.62, po[i1] + 0.03), xytext=(0.2, po[i1] + 0.03), va="center", arrowprops=dict(arrowstyle="->", color=INK)); bx.annotate("stage 2", xy=(0.93, 0.8), xytext=(0.93, 0.3), ha="center", rotation=90, arrowprops=dict(arrowstyle="->", color=INK))
+    bx.set_xlabel("on the teacher's training set"); bx.set_ylabel("on the population (held-out chains)"); bx.set_title(f"What improves where ({SPAN[L - 1]})"); bx.set_xlim(-0.03, 1.03); bx.set_ylim(-0.03, 1.03); below(bx)
+    nums.update({"lead_train1": float(tr[i1]), "lead_pop1": float(po[i1]), "lead_train2": float(tr[-1]), "lead_pop2": float(po[-1]), "lead_rec_train1": float(med_("train_read0")[i1]), "lead_rec_pop1": float(med_("read0")[i1])})
+    save(fig, "toy3-lead.png")
 
 
 # ------------------------------------------------------------------ watching only: recognition leads generation
@@ -61,9 +82,10 @@ def theory_watch(N, seeds=range(4)):
 
 def headstart():
     rs = runs("watch"); N = xs(rs, "N"); fig, (ax, bx) = plt.subplots(1, 2, figsize=(10, 5.4), constrained_layout=True)
-    th = theory_watch(N); band(ax, N, arr(rs, "read0"), TEACH, "links the recogniser accepts"); ax.plot(N, th[0], color=INK, ls=":")
-    for l in range(1, L + 1): band(ax, N, arr(rs, f"write{l}"), LEVEL[l - 1], f"{SPAN[l - 1]} the generator writes"); ax.plot(N, th[l], color=INK, ls=":", label="counting argument" if l == L else None)
-    ax.set_xscale("log"); ax.set_xlabel("teacher chains watched"); ax.set_ylabel("share of the population's links or spans"); ax.set_title("Watching only: the recogniser leads"); below(ax)
+    th = theory_watch(N); band(ax, N, arr(rs, "read0"), TEACH, "recognition: population links accepted"); ax.plot(N, th[0], color=INK, ls=":")
+    for l in range(1, L + 1): band(ax, N, arr(rs, f"write{l}"), LEVEL[l - 1], f"generation: population {SPAN[l - 1]}"); ax.plot(N, th[l], color=INK, ls=":", label="counting argument" if l == L else None)
+    ax.plot(N, np.median(arr(rs, f"train_write{L}"), 0), color=REF, ls="--", label=f"generation: {SPAN[L - 1]} of the teacher set"); nums["watch_train_min"] = float(min(arr(rs, f"train_write{l}").min() for l in range(1, L + 1)))
+    ax.set_xscale("log"); ax.set_xlabel("teacher chains in the training set"); ax.set_ylabel("share accepted, or generated in one pass"); ax.set_title("Stage 1: recognition generalises first"); below(ax)
     half = {l: np.array([cross(N, y) for y in arr(rs, f"write{l}" if l else "read0")]) for l in range(L + 1)}
     nums.update({"half_read0": med(half[0]), **{f"half_watch{l}": med(half[l]) for l in range(1, L + 1)}, **{f"lead{l}": med(half[l] / half[0]) for l in range(1, L + 1)},
                  **{f"lead_theory{l}": M ** (2 ** l - 1) * (n - 1) / (n - 2 ** l) for l in range(1, L + 1)}, "half_read0_theory": S * M * np.log(2) / (n - 1)})
@@ -74,7 +96,7 @@ def headstart():
         nx = 2 ** Lx + 1; pred = [mx ** (2 ** l - 1) * (nx - 1) / (nx - 2 ** l) for l in range(1, Lx + 1)]; meas = [med(h[l] / h[0]) for l in range(1, Lx + 1)]
         bx.plot(pred, meas, marker="osD^v"[i], ls="", color=[OWN, TEACH, THIRD, "#eda100", "#e87ba4"][i], label=f"{Sx:,} states, {mx} successors, chains of {nx}")
         nums[f"scale_{Sx}_{mx}_{Lx}"] = " · ".join(f"{a:,.0f} ({b:,.0f})" for a, b in zip(meas, pred))
-    lim = [1.5, 2000]; bx.plot(lim, lim, color=REF, ls="--", label="measured = predicted"); bx.set_xscale("log"); bx.set_yscale("log"); bx.set_xlabel(r"predicted delay, $m^{2k-1}(n-1)/(n-2k)$"); bx.set_ylabel("measured delay of the generator")
+    lim = [1.5, 2000]; bx.plot(lim, lim, color=REF, ls="--", label="measured = predicted"); bx.set_xscale("log"); bx.set_yscale("log"); bx.set_xlabel(r"predicted delay, $m^{2k-1}(n-1)/(n-2k)$"); bx.set_ylabel("measured delay of generation")
     bx.set_title("The delay grows with the span"); below(bx); save(fig, "toy3-headstart.png")
 
 
@@ -83,15 +105,15 @@ def practice():
     w = runs("watch"); Nw = xs(w, "N"); N = np.array(N_GRID, float); pr = [runs("practice", N=int(v)) for v in N]; po = [runs("pairs_only", N=int(v)) for v in N]
     fin = lambda rs, key: np.array([[r["out"][-1][key] for r in g] for g in rs]).T; first = lambda rs, key: np.array([[r["out"][0][key] for r in g] for g in rs]).T  # (world, N)
     fig, (ax, bx) = plt.subplots(1, 2, figsize=(10, 5.4), constrained_layout=True)
-    band(ax, Nw, arr(w, f"write{L}"), TEACH, "watching only"); band(ax, N, fin(pr, f"write{L}"), OWN, "watching, then practice"); band(ax, N, fin(po, f"write{L}"), THIRD, "teacher gives the pair table only, then practice", ls="--")
+    band(ax, Nw, arr(w, f"write{L}"), TEACH, "stage 1 only"); band(ax, N, fin(pr, f"write{L}"), OWN, "stage 1, then practice"); band(ax, N, fin(po, f"write{L}"), THIRD, "stage 1 without wake, then practice", ls="--")
     ax.plot(N, first(pr, f"reach{L}").mean(0), color=REF, ls=":", label="joined by accepted links (ceiling of practice)")
-    ax.set_xscale("log"); ax.set_xlabel("teacher chains"); ax.set_ylabel(f"share of {SPAN[L - 1]} written in one pass"); ax.set_title("Practice needs far fewer teacher chains"); below(ax)
+    ax.set_xscale("log"); ax.set_xlabel("teacher chains in the training set"); ax.set_ylabel(f"share of population {SPAN[L - 1]} generated"); ax.set_title("Practice needs a far smaller teacher set"); below(ax)
     hw = np.array([cross(Nw, y) for y in arr(w, f"write{L}")]); hp = np.array([cross(N, y) for y in fin(pr, f"write{L}")]); ho = np.array([cross(N, y) for y in fin(po, f"write{L}")])
     nums.update({"half_practice": med(hp), "half_pairs_only": med(ho), "saving": med(hw) / med(hp), "half_practice_theory": S * M * np.log(1 / (1 - 0.5 ** (1 / 2 ** L))) / (n - 1)})
     for l in range(1, L + 1):
         gain = fin(pr, f"write{l}") - first(pr, f"write{l}"); band(bx, N, gain, LEVEL[l - 1], SPAN[l - 1]); nums[f"gain_peak{l}"] = float(gain.mean(0).max()); nums[f"gain_peak_N{l}"] = int(N[gain.mean(0).argmax()])
         nums[f"gain_window{l}"] = " and ".join(f"{int(v):,}" for v in N[np.flatnonzero(gain.mean(0) > 0.5)][[0, -1]]) if (gain.mean(0) > 0.5).any() else "none"
-    bx.set_xscale("log"); bx.set_xlabel("teacher chains watched before practice"); bx.set_ylabel("share of spans gained by practice"); bx.set_title("Practice pays in a window"); below(bx)
+    bx.set_xscale("log"); bx.set_xlabel("teacher chains in the training set"); bx.set_ylabel("share of population spans gained by practice"); bx.set_title("Practice pays in a window"); below(bx)
     for e in [6, 9, 10, 12, 15, 18]:
         i = int(np.flatnonzero(N == 2 ** e)[0]); nums.update({f"n{e}_read0": float(first(pr, "read0")[:, i].mean()), f"n{e}_reach": float(first(pr, f"reach{L}")[:, i].mean()), **{f"n{e}_w{l}": float(first(pr, f"write{l}")[:, i].mean()) for l in range(1, L + 1)},
                      **{f"n{e}_p{l}": float(fin(pr, f"write{l}")[:, i].mean()) for l in range(1, L + 1)}, **{f"n{e}_o{l}": float(fin(po, f"write{l}")[:, i].mean()) for l in range(1, L + 1)}})
@@ -105,12 +127,12 @@ def staircase():
     fig, axes = plt.subplots(1, 2, figsize=(10, 5.6), constrained_layout=True, sharey=True)
     for ax, e in zip(axes, [12, 9]):
         rs = runs("pairs_only", N=2 ** e); Mx = xs(rs, "M"); Mx[0] = Mx[1] / 2; q = arr(rs, "read0")[:, 0].mean(); nums[f"stair_q{e}"] = float(q)
-        ax.axhline(q, color=TEACH, label="links the recogniser accepts")
+        ax.axhline(q, color=TEACH, label="recognition: population links accepted")
         for l in range(1, L + 1):
-            band(ax, Mx, arr(rs, f"write{l}"), LEVEL[l - 1], f"{SPAN[l - 1]}: written in one pass"); ax.plot(Mx[2::5], arr(rs, f"read{l}").mean(0)[2::5], color=LEVEL[l - 1], marker="o", mfc="none", ls="", label="the same spans held as one unit (read in one lookup)" if l == L else None)
+            band(ax, Mx, arr(rs, f"write{l}"), LEVEL[l - 1], f"{SPAN[l - 1]}: generated in one pass"); ax.plot(Mx[2::5], arr(rs, f"read{l}").mean(0)[2::5], color=LEVEL[l - 1], marker="o", mfc="none", ls="", label="the same spans recognised as one unit (one look-up)" if l == L else None)
             ax.axhline(arr(rs, f"reach{l}")[:, 0].mean(), color=LEVEL[l - 1], ls=":")
             nums[f"stair{e}_{l}"] = med([cross(Mx, y, 0.5 * y[-1]) for y in arr(rs, f"write{l}")]); nums[f"stair{e}_end{l}"] = float(arr(rs, f"write{l}")[:, -1].mean()); nums[f"stair{e}_reach{l}"] = float(arr(rs, f"reach{l}")[:, 0].mean())
-        ax.set_xscale("log"); ax.set_xlabel("practice episodes (no teacher data)"); ax.set_title(f"After {2 ** e:,} teacher chains (pair table {'complete' if q > 0.9995 else f'{100 * q:.0f}% complete'})")
+        ax.set_xscale("log"); ax.set_xlabel("practice episodes (no teacher data)"); ax.set_title(f"Teacher set of {2 ** e:,} chains (pair table {'complete' if q > 0.9995 else f'{100 * q:.0f}% complete'})")
     axes[0].plot([], [], color=REF, ls=":", label="dotted: joined by accepted links (ceiling)"); axes[0].set_ylabel("share of the population's links or spans"); below(axes[0])
     save(fig, "toy3-staircase.png")
 
@@ -175,6 +197,25 @@ def spur():
         nums[f"spur_{tag}_start_own"] = float(np.median(y[:, 0])); nums[f"spur_{tag}_start_left"] = float(np.median(arr(rs, f"nwrong{L}")[:, 0])); nums[f"spur_{tag}_share"] = float(np.median(arr(rs, f"wrong{L}")[:, 0]))
         axis.set_xscale("log"); axis.set_xlabel("further tokens (states shown or written)"); axis.set_ylabel(f"share of own chains of {2 ** L} links that are valid"); axis.set_title(title)
     fig.legend(loc="outside lower center", frameon=False, ncol=2); save(fig, "toy3-spurious.png")
+
+
+# ------------------------------------------------------------------ a generator that starts at random, fitted to the teacher set, then practice
+def random_start():
+    fig, axes = plt.subplots(1, 3, figsize=(10, 4.9), constrained_layout=True); R = 2 ** 13
+    arms = [("signed", OWN, "-", "practice with the signed rule"), ("plus", OWN, "--", "practice, failures ignored"), ("teacher", TEACH, "-", "fresh teacher chains (a larger training set)")]
+    for mode, color, ls, label in arms:
+        for rows, tag in [(R, ""), (2 ** 16, "big_")]:
+            rs = runs("stages_random", mode=mode, rows=rows); st = arr(rs, "stage")[0]; i1 = int(np.flatnonzero(st == 1)[-1]); T = xs(rs, "x")[i1 + 1:]; left = arr(rs, f"nwrong{L}") / arr(rs, f"nwrong{L}")[:, :1]
+            cols = {"left": left, "own": arr(rs, f"own{L}"), "pop": arr(rs, f"write{L}"), "train": arr(rs, f"train_write{L}"), "left1": arr(rs, "nwrong1") / arr(rs, "nwrong1")[:, :1]}
+            for key, y in cols.items(): nums[f"rand_{tag}{mode}_{key}_end"] = float(np.median(y[:, -1])); nums[f"rand_{tag}{mode}_{key}_20"] = float(np.median(y[:, i1 + 1:][:, np.argmin(np.abs(T - 2 ** 20))])); nums[f"rand_{tag}stage1_{key}"] = float(np.median(y[:, i1]))
+            nums[f"rand_{tag}{mode}_t99"] = med([cross(T, v, 0.99) for v in cols["own"][:, i1 + 1:]]); nums[f"rand_{tag}start_n"] = float(np.median(arr(rs, f"nwrong{L}")[:, 0])); nums[f"rand_{tag}{mode}_nleft_end"] = float(np.median(arr(rs, f"nwrong{L}")[:, -1]))
+            if rows == R:
+                for axis, key in zip(axes, ["left", "own", "pop"]): band(axis, T, cols[key][:, i1 + 1:], color, label if axis is axes[0] else None, ls, mid=np.median)
+                if mode == "signed":
+                    for axis, key in zip(axes, ["left", "own", "pop"]): axis.axhline(np.median(cols[key][:, i1]), color=REF, ls=":", label="no practice (after stage 1)" if axis is axes[0] else None)
+    nums["rand_rows"] = f"{R:,}"
+    for axis, title in zip(axes, ["Random entries left", "Own chains valid", "Population spans generated"]): axis.set_xscale("log"); axis.set_xlabel("tokens in stage 2"); axis.set_title(title); axis.set_ylim(-0.03, 1.03)
+    axes[0].set_ylabel("share (top table, spans of 8 links)"); fig.legend(loc="outside lower center", frameon=False, ncol=2); save(fig, "toy3-random.png")
 
 
 # ------------------------------------------------------------------ a generator that starts from random entries, and one signed rule
@@ -311,5 +352,5 @@ def reach():
 
 
 if __name__ == "__main__":
-    for f in [scheme, headstart, practice, staircase, tandem, tradeoff, aim, supervision, judge, spur, checks, bridge, own_foreign, reach]: f()
+    for f in [scheme, lead, headstart, practice, staircase, random_start, tandem, tradeoff, aim, supervision, judge, spur, checks, bridge, own_foreign, reach]: f()
     nums.update({"S": S, "m": M, "n": n, "L": L}); (OUT / "numbers.json").write_text(json.dumps(nums, indent=1)); print(OUT / "numbers.json")

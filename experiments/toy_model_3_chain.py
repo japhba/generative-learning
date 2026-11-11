@@ -1,10 +1,10 @@
-"""Toy model 3: the Oracle on a chain world (plan agreed with the user, 10-11 Nov 2026).
+"""Toy model 3: a learner made of tables on a chain world (plan agreed with the user, 10-11 Nov 2026).
 
 World: S states, each with m allowed successors (m permutations of the states, no fixed point, no shared arc). The
 population is the valid chains of n = 2^L + 1 states: uniform start, uniform allowed step. Every state has to fit both
 of its neighbours.
 
-The Oracle is the learner, made of tables and counts only:
+The teacher is the ground truth: it shows chains of the population. The learner is made of tables and counts only:
   recogniser  pairs[a, b]: how often b was seen right after a. A link passes once its pair was seen theta times.
               Checking a chain is one lookup per link, at any length.
   generator   bridge[k]: counts of (a, b) -> c, the midpoint c of a span of 2k links from a to b, k = 1, 2, 4, ..., 2^(L-1).
@@ -12,28 +12,28 @@ The Oracle is the learner, made of tables and counts only:
               entry) and hands (a, c) and (c, b) to its two children.
 Its two ways of learning use the same counting rule:
   watch       a teacher chain adds its adjacent pairs to the recogniser and each of its spans (a, c, b) to the generator.
-  practise    pick a level k, join two units of k links that the Oracle holds at a shared state (a -> c -> b), write the
+  practise    pick a level k, join two units of k links that the learner holds at a shared state (a -> c -> b), write the
               2k + 1 states in one pass, check every link, and count (a, c, b) at level k if all links pass. No teacher data.
               A unit of 1 link is an accepted pair; a unit of 2k links is a span the level-k table has an entry for.
-  rehearse    draw an entry the Oracle holds, write its span in one pass, judge it: the count goes up by one if every link passes
+  rehearse    draw an entry the learner holds, write its span in one pass, judge it: the count goes up by one if every link passes
               and down by one if not. With joins this is the one signed rule of the write-up; `run_tandem` starts the generator
               from random entries and compares it with teacher chains.
   aimed       practice that looks a drawn join up first and writes it only if the table lacks it (`run_aim`, `run_curve`).
 
-Own-versus-foreign extension, nothing given (`run_reach`): a world of regions. The Oracle is taught in one region, reads a
+Own-versus-foreign extension, nothing given (`run_reach`): a world of regions. The learner is taught in one region, reads a
 link only if it has learned it, and can take in a teacher chain only if the chain touches a state it knows.
 Earlier version (`run_map`): the step types are given (the same few steps act everywhere), the world has many states, and
-the Oracle can only file a chain that touches its map, the set of states it has produced or reached.
+the learner can only file a chain that touches its map, the set of states it has produced or reached.
 
 Scores, on held-out population chains (level l has spans of 2^l links):
   read0       share of population links the recogniser accepts
-  read<l>     share of population spans the Oracle holds as one unit (one lookup)
+  read<l>     share of population spans the learner holds as one unit (one lookup)
   write<l>    share of population spans (a, b) for which one pass from (a, b) gives a chain with only allowed links
   allow<l>    share of population spans whose own links are all accepted (what the pair table already permits)
   reach<l>    share of population spans joined by some route of accepted links (the ceiling of practice; where computed)
-  own<l>      share of the Oracle's own samples at level l (ends drawn from its table) with only allowed links
+  own<l>      share of the learner's own samples at level l (ends drawn from its table) with only allowed links
 
-Usage: python toy_model_3_oracle.py [--only watch practice ...] -> /var/tmp/jbauer/generative_practice_chain/<name>.json
+Usage: python toy_model_3_chain.py [--only watch practice ...] -> /var/tmp/jbauer/generative_practice_chain/<name>.json
        python toy_model_3_figures.py -> reports/toy3-*.png"""
 
 import os; os.environ.setdefault("OMP_NUM_THREADS", "1"); os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
@@ -70,7 +70,7 @@ def chains(succ, N, n, rng, noise=0.0, start=None, p=None):
 def grid(lo, hi, points): return np.unique(np.round(np.geomspace(lo, hi, points)).astype(np.int64))
 
 
-class Oracle:
+class Learner:
     """code[0], cnt[0]: the accepted pairs a S + b and their counts. code[k], cnt[k], k >= 1: sorted (a S + b) S + c and counts."""
 
     def __init__(self, S, L, theta=1, succ=None, dense=True):
@@ -131,7 +131,7 @@ class Oracle:
         return np.stack([a, c, b], 1) if k == 1 else np.c_[self.write(a, c, k // 2, rng), self.write(c, b, k // 2, rng)[:, 1:]]
 
     def unit(self, k, a, rng):
-        """The end of a held unit of k links that starts at a (count-weighted), and whether the Oracle holds one."""
+        """The end of a held unit of k links that starts at a (count-weighted), and whether the learner holds one."""
         j = 0 if k == 1 else k // 2; code = self.code[j]; w = self.S if j == 0 else self.S ** 2
         if len(code) == 0: return a, np.zeros(len(a), bool)
         r, held = self.pick(j, np.searchsorted(code, a * w), np.searchsorted(code, (a + 1) * w), rng)
@@ -153,7 +153,7 @@ class Oracle:
         return cum[np.searchsorted(code, key + 1)] - cum[np.searchsorted(code, key)] if j == 0 else cum[np.searchsorted(code, (key + 1) * self.S)] - cum[np.searchsorted(code, key * self.S)]
 
     def aimed(self, tokens, rng, draws=2 ** 14):
-        """Practice that skips what the Oracle already holds. A join is drawn as in practise and looked up; it is written and
+        """Practice that skips what the learner already holds. A join is drawn as in practise and looked up; it is written and
         checked only if the table lacks it, and only written joins cost tokens (2k + 1 states). A new join is filed with the count
         that blind practice would give it in the long run, count(a, c) count(c, b) / count(c, .). Levels are swept bottom-up; a level
         gets fewer draws when its last draws found little, so the tokens go to whichever levels still have gaps, and practice
@@ -179,7 +179,7 @@ class Oracle:
         return spent, looked
 
     def rehearse(self, k, B, rng, signed=True):
-        """B rehearsals at level k: an entry the Oracle holds is drawn in proportion to its count, the span it stands for is written
+        """B rehearsals at level k: an entry the learner holds is drawn in proportion to its count, the span it stands for is written
         in one pass and judged. The entry's count goes up by one if every link passes and, with signed, down by one if not."""
         if len(self.code[k]) == 0 or B == 0: return
         r = np.searchsorted(self.cum[k], rng.random(B) * self.cum[k][-1], side="right") - 1; c = self.code[k][r]; a, b, c = c // self.S ** 2, c // self.S % self.S, c % self.S
@@ -219,14 +219,14 @@ def setup(seed, S=S, m=M, L=L, test=8000, dense=True):
 
 def run_watch(seed, N_max=2 ** 22, points=72, S=S, m=M, L=L):
     """Watching only: the same teacher chains fill the pair table and, by the same counting rule, every level of the generator."""
-    rng, succ, T, test = setup(seed, S, m, L); o = Oracle(S, L); out, done = [], 0
+    rng, succ, T, test = setup(seed, S, m, L); o = Learner(S, L); out, done = [], 0
     for N in grid(8, N_max, points): o.watch(chains(succ, N - done, 2 ** L + 1, rng)); done = N; out.append({"N": int(N), **o.score(test, T, rng)})
     return out
 
 
 def run_practice(seed, N, levels=True, M_max=M_MAX, points=64, theta=1, noise=0.0, gate_teacher=False, slip=0.0, gate=True, false_pairs=0, S=S, m=M, L=L):
     """Watch N teacher chains, then practise. levels=False: the teacher chains fill the pair table only."""
-    rng, succ, T, test = setup(seed, S, m, L); o = Oracle(S, L, theta); o.watch(chains(succ, N, 2 ** L + 1, rng, noise), levels, gate_teacher)
+    rng, succ, T, test = setup(seed, S, m, L); o = Learner(S, L, theta); o.watch(chains(succ, N, 2 ** L + 1, rng, noise), levels, gate_teacher)
     if false_pairs:  # a checker with false accepts: wrong pairs, each as strong as an average right one
         a, b = rng.integers(S, size=false_pairs), rng.integers(S, size=false_pairs); o.pairs[a * S + b] += int(np.ceil(o.pairs[o.pairs > 0].mean())); o.watch(np.empty((0, 2), np.int64), False)
     out, done = [{"M": 0, **o.score(test, T, rng), **o.reach(test)}], 0
@@ -236,7 +236,7 @@ def run_practice(seed, N, levels=True, M_max=M_MAX, points=64, theta=1, noise=0.
 
 def run_schedule(seed, order, N=2 ** 12, M_tot=2 ** 21, blocks=64):
     """The same N teacher chains and M practice episodes in three orders: watch first, practise first, or alternating blocks."""
-    rng, succ, T, test = setup(seed); o = Oracle(S, L); out, seen, done = [{"examples": 0, "N": 0, "M": 0, **o.score(test, T, rng)}], 0, 0
+    rng, succ, T, test = setup(seed); o = Learner(S, L); out, seen, done = [{"examples": 0, "N": 0, "M": 0, **o.score(test, T, rng)}], 0, 0
     w, p = [("w", N // blocks)] * blocks, [("p", M_tot // blocks)] * blocks
     for kind, B in {"watch_first": w + p, "practise_first": p + w, "alternate": [s for pair in zip(w, p) for s in pair]}[order]:
         if kind == "w": o.watch(chains(succ, B, 2 ** L + 1, rng)); seen += B
@@ -247,16 +247,16 @@ def run_schedule(seed, order, N=2 ** 12, M_tot=2 ** 21, blocks=64):
 
 def run_split(seed, tokens, share):
     """A fixed budget of tokens (states shown or written): a share for fresh teacher chains (9 tokens each), the rest for practice."""
-    rng, succ, T, test = setup(seed); o = Oracle(S, L); N = int(round(share * tokens / (2 ** L + 1))); o.watch(chains(succ, N, 2 ** L + 1, rng))
+    rng, succ, T, test = setup(seed); o = Learner(S, L); N = int(round(share * tokens / (2 ** L + 1))); o.watch(chains(succ, N, 2 ** L + 1, rng))
     Mc = int((tokens - N * (2 ** L + 1)) / np.mean([2 * k + 1 for k in o.ks]))  # a join at level k writes 2k + 1 states
     for B in (np.diff(np.r_[0, grid(16, Mc, 40)]) if Mc >= 16 else []): o.rounds(int(B), rng)
     return {"tokens": tokens, "share": share, "N": N, "M": Mc, **o.score(test, T, rng)}
 
 
 def run_aim(seed, tokens, share, aim=True, rare=None):
-    """As run_split, with practice that skips what the Oracle already holds (aim=True) or blind practice (aim=False).
+    """As run_split, with practice that skips what the learner already holds (aim=True) or blind practice (aim=False).
     rare: the second step type is taken with this probability and the first with the rest (a world of common and rare steps)."""
-    rng, succ, T, _ = setup(seed, test=1); p = None if rare is None else [1 - rare, rare]; n = 2 ** L + 1; test = chains(succ, 8000, n, rng, p=p); o = Oracle(S, L)
+    rng, succ, T, _ = setup(seed, test=1); p = None if rare is None else [1 - rare, rare]; n = 2 ** L + 1; test = chains(succ, 8000, n, rng, p=p); o = Learner(S, L)
     N = int(round(share * tokens / n)); o.watch(chains(succ, N, n, rng, p=p)); left = tokens - N * n; row = {"tokens": tokens, "share": share, "N": N}
     if aim: spent, looked = o.aimed(left, rng); row |= {"written": sum(spent.values()), "looked": looked}
     else:
@@ -267,8 +267,8 @@ def run_aim(seed, tokens, share, aim=True, rare=None):
 
 def run_curve(seed, mode, rare=None, N0=2 ** 12, tokens=2 ** 23, points=44):
     """Share of spans written against tokens. fresh: teacher chains only. blind, aim: N0 teacher chains (their tokens counted),
-    then practice only, blind or skipping what the Oracle holds."""
-    rng, succ, T, _ = setup(seed, test=1); p = None if rare is None else [1 - rare, rare]; n = 2 ** L + 1; test = chains(succ, 8000, n, rng, p=p); o = Oracle(S, L)
+    then practice only, blind or skipping what the learner holds."""
+    rng, succ, T, _ = setup(seed, test=1); p = None if rare is None else [1 - rare, rare]; n = 2 ** L + 1; test = chains(succ, 8000, n, rng, p=p); o = Learner(S, L)
     out, spent, used, looked, lvl = [], 0, 0, 0, {k: 0 for k in o.ks}; cost = np.mean([2 * k + 1 for k in o.ks])
     if mode != "fresh": o.watch(chains(succ, N0, n, rng, p=p)); spent = used = N0 * n; out.append({"tokens": spent, "used": used, "looked": 0, **{f"lvl{l}": 0 for l in range(1, L + 1)}, **o.score(test, T, rng)})
     for Tk in grid(2 ** 12, tokens, points):
@@ -297,7 +297,7 @@ def wrong(o, R):
 
 
 def own_judged(o, B, rng, drop=0):
-    """B chains from the Oracle's own generator (ends from its top table, one pass), judged link by link. The entries that wrote a
+    """B chains from the learner's own generator (ends from its top table, one pass), judged link by link. The entries that wrote a
     chain which passes are counted once more. drop=1: an entry loses a count when the state it wrote fits neither of its
     neighbours. drop=2: such an entry is removed."""
     S, k = o.S, o.ks[-1]; r = np.searchsorted(o.cum[k], rng.random(B) * o.cum[k][-1], side="right") - 1; c = o.code[k][r]
@@ -320,10 +320,10 @@ def run_judge(seed, mode, N0=2 ** 14, noise=0.03, tokens=2 ** 21, points=28):
     Stage 2 (the generator only):
       teacher         more of the teacher's chains, taken as shown
       teacher_judged  more of the teacher's chains, a span filed only if all its links pass
-      own             chains drawn from the Oracle's own generator and judged (own_judged)
+      own             chains drawn from the learner's own generator and judged (own_judged)
       own_drop        the same, and an entry loses a count when the state it wrote fits neither of its neighbours
     Every chain shown or written costs its 9 tokens; nothing is looked up first."""
-    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L, theta=2); o.watch(chains(succ, N0, n, rng, noise)); out, spent = [], 0; R = reachable(T, o.ks)
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Learner(S, L, theta=2); o.watch(chains(succ, N0, n, rng, noise)); out, spent = [], 0; R = reachable(T, o.ks)
     out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
     for Tk in grid(2 ** 12, tokens, points):
         B = int(Tk - spent) // n
@@ -343,7 +343,7 @@ def run_spur(seed, mode, rows=64, share=0.2, N0=2 ** 12, M0=2 ** 20, tokens=2 **
       own_drop    and an entry loses a count when the state it wrote fits neither of its neighbours
       own_delete  and such an entry is removed
     Every chain shown or written costs its 9 tokens."""
-    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L); o.watch(chains(succ, N0, n, rng), levels=False); out, spent = [], 0; R = reachable(T, o.ks); k = o.ks[-1]
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Learner(S, L); o.watch(chains(succ, N0, n, rng), levels=False); out, spent = [], 0; R = reachable(T, o.ks); k = o.ks[-1]
     for B in np.diff(np.r_[0, grid(16, M0, 40)]): o.rounds(int(B), rng)
     a, b, c = rng.integers(S, size=(3, rows)); o.merge(k, np.repeat((a * S + b) * S + c, max(1, round(share / (1 - share) * o.cnt[k].sum() / rows))))
     out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
@@ -364,7 +364,7 @@ def run_tandem(seed, mode, rows=2 ** 16, N0=2 ** 12, tokens=2 ** 23, points=40):
       plus     the same, but a failure changes nothing
       teacher  further teacher chains; every span of a chain is counted
     Every chain shown or written costs its tokens."""
-    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L); o.watch(chains(succ, N0, n, rng), levels=False); out, spent = [], 0; R = reachable(T, o.ks); cost = np.mean([2 * k + 1 for k in o.ks])
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Learner(S, L); o.watch(chains(succ, N0, n, rng), levels=False); out, spent = [], 0; R = reachable(T, o.ks); cost = np.mean([2 * k + 1 for k in o.ks])
     for k in o.ks: a, b, c = rng.integers(S, size=(3, rows)); o.add(k, a, c, b)
     out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
     for Tk in grid(2 ** 10, tokens, points):
@@ -378,15 +378,15 @@ def run_tandem(seed, mode, rows=2 ** 16, N0=2 ** 12, tokens=2 ** 23, points=40):
 
 def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
     """Do practised tables converge to the exact bridge conditional? Small world with many routes; the teacher chains fill the pair
-    table only. Target: Chapman-Kolmogorov composition of the Oracle's own pair counts, level by level."""
-    rng, succ, T, test = setup(seed, S, m, L); o = Oracle(S, L); o.watch(chains(succ, N, 2 ** L + 1, rng), levels=False)
-    C = o.pairs.reshape(S, S).astype(float); target, world_target = {}, {}  # C / C.sum(): how often the Oracle draws the unit (a, c)
+    table only. Target: Chapman-Kolmogorov composition of the learner's own pair counts, level by level."""
+    rng, succ, T, test = setup(seed, S, m, L); o = Learner(S, L); o.watch(chains(succ, N, 2 ** L + 1, rng), levels=False)
+    C = o.pairs.reshape(S, S).astype(float); target, world_target = {}, {}  # C / C.sum(): how often the learner draws the unit (a, c)
     for tgt, U in [(target, C / C.sum()), (world_target, T / T.sum())]:
         for k in o.ks: P = U[:, :, None] * (U / U.sum(1, keepdims=True))[None]; tgt[k] = P; U = P.sum(1)  # P[a, c, b] = U(a, c) U(b | c); the next level's units are (a, b)
     def tv(k, tgt):
         P = np.zeros(S ** 3); c = o.code[k]; P[(c // S ** 2) * S ** 2 + (c % S) * S + c // S % S] = o.cnt[k]; P = P.reshape(S, S, S) / max(o.cnt[k].sum(), 1); Q = tgt[k]
         pb, qb = P.sum(1, keepdims=True), Q.sum(1, keepdims=True); cond = np.abs(np.divide(P, pb, out=np.zeros_like(P), where=pb > 0) - np.divide(Q, qb, out=np.zeros_like(Q), where=qb > 0)).sum(1)
-        return float(0.5 * np.abs(P - Q).sum()), float(0.5 * (cond * qb[:, 0]).sum())  # joint TV; population-weighted TV of p(c | a, b), 1 where the Oracle has no entry
+        return float(0.5 * np.abs(P - Q).sum()), float(0.5 * (cond * qb[:, 0]).sum())  # joint TV; population-weighted TV of p(c | a, b), 1 where the learner has no entry
     out, done = [], 0
     for Mc in grid(64, M_max, points):
         o.rounds(Mc - done, rng); done = Mc; row = {"M": int(Mc)}
@@ -399,10 +399,10 @@ def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
 
 
 def run_map(seed, own_share, P_max=2 ** 15, points=56, S=2 ** 14, m=M, L=L, seed_chains=1):
-    """The step types are known and act everywhere; the Oracle can file a chain only if it touches its map (the states it has
+    """The step types are known and act everywhere; the learner can file a chain only if it touches its map (the states it has
     produced or reached). Own chain: starts at a state of the map, applies known steps. Foreign chain: a population chain.
     own_share of the examples are own, the rest foreign, in random order."""
-    rng, succ, _, test = setup(seed, S, m, L, test=4000, dense=False); n = 2 ** L + 1; o = Oracle(S, L, succ=succ); valid = lambda x: (succ[x[:, :-1]] == x[:, 1:, None]).any(-1).all(1)
+    rng, succ, _, test = setup(seed, S, m, L, test=4000, dense=False); n = 2 ** L + 1; o = Learner(S, L, succ=succ); valid = lambda x: (succ[x[:, :-1]] == x[:, 1:, None]).any(-1).all(1)
     first = chains(succ, seed_chains, n, rng); known = np.zeros(S, bool); known[first] = True; o.file(first, False); out, done, used, seen = [], 0, 0, 0
     def score():
         row = {"P": done, "map": float(known.mean()), "usable": float(known[test].any(1).mean()), "predicted": float(1 - (1 - known.mean()) ** n), "used": used, "foreign_seen": seen}
@@ -427,12 +427,12 @@ def regions(K, S_r, m, rng, bridge):
 
 
 def run_reach(seed, share, bridge=0.0, attach=True, tokens=2 ** 23, points=44, K=16, S_r=S, m=M, L=L, N1=2048):
-    """Nothing is granted. The Oracle reads a link only if it has learned it, and it can take in a teacher chain only if the chain
+    """Nothing is granted. The learner reads a link only if it has learned it, and it can take in a teacher chain only if the chain
     touches a state it knows (then the whole chain, outwards from that state). A chain that touches nothing it knows is lost.
-    World: K regions. Stage 1: N1 teacher chains that start in region 0, the Oracle's home. Stage 2: a budget of tokens, a share
+    World: K regions. Stage 1: N1 teacher chains that start in region 0, the learner's home. Stage 2: a budget of tokens, a share
     for practice (own examples: joins of held units, as everywhere), the rest for fresh chains of the whole population (foreign).
     attach=False: a learner that takes in every fresh chain. K=1: one mixed world, where home is the whole world."""
-    rng = np.random.default_rng(seed); succ = regions(K, S_r, m, rng, bridge); n = 2 ** L + 1; o = Oracle(K * S_r, L, dense=False); valid = lambda x: (succ[x[:, :-1]] == x[:, 1:, None]).any(-1).all(1)
+    rng = np.random.default_rng(seed); succ = regions(K, S_r, m, rng, bridge); n = 2 ** L + 1; o = Learner(K * S_r, L, dense=False); valid = lambda x: (succ[x[:, :-1]] == x[:, 1:, None]).any(-1).all(1)
     tests = {"home": chains(succ, 4000, n, rng, start=rng.integers(S_r, size=4000)), "pop": chains(succ, 8000, n, rng)}
     first = chains(succ, N1, n, rng, start=rng.integers(S_r, size=N1)); known = np.zeros(K * S_r, bool); known[first] = True; o.watch(first)
     cost = np.mean([2 * k + 1 for k in o.ks]); out, spent, fresh, taken, joins = [], 0, 0, 0, 0  # a join at level k writes 2k + 1 states

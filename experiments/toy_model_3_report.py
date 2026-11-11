@@ -1,11 +1,11 @@
-"""Build toy_model_3_chain.html: the Oracle (a learner made of tables) on a chain world. Checking a chain is one lookup of a
+"""Build toy_model_3_chain.html: a learner made of tables on a chain world. Checking a chain is one lookup of a
 pair table per link; writing one in a single pass needs a tree of bridge tables. The pair table is learned from few teacher
 chains; practice (joining held units and rehearsing held entries, written in one pass and judged by the pair table, with one
 signed counting rule) fills the bridge tables without teacher data and removes the random entries the generator starts with.
 The page has five sections; the runs it only cites (regions, look-up practice, a teacher who slips) stay in the code.
 
 Every number in the page comes from /var/tmp/jbauer/generative_practice_chain/numbers.json (toy_model_3_figures.py, from the
-runs of toy_model_3_oracle.py); nothing is typed in by hand. The page goes to the world-readable ceph reports folder with its
+runs of toy_model_3_chain.py); nothing is typed in by hand. The page goes to the world-readable ceph reports folder with its
 figures and code, and is symlinked into reports/ for the local 127.0.0.1:8095 server; --project also writes it into the
 OverLyX project (tex/practice-loop/).
 Usage: python toy_model_3_report.py [--project]"""
@@ -21,14 +21,14 @@ import shutil
 from zoneinfo import ZoneInfo
 
 from report_katex import stylesheet, typeset
-from toy_model_3_oracle import M_MAX
+from toy_model_3_chain import M_MAX
 
 SHARED = Path('/ceph/scratch/jbauer/reports/generative-learning')
 PROJECT = 'tex/practice-loop'  # in the clone of the OverLyX project jan/generative-learning
 NAME = 'toy_model_3_chain'
 RUNS = Path('/var/tmp/jbauer/generative_practice_chain')
 FIGS = ['scheme', 'headstart', 'practice', 'staircase', 'tandem']
-CODE = ['experiments/toy_model_3_oracle.py', 'experiments/toy_model_3_figures.py', 'experiments/toy_model_3_report.py', 'experiments/toy_model_3_report.html']
+CODE = ['experiments/toy_model_3_chain.py', 'experiments/toy_model_3_figures.py', 'experiments/toy_model_3_report.py', 'experiments/toy_model_3_report.html']
 COUNT = r'half_.*|stair12_\d|gain_peak_N\d|sched_[NM]|map_\w+_(10|lo10|hi10|w1)|big_\w+_10|noisy_\w+_(wrong|half|wins)|bridge_entries|split\d+_wins|reach_(half|most|never)_\w+|reach_\w+_half_\w+|aim_[ur]_\w+_t\d+(_alt)?|aim_[ur]_(stop_used|cross)|asplit_\w+_wins|judge_wrong_pairs|judge_\w+_left|spur_\w+_left|tandem_\w+_t99|tandem_start|tandem_\w+_nleft\d_\d+'  # whole numbers
 TIMES = r'lead(_theory)?\d|saving|aim_[ur]_(looks|fail\d+|gain\d+)'  # factors
 SHARE = (r'multi_route\d|n\d+_\w+|gain_peak\d|sched_(watch_first|alternate|practise_first)|noisy_\w+_own0?|slip_\w+|false\d+_(\d|pred3)|usable_(at|pred)_10|msplit\w+|split\d+_(all|half)|stair_q\d+|bridge_multi|pairs_only_gap|read_write_gap'
@@ -60,8 +60,9 @@ def main():
     files = SHARED / f'{NAME}-files'; files.mkdir(parents=True, exist_ok=True)
     for src in CODE: shutil.copy2(root / src, files / Path(src).name)
     for f in FIGS: shutil.copy2(root / 'reports' / f'toy3-{f}.png', files / f'toy3-{f}.png')
-    for f in files.glob('toy3-*.png'):  # copies of figures that the page no longer shows (the originals stay in reports/)
-        if f.stem[5:] not in FIGS: f.unlink()
+    keep = {Path(src).name for src in CODE} | {f'toy3-{f}.png' for f in FIGS}
+    for f in files.iterdir():  # copies that the page no longer uses (the originals stay in experiments/ and reports/)
+        if f.name not in keep: f.unlink()
     out = SHARED / f'{NAME}.html'; out.write_text(html)
     for p in [SHARED.parent, SHARED, files]: p.chmod(0o755)
     for p in [out, *files.iterdir()]: p.chmod(0o644)
@@ -73,8 +74,8 @@ def main():
     if args.project:
         page = root / PROJECT / f'{NAME}.html'; (page.parent / files.name).mkdir(exist_ok=True)
         for f in files.iterdir(): shutil.copy2(f, page.parent / files.name / f.name)
-        for f in (page.parent / files.name).glob('toy3-*.png'):
-            if not (files / f.name).exists(): f.unlink()
+        for f in (page.parent / files.name).iterdir():
+            if f.name not in keep: f.unlink()
         page.write_text(html); print(page)
 
 

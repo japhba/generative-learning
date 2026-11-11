@@ -1,4 +1,4 @@
-"""Figures and quoted numbers for toy model 3 (the Oracle on a chain world), from the runs of toy_model_3_oracle.py.
+"""Figures and quoted numbers for toy model 3 (a learner made of tables on a chain world), from the runs of toy_model_3_chain.py.
 Usage: MPLBACKEND=Agg python toy_model_3_figures.py -> reports/toy3-*.png and /var/tmp/jbauer/generative_practice_chain/numbers.json"""
 
 import json
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Arc
 import numpy as np
 
-from toy_model_3_oracle import L, M, N_GRID, OUT, Oracle, S, chains, grid, setup
+from toy_model_3_chain import L, M, N_GRID, OUT, Learner, S, chains, grid, setup
 
 FIG = Path(__file__).resolve().parents[1] / "reports"
 n = 2 ** L + 1
@@ -221,12 +221,12 @@ def bridge():
         nums[f"bridge_cond{l}"] = float(arr(rs, f"cond{l}")[:, -1].mean()); nums[f"bridge_joint{l}"] = float(arr(rs, f"joint{l}")[:, -1].mean()); nums[f"bridge_world{l}"] = float(arr(rs, f"wcond{l}")[:, -1].mean())
     ax.plot(Mx[Mx > 3e3], 30 * Mx[Mx > 3e3] ** -0.5, color=REF, ls=":", label=r"slope of $1/\sqrt{\mathrm{episodes}}$"); ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("practice episodes"); ax.set_ylabel("total variation distance to the exact tables")
     ax.set_title("Practised tables approach the exact ones"); below(ax)
-    Sx, mx, Lx = 64, 3, 2; rng, succ, T, _ = setup(0, Sx, mx, Lx); o = Oracle(Sx, Lx); o.watch(chains(succ, 2 ** 15, 2 ** Lx + 1, rng), levels=False); done = 0  # one small world again, to show the tables themselves
+    Sx, mx, Lx = 64, 3, 2; rng, succ, T, _ = setup(0, Sx, mx, Lx); o = Learner(Sx, Lx); o.watch(chains(succ, 2 ** 15, 2 ** Lx + 1, rng), levels=False); done = 0  # one small world again, to show the tables themselves
     for Mc in grid(64, 2 ** 22, 40): o.rounds(int(Mc - done), rng); done = Mc
     C = o.pairs.reshape(Sx, Sx).astype(float); U = C / C.sum()
     for k in o.ks: Q = U[:, :, None] * (U / U.sum(1, keepdims=True))[None]; U = Q.sum(1)  # Q[a, c, b] at the top level
     c = o.code[2]; P = np.zeros(Sx ** 3); P[(c // Sx ** 2) * Sx ** 2 + (c % Sx) * Sx + c // Sx % Sx] = o.cnt[2]; P = P.reshape(Sx, Sx, Sx); pc, qc = P / np.maximum(P.sum(1, keepdims=True), 1), Q / np.maximum(Q.sum(1, keepdims=True), 1e-300)
-    sel = Q > 0; bx.plot(qc[sel], pc[sel], marker=".", ls="", color=OWN, alpha=0.3); bx.plot([0, 1], [0, 1], color=REF, ls="--"); bx.set_xlabel("exact probability of the midpoint given the ends"); bx.set_ylabel("the Oracle's table after practice")
+    sel = Q > 0; bx.plot(qc[sel], pc[sel], marker=".", ls="", color=OWN, alpha=0.3); bx.plot([0, 1], [0, 1], color=REF, ls="--"); bx.set_xlabel("exact probability of the midpoint given the ends"); bx.set_ylabel("the learner's table after practice")
     bx.set_title(f"{SPAN[1].capitalize()}, one world"); nums["bridge_entries"] = int(sel.sum()); nums["bridge_corr"] = float(np.corrcoef(qc[sel], pc[sel])[0, 1]); nums["bridge_multi"] = float((qc[sel] < 0.999).mean())
     save(fig, "toy3-bridge.png")
 
@@ -241,10 +241,10 @@ def own_foreign():
         nums[f"map_{tag}_lo10"], nums[f"map_{tag}_hi10"] = float(np.nanmin(t10)), float(np.nanmax(t10)); bx.plot(arr(rs, "map").ravel(), arr(rs, "usable").ravel(), marker=".", ls="", color=color, alpha=0.4, label=label)
     for share, color in [(1.0, OWN), (0.0, TEACH)]:
         rs = runs("map_big", own_share=share); P = xs(rs, "P")[1:]; ax.plot(P, np.median(arr(rs, "map")[:, 1:], 0), color=color, ls=":"); nums[f"big_{'own' if share else 'foreign'}_10"] = med([cross(P, v, 0.1) for v in arr(rs, "map")[:, 1:]])
-    ax.plot([], [], color=REF, ls=":", label="dotted: a world of 65,536 states"); ax.set_xscale("log"); ax.set_xlabel("examples"); ax.set_ylabel("share of the states in the Oracle's map"); ax.set_title("What the Oracle can read (16,384 states)"); below(ax)
-    a = np.geomspace(5e-4, 1, 200); bx.plot(a, 1 - (1 - a) ** n, color=REF, ls="--", label=r"a scattered map: $1-(1-a)^9$"); bx.set_xscale("log"); bx.set_xlabel("share $a$ of the states in the map"); bx.set_ylabel("share of foreign chains that touch the map"); bx.set_title("Foreign chains the Oracle can use"); below(bx)
+    ax.plot([], [], color=REF, ls=":", label="dotted: a world of 65,536 states"); ax.set_xscale("log"); ax.set_xlabel("examples"); ax.set_ylabel("share of the states in the learner's map"); ax.set_title("What the learner can read (16,384 states)"); below(ax)
+    a = np.geomspace(5e-4, 1, 200); bx.plot(a, 1 - (1 - a) ** n, color=REF, ls="--", label=r"a scattered map: $1-(1-a)^9$"); bx.set_xscale("log"); bx.set_xlabel("share $a$ of the states in the map"); bx.set_ylabel("share of foreign chains that touch the map"); bx.set_title("Foreign chains the learner can use"); below(bx)
     rs = runs("map", own_share=1.0); amap, use = arr(rs, "map").ravel(), arr(rs, "usable").ravel(); sel = (amap > 0.07) & (amap < 0.14); nums["usable_at_10"] = float(use[sel].mean()); nums["usable_pred_10"] = float((1 - (1 - amap[sel]) ** n).mean()); nums["usable_a"] = float(amap[sel].mean())
-    cx.plot([], [], color=REF, ls="--", label="dashed: spans of 4 links"); cx.set_xscale("log"); cx.set_xlabel("examples"); cx.set_ylabel("share of the population's spans of 2 links written"); cx.set_title("What the Oracle can write"); below(cx)
+    cx.plot([], [], color=REF, ls="--", label="dashed: spans of 4 links"); cx.set_xscale("log"); cx.set_xlabel("examples"); cx.set_ylabel("share of the population's spans of 2 links written"); cx.set_title("What the learner can write"); below(cx)
     sp = runs("map_split"); shares = sorted({r["args"]["own_share"] for r in sp})
     for i, P in enumerate([256, 1024, 4096]):
         y = np.array([[r["out"][-1]["map"] for r in sp if r["args"]["P_max"] == P and r["args"]["own_share"] == x] for x in shares]).T; band(dx, shares, y, plt.cm.Greys(0.4 + 0.25 * i), f"{P:,} examples in total", mid=np.median)
@@ -252,7 +252,7 @@ def own_foreign():
     dx.set_xlabel("share of the examples that are own"); dx.set_ylabel("share of the states in the map at the end"); dx.set_title("A fixed number of examples, split"); below(dx); save(fig, "toy3-own-foreign.png")
 
 
-# ------------------------------------------------------------------ practice that skips what the Oracle holds, against fresh teacher chains
+# ------------------------------------------------------------------ practice that skips what the learner holds, against fresh teacher chains
 def aim():
     fig, axes = plt.subplots(2, 2, figsize=(10, 10.4), constrained_layout=True); (ax, bx), (cx, dx) = axes
     modes = [("fresh", TEACH, "-", "fresh teacher chains only"), ("blind", OWN, "--", "{N0} teacher chains, then blind practice"), ("aim", OWN, "-", "{N0} teacher chains, then practice that skips what it holds")]
@@ -291,7 +291,7 @@ def reach():
         rs = runs("reach", share=0.0, bridge=b, attach=None); x = xs(rs, "fresh")[1:]; y = arr(rs, "usable")[:, 1:]; band(ax, x, y, plt.cm.Greys(0.4 + 0.25 * i), label, mid=np.median)
         nums[f"reach_use0_{tag}"] = float(np.median(arr(rs, "usable")[:, 0])); nums[f"reach_use_end_{tag}"] = float(np.median(y[:, -1])); nums[f"reach_half_{tag}"] = med([cross(x, v, 0.5) for v in y]); nums[f"reach_most_{tag}"] = med([cross(x, v, 0.9) for v in y])
         nums[f"reach_lost_{tag}"] = float(np.median(1 - arr(rs, "taken")[:, -1] / arr(rs, "fresh")[:, -1])); nums[f"reach_never_{tag}"] = int(np.sum(y[:, -1] < 0.5))
-    ax.axhline(1 / 16, color=REF, ls=":", label="the home region's share of the population"); ax.set_xscale("log"); ax.set_xlabel("fresh chains shown so far"); ax.set_ylabel("share of population chains the Oracle can take in"); ax.set_title("Fresh chains the Oracle can read"); below(ax)
+    ax.axhline(1 / 16, color=REF, ls=":", label="the home region's share of the population"); ax.set_xscale("log"); ax.set_xlabel("fresh chains shown so far"); ax.set_ylabel("share of population chains the learner can take in"); ax.set_title("Fresh chains the learner can read"); below(ax)
     for share, color, label, tag in arms:
         rs = runs("reach", share=share, bridge=B, attach=None); T = xs(rs, "tokens")[1:]; band(bx, T, arr(rs, "map")[:, 1:], color, label, mid=np.median); band(cx, T, arr(rs, "home3")[:, 1:], color, label, mid=np.median); cx.plot(T, np.median(arr(rs, "home2")[:, 1:], 0), color=color, ls="--")
         band(dx, T, arr(rs, "pop2")[:, 1:], color, label, mid=np.median); dx.plot(T, np.median(arr(runs("reach", share=share, bridge=0.0, attach=None), "pop2")[:, 1:], 0), color=color, ls=":")
@@ -305,7 +305,7 @@ def reach():
     rs = runs("reach", share=0.0, bridge=B, attach=False); T = xs(rs, "tokens")[1:]; dx.plot(T, np.median(arr(rs, "pop2")[:, 1:], 0), color=REF, ls="--", label="fresh chains only, a learner that keeps every chain")
     nums["reach_keep_half_pop2"] = med([cross(T, v, 0.5) for v in arr(rs, "pop2")[:, 1:]]); nums["reach_start_home2"], nums["reach_start_home3"] = (float(np.median(arr(rs, k)[:, 0])) for k in ["home2", "home3"])
     nums["reach_stage1_map"] = float(np.median(arr(rs, "map")[:, 0])); nums["reach_stage1_links"] = float(np.median(arr(rs, "links")[:, 0])); nums["reach_keep_home3_23"] = float(at(rs, "home3", 2 ** 23))
-    bx.set_xscale("log"); bx.set_xlabel("tokens in stage 2 (states shown or written)"); bx.set_ylabel("share of the world's states the Oracle knows"); bx.set_title("Only fresh chains enlarge the map"); below(bx)
+    bx.set_xscale("log"); bx.set_xlabel("tokens in stage 2 (states shown or written)"); bx.set_ylabel("share of the world's states the learner knows"); bx.set_title("Only fresh chains enlarge the map"); below(bx)
     cx.plot([], [], color=REF, ls="--", label="dashed: spans of 4 links"); cx.set_xscale("log"); cx.set_xlabel("tokens in stage 2"); cx.set_ylabel("share of the home region's spans of 8 links written"); cx.set_title("Writing at home"); below(cx)
     dx.plot([], [], color=REF, ls=":", label="dotted: no state leads to another region"); dx.set_xscale("log"); dx.set_xlabel("tokens in stage 2"); dx.set_ylabel("share of the population's spans of 4 links written"); dx.set_title("Writing in the whole population"); below(dx); save(fig, "toy3-reach.png")
 

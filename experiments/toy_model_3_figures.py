@@ -229,7 +229,7 @@ def spur():
 
 # ------------------------------------------------------------------ a generator that starts at random, fitted to the teacher set, then practice
 def random_start():
-    fig, grid2 = plt.subplots(2, 2, figsize=(10, 9.4), constrained_layout=True); axes = [grid2[0, 0], grid2[0, 1], grid2[1, 0]]; dx = grid2[1, 1]; R = 2 ** 13
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5.3), constrained_layout=True); R = 2 ** 13
     arms = [("signed", OWN, "-", "practice with the signed rule"), ("plus", OWN, "--", "practice, failures ignored"), ("teacher", TEACH, "-", "fresh teacher chains (a larger training set)")]
     for mode, color, ls, label in arms:
         for rows, tag in [(R, ""), (2 ** 16, "big_")]:
@@ -238,15 +238,13 @@ def random_start():
             for key, y in cols.items(): nums[f"rand_{tag}{mode}_{key}_end"] = float(np.median(y[:, -1])); nums[f"rand_{tag}{mode}_{key}_20"] = float(np.median(y[:, i1 + 1:][:, np.argmin(np.abs(T - 2 ** 20))])); nums[f"rand_{tag}stage1_{key}"] = float(np.median(y[:, i1]))
             nums[f"rand_{tag}{mode}_t99"] = med([cross(T, v, 0.99) for v in cols["own"][:, i1 + 1:]]); nums[f"rand_{tag}start_n"] = float(np.median(arr(rs, f"nwrong{L}")[:, 0])); nums[f"rand_{tag}{mode}_nleft_end"] = float(np.median(arr(rs, f"nwrong{L}")[:, -1]))
             if rows == R:
-                for axis, key in zip(axes, ["left", "own", "pop"]): band(axis, T, cols[key][:, i1 + 1:], color, label if axis is axes[0] else None, ls, mid=np.median)
+                for axis, key in zip(axes, ["left", "own"]): band(axis, T, cols[key][:, i1 + 1:], color, label if axis is axes[0] else None, ls, mid=np.median)
                 if mode == "signed":
-                    for axis, key in zip(axes, ["left", "own", "pop"]): axis.axhline(np.median(cols[key][:, i1]), color=REF, ls=":", label="no practice (after stage 1)" if axis is axes[0] else None)
+                    for axis, key in zip(axes, ["left", "own"]): axis.axhline(np.median(cols[key][:, i1]), color=REF, ls=":", label="no practice (after stage 1)" if axis is axes[0] else None)
     nums["rand_rows"] = f"{R:,}"
-    for axis, title in zip(axes, ["(a) Random entries left", "(b) Own chains valid", "(c) Population spans generated"]): axis.set_xscale("log"); axis.set_xlabel("tokens in stage 2"); axis.set_title(title); axis.set_ylim(-0.03, 1.03)
-    for axis in axes[::2]: axis.set_ylabel("share (top table, spans of 8 links)")
+    for axis, title in zip(axes, ["(a) Random entries left", "(b) Own chains valid"]): axis.set_xscale("log"); axis.set_xlabel("tokens in stage 2"); axis.set_title(title); axis.set_ylim(-0.03, 1.03)
+    axes[0].set_ylabel("share (top table, spans of 8 links)")
     Ns = np.array([2 ** e for e in range(8, 21, 2)], float); end = lambda mode, key, i: np.array([[r["out"][i if i < 0 else max(j for j, row in enumerate(r["out"]) if row["stage"] == 1)][key] for r in runs("stages_n", mode=mode, N=int(v))] for v in Ns]).T
-    for mode, color, ls in [("signed", OWN, "-"), ("teacher", TEACH, "-")]: band(dx, Ns, end(mode, f"own{L}", -1), color, None, ls, mid=np.median)
-    band(dx, Ns, end("signed", f"own{L}", 0), REF, None, ":", mid=np.median); dx.set_xscale("log"); dx.set_xlabel("teacher chains in the training set (stage 1)"); dx.set_ylabel("share of own chains valid after stage 2"); dx.set_title(r"(d) After $2^{21}$ tokens of stage 2"); dx.set_ylim(-0.03, 1.03)
     for i, v in enumerate(Ns):
         for mode in ["signed", "teacher"]:
             for key, tag in [(f"own{L}", "own"), (f"write{L}", "pop")]: nums[f"rn{int(v)}_{mode}_{tag}"] = float(np.median(end(mode, key, -1)[:, i])); nums[f"rn{int(v)}_stage1_{tag}"] = float(np.median(end("signed", key, 0)[:, i]))

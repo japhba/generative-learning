@@ -18,6 +18,8 @@ html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
 main{max-width:900px;margin:0 auto;padding:0 16px 64px}
 header{padding:48px 0 8px}
+header .table-wrap{margin-top:6px}
+header .small{margin:18px 0 0}
 h1{font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
 h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
 h3{font-size:1.05rem;margin:22px 0 6px}
@@ -27,10 +29,6 @@ section{padding-top:44px}
 .eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
 .lede{font-size:1.1rem;color:var(--ink2)}
 .small{font-size:.88rem;color:var(--ink2)}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0 0}
-.tile{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-.tile strong{display:block;font-size:1.5rem;line-height:1.2;margin-bottom:4px;font-variant-numeric:tabular-nums}
-.tile span{font-size:.88rem;color:var(--ink2)}
 .takeaways{padding-left:22px;margin:0}.takeaways li{margin-bottom:10px}
 .findings{padding-left:22px}.findings li{margin-bottom:8px}
 .callout{background:var(--note);border-radius:10px;padding:14px 18px;margin:18px 0}
@@ -52,10 +50,8 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-sp
 .paths li{margin-bottom:8px}
 footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
 footer code{overflow-wrap:anywhere}
-.pill{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:1px 9px;border:1.5px solid currentColor;white-space:nowrap}
-.pill.yes{color:var(--yes)}.pill.part{color:var(--part)}.pill.no{color:var(--no)}
 .spec td:first-child{width:36%}.spec td:nth-child(2){width:1%;white-space:nowrap}
-@media (max-width:720px){body{font-size:16px}.tiles,.columns{grid-template-columns:1fr}header{padding-top:28px}section{padding-top:34px}}
+@media (max-width:720px){body{font-size:16px}.columns{grid-template-columns:1fr}header{padding-top:28px}section{padding-top:34px}}
 @media print{body{background:#fff}}
 </style>
 </head>
@@ -65,12 +61,28 @@ footer code{overflow-wrap:anywhere}
 <header>
 <div class="eyebrow">Generative learning · toy model 3 · practice on a chain</div>
 <h1>A learner that can check a chain long before it can write one, and closes the gap by practice</h1>
-<p class="abstract lede">The task is to write chains of {{n}} states in which every state fits both of its neighbours. Checking a chain needs one table of allowed pairs. Writing a chain in a single pass needs a tree of tables that say, for the two ends of a span, which state lies in the middle. A learner made of such tables fills its pair table from a few hundred teacher chains and needs about {{lead3}} times as many for its top table. Practice closes that gap without further teacher chains: the learner writes spans itself, its pair table judges them, and one signed rule counts an entry up when its span passes and down when it fails. The same rule removes the random entries with which the generator starts. Teacher chains never do.</p>
-<div class="tiles">
-<div class="tile"><strong>{{half_read0}} → {{half_watch3}}</strong> <span>teacher chains until the learner accepts half of the population's links, and until it writes half of the population's spans of 8 links, by watching alone</span></div>
-<div class="tile"><strong>{{half_practice}} chains</strong> <span>teacher chains for the same once the learner practises: {{saving}} times fewer</span></div>
-<div class="tile"><strong>{{tandem_signed_left3_23}} vs {{tandem_teacher_left3_23}}</strong> <span>of the generator's random initial entries left after practice with the signed rule, and after as many tokens of teacher chains</span></div>
-</div>
+<p class="abstract lede">The task is to write chains of {{n}} states in which every state fits both of its neighbours. Checking a chain needs one table of allowed pairs. Writing a chain in a single pass needs a tree of tables that say, for the two ends of a span, which state lies in the middle. A learner made of such tables fills its pair table from a few hundred teacher chains and needs about {{lead3}} times as many for its top table. Practice closes that gap and needs {{saving}} times fewer teacher chains: the learner writes spans itself, its pair table judges them, and one signed rule counts an entry up when its span passes and down when it fails. The same rule removes the random entries with which the generator starts. Teacher chains never do.</p>
+<p class="small">How far the model meets the requirements of the project's specification (tex/README.md):</p>
+<div class="table-wrap"><table class="spec">
+<thead><tr><th>Requirement</th><th>Met</th><th>Where, and how far</th></tr></thead>
+<tbody>
+<tr><td>Local, Hebb-like or three-factor rule</td><td>yes</td><td>One signed count per entry, with the recogniser's verdict as the third factor (section 1).</td></tr>
+<tr><td>Generation improves offline, through a generate–recognise loop</td><td>yes</td><td>Section 3: {{n12_w3}} to {{n12_p3}} of the spans of 8 links with no teacher data.</td></tr>
+<tr><td>Better than the same learner without practice</td><td>yes</td><td>Section 3.</td></tr>
+<tr><td>Better than as many fresh examples</td><td>partly</td><td>For adding what is missing, no: fresh teacher chains win token for token (section 3). For removing what is wrong, yes (section 4).</td></tr>
+<tr><td>Beats the same learner fitted end to end to the supplied examples</td><td>yes</td><td>Watching only is that fit. Practice needs {{saving}} times fewer teacher chains (section 3).</td></tr>
+<tr><td>Recognition infers latent causes or judges correctness</td><td>partly</td><td>It judges correctness. There is no hidden cause.</td></tr>
+<tr><td>Depth, with deeper layers emergently later</td><td>yes</td><td>Sections 2 and 3.</td></tr>
+<tr><td>Normative grounding</td><td>yes</td><td>Joins sample the composition rule of section 1, and the practised tables converge to the teacher's (section 5). Not checked with rehearsals.</td></tr>
+<tr><td>Interpretable in terms of weights; analytically tractable</td><td>yes</td><td>The tables are \(\mathbf{T}\) and its powers, and the delays follow a counting law (section 2).</td></tr>
+<tr><td>Benefit not explained by reconstruction error on the data</td><td>yes</td><td>Practice uses no data.</td></tr>
+<tr><td>Recognition and generation in the same space</td><td>yes</td><td>Both act on chains.</td></tr>
+<tr><td>Recognition stays ahead of generation, emergently</td><td>partly</td><td>Ahead at the level of links (section 2). Above it, reading a span as a unit and writing it are the same table (section 3).</td></tr>
+<tr><td>Latent representations improve with generation</td><td>partly</td><td>Longer spans become readable as units (section 3). There is no hidden cause to clean up.</td></tr>
+<tr><td>More supervision can make the learner worse</td><td>partly</td><td>Only with a teacher who slips (section 5). Otherwise further teacher chains add little and never hurt.</td></tr>
+<tr><td>Own examples better than foreign ones of at least equal quality</td><td>partly</td><td>Own samples remove the generator's random entries, which exact samples of the population never do (section 4). The random start is an assumption, and teacher chains stay better at coverage.</td></tr>
+<tr><td>Mapping to in-context learning</td><td>no</td><td>Not addressed.</td></tr>
+</tbody></table></div>
 </header>
 
 <section id="model">

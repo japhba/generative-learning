@@ -269,42 +269,77 @@ def run_curve(seed, mode, rare=None, N0=2 ** 12, tokens=2 ** 23, points=44):
     return out
 
 
+def reachable(T, ks):
+    """R[k][a, c]: c can be reached from a in k links."""
+    R = {}; P = T.astype(np.float32)
+    for k in ks: R[k] = P > 0; P = (P @ P > 0).astype(np.float32)
+    return R
+
+
+def wrong(o, R):
+    """Per level: the share of the table's counts on entries whose midpoint does not lie on a route between their ends, and the number of such entries."""
+    row = {}
+    for l, k in enumerate(o.ks, 1): c = o.code[k]; a, b, mid = c // o.S ** 2, c // o.S % o.S, c % o.S; bad = ~(R[k][a, mid] & R[k][mid, b]); row[f"wrong{l}"] = float(o.cnt[k][bad].sum() / o.cnt[k].sum()); row[f"nwrong{l}"] = int(bad.sum())
+    return row
+
+
+def own_judged(o, B, rng, drop=0):
+    """B chains from the Oracle's own generator (ends from its top table, one pass), judged link by link. The entries that wrote a
+    chain which passes are counted once more. drop=1: an entry loses a count when the state it wrote fits neither of its
+    neighbours. drop=2: such an entry is removed."""
+    S, k = o.S, o.ks[-1]; r = np.searchsorted(o.cum[k], rng.random(B) * o.cum[k][-1], side="right") - 1; c = o.code[k][r]
+    x = np.empty((B, 2 * k + 1), np.int64); x[:, 0], x[:, -1], x[:, k] = c // S ** 2, c // S % S, c % S; nodes = [(k, k, r, np.ones(B, bool))]  # level, position of the midpoint, table row, held
+    for kk in o.ks[-2::-1]:
+        for i in range(0, 2 * k, 2 * kk):
+            key = (x[:, i] * S + x[:, i + 2 * kk]) * S; r, held = o.pick(kk, np.searchsorted(o.code[kk], key), np.searchsorted(o.code[kk], key + S), rng)
+            x[:, i + kk] = np.where(held, o.code[kk][r] % S, rng.integers(S, size=B)); nodes.append((kk, i + kk, r, held))
+    ok = o.passes(x[:, :-1], x[:, 1:]); good = ok.all(1)
+    for kk, p, r, held in nodes:
+        np.add.at(o.cnt[kk], r[good & held], 1)
+        if drop == 1: np.subtract.at(o.cnt[kk], r[held & ~ok[:, p - 1] & ~ok[:, p]], 1)
+        if drop == 2: o.cnt[kk][r[held & ~ok[:, p - 1] & ~ok[:, p]]] = 0
+    for kk in o.ks: keep = o.cnt[kk] > 0; o.code[kk], o.cnt[kk] = o.code[kk][keep], o.cnt[kk][keep]; o.cum[kk] = np.r_[0, np.cumsum(o.cnt[kk])]
+
+
 def run_judge(seed, mode, N0=2 ** 14, noise=0.03, tokens=2 ** 21, points=28):
     """A generator with wrong entries, and four ways to spend more tokens on it. Stage 1: N0 chains of a teacher who slips; the
     recogniser accepts a pair seen twice and is then frozen; the generator takes every span as shown, slips included.
     Stage 2 (the generator only):
       teacher         more of the teacher's chains, taken as shown
       teacher_judged  more of the teacher's chains, a span filed only if all its links pass
-      own             chains drawn from the Oracle's own generator (ends from its top table, one pass) and judged: the entries
-                      that wrote a chain which passes are counted once more
-      own_drop        the same, and an entry is dropped when the state it wrote fits neither of its neighbours
+      own             chains drawn from the Oracle's own generator and judged (own_judged)
+      own_drop        the same, and an entry loses a count when the state it wrote fits neither of its neighbours
     Every chain shown or written costs its 9 tokens; nothing is looked up first."""
-    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L, theta=2); o.watch(chains(succ, N0, n, rng, noise)); out, spent = [], 0
-    R = {}; P = T.astype(np.float32)
-    for k in o.ks: R[k] = P > 0; P = (P @ P > 0).astype(np.float32)  # R[k][a, c]: c can be reached from a in k links
-    def score():
-        row = {"tokens": spent, **o.score(test, T, rng)}
-        for l, k in enumerate(o.ks, 1): c = o.code[k]; a, b, mid = c // S ** 2, c // S % S, c % S; row[f"wrong{l}"] = float(o.cnt[k][~(R[k][a, mid] & R[k][mid, b])].sum() / o.cnt[k].sum())
-        return row
-    def own(B, drop):
-        k = o.ks[-1]; r = np.searchsorted(o.cum[k], rng.random(B) * o.cum[k][-1], side="right") - 1; c = o.code[k][r]
-        x = np.empty((B, 2 * k + 1), np.int64); x[:, 0], x[:, -1], x[:, k] = c // S ** 2, c // S % S, c % S; nodes = [(k, k, r, np.ones(B, bool))]  # level, position of the midpoint, table row, held
-        for kk in o.ks[-2::-1]:
-            for i in range(0, 2 * k, 2 * kk):
-                key = (x[:, i] * S + x[:, i + 2 * kk]) * S; r, held = o.pick(kk, np.searchsorted(o.code[kk], key), np.searchsorted(o.code[kk], key + S), rng)
-                x[:, i + kk] = np.where(held, o.code[kk][r] % S, rng.integers(S, size=B)); nodes.append((kk, i + kk, r, held))
-        ok = o.passes(x[:, :-1], x[:, 1:]); good = ok.all(1)
-        for kk, p, r, held in nodes:
-            np.add.at(o.cnt[kk], r[good & held], 1)
-            if drop: np.subtract.at(o.cnt[kk], r[held & ~ok[:, p - 1] & ~ok[:, p]], 1)
-        for kk in o.ks: keep = o.cnt[kk] > 0; o.code[kk], o.cnt[kk] = o.code[kk][keep], o.cnt[kk][keep]; o.cum[kk] = np.r_[0, np.cumsum(o.cnt[kk])]
-    out.append(score())
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L, theta=2); o.watch(chains(succ, N0, n, rng, noise)); out, spent = [], 0; R = reachable(T, o.ks)
+    out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
     for Tk in grid(2 ** 12, tokens, points):
         B = int(Tk - spent) // n
         if mode in ["teacher", "teacher_judged"]: o.file(chains(succ, B, n, rng, noise), gate=mode == "teacher_judged")
         else:
-            for b in np.diff(np.r_[0, np.linspace(0, B, 9)[1:].astype(int)]): own(int(b), mode == "own_drop")  # in 8 parts, so that the tables are up to date
-        spent = int(Tk); out.append(score())
+            for b in np.diff(np.r_[0, np.linspace(0, B, 9)[1:].astype(int)]): own_judged(o, int(b), rng, int(mode == "own_drop"))  # in 8 parts, so that the tables are up to date
+        spent = int(Tk); out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
+    return out
+
+
+def run_spur(seed, mode, rows=64, share=0.2, N0=2 ** 12, M0=2 ** 20, tokens=2 ** 21, points=28):
+    """A generator with spurious entries of its own, never seeded by the teacher. The teacher (no slips) supplies the pair table
+    only, and practice builds the generator's tables. Its top table also holds `rows` random entries, put there by hand, which
+    carry `share` of the table's counts: few rows with large counts, or many rows with small ones. Then further tokens:
+      teacher     the teacher's chains, every span filed
+      own         own samples, judged; what passes is counted once more
+      own_drop    and an entry loses a count when the state it wrote fits neither of its neighbours
+      own_delete  and such an entry is removed
+    Every chain shown or written costs its 9 tokens."""
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Oracle(S, L); o.watch(chains(succ, N0, n, rng), levels=False); out, spent = [], 0; R = reachable(T, o.ks); k = o.ks[-1]
+    for B in np.diff(np.r_[0, grid(16, M0, 40)]): o.rounds(int(B), rng)
+    a, b, c = rng.integers(S, size=(3, rows)); o.merge(k, np.repeat((a * S + b) * S + c, max(1, round(share / (1 - share) * o.cnt[k].sum() / rows))))
+    out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
+    for Tk in grid(2 ** 10, tokens, points):
+        B = int(Tk - spent) // n
+        if mode == "teacher": o.file(chains(succ, B, n, rng), gate=False)
+        else:
+            for b in np.diff(np.r_[0, np.linspace(0, B, 9)[1:].astype(int)]): own_judged(o, int(b), rng, ["own", "own_drop", "own_delete"].index(mode))
+        spent = int(Tk); out.append({"tokens": spent, **o.score(test, T, rng), **wrong(o, R)})
     return out
 
 
@@ -402,6 +437,7 @@ JOBS = {
     "aim": [(run_aim, dict(seed=s, tokens=t, share=x, aim=a, rare=r)) for r in [None, 0.1] for a in [True, False] for t in [2 ** 19, 2 ** 21, 2 ** 23] for x in [0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0] for s in range(WORLDS)],
     "aim_curve": [(run_curve, dict(seed=s, mode=mo, rare=r, N0=N0)) for r, N0 in [(None, 2 ** 12), (0.1, 2 ** 13)] for mo in ["fresh", "blind", "aim"] for s in range(WORLDS)],
     "judge": [(run_judge, dict(seed=s, mode=mo)) for mo in ["teacher", "teacher_judged", "own", "own_drop"] for s in range(WORLDS)],
+    "spur": [(run_spur, dict(seed=s, mode=mo, rows=r)) for r in [64, 2 ** 15] for mo in ["teacher", "own", "own_drop", "own_delete"] for s in range(WORLDS)],
     "reach": [(run_reach, dict(seed=s, share=x, bridge=b)) for b in [0.0, 1 / 1024, 1 / 64] for x in [0.0, 0.5, 1.0] for s in range(WORLDS)]
     + [(run_reach, dict(seed=s, share=x, bridge=1 / 64, attach=False)) for x in [0.0, 0.5] for s in range(WORLDS)]
     + [(run_reach, dict(seed=s, share=x, K=1, S_r=16 * S)) for x in [0.0, 0.5, 1.0] for s in range(WORLDS)],

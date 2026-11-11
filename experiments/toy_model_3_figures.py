@@ -160,6 +160,21 @@ def judge():
         for key in [f"own{L}", "write2", f"write{L}", f"wrong{L}"]: nums[f"judge_{mode}_{key}"] = float(np.median(arr(rs, key)[:, -1])); nums[f"judge_start_{key}"] = float(np.median(arr(rs, key)[:, 0]))
     for a_, t in [(ax, f"Own chains of {2 ** L} links that are valid"), (bx, "Population spans of 4 links written")]: a_.set_xscale("log"); a_.set_xlabel("further tokens (states shown or written)"); a_.set_ylabel("share"); a_.set_title(t)
     fig.legend(loc="outside lower center", frameon=False, ncol=2); nums["judge_wrong_pairs"] = float(np.median(arr(runs("judge", mode="own"), "wrong0")[:, 0])); save(fig, "toy3-judge.png")
+    for mode in ["teacher_judged", "own_drop"]: nums[f"judge_{mode}_left"] = float(np.median(arr(runs("judge", mode=mode), f"nwrong{L}")[:, -1]))
+    nums["judge_start_left"] = float(np.median(arr(runs("judge", mode="own"), f"nwrong{L}")[:, 0])); nums["judge_thin"] = float(np.median(arr(runs("judge", mode="teacher_judged"), f"size{L}")[:, -1] / arr(runs("judge", mode="teacher_judged"), f"size{L}")[:, 0]))
+
+
+# ------------------------------------------------------------------ a generator with spurious entries of its own, never seeded by the teacher
+def spur():
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5.4), constrained_layout=True)
+    arms = [("teacher", TEACH, "-", "teacher chains"), ("own", OWN, ":", "own samples, judged; what passes is counted"), ("own_drop", OWN, "--", "and a failing entry loses a count"), ("own_delete", OWN, "-", "and a failing entry is removed")]
+    for axis, rows, tag, title in zip(axes, [64, 2 ** 15], ["few", "many"], ["64 strong spurious entries", "32,768 weak spurious entries"]):
+        for mode, color, ls, label in arms:
+            rs = runs("spur", mode=mode, rows=rows); T = xs(rs, "tokens")[1:]; y = arr(rs, f"own{L}"); band(axis, T, y[:, 1:], color, label if rows == 64 else None, ls, mid=np.median)
+            nums[f"spur_{tag}_{mode}_own"] = float(np.median(y[:, -1])); nums[f"spur_{tag}_{mode}_left"] = float(np.median(arr(rs, f"nwrong{L}")[:, -1])); nums[f"spur_{tag}_{mode}_own14"] = float(np.median(y[:, 1:][:, np.argmin(np.abs(T - 2 ** 14))]))
+        nums[f"spur_{tag}_start_own"] = float(np.median(y[:, 0])); nums[f"spur_{tag}_start_left"] = float(np.median(arr(rs, f"nwrong{L}")[:, 0])); nums[f"spur_{tag}_share"] = float(np.median(arr(rs, f"wrong{L}")[:, 0]))
+        axis.set_xscale("log"); axis.set_xlabel("further tokens (states shown or written)"); axis.set_ylabel(f"share of own chains of {2 ** L} links that are valid"); axis.set_title(title)
+    fig.legend(loc="outside lower center", frameon=False, ncol=2); save(fig, "toy3-spurious.png")
 
 
 # ------------------------------------------------------------------ what the check is for
@@ -277,5 +292,5 @@ def reach():
 
 
 if __name__ == "__main__":
-    for f in [scheme, headstart, practice, staircase, tradeoff, aim, supervision, judge, checks, bridge, own_foreign, reach]: f()
+    for f in [scheme, headstart, practice, staircase, tradeoff, aim, supervision, judge, spur, checks, bridge, own_foreign, reach]: f()
     nums.update({"S": S, "m": M, "n": n, "L": L}); (OUT / "numbers.json").write_text(json.dumps(nums, indent=1)); print(OUT / "numbers.json")

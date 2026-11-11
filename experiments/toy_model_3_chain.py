@@ -410,6 +410,18 @@ def run_stages(seed, mode, rows=0, N=2 ** 12, tokens=2 ** 23, points=40, rehears
     return out
 
 
+def run_window(seed, N, mode, tokens=2 ** 21):
+    """After a teacher set of N chains (recognition and wake, empty start), the same number of further tokens spent in one of three
+    ways: fresh (fresh teacher chains), practice (joins, drawn blindly), aim (joins that the learner looks up first and skips
+    if it holds them; only written joins cost tokens). Scores on the population before and after."""
+    rng, succ, T, test = setup(seed); n = 2 ** L + 1; o = Learner(S, L); o.watch(chains(succ, N, n, rng)); before = o.score(test, T, rng)
+    if mode == "fresh": o.watch(chains(succ, tokens // n, n, rng))
+    elif mode == "aim": o.aimed(tokens, rng)
+    else:
+        for B in np.diff(np.r_[0, grid(16, int(tokens / np.mean([2 * k + 1 for k in o.ks])), 40)]): o.rounds(int(B), rng)
+    return {"before": before, "after": o.score(test, T, rng)}
+
+
 def run_bridge(seed, S=64, m=3, L=2, N=2 ** 15, M_max=2 ** 22, points=40):
     """Do practised tables converge to the exact bridge conditional? Small world with many routes; the teacher chains fill the pair
     table only. Target: Chapman-Kolmogorov composition of the learner's own pair counts, level by level."""
@@ -504,6 +516,8 @@ JOBS = {
     "aim": [(run_aim, dict(seed=s, tokens=t, share=x, aim=a, rare=r)) for r in [None, 0.1] for a in [True, False] for t in [2 ** 19, 2 ** 21, 2 ** 23] for x in [0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0] for s in range(WORLDS)],
     "aim_curve": [(run_curve, dict(seed=s, mode=mo, rare=r, N0=N0)) for r, N0 in [(None, 2 ** 12), (0.1, 2 ** 13)] for mo in ["fresh", "blind", "aim"] for s in range(WORLDS)],
     "judge": [(run_judge, dict(seed=s, mode=mo)) for mo in ["teacher", "teacher_judged", "own", "own_drop"] for s in range(WORLDS)],
+    "window": [(run_window, dict(seed=s, N=N, mode=mo)) for mo in ["fresh", "practice", "aim"] for N in N_GRID for s in range(WORLDS)],
+    "stages_n": [(run_stages, dict(seed=s, mode=mo, rows=2 ** 13, N=N, tokens=2 ** 21, points=3)) for mo in ["signed", "teacher"] for N in [2 ** e for e in range(8, 21, 2)] for s in range(WORLDS)],
     "stages": [(run_stages, dict(seed=s, mode="signed", rehearse=0.0, tokens=2 ** 26, points=48)) for s in range(WORLDS)],
     "stages_random": [(run_stages, dict(seed=s, mode=mo, rows=r)) for r in [2 ** 13, 2 ** 16] for mo in ["signed", "plus", "teacher"] for s in range(WORLDS)],
     "tandem": [(run_tandem, dict(seed=s, mode=mo, rows=r)) for r in [2 ** 16, 2 ** 13] for mo in ["signed", "plus", "teacher"] for s in range(WORLDS)],

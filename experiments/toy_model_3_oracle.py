@@ -16,8 +16,10 @@ Its two ways of learning use the same counting rule:
               2k + 1 states in one pass, check every link, and count (a, c, b) at level k if all links pass. No teacher data.
               A unit of 1 link is an accepted pair; a unit of 2k links is a span the level-k table has an entry for.
 
-Own-versus-foreign extension (`run_map`): the step types are given (the same few steps act everywhere), the world has
-many states, and the Oracle can only file a chain that touches its map, the set of states it has produced or reached.
+Own-versus-foreign extension, nothing given (`run_reach`): a world of regions. The Oracle is taught in one region, reads a
+link only if it has learned it, and can take in a teacher chain only if the chain touches a state it knows.
+Earlier version (`run_map`): the step types are given (the same few steps act everywhere), the world has many states, and
+the Oracle can only file a chain that touches its map, the set of states it has produced or reached.
 
 Scores, on held-out population chains (level l has spans of 2^l links):
   read0       share of population links the recogniser accepts
@@ -66,18 +68,22 @@ def grid(lo, hi, points): return np.unique(np.round(np.geomspace(lo, hi, points)
 class Oracle:
     """code[0], cnt[0]: the accepted pairs a S + b and their counts. code[k], cnt[k], k >= 1: sorted (a S + b) S + c and counts."""
 
-    def __init__(self, S, L, theta=1, succ=None):
+    def __init__(self, S, L, theta=1, succ=None, dense=True):
         self.S, self.L, self.theta, self.succ = S, L, theta, succ; self.ks = [2 ** l for l in range(L)]  # succ given: the step types are known
-        self.pairs = None if succ is not None else np.zeros(S * S, np.int64)
+        self.pairs = np.zeros(S * S, np.int64) if succ is None and dense else None  # dense=False (large worlds): the pairs live only in the sorted list code[0], theta = 1
         self.code = {k: np.empty(0, np.int64) for k in [0] + self.ks}; self.cnt = {k: np.empty(0, np.int64) for k in [0] + self.ks}
-        self.cum = {k: np.zeros(1, np.int64) for k in [0] + self.ks}; self.acc = np.zeros((S, S), bool) if succ is None else None
+        self.cum = {k: np.zeros(1, np.int64) for k in [0] + self.ks}; self.acc = np.zeros((S, S), bool) if succ is None and dense else None
 
-    def passes(self, a, b): return self.acc[a, b] if self.succ is None else (self.succ[a] == b[..., None]).any(-1)
+    def passes(self, a, b):
+        if self.succ is not None: return (self.succ[a] == b[..., None]).any(-1)
+        if self.acc is not None: return self.acc[a, b]
+        key = a * self.S + b; return self.code[0][np.minimum(np.searchsorted(self.code[0], key), len(self.code[0]) - 1)] == key
 
-    def add(self, k, a, c, b):
-        new, n = np.unique((a * self.S + b) * self.S + c, return_counts=True)
-        code, inv = np.unique(np.r_[self.code[k], new], return_inverse=True)
+    def merge(self, k, keys):
+        new, n = np.unique(keys, return_counts=True); code, inv = np.unique(np.r_[self.code[k], new], return_inverse=True)
         self.code[k], self.cnt[k] = code, np.bincount(inv, np.r_[self.cnt[k], n], len(code)).astype(np.int64); self.cum[k] = np.r_[0, np.cumsum(self.cnt[k])]
+
+    def add(self, k, a, c, b): self.merge(k, (a * self.S + b) * self.S + c)
 
     def file(self, x, gate):
         """The generator's counting rule: (ends, midpoint) of every span of every chain; with the gate, only spans whose links all pass."""
@@ -90,9 +96,11 @@ class Oracle:
 
     def watch(self, x, levels=True, gate=False):
         """Teacher chains: count the adjacent pairs; with levels, also every span (through the gate if asked)."""
-        self.pairs += np.bincount(x[:, :-1].ravel() * self.S + x[:, 1:].ravel(), minlength=self.S ** 2)
-        self.code[0] = np.flatnonzero(self.pairs >= self.theta); self.cnt[0] = self.pairs[self.code[0]]; self.cum[0] = np.r_[0, np.cumsum(self.cnt[0])]
-        self.acc = (self.pairs >= self.theta).reshape(self.S, self.S)
+        if self.pairs is None: self.merge(0, x[:, :-1].ravel() * self.S + x[:, 1:].ravel())
+        else:
+            self.pairs += np.bincount(x[:, :-1].ravel() * self.S + x[:, 1:].ravel(), minlength=self.S ** 2)
+            self.code[0] = np.flatnonzero(self.pairs >= self.theta); self.cnt[0] = self.pairs[self.code[0]]; self.cum[0] = np.r_[0, np.cumsum(self.cnt[0])]
+            self.acc = (self.pairs >= self.theta).reshape(self.S, self.S)
         if levels: self.file(x, gate)
 
     def pick(self, k, lo, hi, rng):
@@ -238,6 +246,39 @@ def run_map(seed, own_share, P_max=2 ** 15, points=56, S=2 ** 14, m=M, L=L, seed
     return out
 
 
+def regions(K, S_r, m, rng, bridge):
+    """K regions of S_r states. Every step stays inside its region, except at a share `bridge` of the states: their first step
+    is swapped with that of a state in another region, so that it leads there."""
+    succ = np.concatenate([world(S_r, m, rng) + r * S_r for r in range(K)]); z = rng.permutation(K * S_r)[: 2 * round(bridge * K * S_r / 2)].reshape(-1, 2); z = z[z[:, 0] // S_r != z[:, 1] // S_r]
+    succ[z[:, 0], 0], succ[z[:, 1], 0] = succ[z[:, 1], 0], succ[z[:, 0], 0]
+    return succ
+
+
+def run_reach(seed, share, bridge=0.0, attach=True, tokens=2 ** 23, points=44, K=16, S_r=S, m=M, L=L, N1=2048):
+    """Nothing is granted. The Oracle reads a link only if it has learned it, and it can take in a teacher chain only if the chain
+    touches a state it knows (then the whole chain, outwards from that state). A chain that touches nothing it knows is lost.
+    World: K regions. Stage 1: N1 teacher chains that start in region 0, the Oracle's home. Stage 2: a budget of tokens, a share
+    for practice (own examples: joins of held units, as everywhere), the rest for fresh chains of the whole population (foreign).
+    attach=False: a learner that takes in every fresh chain. K=1: one mixed world, where home is the whole world."""
+    rng = np.random.default_rng(seed); succ = regions(K, S_r, m, rng, bridge); n = 2 ** L + 1; o = Oracle(K * S_r, L, dense=False); valid = lambda x: (succ[x[:, :-1]] == x[:, 1:, None]).any(-1).all(1)
+    tests = {"home": chains(succ, 4000, n, rng, start=rng.integers(S_r, size=4000)), "pop": chains(succ, 8000, n, rng)}
+    first = chains(succ, N1, n, rng, start=rng.integers(S_r, size=N1)); known = np.zeros(K * S_r, bool); known[first] = True; o.watch(first)
+    cost = np.mean([2 * k + 1 for k in o.ks]); out, spent, fresh, taken, joins = [], 0, 0, 0, 0  # a join at level k writes 2k + 1 states
+    def score():
+        row = {"tokens": spent, "fresh": fresh, "taken": taken, "joins": joins, "map": float(known.mean()), "usable": float(known[tests["pop"]].any(1).mean()), "links": float(o.passes(tests["pop"][:, :-1], tests["pop"][:, 1:]).mean())}
+        for name, test in tests.items():
+            for l, k in enumerate(o.ks, 1): row[f"{name}{l}"] = float(valid(o.write(test[:, 0], test[:, 2 * k], k, rng)).mean())
+        return row
+    out.append(score())
+    for T in grid(2 ** 10, tokens, points):
+        while spent < T:  # small batches (at most 1/16 of the tokens so far), so that the map is up to date for every chain
+            B = int(min(T - spent, max(256, spent // 16))); x = chains(succ, round((1 - share) * B / n), n, rng); fresh += len(x); x = x[known[x].any(1)] if attach else x; taken += len(x)
+            if len(x): known[x] = True; o.watch(x)
+            Bo = round(share * B / cost); o.rounds(Bo, rng); joins += Bo; spent += B
+        out.append(score())
+    return out
+
+
 # ---------------------------------------------------------------------------------------------- runner
 
 JOBS = {
@@ -254,6 +295,9 @@ JOBS = {
     "map": [(run_map, dict(seed=s, own_share=x)) for x in [0.0, 0.5, 1.0] for s in range(WORLDS)],
     "map_big": [(run_map, dict(seed=s, own_share=x, S=2 ** 16, P_max=2 ** 16)) for x in [0.0, 1.0] for s in range(WORLDS)],
     "map_split": [(run_map, dict(seed=s, own_share=x, P_max=P, points=4)) for P in [256, 1024, 4096] for x in [0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0] for s in range(WORLDS)],
+    "reach": [(run_reach, dict(seed=s, share=x, bridge=b)) for b in [0.0, 1 / 1024, 1 / 64] for x in [0.0, 0.5, 1.0] for s in range(WORLDS)]
+    + [(run_reach, dict(seed=s, share=x, bridge=1 / 64, attach=False)) for x in [0.0, 0.5] for s in range(WORLDS)]
+    + [(run_reach, dict(seed=s, share=x, K=1, S_r=16 * S)) for x in [0.0, 0.5, 1.0] for s in range(WORLDS)],
 }
 
 

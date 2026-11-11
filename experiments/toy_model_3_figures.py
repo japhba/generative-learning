@@ -207,6 +207,34 @@ def own_foreign():
     dx.set_xlabel("share of the examples that are own"); dx.set_ylabel("share of the states in the map at the end"); dx.set_title("A fixed number of examples, split"); below(dx); save(fig, "toy3-own-foreign.png")
 
 
+# ------------------------------------------------------------------ own versus foreign with nothing granted: a learner at home in one of 16 regions
+def reach():
+    fig, axes = plt.subplots(2, 2, figsize=(10, 10.4), constrained_layout=True); (ax, bx), (cx, dx) = axes; B = 1 / 64
+    arms = [(1.0, OWN, "practice only (own examples)", "own"), (0.5, THIRD, "half practice, half fresh chains", "mix"), (0.0, TEACH, "fresh chains of the population only", "fresh")]
+    at = lambda rs, key, T: np.median(arr(rs, key)[:, np.argmin(np.abs(xs(rs, "tokens") - T))])
+    for i, (b, label, tag) in enumerate([(0.0, "no state leads to another region", "b0"), (1 / 1024, "1 state in 1,024 leads to another region", "b1024"), (B, "1 state in 64 leads to another region", "b64")]):
+        rs = runs("reach", share=0.0, bridge=b, attach=None); x = xs(rs, "fresh")[1:]; y = arr(rs, "usable")[:, 1:]; band(ax, x, y, plt.cm.Greys(0.4 + 0.25 * i), label, mid=np.median)
+        nums[f"reach_use0_{tag}"] = float(np.median(arr(rs, "usable")[:, 0])); nums[f"reach_use_end_{tag}"] = float(np.median(y[:, -1])); nums[f"reach_half_{tag}"] = med([cross(x, v, 0.5) for v in y]); nums[f"reach_most_{tag}"] = med([cross(x, v, 0.9) for v in y])
+        nums[f"reach_lost_{tag}"] = float(np.median(1 - arr(rs, "taken")[:, -1] / arr(rs, "fresh")[:, -1])); nums[f"reach_never_{tag}"] = int(np.sum(y[:, -1] < 0.5))
+    ax.axhline(1 / 16, color=REF, ls=":", label="the home region's share of the population"); ax.set_xscale("log"); ax.set_xlabel("fresh chains shown so far"); ax.set_ylabel("share of population chains the Oracle can take in"); ax.set_title("Fresh chains the Oracle can read"); below(ax)
+    for share, color, label, tag in arms:
+        rs = runs("reach", share=share, bridge=B, attach=None); T = xs(rs, "tokens")[1:]; band(bx, T, arr(rs, "map")[:, 1:], color, label, mid=np.median); band(cx, T, arr(rs, "home3")[:, 1:], color, label, mid=np.median); cx.plot(T, np.median(arr(rs, "home2")[:, 1:], 0), color=color, ls="--")
+        band(dx, T, arr(rs, "pop2")[:, 1:], color, label, mid=np.median); dx.plot(T, np.median(arr(runs("reach", share=share, bridge=0.0, attach=None), "pop2")[:, 1:], 0), color=color, ls=":")
+        for key in ["home1", "home2", "home3", "pop1", "pop2", "pop3", "map"]:
+            for e in [16, 20, 23]: nums[f"reach_{tag}_{key}_{e}"] = float(at(rs, key, 2 ** e))
+        for key in ["home3", "pop2", "pop3"]: nums[f"reach_{tag}_{key}_23_b0"] = float(at(runs("reach", share=share, bridge=0.0, attach=None), key, 2 ** 23))
+        nums[f"reach_{tag}_half_home3"] = med([cross(T, v, 0.5) for v in arr(rs, "home3")[:, 1:]]); nums[f"reach_{tag}_half_pop2"] = med([cross(T, v, 0.5) for v in arr(rs, "pop2")[:, 1:]])
+        ms = runs("reach", share=share, K=1)
+        for key in ["home1", "home2", "home3", "map", "links"]: nums[f"mixed_{tag}_{key}_0"] = float(np.median(arr(ms, key)[:, 0])); nums[f"mixed_{tag}_{key}_20"] = float(at(ms, key, 2 ** 20)); nums[f"mixed_{tag}_{key}_23"] = float(at(ms, key, 2 ** 23))
+        nums[f"mixed_{tag}_usable_0"] = float(np.median(arr(ms, "usable")[:, 0]))
+    rs = runs("reach", share=0.0, bridge=B, attach=False); T = xs(rs, "tokens")[1:]; dx.plot(T, np.median(arr(rs, "pop2")[:, 1:], 0), color=REF, ls="--", label="fresh chains only, a learner that keeps every chain")
+    nums["reach_keep_half_pop2"] = med([cross(T, v, 0.5) for v in arr(rs, "pop2")[:, 1:]]); nums["reach_start_home2"], nums["reach_start_home3"] = (float(np.median(arr(rs, k)[:, 0])) for k in ["home2", "home3"])
+    nums["reach_stage1_map"] = float(np.median(arr(rs, "map")[:, 0])); nums["reach_stage1_links"] = float(np.median(arr(rs, "links")[:, 0])); nums["reach_keep_home3_23"] = float(at(rs, "home3", 2 ** 23))
+    bx.set_xscale("log"); bx.set_xlabel("tokens in stage 2 (states shown or written)"); bx.set_ylabel("share of the world's states the Oracle knows"); bx.set_title("Only fresh chains enlarge the map"); below(bx)
+    cx.plot([], [], color=REF, ls="--", label="dashed: spans of 4 links"); cx.set_xscale("log"); cx.set_xlabel("tokens in stage 2"); cx.set_ylabel("share of the home region's spans of 8 links written"); cx.set_title("Writing at home"); below(cx)
+    dx.plot([], [], color=REF, ls=":", label="dotted: no state leads to another region"); dx.set_xscale("log"); dx.set_xlabel("tokens in stage 2"); dx.set_ylabel("share of the population's spans of 4 links written"); dx.set_title("Writing in the whole population"); below(dx); save(fig, "toy3-reach.png")
+
+
 if __name__ == "__main__":
-    for f in [scheme, headstart, practice, staircase, tradeoff, supervision, checks, bridge, own_foreign]: f()
+    for f in [scheme, headstart, practice, staircase, tradeoff, supervision, checks, bridge, own_foreign, reach]: f()
     nums.update({"S": S, "m": M, "n": n, "L": L}); (OUT / "numbers.json").write_text(json.dumps(nums, indent=1)); print(OUT / "numbers.json")

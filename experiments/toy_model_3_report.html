@@ -69,7 +69,7 @@ footer code{overflow-wrap:anywhere}
 <div class="tiles">
 <div class="tile"><strong>{{half_read0}} → {{half_watch3}}</strong> <span>teacher chains until the Oracle accepts half of the population's links, and until it writes half of the population's spans of 8 links, by watching alone</span></div>
 <div class="tile"><strong>{{half_practice}} chains</strong> <span>teacher chains for the same once the Oracle practises: {{saving}} times fewer</span></div>
-<div class="tile"><strong>{{map_own_10}} vs {{map_foreign_10}}</strong> <span>own against foreign examples until a tenth of a large world is in the Oracle's map (the own-versus-foreign extension, section 8)</span></div>
+<div class="tile"><strong>{{reach_own_home3_23}} vs {{reach_fresh_home3_23}}</strong> <span>of the spans of 8 links in the Oracle's home region written after practice, and after as many tokens of fresh chains of the whole population, in a world of 16 regions (section 8)</span></div>
 </div>
 </header>
 
@@ -83,7 +83,7 @@ footer code{overflow-wrap:anywhere}
 <li><strong>Watch first, then practise.</strong> Practice pays in a window: too few teacher chains and the pair table has gaps that practice cannot fill, too many and watching alone suffices. The same examples in the order watch-then-practise give {{sched_watch_first}}, alternating {{sched_alternate}}, practise-then-watch {{sched_practise_first}} (section 5).</li>
 <li><strong>Practice does not beat fresh teacher chains.</strong> Token for token, spending the whole budget on fresh teacher chains was best at every budget we tried. Practice is what the Oracle can do when no more teacher chains come (section 5).</li>
 <li><strong>Supervising every level adds nothing.</strong> A teacher who supplies only the pair table does as well as one who fills every level. With a teacher who slips, a recogniser that accepts every pair it sees ruins the generator ({{noisy_trust_own}} of own chains valid), and a careful one keeps it ({{noisy_left_own}}) (section 6).</li>
-<li><strong>Own against foreign examples.</strong> In an extension with many states and a few step types that act everywhere, the Oracle can file only chains that touch its map of known states. Own chains always do. Foreign chains are exact samples of the population and mostly do not, until the map has grown. A tenth of the world is mapped after {{map_own_10}} own examples or {{map_foreign_10}} foreign ones. This advantage rests on that filing rule, which is an assumption (section 8).</li>
+<li><strong>Own against foreign examples.</strong> In a world of 16 regions, an Oracle taught in one region can take in a fresh chain only if the chain touches a state it knows. Nothing else is given to it. Chains of the population mostly touch nothing it knows and are lost: {{reach_lost_b0}} of them for good if no step leads from one region to another, and the first few thousand if 1 state in 64 has such a step. Practice is never lost, but it never enlarges what the Oracle reads. Token for token, practice writes more of the home region's spans of 8 links than fresh chains of the population do ({{reach_own_home3_23}} against {{reach_fresh_home3_23}}). For the whole population, fresh chains win as soon as they connect (section 8).</li>
 </ol>
 </section>
 
@@ -207,7 +207,27 @@ footer code{overflow-wrap:anywhere}
 
 <section id="own">
 <h2>8. Extension: own against foreign examples</h2>
-<p>In the core model a teacher chain can always be filed, so it is never worse than an own chain. This extension changes three things.</p>
+<p>In the core model a teacher chain can always be filed, so it is never worse than an own chain. An advantage of own examples needs teacher chains that the Oracle cannot read. This section has two versions. In the first, nothing is given to the Oracle. The second is an earlier version, in which the Oracle is given the step types.</p>
+<h3>8.1 Nothing given: an Oracle at home in one region</h3>
+<ul class="findings">
+<li><strong>A world of regions.</strong> The world has 16 regions of 1,024 states, each a world like that of section 1. A step stays inside its region, except at a few states, where one of the {{m}} steps leads into another region. We try three cases: no such state, 1 state in 1,024, and 1 state in 64.</li>
+<li><strong>The same learner.</strong> The Oracle reads a link only if the pair is in its table. It learns by watching and by practice, as in the core model.</li>
+<li><strong>One restriction on watching.</strong> The Oracle can take in a teacher chain only if the chain touches a state it knows. It then learns the whole chain, link by link outwards from that state. A chain that touches nothing it knows is lost.</li>
+<li><strong>Two stages.</strong> First the Oracle watches 2,048 teacher chains that start in one region, its home. Then it gets {{reach_tokens}} tokens (states shown or written), spent on practice, on fresh chains of the whole population, or on half of each.</li>
+</ul>
+<p>The fresh chains are exact samples of the population. The Oracle's own chains stay inside what it already reads, so they are further from the population.</p>
+<figure><img src="{{filesDir}}/toy3-reach.png" alt="Four panels. Top left: share of population chains the Oracle can take in against fresh chains shown; flat near 6% with no state leading to another region, near 13% with 1 state in 1,024, and rising to 100% within a few thousand chains with 1 state in 64. Top right: share of the world's states the Oracle knows against tokens; flat for practice only, rising to 100% for fresh chains and for half of each. Bottom left: share of the home region's spans of 8 links written against tokens; practice rises to about 70%, the other two to about 24%. Bottom right: share of the population's spans of 4 links written against tokens; fresh chains rise to 100%, practice stays near 6%."><figcaption>Median and range over 16 worlds. Top left: fresh chains only, for three numbers of states that lead to another region. The other three panels: 1 state in 64 leads to another region, unless marked.</figcaption></figure>
+<ul class="findings">
+<li><strong>Fresh chains are lost until the map reaches them.</strong> If no state leads to another region, the Oracle takes in {{reach_use0_b0}} of the population's chains, which is the home region's share, and loses the rest for good. With 1 state in 1,024 it still reads less than half of them at the end in {{reach_never_b1024}} of 16 worlds (median {{reach_use_end_b1024}}). With 1 state in 64 it reads {{reach_use0_b64}} at the start, half after {{reach_half_b64}} fresh chains and nine in ten after {{reach_most_b64}}, out of {{reach_fresh_total}}.</li>
+<li><strong>Practice never enlarges the map.</strong> An own chain is made of links the Oracle already accepts. With practice only, the Oracle knows {{reach_own_map_23}} of the world's states at the end, as after the first stage: its home region and the few states beyond it that its teacher chains reached.</li>
+<li><strong>At home, practice beats fresh chains for long spans.</strong> After the {{reach_tokens}} tokens the Oracle writes {{reach_own_home3_23}} of the home region's spans of 8 links if it practised, and {{reach_fresh_home3_23}} if it watched fresh chains (from {{reach_start_home3}} after the first stage). Only 1 fresh chain in 16 is about the home region. This holds whether or not the other chains can be read: a learner that keeps every fresh chain also ends at {{reach_keep_home3_23}}. For spans of 4 links there is no advantage ({{reach_own_home2_20}} against {{reach_fresh_home2_20}} after {{reach_tokens_20}} tokens), because one fresh chain holds five such spans and one own example holds one.</li>
+<li><strong>For the whole population, fresh chains win once they connect.</strong> With 1 state in 64 leading out, fresh chains write half of the population's spans of 4 links after {{reach_fresh_half_pop2}} tokens. Practice alone stays at {{reach_own_pop2_23}}, the home region. If no state leads out, practice wins on the population too, at a low level: {{reach_own_pop3_23_b0}} against {{reach_fresh_pop3_23_b0}} of the spans of 8 links.</li>
+<li><strong>The restriction costs little when regions connect quickly.</strong> With 1 state in 64 leading out, a learner that keeps every fresh chain reaches the same half after {{reach_keep_half_pop2}} tokens.</li>
+<li><strong>Without regions there is no advantage.</strong> In one mixed world of 16,384 states, {{mixed_own_usable_0}} of fresh chains touch the map after the first stage. Practice then writes {{mixed_own_home3_23}} of the spans of 8 links, and fresh chains write {{mixed_fresh_home3_23}}.</li>
+</ul>
+<div class="callout"><p><strong>What this does and does not show.</strong> Own examples are worth more than exact samples of the population where those samples lie outside what the Oracle reads. The advantage stays inside what the Oracle already reads. Practice cannot carry it further, and a fresh chain that the Oracle can read is worth at least as much as an own example. The restriction on watching is an assumption about a bounded learner: one with spare memory could keep the chains it cannot read and connect them later.</p></div>
+<h3>8.2 An earlier version, with the step types given</h3>
+<p>This version gives the Oracle more than it has earned: the step types. Its own chains can then enter states it was never shown, so own examples enlarge the map. With nothing given they cannot (section 8.1). The version changes three things in the core model.</p>
 <ul class="findings">
 <li><strong>Many states, a few step types.</strong> The world has 16,384 states. The {{m}} step types act in the same way everywhere, and the Oracle knows them (from a small seed, which we do not model). So it can check any single step, anywhere.</li>
 <li><strong>A map.</strong> The Oracle's tables are keyed by states it knows: those it has produced itself, or reached from a known state by a checked step. It starts with the 9 states of one chain.</li>
@@ -221,7 +241,7 @@ footer code{overflow-wrap:anywhere}
 <li><strong>Writing follows reading.</strong> Half of the population's spans of 2 links are written after {{map_own_w1}} own or {{map_foreign_w1}} foreign examples.</li>
 <li><strong>With few examples, own ones are worth more.</strong> Of 256 examples, all own leave {{msplit256_100}} of the states mapped, half and half {{msplit256_50}}, all foreign {{msplit256_0}}. Of 4,096 examples: {{msplit4096_100}}, {{msplit4096_50}} and {{msplit4096_0}}. Once most foreign chains are usable, the two kinds are worth the same.</li>
 </ul>
-<div class="callout"><p><strong>What this does and does not show.</strong> The advantage of own examples follows from the filing rule. The run shows its size and its time course, and that the map's shape matters. It does not show that a learner must be unable to store what it cannot read: a learner with spare codes could keep unreadable chains and connect them later. Also, with the step types given, a foreign chain contains nothing the Oracle could not derive. A network version would have to earn both, by reading states it has not produced poorly, and by learning the steps.</p></div>
+<div class="callout"><p><strong>What this version does and does not show.</strong> It shows the size and the time course of an own advantage under the filing rule, and that the map's shape matters. The growth of the map through own examples comes from the given step types. With them, a foreign chain also contains nothing the Oracle could not derive.</p></div>
 </section>
 
 <section id="limits">
@@ -232,13 +252,15 @@ footer code{overflow-wrap:anywhere}
 <li>Generation that improves offline, through generating and checking, to an exact target.</li>
 <li>Deeper levels arriving later, without a schedule.</li>
 <li>A check whose errors compound over a span, and practice that cannot repair them.</li>
+<li>Teacher chains that are lost because they touch nothing the Oracle knows, and own examples that then beat exact samples of the population inside the Oracle's home region (section 8.1).</li>
 </ul></div>
 <div class="panel"><h3>Does not show</h3><ul>
-<li><strong>Better than fresh data.</strong> Fresh teacher chains beat practice token for token.</li>
+<li><strong>Better than fresh data that the Oracle can read.</strong> Fresh teacher chains beat practice token for token, unless most of them lie outside what the Oracle reads (section 8.1).</li>
 <li><strong>That writing is hard in general.</strong> A learner that may iterate its pair table already writes valid chains, one link at a time. The difficulty is specific to writing in one pass, and practice compiles the iteration into the tables.</li>
 <li><strong>Generalisation.</strong> Tables do not generalise across states. The Oracle is the reference for a network, not a model of one.</li>
 <li><strong>A hidden cause.</strong> The recogniser judges correctness; it infers no latent variable.</li>
-<li><strong>An own advantage without the filing rule</strong> (section 8), or any mapping to in-context learning.</li>
+<li><strong>An own advantage beyond what the Oracle already reads.</strong> Practice never enlarges the map (section 8.1).</li>
+<li><strong>A mapping to in-context learning.</strong></li>
 </ul></div>
 </div>
 </section>
@@ -252,7 +274,7 @@ footer code{overflow-wrap:anywhere}
 <tr><td>Local, Hebb-like or three-factor rule</td><td><span class="pill yes">yes</span></td><td>Every update is a count for (ends of a span, midpoint), with the check as the third factor.</td></tr>
 <tr><td>Generation improves offline, through a generate–recognise loop</td><td><span class="pill yes">yes</span></td><td>Section 3: {{n12_w3}} to {{n12_p3}} of spans of 8 links with no teacher data.</td></tr>
 <tr><td>Better than the same learner without practice</td><td><span class="pill yes">yes</span></td><td>Sections 3 and 5.</td></tr>
-<tr><td>Better than as many fresh examples</td><td><span class="pill no">no</span></td><td>Section 5: fresh teacher chains win at every budget.</td></tr>
+<tr><td>Better than as many fresh examples</td><td><span class="pill part">partly</span></td><td>Section 5: no, fresh teacher chains win at every budget. Section 8.1: yes for long spans in the home region, when most fresh chains are about other regions.</td></tr>
 <tr><td>Beats the same learner fitted end to end to the supplied examples</td><td><span class="pill yes">yes</span></td><td>Watching only is that fit. Practice needs {{saving}} times fewer teacher chains.</td></tr>
 <tr><td>Recognition infers latent causes or judges correctness</td><td><span class="pill part">partly</span></td><td>It judges correctness. There is no hidden cause.</td></tr>
 <tr><td>Depth, with deeper layers emergently later</td><td><span class="pill yes">yes</span></td><td>Sections 2 and 4.</td></tr>
@@ -263,7 +285,7 @@ footer code{overflow-wrap:anywhere}
 <tr><td>Recognition stays ahead of generation, emergently</td><td><span class="pill part">partly</span></td><td>Ahead at the level of links. Above it, reading a span as a unit and writing it are the same table.</td></tr>
 <tr><td>Latent representations improve with generation</td><td><span class="pill part">partly</span></td><td>Larger units become readable (section 4). No hidden cause to clean up.</td></tr>
 <tr><td>More supervision can make the learner worse</td><td><span class="pill part">partly</span></td><td>Only with a teacher who slips (section 6). Otherwise it adds nothing.</td></tr>
-<tr><td>Own examples better than foreign ones of at least equal quality</td><td><span class="pill part">partly</span></td><td>Section 8, under the filing rule.</td></tr>
+<tr><td>Own examples better than foreign ones of at least equal quality</td><td><span class="pill part">partly</span></td><td>Section 8.1, with nothing given: inside the home region and for long spans. Not for the whole population once fresh chains connect.</td></tr>
 <tr><td>Mapping to in-context learning</td><td><span class="pill no">no</span></td><td>Not addressed.</td></tr>
 </tbody></table></div>
 <h3>The figures asked for in proposal.tex</h3>
@@ -273,7 +295,7 @@ footer code{overflow-wrap:anywhere}
 <tr><td>Practising is more sample-efficient than passive supervision</td><td><span class="pill yes">yes</span></td><td>Section 3, counted in teacher chains: {{saving}} times fewer.</td></tr>
 <tr><td>Practising does not help early; a period of passive learning is needed</td><td><span class="pill yes">yes</span></td><td>Section 3 (the window) and section 5 (the order).</td></tr>
 <tr><td>Lots of supervision does not always help</td><td><span class="pill part">partly</span></td><td>Sections 3 and 6: supervising every level adds nothing, and costs a little when the teacher slips.</td></tr>
-<tr><td>Own against foreign samples</td><td><span class="pill part">partly</span></td><td>Section 8, under the filing rule.</td></tr>
+<tr><td>Own against foreign samples</td><td><span class="pill part">partly</span></td><td>Section 8.1.</td></tr>
 <tr><td>Trade-off between supervised and imagined samples</td><td><span class="pill yes">yes</span></td><td>Section 5: the heat map and the split of a token budget.</td></tr>
 <tr><td>Mapping to schema learning</td><td><span class="pill no">no</span></td><td>Not addressed. The units of 2, 4 and 8 links are reusable pieces, which may be a place to start.</td></tr>
 </tbody></table></div>
@@ -282,7 +304,7 @@ footer code{overflow-wrap:anywhere}
 <section id="code">
 <h2>11. Code and data</h2>
 <ul class="paths">
-<li><a href="{{filesDir}}/toy_model_3_oracle.py"><code>toy_model_3_oracle.py</code></a>: the world, the Oracle and every experiment. Runs in about 12 minutes on 28 cores.</li>
+<li><a href="{{filesDir}}/toy_model_3_oracle.py"><code>toy_model_3_oracle.py</code></a>: the world, the Oracle and every experiment. Runs in about 15 minutes on 28 cores.</li>
 <li><a href="{{filesDir}}/toy_model_3_figures.py"><code>toy_model_3_figures.py</code></a>: the figures and every number quoted here.</li>
 <li><a href="{{filesDir}}/toy_model_3_report.py"><code>toy_model_3_report.py</code></a> and <a href="{{filesDir}}/toy_model_3_report.html"><code>toy_model_3_report.html</code></a>: this page.</li>
 <li>Runs: <code>/var/tmp/jbauer/generative_practice_chain/</code> on u435d.</li>

@@ -9,6 +9,9 @@ Scores (codes matched to causes through the generator's per-view accuracy matrix
   a           per-view writing accuracy                                            valid       mass of own samples that are valid strings
 Theory for a uniformly blurred generator (right token with probability a): rho(a) = a^s / (a^s + (K-1) ((1-a)/(V-1))^s), slope s at chance.
 Part 2 (frozen): generator fixed at blur a, recogniser trained from zero by sleep alone.
+Part 3 (kinds): what the generator must have for its posterior to read world strings. Every code writes r of its s views right and the
+others always wrong (so it never writes a valid string), with a fixed random wrong token (frozen) or the token of one other cause (coherent);
+each view is smoothed by EPS. Compared with the blurred generator of the same per-view accuracy.
 Usage: python ws_reading_gain.py -> reports/ws-reading-gain.png, /var/tmp/jbauer/generative_practice_reading/ws_reading_gain.npz"""
 
 import os; os.environ.setdefault("OMP_NUM_THREADS", "4")
@@ -19,7 +22,7 @@ import numpy as np
 from tqdm.auto import tqdm
 
 K = V = 8; SS = [1, 2, 4, 8, 16]; SEEDS, B, LR, STEPS, NEVAL = 16, 64, 1.0, 5000, 4096
-DREAMS = [0, 0.25, 1, 4]; FROZEN_A, FROZEN_S, FROZEN_STEPS = [0.15, 0.2, 0.3], 8, 10000
+DREAMS = [0, 0.25, 1, 4]; EPS, KINDS = 0.05, [(8, 2), (8, 3), (8, 4), (8, 6), (16, 3), (16, 4), (16, 6), (16, 8), (16, 12), (32, 6), (32, 8)]; FROZEN_A, FROZEN_S, FROZEN_STEPS = [0.15, 0.2, 0.3], 8, 10000
 T = np.unique(np.r_[0, np.round(np.geomspace(1, STEPS, 70))].astype(int)); TF = np.unique(np.r_[0, np.round(np.geomspace(1, FROZEN_STEPS, 40))].astype(int))
 OUT = Path("/var/tmp/jbauer/generative_practice_reading"); FIG = Path(__file__).resolve().parents[1] / "reports/ws-reading-gain.png"
 KEYS = ["read_world", "read_exact", "read_own", "own_exact", "a", "valid", "kl"]
@@ -74,6 +77,13 @@ def frozen(a, s, seed=0):
     return {k: np.array([row[k] for row in log]) for k in KEYS}
 
 
+def kinds(s, r, kind, n=2000, seed=0):                                                                    # exact posterior reading of the K world strings
+    rng = np.random.default_rng(seed); sig = np.argsort(rng.random((n, s, K)), -1); right = np.argsort(rng.random((n, K, s)), -1).transpose(0, 2, 1) < r   # [n, s, code]
+    wrong = np.take_along_axis(sig, np.broadcast_to((np.arange(K) + 1) % K, sig.shape), 2) if kind == "coherent" else (sig + rng.integers(1, V, size=sig.shape)) % V
+    P = np.full((n, s, K, V), EPS / V); np.put_along_axis(P, np.where(right, sig, wrong)[..., None], 1 - EPS + EPS / V, 3); lw = gather(np.log(P), sig)
+    return {"a": np.exp(lw)[:, :, np.arange(K), np.arange(K)].mean(), "read": sm(lw.sum(1))[:, np.arange(K), np.arange(K)].mean(), "valid": np.exp(lw.sum(1)).sum((1, 2)).mean() / K}
+
+
 def onset(t, y, level=0.5): hit = y >= level; return np.where(hit.any(0), t[hit.argmax(0)], np.nan)        # first evaluation at which each seed is above the level
 
 
@@ -92,6 +102,11 @@ def main():
     for d, r in dream_runs.items(): print(f"  dreams={d:<5}" + "  ".join(f"{k} {np.nanmedian(onset(T, r[k])):7.0f} ({np.isfinite(onset(T, r[k])).sum():2d}/{SEEDS})" for k in ["read_world", "valid"]) + f"  end kl {np.median(r['kl'][-1]):.2f}")
     print(f"frozen generator, s = {FROZEN_S}, sleep only: after {FROZEN_STEPS} own batches")
     for a, r in frozen_runs.items(): print(f"  a={a}: read_world {r['read_world'][-1].mean():.3f} (exact {r['read_exact'][-1].mean():.3f}, formula {rho(a, FROZEN_S):.3f})  read_own {r['read_own'][-1].mean():.3f} (exact {r['own_exact'][-1].mean():.3f})  valid {r['valid'][-1].mean():.2e}")
+
+    print(f"kinds of generator error (exact posterior on world strings, smoothing {EPS}): per-view accuracy a | read (valid strings written) frozen, coherent, blur of the same a")
+    for s, r in KINDS:
+        f, c = kinds(s, r, "frozen"), kinds(s, r, "coherent")
+        print(f"  s={s:2d} right views {r:2d}: a {f['a']:.2f} | frozen {f['read']:.3f} ({f['valid']:.1e})  coherent {c['read']:.3f} ({c['valid']:.1e})  blur {rho(f['a'], s):.3f} ({f['a'] ** s:.1e})")
 
     fig, ax = plt.subplots(1, 3, figsize=(15, 4.2), constrained_layout=True); med = lambda y: np.median(y, 1)
     r = main_runs[8]

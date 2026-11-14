@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate"><meta http-equiv="pragma" content="no-cache"><meta http-equiv="expires" content="0">
+<title>Offline practice from learned constraints — Model 4 feasibility</title>
+<style>
+:root{color-scheme:light;--ink:#24292e;--muted:#59636a;--rule:#cdd4d8;--accent:#196a85}*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font-family:Georgia,'Times New Roman',serif;line-height:1.65}main{max-width:1040px;margin:auto;padding:3rem 2rem}header{border-bottom:2px solid var(--ink);padding-bottom:1.5rem}h1{line-height:1.18;font-weight:normal;margin:.5rem 0 1rem;font-size:2.4em}h2{margin-top:2.5rem;font-weight:normal;border-bottom:1px solid var(--rule);padding-bottom:.35rem}h3{margin-top:1.7rem}p{margin:.8rem 0}a{color:var(--accent)}.meta,.controls,nav,button,select,label,table,.tag{font-family:system-ui,sans-serif}.meta{color:var(--muted)}nav{display:flex;gap:1rem;flex-wrap:wrap;padding:1rem 0;border-bottom:1px solid var(--rule)}.abstract{padding:1.2rem 0}.abstract p{margin:.5rem 0}.claim{border-left:3px solid var(--accent);padding:.5rem 1.2rem;background:#f5f8f9}.proposition{padding:1rem 1.2rem;border:1px solid var(--rule);margin:1.4rem 0}.proposition p:first-child{margin-top:0}figure{margin:1.8rem 0;padding:1rem 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}figcaption{line-height:1.5;margin:.8rem 0;color:#3b454a}.controls{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin:.6rem 0}.controls label{display:flex;gap:.5rem;align-items:center}select,button,input{font:inherit}select,button{padding:.3rem .55rem;background:white;border:1px solid #9caab0;border-radius:.2rem}.plot{width:100%;overflow:hidden}.scrolltable{overflow:auto}table{width:100%;border-collapse:collapse;line-height:1.4;margin:1.2rem 0}th,td{text-align:left;vertical-align:top;padding:.65rem;border-bottom:1px solid #dce1e4}th{background:#f5f7f8}.small{color:var(--muted);font-size:.93em}details{margin:1rem 0;border:1px solid var(--rule);padding:.7rem 1rem}summary{cursor:pointer;font-weight:bold}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#f5f7f8}code{font-family:ui-monospace,monospace;overflow-wrap:anywhere}.katex-display{overflow-x:auto;overflow-y:hidden;padding:.25rem 0}.world{display:grid;gap:.8rem;text-align:center}.nodes{display:flex;justify-content:space-evenly;gap:.7rem;flex-wrap:wrap}.node{padding:.6rem 1rem;border:1px solid var(--rule);background:#f8fafb}.bits{display:flex;gap:.6rem;justify-content:center}.bit{padding:.4rem .8rem;border:1px solid #b6c4cb;background:#edf4f7}.hint{font-style:italic}.artifacts{columns:2;overflow-wrap:anywhere}footer{border-top:1px solid var(--rule);margin-top:3rem;padding-top:1rem}.badge{font-family:system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-size:.8em}@media(max-width:650px){main{padding:1.4rem 1rem}h1{font-size:1.9em}.artifacts{columns:1}.controls{display:block}.controls label{margin:.6rem 0}.bits{gap:.2rem}.bit{padding:.35rem .6rem}table{font-size:.85em}}@media print{main{max-width:none;padding:0}.controls,nav{display:none}figure{break-inside:avoid}a{color:inherit}details{display:block}}
+.controls label{min-width:0}.controls select{min-width:0;max-width:100%;flex-shrink:1}
+@KATEX_CSS@
+</style></head><body><main>
+<header><div class="badge">Research note · Theory followed by CPU experiments</div>
+<h1>Offline practice from learned constraints</h1>
+<p>A feasible, qualified version of Model 4</p>
+<div class="meta">14 November 2026 · UK time · Finite demonstrations, local stochastic learning, exact diagnostics</div></header>
+<nav aria-label="Contents"><a href="#abstract">Abstract</a><a href="#world">Model</a><a href="#theory">Theory</a><a href="#results">Results</a><a href="#failures">Failures</a><a href="#spec">README audit</a><a href="#reproduce">Reproduce</a></nav>
+
+<section class="abstract" id="abstract"><h2>Abstract</h2>
+<p>We construct a small hierarchical learner whose generation improves after external observations cease. Watching learns both a stochastic encoder–decoder and a bank of short parity constraints. During practice, the networks generate and recognize complete latent trajectories; a likelihood ratio derived from the learned constraints supplies a scalar third factor for local updates. A forward joint-KL objective gives a variational bound on the discrepancy between generation and the learned constraint distribution. Pure ancestral proposals can lose valid modes, so the final sampler mixes ancestral generation with internally generated random observations followed by recognition.</p>
+<p>In a prospective test over thirty-two new seeds, population KL falls from <strong>@INITIAL@ to @FINAL@ ± @FINAL_SE@ nats</strong> (mean ± standard error). Continued Watching on the same demonstrations reaches 0.375 nats, and an end-to-end stochastic reconstruction baseline reaches 1.191 nats. Fresh teacher data reaches 0.164 nats; the paired interval does not establish an advantage over fresh data. Recognition acquires the shared root cause during practice. <strong>This establishes a feasible relaxed construction, not a solution of every README requirement.</strong> Learned constraint memory, supplied parity features, and exploratory proposals are substantive additions; a specifically own-sample advantage and a general depth law remain unproved.</p>
+</section>
+
+<section><h2>1. What has to be added to Model 4?</h2>
+<p>The original proposal supplies an access mechanism: coupled random recognition and generation may make deep states easier to activate on own examples. Access does not select a teacher-aligned hierarchy. Two worlds can have identical shallow marginals but different dependencies between those marginals. If Watching discards the dependencies, autonomous practice cannot reconstruct them.</p>
+<p>The construction below preserves evidence about overlapping local relations. These relations constrain the deeper joint distribution even before the encoder has discovered the corresponding latent cause. The evidence memory is part of recognition, but is distinct from the trainable inference pathway. Its weights are learned from demonstrations and then retained. This separates <em>remembering a constraint</em> from <em>organizing a generator that satisfies all constraints together</em>.</p>
+<div class="claim"><strong>Feasibility claim.</strong> A finite learned constraint model can supervise fully offline changes to both recognition and generation through local stochastic updates. The benefit can include better population likelihood and more informative deep causes. This claim allows an explicit constraint prior and bounded importance sampling; it does not assert that coupled initialization alone suffices.</div></section>
+
+<section id="world"><h2>2. World, learner, and retained evidence</h2>
+<h3>2.1 A hierarchy with overlapping observable constraints</h3>
+<p>Let the root cause \(z\) and private branch variables \(u,v\) be independent uniform signs. A fixed, randomly chosen sign mask \(\mathbf{m}\) varies between worlds. The observed vector is</p>
+\[\mathbf{x}=\mathbf{m}\odot(u,zu,z,v,zv,z).\]
+<p>The branch causes are \(\mathbf{h}_1=(z,u)\) and \(\mathbf{h}_2=(z,v)\). Each has four states; the root has two. There are eight equally likely valid observations. With \(\mathbf{y}=\mathbf{m}\odot\mathbf{x}\), two within-branch checks and one cross-branch check describe validity:</p>
+\[y_1y_2y_3=1,\qquad y_4y_5y_6=1,\qquad y_3y_6=1.\]
+<p>Unlike a pure RHM with arbitrary unknown upper rules, the root relationship leaves a short observable trace. The learner is not told the mask, the valid strings, or which checks hold. It is supplied the family of all parity features involving at most three coordinates. The root is redundantly rendered in observations; this is a deliberately favorable two-level world, not a generic deep grammar.</p>
+<figure><div class="controls"><label>Root <select id="world-z"><option value="1">+1</option><option value="-1">−1</option></select></label><label>Left variation <select id="world-u"><option value="1">+1</option><option value="-1">−1</option></select></label><label>Right variation <select id="world-v"><option value="1">+1</option><option value="-1">−1</option></select></label><label><input type="checkbox" id="world-error">Flip the last observation</label></div>
+<div class="world"><div class="nodes"><div class="node">Root cause \(z\)</div></div><div>↓</div><div class="nodes"><div class="node">Left cause \((z,u)\)</div><div class="node">Right cause \((z,v)\)</div></div><div>↓</div><div class="bits" id="world-bits"></div><div id="world-checks" aria-live="polite"></div></div>
+<figcaption><strong>Overlapping local relations constrain the globally shared cause.</strong> Change the latent variables to enumerate valid observations, or flip a leaf to see which checks reject it. The display uses an unmasked world for readability; simulated worlds have random masks.</figcaption></figure>
+
+<h3>2.2 Separate stochastic recognition and generation</h3>
+<p>The decoder follows the tree top-down, and recognition reverses its connections. Write \(\mathbf{h}=(z,h_1,h_2)\), where each \(h_b\) is categorical:</p>
+\[\begin{aligned}
+p_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})
+&=\tfrac12\prod_{b=1}^{2}T_b(h_b\mid z)B_b(\mathbf{x}_b\mid h_b),\\
+q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x})
+&=U(z\mid h_1,h_2)\prod_{b=1}^{2}R_b(h_b\mid\mathbf{x}_b).
+\end{aligned}\]
+\[\begin{gathered}B_b(\mathbf{x}_b\mid h_b)\\=\prod_{j=1}^{3}\operatorname{Bern}\!\left(\frac{x_{bj}+1}{2};\sigma(D_{b,h_b,j})\right).\end{gathered}\]
+<p>Here \(\mathbf{T}_b\) are softmax conditionals; \(R_b\) is a softmax of an affine function of three leaf signs; and \(U\) is a softmax of the sum of two learned one-hot inputs. The networks have separate parameters. The decoder has forty scalar logits and the encoder forty-eight, before accounting for softmax redundancies. They are small stochastic multilayer networks, not exactly the equal-expressivity deterministic MLP pair requested in the README.</p>
+<p>Recognition starts correlated with the decoder's local inverse, mixed with independent random weights at coupling \(\rho=0.8\). Teacher structure never enters initialization. The baseline networks receive the same initialization and initial Watching trajectory. No weights are tied after initialization.</p>
+
+<h3>2.3 Learning the checks from finite examples</h3>
+<p>For every coordinate subset \(S\) of size at most three, form a fixed nonlinear detector and its empirical mean:</p>
+\[\chi_S(\mathbf{x})=\prod_{j\in S}x_j,\qquad c_S=\frac1N\sum_{p=1}^{N}\chi_S(\mathbf{x}^{p}).\]
+<p>Retain a detector when its observed sign is constant: \(|c_S|=1\). Let \(\mathcal C_X\) be this learned set and \(s_S=\operatorname{sign}(c_S)\). The final model retains <em>all</em> such detectors, so the memory requires local feature counting and thresholding, rather than an algebraic solver:</p>
+\[\begin{aligned}E_X(\mathbf{x})&=\beta\sum_{S\in\mathcal C_X}s_S\chi_S(\mathbf{x}),\\
+\pi_X(\mathbf{x})&=\frac{e^{E_X(\mathbf{x})}}{Z_X},\\
+\beta&=\frac12\log(2N+1).\end{aligned}\]
+<p>The strength corresponds to half-count smoothing of a constant observed binary relation; it is a modeling choice, not an exact Bayesian posterior over grammars. The feature products are supplied computational primitives. A product of inputs can be represented by a small nonlinear circuit, but these circuits are not learned here. What is learned is which detectors are reliable and their sign.</p>
+<p>Earlier experiments selected an independent constraint basis by binary elimination. That makes some calculations especially simple but introduces a nonlocal preprocessing step. Both variants are retained in the results. The final locally counted variant uses the same sampling repair and requires no basis selection.</p>
+<div class="proposition"><p><strong>Finite-data identifiability in this world.</strong> Every nonconstant candidate parity is balanced over the population. Its probability of accidentally being constant in an iid sample is \(2^{1-N}\). There are forty-one candidate features, of which five are truly constant, hence</p>
+\[\Pr(\text{false check retained})\leq 36\,2^{1-N}.\]
+<p>This is a union bound, capped at one. True checks are never missed in the noiseless world. The prior therefore generalizes from finite examples without receiving the true grammar. At small sample sizes it can confidently retain false constraints, and the simulations preserve those failures.</p></div>
+</section>
+
+<section id="theory"><h2>3. A practice objective with a coverage guarantee</h2>
+<h3>3.1 Forward joint KL</h3>
+<p>Consider the joint target \(t_{\boldsymbol{\phi}}(\mathbf{x},\mathbf{h})=\pi_X(\mathbf{x})q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x})\). Both networks minimize</p>
+\[\begin{aligned}
+\mathcal F(\boldsymbol{\theta},\boldsymbol{\phi})
+&=D_{\mathrm{KL}}\!\left(\pi_X q_{\boldsymbol{\phi}}\,\Vert\,p_{\boldsymbol{\theta}}\right)\\
+&=D_{\mathrm{KL}}\!\left(\pi_X\,\Vert\,p_{\boldsymbol{\theta}}(\mathbf{x})\right)+\mathcal I,\\
+\mathcal I&=\mathbb E_{\pi_X}D_{\mathrm{KL}}\!\left(q_{\boldsymbol{\phi}}(\cdot\mid\mathbf{x})\,\Vert\,p_{\boldsymbol{\theta}}(\cdot\mid\mathbf{x})\right).
+\end{aligned}\]
+<p>The second term is the variational inference gap. The first penalizes a generator that omits modes of the learned constraint distribution. Exact gradient descent with a sufficiently small step decreases this objective. A fixed finite step, self-normalized sampling, and a nonconvex parameterization do not provide a per-step guarantee.</p>
+<div class="proposition"><p><strong>Population statement and its limits.</strong> By the triangle inequality and Pinsker's inequality,</p>
+\[\operatorname{TV}(p_\star,p_{\boldsymbol{\theta}})
+\leq\operatorname{TV}(p_\star,\pi_X)+\sqrt{\mathcal F/2}.\]
+<p>For every observable taking values between zero and one, the difference of its expectations is bounded by the same right-hand side. Thus an accurate learned constraint model and small variational objective imply small bounded population-risk discrepancy. This is not a theorem that every practice update improves forward population KL, nor a guarantee of finding a global optimum. Population KL is measured separately in the experiments.</p></div>
+
+<h3>3.2 Own trajectories give local updates</h3>
+<p>Let \(r(\mathbf{x},\mathbf{h})\) be any full-support internal proposal whose probability can be evaluated. For a generated and recognized trajectory, define</p>
+\[\begin{aligned}w(\mathbf{x},\mathbf{h})&=\frac{e^{E_X(\mathbf{x})}q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x})}{r(\mathbf{x},\mathbf{h})},\\
+\overline w&=\frac{w}{\mathbb E_r w}=\frac{w}{Z_X}.\end{aligned}\]
+<p>Define the two vectors of local score eligibilities and a scalar recognition return:</p>
+\[\begin{aligned}\mathbf e_{\boldsymbol{\theta}}&=\nabla_{\boldsymbol{\theta}}\log p_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h}),\\
+\mathbf e_{\boldsymbol{\phi}}&=\nabla_{\boldsymbol{\phi}}\log q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x}),\\
+A&=\log p_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})\\
+&\quad-\log q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x})-b(\mathbf{x}).\end{aligned}\]
+<p>The exact negative gradients are then</p>
+\[\begin{aligned}
+\Delta\boldsymbol{\theta}&\propto\mathbb E_r[\overline w\,\mathbf e_{\boldsymbol{\theta}}],\\
+\Delta\boldsymbol{\phi}&\propto\mathbb E_r[\overline w A\,\mathbf e_{\boldsymbol{\phi}}].
+\end{aligned}\]
+<p>A baseline independent of the inferred latent trajectory leaves the exact encoder gradient unchanged. For a softmax synapse from presynaptic activity \(a_i\) to categorical unit \(j\), its score is</p>
+\[e_{ij}=a_i\left(\mathbf 1[h=j]-P(h=j\mid\text{parents})\right).\]
+<p>A synapse therefore needs its pre- and postsynaptic activity, its local conditional probability, and one scalar learning factor. The scalar is not purely local: it aggregates evidence and log probabilities over the trajectory, consistent with a three-factor rule. Neither update backpropagates a reconstruction derivative through the opposite network. Normalized batch weights estimate \(\overline w\); this estimator is consistent but biased at finite batch size. Using unnormalized weights instead gives an unbiased direction up to the fixed positive multiplier \(Z_X\), with potentially poor scaling.</p>
+<p>For pure ancestral practice, \(r=p_{\boldsymbol{\theta}}\). Its ratio requires only the joint path probability and recognition probability; it does not require a marginal likelihood, a true latent label, the constraint partition function, or an external reward. This resembles the importance-sampling principle of <a href="https://arxiv.org/abs/1406.2751">reweighted wake–sleep</a>, with a different proposal and learned target.</p>
+
+<h3>3.3 Preventing a proposal from losing valid modes</h3>
+<p>Pure ancestral proposals can make the required weights extremely variable when the generator nearly loses a mode. The final model uses a fixed mixture:</p>
+\[\begin{aligned}r_\varepsilon(\mathbf{x},\mathbf{h})&=(1-\varepsilon)p_{\boldsymbol{\theta}}(\mathbf{x},\mathbf{h})\\
+&\quad+\varepsilon\,2^{-6}q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x}),\\
+\varepsilon&=0.2.\end{aligned}\]
+<p>The first component generates top-down. The second draws an independent random observation and recognizes it bottom-up. Both are internal; neither accesses teacher examples. Each proposal is scored with its full mixture probability. The expected objective is unchanged, and</p>
+\[\frac{\pi_X(\mathbf{x})q_{\boldsymbol{\phi}}(\mathbf{h}\mid\mathbf{x})}{r_\varepsilon(\mathbf{x},\mathbf{h})}
+\leq\frac{2^6\pi_X(\mathbf{x})}{\varepsilon}.\]
+<p>This bounds importance ratios and protects coverage in the small world. The bound scales exponentially with the observation dimension for uniform exploration; it is not a scalable solution by itself. The final mechanism also gives up the requirement that <em>every</em> practice observation be ancestrally generated from a deep latent. Most are; the exploration fraction is a declared additional ingredient.</p>
+
+<h3>3.4 What the mechanism does—and does not—explain</h3>
+<p><strong>There is no new information in a dream.</strong> Target information lives in \(E_X\), learned from the demonstrations. Practice reorganizes network weights so that they express a distribution compatible with that evidence. The checker is learned rather than handed in, but its retained weights are fixed during practice; the latent inference pathway and decoder both continue learning.</p>
+<p><strong>Own-ness is not proved by these gradients.</strong> In exact expectation the forward updates equal variational training on \(\pi_X\). Any other proposal with the correct importance weights gives the same expected direction. Generation is an internal means of approximating those expectations. Its computational usefulness can depend on proposal–recognizer alignment and sample variance, but this construction does not establish the README's quality-matched own-versus-foreign advantage.</p>
+<p><strong>The advantage over reconstruction has a structural-prior component.</strong> The learned constraints infer a population model from a small sample. Reconstruction and empirical likelihood optimize the empirical observations instead. The experiments compare the same network class and observation budget, but do not show that generation beats every method given the same constraint prior. In this parity world, a specialized algebraic solver would be a strong shortcut.</p>
+</section>
+
+<section id="results"><h2>4. Prospective simulations</h2>
+<h3>4.1 Protocol and controls</h3>
+<p>All simulations run on CPU. Each main world supplies sixteen iid demonstrations. Watching uses one hundred updates of the finite-data variational likelihood bound and trains <em>both</em> networks. Each continuation receives two thousand updates, at learning rate 0.5 and batch size 128. The final comparison uses seeds 300–331, reserved after the coverage repair was specified. Curves evaluate all sixty-four observations and thirty-two latent configurations exactly; true latent labels are used only for diagnostics. No ground-truth labels, population distribution, or new teacher examples enter practice updates.</p>
+<p>Stored-data Watching continues the same variational objective on the finite demonstrations. Fresh-data Watching instead draws new iid observations from the identical teacher population. The reconstruction baseline minimizes expected reconstruction of the leaves and branch codes, with the full gradient through its stochastic encoder; its recognition pathway is not frozen. It is an end-to-end <em>stochastic, layerwise</em> autoencoder, not a conventional deterministic root-only bottleneck autoencoder. That distinction limits the claim against the literal README baseline.</p>
+<p>The initial parameters and Watching trajectory are shared across arms within each seed. Each sampled update uses the same number of complete trajectories. The constraints have the same finite-data origin; their counting pass is common to the learner and is excluded from continuation budgets. Exact-expectation studies are separate controls and are not described as sample-budget matched. The final horizons are fixed finite-budget comparisons, not convergence claims: the median terminal double-log slope of the practice objective is @SLOPE@, so typical runs have not reached stationarity.</p>
+<p>For variance reduction, the observational and reconstruction baselines use an enumerated per-observation encoder baseline, whereas sampled practice uses a fixed scalar baseline. Thus the comparison matches trajectory counts, not all arithmetic operations. The implementation vectorizes over the tiny state space even for sampled updates; the proposed local rule concerns which quantities enter each weight update, not a claim that this reference code is a neural circuit simulator.</p>
+
+<figure><div class="controls"><label>Study <select id="study"><option value="exploration_local">Final model: local checks + exploration</option><option value="exploration_basis">Independent checks + exploration</option><option value="final_exact">Pure ancestral rule: exact expectations</option><option value="final_sampled">Pure ancestral rule: sampled</option><option value="confirmation">Earlier symmetric / reverse-KL study</option><option value="sampled">Earlier symmetric / reverse-KL sampling</option><option value="local_ablations">Final model: mechanism ablations</option></select></label><label>Measure <select id="metric"><option value="kl">Population KL (nats)</option><option value="validity">Population validity</option><option value="root_mi">Root information</option><option value="branch_mi">Branch information</option><option value="forward_objective">Forward variational objective</option><option value="objective">Reverse variational objective</option><option value="effective_modes">Effective valid modes</option><option value="importance_ess">Ancestral-proposal ESS fraction</option></select></label><label>View <select id="curve-view"><option value="mean">Mean and standard error</option><option value="median">Median</option><option value="seeds">Individual seeds</option></select></label></div><div class="plot" id="learning"></div>
+<figcaption><strong>Offline practice can improve population likelihood while learning meaningful latent causes.</strong> Curves begin at the shared end of Watching. Hover for values and toggle methods with the colored buttons. The study selector includes exact-expectation controls and failed earlier variants. Objective diagnostics keep the original learned target for all ablations. The ESS diagnostic refers to the pure ancestral proposal, even when the training sampler uses exploration.</figcaption></figure>
+
+<div class="scrolltable">@TABLE@</div>
+<p>Root information is the mutual information between the inferred root and the true root, divided by the true root's entropy. It is invariant to exchanging latent labels. Branch information uses the corresponding four-state true cause. Validity tests all true relations together, whereas population KL also measures coverage and frequency. The final generator need not maximize validity at every intermediate stage to improve KL.</p>
+<div class="scrolltable">@COMPARISONS@</div>
+<p>The intervals are percentile intervals from ten thousand paired bootstrap resamples of the thirty-two seeds. Positive advantages mean lower KL for practice. They summarize this small task and fixed protocol, not a distribution of arbitrary learning problems. The comparison with fresh observations remains unresolved; the central estimate is close to a tie. The improvement over stored-data Watching and over the reconstruction baseline is supported by the paired intervals.</p>
+
+<figure><div class="controls"><label>Seed <select id="inspect-seed"></select></label><label>Inspect <select id="inspect-view"><option value="distribution">Valid-mode coverage</option><option value="emissions">Decoder leaf weights</option><option value="top">Decoder root-to-branch conditionals</option></select></label><label>Generator <select id="inspect-arm"><option value="forward_explore">Practice + exploration</option><option value="forward">Pure ancestral practice</option></select></label></div><div id="distribution" class="plot"></div>
+<figcaption><strong>Coverage and individual weight matrices expose effects hidden by average validity.</strong> The distribution view shows every valid string and aggregates invalid strings. The target, learned constraint distribution, and empirical demonstrations can be compared directly. Weight views show individual networks because latent labels differ between seeds; missing cross-branch connections are blank.</figcaption></figure>
+
+<figure><div id="depth" class="plot"></div>
+<figcaption><strong>Branch representations become informative before the shared root representation.</strong> Both traces are measured on the entire teacher population and are normalized by the corresponding cause entropy. This is evidence for a learning sequence in the constructed world; it does not establish an arbitrary-depth staircase or show that observation can never learn the root.</figcaption></figure>
+
+<h3>4.2 Sample size, coupling, and budget allocation</h3>
+<p>Secondary controls vary the number of demonstrations and the correlation of initial recognition and generation. Small datasets can create false retained constraints. Increasing the sample size both reduces this error and changes the prescribed constraint strength. Consequently these sweeps do not isolate sample count from target temperature. Coupling changes the inverse component in the initialization mixture; it is not a perfectly variance-matched manipulation of correlation alone.</p>
+<figure><div class="controls"><label>Initial coupling <select id="coupling"><option value="0.8">0.8</option><option value="0">0</option><option value="1">1</option></select></label><label>Measure <select id="sensitivity-metric"><option value="kl">Population KL (nats)</option><option value="root_mi">Root information</option><option value="validity">Validity</option></select></label></div><div id="sensitivity" class="plot"></div>
+<figcaption><strong>Finite evidence and initialization constrain the range in which practice helps.</strong> The controls retain every seed and include the same observational baselines. Error bars are standard errors across the secondary seed set. The constraint-model reference measures evidence quality before the neural networks fit it.</figcaption></figure>
+<p>The secondary runs also learn with zero initial coupling. Thus coupling is not necessary for this construction's success, and these results do not validate coupled initialization as the source of an intrinsic own-sample advantage.</p>
+
+<figure><div class="controls"><label>Heatmap <select id="budget-metric"><option value="kl">Population KL</option><option value="root_mi">Root information</option><option value="validity">Validity</option></select></label></div><div id="budget" class="plot"></div>
+<figcaption><strong>The allocation of a fixed training budget changes the quality reached by the learner.</strong> The horizontal axis counts network-training sample presentations; the vertical axis is the nominal fraction allocated to offline practice after Watching, rounded to whole updates. All cells share the same finite evidence budget and use the final exploratory sampler. A practice trajectory can be ancestral or an internal exploratory proposal. The common evidence-counting pass is excluded. Hover for the mean, standard error, and seed count.</figcaption></figure>
+</section>
+
+<section id="failures"><h2>5. Failed versions and what they taught us</h2>
+<p>The search proceeded by deriving objectives before simulating them. The protocol records every change. Negative results are retained in the study selector and downloadable arrays.</p>
+<table><thead><tr><th>Candidate</th><th>Reason for trying it</th><th>Observed limitation</th></tr></thead><tbody>
+<tr><td>Unweighted own wake</td><td>Generated latent trajectories are locally available.</td><td>The exact expected decoder score is zero. Recognition can adapt, but the generator has no population-directed update.</td></tr>
+<tr><td>Reverse joint KL</td><td>Combines a learned evidence score, generator entropy, and ordinary sleep learning.</td><td>Can increase validity while dropping whole valid modes. A decreasing fitted objective does not imply decreasing forward population KL.</td></tr>
+<tr><td>Symmetric joint KL</td><td>Add a forward coverage term while retaining a direct sleep gradient.</td><td>Exact-expectation gains did not reliably survive small-batch importance sampling. The forward term can be poorly estimated when the proposal misses modes.</td></tr>
+<tr><td>Forward KL, pure ancestral proposals</td><td>A variational bound explicitly penalizes omitted target modes.</td><td>Mostly works, but rare severe failures persist. A sound population objective does not make its finite-sample estimator reliable.</td></tr>
+<tr><td>Forward KL, exploratory mixture</td><td>Ensure target-relevant observations can be proposed, with a known density and corrected weights.</td><td>Removes the largest observed failures in the prospective small-world test, while adding internal random-observation proposals and a dimension-dependent coverage mechanism.</td></tr>
+</tbody></table>
+<p>The learned evidence also matters independently of the sampler. With evidence removed, the target becomes uniform and practice tends toward a generator with little true hierarchical structure. Freezing the initial encoder prevents meaningful root inference and strongly limits generation. These ablations concern the same final network and are available in the learning-curve selector.</p>
+<p>Failure is not confined to validity: the all-check memory can be more accurate than the basis memory yet harder to sample from because its target is sharper. The successful coverage repair therefore addresses a computational problem rather than adding teacher information. Residual neural local optima remain even with exploration; some seeds perform substantially worse than the median.</p>
+</section>
+
+<section id="spec"><h2>6. Assessment against the README</h2>
+<table><thead><tr><th>Requirement or intuition</th><th>Assessment</th></tr></thead><tbody>
+<tr><td>Offline improvement without external feedback</td><td><strong>Demonstrated in the toy.</strong> The final practice phase consumes only retained constraint weights and internal proposals.</td></tr>
+<tr><td>Recognition infers latent causes</td><td><strong>Demonstrated.</strong> Population root and branch information increase; recognition is not only a binary realism score.</td></tr>
+<tr><td>Local Hebbian or three-factor updates</td><td><strong>Qualified.</strong> Network updates use local score eligibilities and scalar factors. The final constraint memory uses local counts of supplied nonlinear parity detectors. Global scalar aggregation and batch weight normalization are required.</td></tr>
+<tr><td>Recognition and generation learn together</td><td><strong>Demonstrated for the trainable pathways.</strong> Both learn during Watching and practice. The separate learned evidence memory is retained rather than relearned from dreams.</td></tr>
+<tr><td>Deeper representations become usable during practice</td><td><strong>Demonstrated at two levels.</strong> No generic depth scaling, emergent arbitrary-depth architecture, or strict recognition-always-ahead result is established.</td></tr>
+<tr><td>Outperform the same learner without practice</td><td><strong>Supported for the stated stored-data protocol.</strong> It is not a theorem for every seed or every alternative use of the learned prior.</td></tr>
+<tr><td>Outperform fresh teacher examples</td><td><strong>Not established.</strong> The final comparison is statistically unresolved. Earlier variants lose clearly.</td></tr>
+<tr><td>Outperform an end-to-end autoencoder</td><td><strong>Supported for the specified stochastic layerwise reconstruction baseline.</strong> The literal deterministic MLP autoencoder comparison remains open.</td></tr>
+<tr><td>Normative grounding</td><td><strong>Available.</strong> Forward joint KL upper-bounds fitted marginal KL and gives a total-variation population bound when the learned constraint model is accurate. Global optimization and monotonic true KL are not guaranteed.</td></tr>
+<tr><td>Benefit not merely direct reconstruction of teacher examples</td><td><strong>Satisfied operationally, with an important caveat.</strong> Practice uses no teacher reconstruction targets, but its expected update is variational fitting of a learned structured population model.</td></tr>
+<tr><td>Own examples beat equally good foreign ones</td><td><strong>Not established.</strong> Correctly weighted proposals have the same expected update; proposal efficiency would need a separate quality-matched experiment.</td></tr>
+<tr><td>Simple equally expressive decoupled MLPs</td><td><strong>Partial.</strong> The pathways are separate small stochastic networks. A supplied parity-feature bank and the evidence-memory split are additional structure.</td></tr>
+<tr><td>Straightforward transformer ICL mapping</td><td><strong>Only an analogy.</strong> Retained constraints could correspond to rules inferred from demonstrations, generated trajectories to candidate continuations, and weighting to selective reuse. No attention-level implementation or in-context counterpart of these weight updates is proved.</td></tr>
+</tbody></table>
+<p><strong>Interpretation.</strong> The workable core is evidence-preserving internal computation: Watching records compositional relations before the learner can generate their joint consequences; practice uses internal proposals to fit those relations and infer shared causes. The original explanation based solely on coupled initialization remains insufficient. The next important problem is to learn the constraint features themselves with equally expressive pathways, while retaining the coverage mechanism and testing the literal autoencoder and matched-quality foreign controls.</p>
+</section>
+
+<section id="reproduce"><h2>7. Reproducibility and audit trail</h2>
+<p>The main sampled run is reproduced with the command below using the project's existing UV environment. No GPU, external LLM call, or model download is involved. The exact state space is used for diagnostics and convenient vectorization; the practice proposal is sampled ancestrally or from internal noise followed by recognition. The sampled weight formula uses neither the target normalizer nor the generator's marginal likelihood.</p>
+<pre>OPENBLAS_NUM_THREADS=1 /var/tmp/jbauer/venvs/generative-learning/bin/python \
+  experiments/model4_feasibility.py --name exploration_local \
+  --start 300 --seeds 32 --batch 128 --evidence all \
+  --steps 2000 --watchsteps 100 \
+  --arms forward_explore forward watch fresh ae --workers 4</pre>
+<p>Finite-difference checks verify decoder and encoder gradients for Watching, reconstruction, forward KL, reverse KL, and their symmetric combination. Checks also verify normalization, the KL decomposition, and that changing population-evaluation labels cannot change the practice gradient. Empirical observations are iid from the same population used for the fresh-data baseline. All seeds, arrays, initial learning curves, final network parameters, failed variants, and protocol amendments are retained.</p>
+<p>Durable artifacts:</p><pre>@DURABLE@/</pre>
+<p><a href="model4-files/manifest.json">Artifact manifest with SHA-256 hashes</a> · <a href="model4-files/learning.png">Standalone learning-curve PNG</a> · <a href="model4-files/learning.svg">Editable figure</a></p>
+<details><summary>Source, protocols, and full simulation data</summary><ul class="artifacts">@ARTIFACTS@</ul></details>
+<p>The report embeds its plotting library, data, KaTeX stylesheet, and fonts. The interactive figures work without external network requests. The canonical URL is stable and is served with no-cache settings.</p>
+</section>
+
+<section><h2>References</h2>
+<ol><li>Hinton, Dayan, Frey and Neal (1995). <a href="https://www.cs.toronto.edu/~hinton/absps/ws.pdf">The “wake-sleep” algorithm for unsupervised neural networks.</a> Separate generative and recognition pathways and local wake/sleep updates.</li>
+<li>Bornschein and Bengio (2015). <a href="https://arxiv.org/abs/1406.2751">Reweighted Wake-Sleep.</a> Importance-weighted learning of generative and inference networks. The proposal used in this note differs from that paper.</li>
+<li>Hinton (2002). <a href="https://www.cs.toronto.edu/~hinton/absps/tr00-004.pdf">Training products of experts by minimizing contrastive divergence.</a> Background for combining local constraints into a joint distribution; this note does not use contrastive divergence.</li>
+<li>Cagnetta et al. (2024). <a href="https://journals.aps.org/prx/abstract/10.1103/PhysRevX.14.031001">How Deep Neural Networks Learn Compositional Data: The Random Hierarchy Model.</a> The motivating hierarchy; the overlapping-constraint world here is a modification, not the RHM.</li></ol>
+</section>
+<footer><p class="small">Research prototype. The distinction between demonstrated results, mathematical guarantees, and outstanding README requirements is intentional. README.md and model_4.md were not edited.</p></footer>
+</main><script>@PLOTLY@</script><script>const DATA=@DATA@;</script><script>@SCRIPT@</script></body></html>

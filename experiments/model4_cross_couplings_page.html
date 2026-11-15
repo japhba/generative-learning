@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="overlyx" content="article">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>Cross couplings in the RHM</title>
+<style>/*__KATEX_CSS__*/</style>
+<style>
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--ok:#2a78d6;--bad:#e34948}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--ok:#3987e5;--bad:#e66767}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--ok:#3987e5;--bad:#e66767}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:900px;margin:0 auto;padding:0 16px 64px}
+header{padding:48px 0 8px}
+h1{font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
+h3{font-size:1.05rem;margin:22px 0 6px}
+p{margin:0 0 14px}
+a{color:var(--link)}
+section{padding-top:44px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
+.byline{color:var(--ink2);font-size:.92rem}
+.lede{font-size:1.1rem;color:var(--ink2)}
+.small{font-size:.88rem;color:var(--ink2)}
+.takeaways{padding-left:22px;margin:0 0 14px}.takeaways li{margin-bottom:10px}
+ul{padding-left:22px}li{margin-bottom:6px}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+figure{margin:22px 0}
+figure img{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:12px}
+figcaption{font-size:.88rem;color:var(--ink2);margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:6px 0 14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-space:nowrap}
+.table-wrap{overflow-x:auto}
+.counts th,.counts td{text-align:right;font-variant-numeric:tabular-nums}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
+code{overflow-wrap:anywhere}
+figure.widget{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.w-controls{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-bottom:8px;font-size:.9rem}
+.w-controls button,.w-controls select{font:inherit;font-size:.88rem;padding:5px 10px;border-radius:8px;border:1px solid var(--axis);background:var(--bg);color:var(--ink);cursor:pointer}
+.w-controls button:hover{border-color:var(--ink2)}
+.w-controls button.primary{border-color:var(--ok)}
+#wTree{display:block;width:100%;height:auto}
+#wTree text{font:11px system-ui,sans-serif;pointer-events:none}
+.w-status{font-size:.88rem;color:var(--ink2);min-height:2.9em;margin:6px 0 4px}
+.w-stats td,.w-stats th{font-size:.86rem;padding:5px 8px}
+@media (max-width:720px){body{font-size:16px}header{padding-top:28px}section{padding-top:34px}}
+@media print{body{background:#fff}}
+</style>
+</head>
+<body>
+<main>
+<article>
+<header>
+<div class="eyebrow">Generative learning · model 4 · cross couplings</div>
+<h1>Why the RHM needs cross couplings, and of what kind</h1>
+<p class="byline">Note for model 4. Written 14 November 2026, illustrated 15 November 2026 (UK time).</p>
+<p class="abstract lede">In the plain random hierarchy model (RHM) a reader and a writer hold the same thing at every node, its symbol, so nothing in it is easier to check than to produce. An agreement between neighbouring nodes that are not siblings, at every level, changes this. Checking stays one lookup per pair of neighbours. A writer that works top-down in one pass, writing the two halves of each node independently, must hand every node promises about the nodes on its edges, which will meet nodes written elsewhere: up to \(v\rho^{2l}\) states for a node of height \(l\), where the reader holds \(v\). Without the promises a valid string comes out by luck: with 16 symbols, 4 productions per symbol and 2 feature values, the best writer that holds only the reader's states writes a valid string of 16 tokens {{fit4}} of the time, and one of 64 tokens with probability {{fit6}}.</p>
+</header>
+
+<p class="small">The three questions this note answers:</p>
+<ul class="takeaways">
+<li><strong>Why cross couplings?</strong> On a tree, one table per level both reads and writes, each in a single pass, so the README's "verification is easier than generation" has no room. Agreements between neighbouring nodes that are not siblings, at every level, close loops. Checking stays one lookup per pair of neighbours; a top-down writer must hold up to \(v\rho^{2l}\) states for a node of height \(l\), where the reader holds \(v\) (sections 1 and 4).</li>
+<li><strong>Does the RHM have \(k\)-body interactions once the symbols are summed out?</strong> Yes. The tokens under every node of height \(l\) share one interaction among all \(2^l\) of them. This is not what makes writing hard: the interactions are nested, and the hierarchy of symbols resolves them exactly with three-body rules (section 2).</li>
+<li><strong>Do we need non-local or more-than-two-body interactions?</strong> No. What counts is how much a cut through the system has to transmit, not the range or the order of the couplings (section 3). The cross couplings are two-body and nearest-neighbour in the latents. They must sit at every level: at the leaves alone they cost a constant factor.</li>
+</ul>
+<p>The numbers are exact counts from <code>experiments/rhm_cross_coupling_gap.py</code> and <code>experiments/model4_cross_couplings_figures.py</code>. No learner has been run on this world yet.</p>
+
+<section>
+<h2>1. Reading and writing</h2>
+<p>Both work on the RHM's tree of symbols (section 2): a node at height \(l\) carries one of \(v\) symbols, the tokens are the symbols at height 0, and every node is rewritten into its two children by one of \(m\) productions.</p>
+<p><strong>The reader</strong> gets a finished string. It parses it bottom-up, which gives every node its symbol, one state out of \(v\), and checks every rule by looking at the few nodes that rule involves. The checks do not depend on each other and can run in any order.</p>
+<p><strong>The writer</strong> starts at the root and works down, as the RHM's own generative process does and as the README's top-down generator would. At each node it holds a state \(h\), and given \(h\) it writes the node's two halves independently. Whatever the two halves have in common must therefore pass through \(h\):</p>
+\[P(\mathbf x_L,\mathbf x_R)=\sum_h P(h)\,P(\mathbf x_L\mid h)\,P(\mathbf x_R\mid h).\]
+<p>Read as a matrix with one row per left half \(\mathbf x_L\) and one column per right half \(\mathbf x_R\), the right side is a sum of one rank-one matrix per state of \(h\). So \(h\) needs at least as many states as the rank of \(P(\mathbf x_L,\mathbf x_R)\). In transfer-matrix language \(h\) is the boundary state: what one half has to know about the other.</p>
+
+<figure><img src="figures/model4-read-write.svg" alt="Three copies of the same small tree of symbols with a vertical cut through the root. (a) Finished tree, every agreement between neighbouring non-sibling nodes marked with a tick. (b) Only the root and its two children written; the nodes below are dashed outlines, and the four nodes next to the cut carry a promised feature and a question mark. (c) A tree written with symbols only; the two agreements across the cut are marked with crosses."><figcaption><strong>Figure 1. The reader checks a finished string one rule at a time; the writer has to promise, before anything below a node exists, what will meet across the cut.</strong> A small RHM with cross couplings (section 4): neighbouring nodes that are not siblings must agree in a feature (shading); numbers are symbols. (a) Every agreement is checked by one lookup of two features. (b) Halfway down: the root's children carry promised features (?) for the nodes on their inner edges, which will meet across the cut although the two halves are written independently. (c) A writer that knows every production but passes each node only its symbol, with the same root and children: an agreement between nodes written apart holds by luck. Plot script: <code>experiments/model4_cross_couplings_figures.py</code>.</figcaption></figure>
+
+<p>The reader's advantage rests on its check units, one per pair of neighbours, which look sideways across the boundary between two subtrees at nodes that are already there. A reader built as a strict tree, in which a node sees only its two children, would have to carry the edge features up and would pay as much as the writer. A one-pass writer cannot use sideways units in the same way: the two nodes they join do not exist yet when it has to decide, and a random choice shared by both would have to know what each subtree can still produce, which is the same table again.</p>
+</section>
+
+<section>
+<h2>2. The plain RHM: nested interactions on a tree</h2>
+<p>Take pairs and depth \(L\). A node at height \(l\) carries a symbol \(a\in\{1,\dots,v\}\); the tokens are the symbols at height 0. At every level each symbol has \(m\) productions \(R_l(a)\subset\{1,\dots,v\}^2\), and no pair is a production of two symbols:</p>
+\[P(\text{tree})=\frac1v\prod_{\text{nodes } n \text{ above the tokens}}\frac1m\,\mathbb{I}\!\left[(b_n,c_n)\in R_{l(n)}(a_n)\right],\]
+<p>with \(a_n\) the symbol of node \(n\) and \(b_n,c_n\) those of its children. Every factor ties three symbols. For \(v=m=2\) with the rule \(a=bc\) it is the three-spin interaction of the parity prototype in <code>model_4.md</code>. With one more unit per node that names the production, the same factor is three pairwise couplings to that unit. The order of an interaction depends on which variables one writes down; the graph is a tree either way.</p>
+<p><strong>Summing out the symbols.</strong> The parse is unique, so a block \(B\) of \(2^l\) tokens under one node has a symbol \(\sigma_l(\mathbf x_B)\), with \(\sigma_0(x)=x\). The tokens alone are uniform on the valid strings:</p>
+\[P(\mathbf x)=\frac{1}{v\,m^{2^L-1}}\prod_{l=1}^{L}\ \prod_{\text{blocks } B \text{ of height } l}\chi_l(\mathbf x_B),\qquad \chi_l(\mathbf x_B)=\mathbb{I}\!\left[\big(\sigma_{l-1}(\mathbf x_{B'}),\sigma_{l-1}(\mathbf x_{B''})\big)\in R_l\right],\]
+<p>where \(B'\) and \(B''\) are the two halves of \(B\) and \(R_l\) is the set of all productions of level \(l\). Each \(\chi_l\) is one interaction among \(2^l\) tokens, so the orders are \(2,4,\dots,2^L\). In general it does not split into terms on fewer tokens, because it sees each half only through its symbol. The parity grammar is the clearest case: given the root \(a\), the tokens are uniform on \(\prod_i x_i=a\), a single \(2^L\)-spin interaction with every correlation among fewer tokens equal to zero. With random rules, weak correlations among a few tokens of different blocks exist, and a gradient learner uses them to group synonyms (Cagnetta, Petrini, Tomasini, Favero &amp; Wyart, PRX 2024). They are leftovers of the random tables and do not define the grammar.</p>
+<p><strong>Why this is still easy.</strong> The interactions are nested: blocks of one height are disjoint and contain lower blocks whole. Every symbol at height \(l\) has the same number of valid subtrees, \(Z_l=m^{2^l-1}\). Summing out everything below a level therefore leaves a constant and no new coupling, and the symbols at height \(l\) are again an RHM, of depth \(L-l\). An interaction that is \(k\)-body in the tokens is two-body between sibling symbols at the right scale. So reading (\((b,c)\mapsto a\), bottom-up) and writing (\(a\mapsto(b,c)\), top-down) are both exact in one pass and use the same \(vm\) entries per level. The check "is \((b,c)\) a production?" is complete exactly when the writer's table is.</p>
+<p>In the terms of section 1: the state the writer passes to a node is its symbol, the reader's state, and what crosses the cut between a node's two halves is its production, which the reader recovers from the parse.</p>
+</section>
+
+<section>
+<h2>3. What makes writing hard: what a cut has to transmit</h2>
+<p>Section 1 put the cost of one-pass writing into the rank of \(P(\mathbf x_L,\mathbf x_R)\) across a cut. Ising models show what sets that rank. Take \(P(\mathbf s)\propto\exp(\tfrac12\mathbf s^\top\mathbf J\mathbf s)\) with \(s_i=\pm1\), split the spins into a left and a right half, and collect the couplings between the halves in \(\mathbf J_{LR}\):</p>
+\[P(\mathbf s_L,\mathbf s_R)\propto e^{\frac12\mathbf s_L^\top\mathbf J_{LL}\mathbf s_L}\;e^{\frac12\mathbf s_R^\top\mathbf J_{RR}\mathbf s_R}\;e^{\mathbf s_L^\top\mathbf J_{LR}\mathbf s_R}.\]
+<p>The right half feels the left half only through the field \(\mathbf b=\mathbf J_{LR}^\top\mathbf s_L\) that the left spins exert on the right spins. So \(h=\mathbf b\) is a writer's state that works (draw \(\mathbf b\), then each half given it), and \(h\) needs as many states as \(\mathbf b\) takes values (Figure 2):</p>
+<ul>
+<li><strong>Chain:</strong> one bond crosses, and \(\mathbf b\) is the coupling times the boundary spin. Two states.</li>
+<li><strong>Square lattice, \(N\times N\):</strong> \(N\) bonds cross, each from a different spin, and \(\mathbf b\) is the column of boundary spins. \(2^N\) states.</li>
+<li><strong>Complete graph</strong> (Curie–Weiss, \(J_{ij}=J/N\)): all \(N^2/4\) bonds between the halves cross, but \(\mathbf J_{LR}=\tfrac JN\,\mathbf 1\,\mathbf 1^\top\) has rank one, so every right spin feels the same field \(\tfrac JN M_L\), with \(M_L=\sum_{i\in L}s_i\) the magnetisation of the left half. One number with \(N/2+1\) values.</li>
+</ul>
+
+<figure><img src="figures/model4-cut-ising.svg" alt="Four Ising graphs, each cut into a left and a right half by a dashed line, with the couplings across the cut in orange: a chain with one crossing bond; a complete graph on eight spins with sixteen crossing bonds; the same eight spins as a star around a central field phi; a six by six square lattice with six crossing bonds."><figcaption><strong>Figure 2. How much a writer must hold is set by what crosses a cut, not by how many bonds there are or how far they reach.</strong> Ising models split into a left and a right half (dashed). (a) Chain: one bond crosses. (b) Complete graph: every bond between the halves crosses, but all of them through the magnetisation of a half. (c) The same model after the Hubbard–Stratonovich transform: every spin couples only to one field \(\phi\), which is the writer's state for any cut. (d) Square lattice: one bond per row crosses, each on a different spin, so the writer must carry every boundary spin. Plot script: <code>experiments/model4_cross_couplings_figures.py</code>.</figcaption></figure>
+
+<h3>The Hubbard–Stratonovich field is the writer's state</h3>
+<p>For the complete graph the same statement can be made for all cuts at once. With \(M=\sum_i s_i\) and \(J>0\),</p>
+\[e^{\frac{J}{2N}M^2}=\sqrt{\frac{NJ}{2\pi}}\int d\phi\;e^{-\frac{NJ}{2}\phi^2+J\phi M},\]
+<p>and therefore</p>
+\[P(\mathbf s)=\int d\phi\;P(\phi)\prod_{i=1}^{N}\frac{e^{J\phi s_i}}{2\cosh J\phi},\qquad P(\phi)\propto e^{-NJ\phi^2/2}\,(2\cosh J\phi)^N.\]
+<p>Read from left to right, this is a writer: draw one number \(\phi\), then every spin independently in the external field \(J\phi\). The all-to-all graph has become a star with \(\phi\) at its centre (Figure 2c), and \(h=\phi\) serves for any cut. So the Hubbard–Stratonovich field is a random external field shared by all spins, and it is exactly the writer's state \(h\): the usual Ising symbol for an external field and our \(h\) mean the same thing here, up to the factor \(J\). \(\phi\) is continuous, but \(h=M_L\), with \(N/2+1\) values, does the same job exactly. No transform of this kind shrinks the cut of the square lattice: there \(\mathbf J_{LR}\) has rank \(N\), one column per boundary spin.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Ising model on</th><th>couplings</th><th>what crosses a cut</th><th>states of \(h\)</th></tr></thead>
+<tbody>
+<tr><td>a chain</td><td>two-body, nearest neighbour</td><td>one bond</td><td>2: the boundary spin</td></tr>
+<tr><td>the complete graph</td><td>two-body, all pairs</td><td>every bond, all through the magnetisation of a half</td><td>\(N/2+1\): the magnetisation of a half; or one real number, the Hubbard–Stratonovich field</td></tr>
+<tr><td>an \(N\times N\) square lattice</td><td>two-body, nearest neighbour</td><td>\(N\) bonds on different spins</td><td>\(2^N\): the boundary spins</td></tr>
+</tbody></table></div>
+
+<ul>
+<li><strong>Range is not the criterion.</strong> The fully connected model is as non-local as a model can be, and its cut carries one number. The square lattice is local, and its cut carries \(N\) bits.</li>
+<li><strong>Order is not the criterion.</strong> Any \(k\)-body factor equals pairwise couplings to one more hidden unit, as for the production in section 2.</li>
+<li><strong>Loops are.</strong> What counts is how many independent numbers cross a cut, the rank of \(\mathbf J_{LR}\), and how many values they take. The rank grows when a cut is crossed by many bonds that act on different variables, and that needs loops.</li>
+</ul>
+<p>Checking a configuration is evaluating its energy, a sum of local terms. Writing one in a single pass needs the transfer matrix across every cut. The gap between verification and generation is the size of that matrix. In the plain RHM only the production of a block crosses the cut between its halves, at any height, and the reader holds that production too: there is no gap.</p>
+</section>
+
+<section>
+<h2>4. Cross couplings</h2>
+<p><strong>Definition.</strong> Every level \(j\) gets a feature \(\phi_j:\{1,\dots,v\}\to\{1,\dots,\rho\}\) that takes each value equally often. Two neighbouring nodes of height \(j\) that are not siblings must agree in it. The target is uniform on the trees that obey every production and every agreement. For \(\rho=2\) this is an Ising coupling between feature spins in the limit \(J\to\infty\) (a Potts coupling for larger \(\rho\)). In the latents it is two-body and nearest-neighbour. In the tokens it ties two blocks of \(2^j\) tokens, so it is many-body and present at every scale, exactly as the productions are.</p>
+
+<figure><img src="figures/model4-cross-couplings.svg" alt="Two binary trees of depth four with a dashed cut through the root. Top: agreements only between neighbouring tokens; one crosses the cut. Bottom: agreements at every height below the root's children; one crosses the cut at every height."><figcaption><strong>Figure 3. Agreements at every level make a cut carry more the taller the block is; agreements at the leaves alone do not.</strong> Symbols of an RHM with pairs, drawn by height, tokens at the bottom. Grey: productions; these alone are the plain RHM. Coloured: agreements between neighbouring nodes that are not siblings, highlighted where they cross the cut between the two halves of the root (dashed). Below each panel: what crosses that cut, and what a node has to carry so that its two halves can be written independently. Plot script: <code>experiments/rhm_cross_coupling_schematic.py</code>.</figcaption></figure>
+
+<p><strong>Counting the bonds.</strong> Take a node of height \(l\). At every height \(j<l\), the outermost node of height \(j\) inside its block and that node's neighbour outside have different parents, so an agreement ties them (Figure 3). Each side of the block is crossed by \(l\) agreements, and the cut between its two halves by \(l-1\), since at height \(l-1\) the two nodes are siblings. A writer that writes the two halves independently must tell each node its symbol and the \(l\) feature values along each edge of its subtree, the promises of Figure 1b:</p>
+\[\text{states of a node of height } l\ \le\ v\,\rho^{2l}=v\,n^{2\log_2\rho},\qquad n=2^l \text{ tokens}.\]
+<p>This is a power of the block length: more than the Ising chain (constant), less than the square lattice (exponential in the cut). The reader keeps \(v\) states and checks each agreement by one lookup.</p>
+<p>Summing out no longer leaves a constant. The number of completions of a node depends on its symbol and its \(2l\) edge features, where it was the constant \(Z_l\). The writer has to weigh every production by how many completions fit, and the symbols no longer absorb the summed-out interactions. In tensor-network terms the plain RHM is a tree with bond dimension \(v\); the agreements add bonds between neighbouring blocks at every scale, roughly the geometry of a MERA.</p>
+
+<h3>Counts</h3>
+<p>\(v=16\), \(m=4\), \(\rho=2\), median of 8 random grammars. The first two columns are for a node of height \(l\), the last three for a tree of depth \(l\).</p>
+<div class="table-wrap counts"><table>
+<thead><tr><th>\(l\)</th><th>states of a node, per symbol</th><th>bound \(\rho^{2l}\)</th><th>two valid halves fit</th><th>plain-RHM strings valid</th><th>reader-state writer valid</th></tr></thead>
+<tbody>
+{{count_rows}}
+</tbody></table></div>
+<p>The reader has one state per symbol at every height. The bound is missed by a constant factor because the \(m\) productions of a symbol do not realise every combination of edge features. "Two valid halves fit" is the chance that two halves, each valid, agree at the cut when joined under a production, \(\rho^{-(l-1)}\). "Plain-RHM strings valid" is the share of strings from a plain RHM of depth \(l\) with the same productions that obey every agreement, about \(\rho^{-(n-l-1)}\). "Reader-state writer valid" is the best writer that holds only the reader's states: one production table per node and symbol, fitted to the target by maximum likelihood (on {{samples}} exact samples; at depths 2 and 3 this agrees with the exact fit by enumeration). It does better than drawing productions uniformly, because it learns which productions tend to work at each position, but it cannot learn which ones fit together across a cut, since it is told nothing about the other side. With \(\rho=1\) every column returns to the tree.</p>
+
+<figure><img src="figures/model4-writer-cost.svg" alt="Left: log-scale plot of states per symbol and table entries per symbol against the height of the node, both rising as a power of the block length, with the reader flat at one. Right: log-scale plot of the share of valid strings against depth; the writer with promises stays at one, the writer with the reader's states and the uniform writer fall steeply."><figcaption><strong>Figure 4. A writer's state and table grow as a power of the block length, and without them valid strings become exponentially rare.</strong> Exact counts for the grammars of the table (median over grammars). (a) States a top-down writer needs per symbol at a node of height \(l\), the bound \(\rho^{2l}\), and the size of its table of productions and cut features, both as multiples of the reader's (grey). (b) Share of valid strings by depth: the writer with promises (exact); the best writer that holds only the reader's states (band: range over grammars); the writer that knows the productions and draws them uniformly, which is the plain RHM's writer. Plot script: <code>experiments/model4_cross_couplings_figures.py</code>.</figcaption></figure>
+
+<h3>Try it</h3>
+<p>The widget writes strings of a smaller grammar, \(v=8\), \(m=4\), \(\rho=2\), so that the symbols fit into the nodes. Agreements that hold are blue, broken ones red. Raise the depth and compare the two writers; hover over a node to see what it was told.</p>
+<figure class="widget" id="writeBlock">
+<div class="w-controls">
+<label>Depth <select id="wDepth"><option>2</option><option>3</option><option selected>4</option><option>5</option></select></label>
+<button id="wExact" type="button" class="primary">Write with promises</button>
+<button id="wReader" type="button" class="primary">Write with the reader's states</button>
+<button id="wMany" type="button">Write 10,000 with each</button>
+<button id="wNew" type="button">New grammar</button>
+</div>
+<svg id="wTree" viewBox="0 0 760 300" role="img" aria-label="A tree of symbols written by one of the two writers, with the agreements between neighbouring non-sibling nodes drawn in blue where they hold and in red where they fail."></svg>
+<p class="w-status" id="wStatus"></p>
+<table class="w-stats">
+<thead><tr><th>Writer</th><th>What a node of height \(l\) is told</th><th class="num">valid, exact</th><th class="num">valid in your strings</th></tr></thead>
+<tbody>
+<tr><td>with promises</td><td id="wHoldE"></td><td class="num">100%</td><td class="num" id="wCountE">–</td></tr>
+<tr><td>with the reader's states</td><td>its symbol</td><td class="num" id="wExactR"></td><td class="num" id="wCountR">–</td></tr>
+</tbody></table>
+<script>
+// Cross-coupled RHM with pairs: rules[d-1][a] = m productions [b, c] of a node at height d; phi[j][symbol] = feature at height j.
+// Writer with promises: exact sampler from inside counts N[d][a][l * rho^d + r] (left / right edge features, index sum_j f_j rho^j).
+// Writer with the reader's states: one production table per node and symbol, fitted to exact samples; its exact share of valid
+// strings by weighted transfer matrices. OverLyX shows an article's block by loading the whole page in a frame with the other blocks
+// hidden, so the widget starts only where it is shown.
+(() => {
+'use strict';
+const V = 8, M = 4, RHO = 2, LTOP = 5, FIT = 20000, MANY = 10000, NS = 'http://www.w3.org/2000/svg';
+const FEAT = [['#d4e5f9', '#0b0b0b'], ['#2a78d6', '#ffffff']];
+const $ = id => document.getElementById(id);
+function rng(s) { return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const range = n => Array.from({length: n}, (_, i) => i);
+function perm(n, r) { const a = range(n); for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pick(w, r) { let t = 0; for (const x of w) t += x; let u = r() * t, last = 0; for (let i = 0; i < w.length; i++) { if (w[i] > 0) { last = i; u -= w[i]; if (u < 0) return i; } } return last; }
+function grammar(seed) {
+  const r = rng(seed), rules = [], phi = [];
+  for (let d = 0; d < LTOP; d++) { const p = perm(V * V, r); rules.push(range(V).map(a => range(M).map(k => [Math.floor(p[a * M + k] / V), p[a * M + k] % V]))); phi.push(perm(V, r).map(x => x % RHO)); }
+  return {rules, phi};
+}
+function inside(g) {
+  const N = [range(V).map(() => Float64Array.of(1))];
+  for (let d = 1; d <= LTOP; d++) {
+    const q = RHO ** (d - 1), Q = RHO ** d;
+    N.push(range(V).map(a => { const out = new Float64Array(Q * Q);
+      for (const [b, c] of g.rules[d - 1][a]) { const fb = g.phi[d - 1][b], fc = g.phi[d - 1][c], Nb = N[d - 1][b], Nc = N[d - 1][c];
+        for (let i = 0; i < q; i++) for (let j = 0; j < q; j++) { let s = 0; for (let f = 0; f < q; f++) s += Nb[i * q + f] * Nc[f * q + j]; out[(fb * q + i) * Q + fc * q + j] += s; } }
+      return out; }));
+  }
+  return N;
+}
+function empty(L) { return {sym: range(L + 1).map(d => new Array(2 ** (L - d))), prod: range(L + 1).map(d => new Array(2 ** (L - d))), edge: range(L + 1).map(d => new Array(2 ** (L - d)))}; }
+const cdfs = new Map();                                                       // cumulative weights of (root symbol, left edge, right edge), per grammar and depth
+function rootPick(N, L, r) {
+  let c = cdfs.get(N) || new Map(); cdfs.set(N, c);
+  if (!c.has(L)) { const Q = RHO ** L, w = new Float64Array(V * Q * Q); let s = 0; for (let a = 0; a < V; a++) for (let x = 0; x < Q * Q; x++) { s += N[L][a][x]; w[a * Q * Q + x] = s; } c.set(L, w); }
+  const w = c.get(L), u = r() * w[w.length - 1]; let lo = 0, hi = w.length - 1;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (w[mid] > u) hi = mid; else lo = mid + 1; }
+  return lo;
+}
+function writeExact(g, N, L, r) {
+  const Q = RHO ** L, j = rootPick(N, L, r), t = empty(L); t.sym[L][0] = Math.floor(j / (Q * Q)); t.edge[L][0] = [Math.floor(j / Q) % Q, j % Q];
+  for (let d = L; d >= 1; d--) {
+    const q = RHO ** (d - 1);
+    for (let i = 0; i < 2 ** (L - d); i++) {
+      const a = t.sym[d][i], [lx, rx] = t.edge[d][i], lt = Math.floor(lx / q), lr = lx % q, rt = Math.floor(rx / q), rr = rx % q, ww = new Float64Array(M * q);
+      g.rules[d - 1][a].forEach(([b, c], k) => { if (g.phi[d - 1][b] !== lt || g.phi[d - 1][c] !== rt) return; for (let f = 0; f < q; f++) ww[k * q + f] = N[d - 1][b][lr * q + f] * N[d - 1][c][f * q + rr]; });
+      const jj = pick(ww, r), k = Math.floor(jj / q), F = jj % q, [b, c] = g.rules[d - 1][a][k];
+      t.prod[d][i] = k; t.sym[d - 1][2 * i] = b; t.sym[d - 1][2 * i + 1] = c; t.edge[d - 1][2 * i] = [lr, F]; t.edge[d - 1][2 * i + 1] = [F, rr];
+    }
+  }
+  return t;
+}
+function fit(g, N, L, r) {
+  const root = new Float64Array(V), q = range(L + 1).map(d => range(2 ** (L - d)).map(() => range(V).map(() => new Float64Array(M))));
+  for (let s = 0; s < FIT; s++) { const t = writeExact(g, N, L, r); root[t.sym[L][0]]++; for (let d = 1; d <= L; d++) for (let i = 0; i < 2 ** (L - d); i++) q[d][i][t.sym[d][i]][t.prod[d][i]]++; }
+  for (let a = 0; a < V; a++) root[a] /= FIT;
+  for (let d = 1; d <= L; d++) for (const node of q[d]) for (const row of node) { let s = 0; for (const x of row) s += x; for (let k = 0; k < M; k++) row[k] = s ? row[k] / s : 1 / M; }
+  return {root, q};
+}
+function writeReader(g, F, L, r) {
+  const t = empty(L); t.sym[L][0] = pick(F.root, r);
+  for (let d = L; d >= 1; d--) for (let i = 0; i < 2 ** (L - d); i++) { const k = pick(F.q[d][i][t.sym[d][i]], r), [b, c] = g.rules[d - 1][t.sym[d][i]][k]; t.prod[d][i] = k; t.sym[d - 1][2 * i] = b; t.sym[d - 1][2 * i + 1] = c; }
+  return t;
+}
+function readerValid(g, F, L) {
+  let W = range(2 ** L).map(() => range(V).map(() => Float64Array.of(1)));
+  for (let d = 1; d <= L; d++) {
+    const q = RHO ** (d - 1), Q = RHO ** d;
+    W = range(2 ** (L - d)).map(i => range(V).map(a => { const out = new Float64Array(Q * Q), Wl = W[2 * i], Wr = W[2 * i + 1];
+      g.rules[d - 1][a].forEach(([b, c], k) => { const p = F.q[d][i][a][k]; if (!p) return; const fb = g.phi[d - 1][b], fc = g.phi[d - 1][c];
+        for (let x = 0; x < q; x++) for (let y = 0; y < q; y++) { let s = 0; for (let f = 0; f < q; f++) s += Wl[b][x * q + f] * Wr[c][f * q + y]; out[(fb * q + x) * Q + fc * q + y] += p * s; } });
+      return out; }));
+  }
+  let tot = 0; for (let a = 0; a < V; a++) { let s = 0; for (const x of W[0][a]) s += x; tot += F.root[a] * s; }
+  return tot;
+}
+function bonds(g, t, L) { const out = []; for (let j = 0; j <= L - 2; j++) for (let i = 1; i + 1 < 2 ** (L - j); i += 2) out.push({j, i, ok: g.phi[j][t.sym[j][i]] === g.phi[j][t.sym[j][i + 1]]}); return out; }
+const fmt = x => x >= 0.995 ? '100%' : x >= 0.001 ? (100 * x).toPrecision(2) + '%' : x.toExponential(1).replace('e', '·10^');
+function el(parent, tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; parent.append(e); return e; }
+
+let seed = 1, g, N, L = 4, fitted = {}, counts, last;
+const r = rng(20261115);
+function reset() { counts = {exact: [0, 0], reader: [0, 0]}; $('wCountE').textContent = '–'; $('wCountR').textContent = '–'; }
+function fitFor(d) { if (!fitted[d]) { const F = fit(g, N, d, rng(seed * 101 + d)); fitted[d] = {F, valid: readerValid(g, F, d)}; } return fitted[d]; }
+function newGrammar() { g = grammar(seed); N = inside(g); fitted = {}; reset(); }
+function info(L) {
+  const st = []; for (let a = 0; a < V; a++) { let n = 0; for (const x of N[L - 1][a]) n += x > 0; if (n) st.push(n); }
+  $('wHoldE').innerHTML = `its symbol and one promised feature per height below it, on each edge: up to ρ<sup>2l</sup> combinations per symbol (at height ${L - 1}: ${RHO ** (2 * (L - 1))}; this grammar uses ${(st.reduce((s, x) => s + x, 0) / st.length).toFixed(1)} on average)`;
+  $('wExactR').textContent = fmt(fitFor(L).valid);
+}
+function draw(t, writer) {
+  const svg = $('wTree'), W = 760, top = 22, dy = 54, H = top + dy * L + 28, sp = (W - 30) / 2 ** L, rad = Math.min(13, 0.42 * sp);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.replaceChildren();
+  const X = (d, i) => 15 + (i + 0.5) * 2 ** d * sp, Y = d => top + dy * (L - d);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  el(svg, 'line', {x1: W / 2, x2: W / 2, y1: 4, y2: H - 6, stroke: css('--muted'), 'stroke-dasharray': '4 4'});
+  for (let d = 1; d <= L; d++) for (let i = 0; i < 2 ** (L - d); i++) for (const c of [2 * i, 2 * i + 1]) el(svg, 'line', {x1: X(d, i), y1: Y(d), x2: X(d - 1, c), y2: Y(d - 1), stroke: '#999', 'stroke-width': 1.2});
+  const bs = bonds(g, t, L);
+  for (const b of bs) el(svg, 'line', {x1: X(b.j, b.i), x2: X(b.j, b.i + 1), y1: Y(b.j), y2: Y(b.j), stroke: b.ok ? css('--ok') : css('--bad'), 'stroke-width': b.ok ? 2.5 : 4});
+  const nodes = [];
+  for (let d = 0; d <= L; d++) for (let i = 0; i < 2 ** (L - d); i++) {
+    const a = t.sym[d][i], f = d < L - 1 ? g.phi[d][a] : null, grp = el(svg, 'g', {});
+    const c = el(grp, 'circle', {cx: X(d, i), cy: Y(d), r: rad, fill: f === null ? '#ffffff' : FEAT[f][0], stroke: '#0b0b0b', 'stroke-width': 1});
+    el(grp, 'text', {x: X(d, i), y: Y(d) + 4, 'text-anchor': 'middle', fill: f === null ? '#0b0b0b' : FEAT[f][1]}, String(a + 1));
+    nodes.push({d, i, c}); grp.style.cursor = 'default';
+    grp.addEventListener('mouseenter', () => hover(t, writer, d, i, nodes)); grp.addEventListener('mouseleave', () => { for (const n of nodes) n.c.setAttribute('stroke-width', 1); status(t, writer, bs); });
+  }
+  status(t, writer, bs);
+}
+function status(t, writer, bs) {
+  const bad = bs.filter(b => !b.ok).length;
+  $('wStatus').textContent = `Written ${writer === 'exact' ? 'with promises' : "with the reader's states"}: ${bs.length - bad} of ${bs.length} agreements hold${bad ? `, ${bad} broken: the reader rejects this string with ${bad} lookup${bad > 1 ? 's' : ''} that fail.` : ', so the reader accepts it.'}`;
+}
+function hover(t, writer, d, i, nodes) {
+  const edgeL = j => i * 2 ** (d - j), edgeR = j => (i + 1) * 2 ** (d - j) - 1;
+  for (const n of nodes) if (n.d < d && (n.i === edgeL(n.d) || n.i === edgeR(n.d))) n.c.setAttribute('stroke-width', 3);
+  let s = `Height ${d}, symbol ${t.sym[d][i] + 1}.`;
+  if (d === 0) s += ' A token.';
+  else if (writer === 'exact') { const [lx, rx] = t.edge[d][i], dig = x => range(d).map(j => Math.floor(x / RHO ** j) % RHO + 1).join(' '); s += ` It was also told the features of the nodes on its edges (thick outlines), from the tokens up: left ${dig(lx)}, right ${dig(rx)}.`; }
+  else s += ' It was told nothing else, so the nodes on its edges (thick outlines) are written without regard for their neighbours outside.';
+  $('wStatus').textContent = s;
+}
+function write(writer) {
+  const t = writer === 'exact' ? writeExact(g, N, L, r) : writeReader(g, fitFor(L).F, L, r), ok = bonds(g, t, L).every(b => b.ok);
+  counts[writer][0] += ok; counts[writer][1] += 1; last = [t, writer]; draw(t, writer); show();
+}
+function show() { for (const [k, id] of [['exact', 'wCountE'], ['reader', 'wCountR']]) { const [a, n] = counts[k]; if (n) $(id).textContent = `${a.toLocaleString('en-GB')} of ${n.toLocaleString('en-GB')}`; } }
+function many() {
+  const F = fitFor(L).F;
+  for (let s = 0; s < MANY; s++) { counts.exact[0] += bonds(g, writeExact(g, N, L, r), L).every(b => b.ok); counts.reader[0] += bonds(g, writeReader(g, F, L, r), L).every(b => b.ok); }
+  counts.exact[1] += MANY; counts.reader[1] += MANY; show();
+}
+function start() {
+  const block = $('writeBlock'); if (!block || block.closest('[data-ol-embed-hidden]')) return;
+  newGrammar(); info(L); write('exact');
+  $('wExact').addEventListener('click', () => write('exact')); $('wReader').addEventListener('click', () => write('reader'));
+  $('wMany').addEventListener('click', many);
+  $('wNew').addEventListener('click', () => { seed += 1; newGrammar(); info(L); write('exact'); });
+  $('wDepth').addEventListener('change', e => { L = +e.target.value; reset(); info(L); write('exact'); });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once: true}); else start();
+})();
+</script>
+</figure>
+<p class="small">The writer with the reader's states is fitted to 20,000 exact strings of the target at the chosen depth, and its exact share of valid strings is computed from its tables. "New grammar" draws another random grammar of the same size.</p>
+
+<h3>Design rules</h3>
+<ul>
+<li><strong>Every level, not only the leaves.</strong> Agreements at the leaves alone are an Ising chain under a tree. A node carries one feature per edge, \(\rho^2\) states at any height. That is a constant factor; the README asks for a deficit that grows with depth.</li>
+<li><strong>\(\rho<m\).</strong> A string of \(n=2^L\) tokens has \(n-1\) production choices worth \(\log m\) each and \(n-L-1\) agreements that cost about \(\log\rho\) each. For \(\rho\ge m\) the entropy per token vanishes.</li>
+<li><strong>Nothing beyond two-body and nearest-neighbour.</strong> Longer range or higher order would only put more bonds across each cut and move the model towards the square lattice, where a one-pass writer is out of reach at any depth.</li>
+</ul>
+
+<h3>Limits</h3>
+<p>These are counts of what has to be held, not of learning: they do not say how many examples a reader or a writer needs. They hold for a writer that writes the two halves of a block independently given the state of its node, the README's top-down generator. A writer that revises its output over several passes trades states for time. So does writing and checking: joining two valid halves of a node of height \(l\) and keeping the join if the reader finds the agreements at the cut intact succeeds with probability about \(\rho^{-(l-1)}\) ("two valid halves fit"), so a learner with the reader's states can still make valid strings, at about \(\rho^{l-1}\) tries per join. That trade is what practice can use.</p>
+</section>
+</article>
+<footer>
+<p>Built {{built}} by <code>experiments/model4_cross_couplings_page.py</code> from <code>experiments/model4_cross_couplings_page.html</code>; it overwrites this page, so edits made here are lost on a rebuild. Counts: <code>experiments/rhm_cross_coupling_gap.py</code>. Figures 1, 2 and 4 and the fitted writer: <code>experiments/model4_cross_couplings_figures.py</code>, numbers in <code>/nfs/gatsbystor/jbauer/generative-learning/model4_cross_couplings/numbers.json</code>. Figure 3: <code>experiments/rhm_cross_coupling_schematic.py</code>.</p>
+</footer>
+</main>
+</body>
+</html>

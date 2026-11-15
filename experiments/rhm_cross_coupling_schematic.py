@@ -1,4 +1,4 @@
-"""Schematic for tex/model_4_cross_couplings.tex. The RHM as a graph of interactions between symbols, with agreement between neighbouring nodes
+"""Schematic for tex/model_4_cross_couplings.html (Figure 3). The RHM as a graph of interactions between symbols, with agreement between neighbouring nodes
 that are not siblings at the leaves only (top) and at every level (bottom); the grey lines alone are the plain RHM. Marked: the cut between
 the two halves of the root and the agreements that cross it (what a writer that writes the two halves independently has to carry).
 Usage: python rhm_cross_coupling_schematic.py -> tex/figures/model4-cross-couplings.svg (transparent), reports/model4-cross-couplings.png"""

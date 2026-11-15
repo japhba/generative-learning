@@ -14,7 +14,7 @@ rates   own share 1/2 (teacher only: 0), teacher step in units of ETA (x1 as bef
         At the end: log-probability deficit of a valid derivation by the number of its table rows that the stored set never showed.
 shares  practice and wake-sleep at other own shares, same T (argument: teacher step in units of ETA)
 Usage: python experiments/cross_coupling_depth3_mechanism.py lead | rates | shares <step> | report
--> /var/tmp/jbauer/generative_practice_reading/cross_coupling_depth3_mechanism_{lead,rates,shares}.npz, reports/cross-coupling-depth3-mechanism-{lead,rates,rows,shares}.png"""
+-> /var/tmp/jbauer/generative_practice_reading/cross_coupling_depth3_mechanism_{lead,rates,shares}.npz, reports/cross-coupling-depth3-mechanism-{lead,rates,rows,shares,map}.png"""
 
 import sys
 from multiprocessing import Pool
@@ -119,7 +119,7 @@ def report_rates():
             print(f"   {arm:38s} {np.round(np.nanmedian(e[0, :, k, :4], 0), 2)}")
             if not arm.endswith("x4"): axes2[row].plot(range(4), np.nanmedian(e[0, :, k, :4], 0), marker="o", color=style[arm][0], linestyle=style[arm][1], label=arm)
         axes2[row].set(xlabel="rows of the derivation that the stored set never showed", xticks=range(4), xticklabels=["0", "1", "2", "3 or more"], title=f"writer as {form}, stored set of {SETS[0]}")
-    fig.supxlabel("samples after watching (re-read teacher samples and own samples)")
+    axes[-1, 1].set_xlabel("samples after watching (re-read teacher samples and own samples)")
     for ax in axes[:, 0]: ax.set_ylabel("population KL, nats")
     axes2[0].set_ylabel("log-probability missing, nats"); handles, labels = axes[0, 0].get_legend_handles_labels(); fig.legend(handles, labels, loc="outside lower center", ncols=4, frameon=False)
     handles, labels = axes2[0].get_legend_handles_labels(); fig2.legend(handles, labels, loc="outside lower center", ncols=3, frameon=False)
@@ -142,6 +142,20 @@ def report_shares():
     handles, labels = axes[0, 0].get_legend_handles_labels(); fig.legend(handles, labels, loc="outside lower center", ncols=3, frameon=False); fig.savefig(PNG / "cross-coupling-depth3-mechanism-shares.png", dpi=130); print(PNG / "cross-coupling-depth3-mechanism-shares.png")
 
 
+def report_map():   # the same scan resolved in exposures: x = samples after watching, y = own share, colour = median population KL (README, Strategy)
+    from matplotlib.colors import LinearSegmentedColormap, LogNorm
+    d = np.load(OUT / "cross_coupling_depth3_mechanism_shares.npz"); sets, learners = tuple(int(n) for n in d["stored"]), ("practice", "wake-sleep"); ticks = [MARKS.index(m) for m in (1000, 8000, 64000, T)]
+    fig, axes = plt.subplots(len(FORMS), len(learners) * len(sets), sharex=True, sharey=True, constrained_layout=True, figsize=(6.4 * 2.4, 4.8 * 1.5)); cmap, norm = LinearSegmentedColormap.from_list("blues", ["#cde2fb", "#3987e5", "#0d366b"]), LogNorm(0.005, 20)
+    for row, form in enumerate(FORMS):
+        for n, name in enumerate(learners):
+            for col, n0 in enumerate(sets):
+                ax = axes[row, n * len(sets) + col]; kl = np.median(d[f"{form} curves"][col, :, n * len(SHARES):(n + 1) * len(SHARES), :, 2], 0); im = ax.pcolormesh(np.arange(len(MARKS) + 1) - 0.5, np.arange(len(SHARES) + 1) - 0.5, kl, cmap=cmap, norm=norm)
+                ax.set(title=f"{name}, {form}, stored set of {n0}", xticks=ticks, xticklabels=["1k", "8k", "64k", "200k"], yticks=range(len(SHARES)), yticklabels=["1/8", "1/4", "1/2", "3/4", "7/8", "15/16", "1"])
+    for ax in axes[-1]: ax.set_xlabel("samples after watching")
+    for ax in axes[:, 0]: ax.set_ylabel("own share")
+    fig.colorbar(im, ax=axes, label="population KL, nats"); fig.savefig(PNG / "cross-coupling-depth3-mechanism-map.png", dpi=130); print(PNG / "cross-coupling-depth3-mechanism-map.png")
+
+
 if __name__ == "__main__":
     mode = sys.argv[1]
     if mode == "lead":
@@ -149,5 +163,5 @@ if __name__ == "__main__":
         report_lead()
     if mode == "rates": sweep(RATES, SETS, "rates"); report_rates()
     if mode == "shares":
-        step = int(sys.argv[2]); sets = SETS[:2]; sweep({f"{name} {s}": ("named", rule, step, s) for name, rule in (("practice", OWN), ("wake-sleep", "naming")) for s in SHARES}, sets, "shares", step=step, stored=sets); report_shares()
-    if mode == "report": report_lead(); report_rates(); report_shares()
+        step = int(sys.argv[2]); sets = SETS[:2]; sweep({f"{name} {s}": ("named", rule, step, s) for name, rule in (("practice", OWN), ("wake-sleep", "naming")) for s in SHARES}, sets, "shares", step=step, stored=sets); report_shares(); report_map()
+    if mode == "report": report_lead(); report_rates(); report_shares(); report_map()

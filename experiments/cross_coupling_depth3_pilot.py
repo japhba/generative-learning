@@ -19,6 +19,9 @@ Reader, all blank at the start:
             u3 from the root cut's two tokens plus its two level-1 symbols (two tables, logits added)
 Steps:
   teacher sample, unnamed / named / inferred   codes from the prior / read off by the naming layers / the writer's exact posterior (not local)
+  teacher sample, sorted                       codes read off by a reader that needs no own samples (class Sorter; used by cross_coupling_depth3_maps.py): what
+                                               met at a cut is linked into one feature class, a spare unit is named by the class at its cut, a production
+                                               unit by the order in which the symbol's productions of that class first appeared
   own sample, naming                           the naming layers learn the codes the sample was written with
   own sample, accepted if legible              a row whose production and adjacent cuts the checker accepts steps towards what it wrote, times the naming
                                                layers' probability of the codes that address the row (in units of chance, capped at CAP)
@@ -136,6 +139,33 @@ class Reader:
         return [self.prod3[a, p3], self.prod2[p3 // V, pL] and c1, self.prod2[p3 % V, pR] and c1] + [self.prod1[ys[i], ts[i]] and c0[i] and c0[i + 1] for i in range(4)]
 
 
+class Sorter(Reader):
+    def __init__(self): super().__init__(); self.link, self.first = [np.arange(2 * V), np.arange(2 * V)], {}   # links per level over (left of a cut, right of a cut); productions in order of appearance
+
+    def root(self, level, i):
+        while self.link[level][i] != i: i = self.link[level][i]
+        return i
+
+    def kind(self, level, i):   # feature class of token / level-1 symbol i (index + V if it stands right of a cut): rank of its group among the groups that hold more than one member
+        roots = [self.root(level, n) for n in range(2 * V)]; groups = sorted(r for r in set(roots) if roots.count(r) > 1); return groups.index(roots[i]) % RHO if roots[i] in groups else 0
+
+    def see(self, tree):
+        super().see(tree); a, p3, pL, pR, *ts = tree
+        for level, pairs in ((0, [(ts[i] % V, ts[i + 1] // V) for i in range(3)]), (1, [(pL % V, pR // V)])):
+            for left, right in pairs: i, k = sorted((self.root(level, left), self.root(level, V + right))); self.link[level][k] = i
+        for key, p in ((("root", a), p3), (("left", p3 // V), pL), (("right", p3 % V), pR), *(((i, y), t) for i, y, t in zip(range(4), (pL // V, pL % V, pR // V, pR % V), ts))):
+            if p not in self.first.setdefault(key, []): self.first[key].append(p)
+
+    def sort(self, tree):   # one-hot names for [k3, u3, k2 left, k2 right, u2 left, u2 right, j x 4]; the two inner level-1 nodes have one production per code, so every j is credited
+        a, p3, pL, pR, *ts = tree; ys = (pL // V, pL % V, pR // V, pR % V); edge = {("left", p3 // V): lambda p: self.kind(1, p % V), ("right", p3 % V): lambda p: self.kind(1, V + p // V),
+                                                                                (0, ys[0]): lambda p: self.kind(0, p % V), (3, ys[3]): lambda p: self.kind(0, V + p // V)}
+
+        def rank(key, p): seen = self.first[key]; return sum(edge[key](q) == edge[key](p) for q in seen[:seen.index(p)]) if key in edge else seen.index(p)
+
+        return [onehot(rank(("root", a), p3) % K3, K3), onehot(RHO * self.kind(1, pL % V) + self.kind(0, ts[1] % V), U3), onehot(rank(("left", p3 // V), pL) % K2, K2), onehot(rank(("right", p3 % V), pR) % K2, K2),
+                onehot(self.kind(0, ts[0] % V), U2), onehot(self.kind(0, ts[2] % V), U2), onehot(rank((0, ys[0]), ts[0]) % J, J), np.full(J, 1 / J), np.full(J, 1 / J), onehot(rank((3, ys[3]), ts[3]) % J, J)]
+
+
 def score(wr, rd, w):
     a, p3, pL, pR, *ts = w.trees.T; ys = (pL // V, pL % V, pR // V, pR % V); F2, F1 = wr.full(); A3, B2, C1 = soft(wr.D3).mean(1), soft(F2).mean(3), soft(F1).mean(4)
     leaf = [C1[i][ys[i], :, :, ts[i]].transpose(0, 2, 1) for i in range(4)]   # (derivation, u3, u2)
@@ -153,7 +183,7 @@ def teacher(wr, rd, w, rng, how):
         joint = (m2[0] * m2[1])[:, None, None] * (m1[0] * m1[1]).T[:, :, None] * (m1[2] * m1[3]).T[:, None, :]; joint = joint / joint.sum(); side = [joint.sum(2).T, joint.sum(1).T]   # (u2, u3)
         rk3, W2, W1 = P3[:, p3] / P3[:, p3].sum(), [joint.sum((1, 2))[:, None] * l2[s] / m2[s][:, None] for s in range(2)], [side[i // 2][:, :, None] * l1[i] / m1[i][:, :, None] for i in range(4)]
     else:
-        sizes = (K3, U3, K2, K2, U2, U2, J, J, J, J); r = [soft(sum(parts)) for parts in rd.names(tree)] if how == "named" else [onehot(rng.integers(n), n) for n in sizes]
+        sizes = (K3, U3, K2, K2, U2, U2, J, J, J, J); r = [soft(sum(parts)) for parts in rd.names(tree)] if how == "named" else rd.sort(tree) if how == "sorted" else [onehot(rng.integers(n), n) for n in sizes]
         rk3, W2, W1 = r[0], [r[1][:, None] * r[2 + s][None, :] for s in range(2)], [r[4 + i // 2][:, None, None] * r[1][None, :, None] * r[6 + i][None, None, :] for i in range(4)]
     wr.D3[a] += ETA * rk3[:, None] * (EYE[p3] - P3)
     for s, (sym, p) in enumerate(((p3 // V, pL), (p3 % V, pR))): wr.add2(s, sym, ETA * W2[s][:, :, None] * (EYE[p] - P2[s]))

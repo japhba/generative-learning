@@ -175,7 +175,7 @@ def score(wr, rd, w):
             mi(n3, w.f0), mi(n3, w.f1), (mi(n2[0], w.fL) + mi(n2[1], w.fR)) / 2, *(sum(x[:, v].sum() / qt.sum() * mi(x[:, v], f) for v in range(U3)) for x, f in ((q.sum(3), w.fL), (q.sum(2), w.fR))))
 
 
-def teacher(wr, rd, w, rng, how):
+def teacher(wr, rd, w, rng, how, eta=ETA):
     tree = w.trees[rng.integers(len(w.trees))]; rd.see(tree); a, p3, pL, pR, *ts = tree; ys = (pL // V, pL % V, pR // V, pR % V)
     P3, P2, P1 = soft(wr.D3[a]), [soft(wr.rows2(0, p3 // V)), soft(wr.rows2(1, p3 % V))], [soft(wr.rows1(i, ys[i])) for i in range(4)]   # (k3, .), (u3, k2, .), (u2, u3, j, .)
     if how == "inferred":
@@ -185,9 +185,9 @@ def teacher(wr, rd, w, rng, how):
     else:
         sizes = (K3, U3, K2, K2, U2, U2, J, J, J, J); r = [soft(sum(parts)) for parts in rd.names(tree)] if how == "named" else rd.sort(tree) if how == "sorted" else [onehot(rng.integers(n), n) for n in sizes]
         rk3, W2, W1 = r[0], [r[1][:, None] * r[2 + s][None, :] for s in range(2)], [r[4 + i // 2][:, None, None] * r[1][None, :, None] * r[6 + i][None, None, :] for i in range(4)]
-    wr.D3[a] += ETA * rk3[:, None] * (EYE[p3] - P3)
-    for s, (sym, p) in enumerate(((p3 // V, pL), (p3 % V, pR))): wr.add2(s, sym, ETA * W2[s][:, :, None] * (EYE[p] - P2[s]))
-    for i in range(4): wr.add1(i, ys[i], ETA * W1[i][:, :, :, None] * (EYE[ts[i]] - P1[i]))
+    wr.D3[a] += eta * rk3[:, None] * (EYE[p3] - P3)
+    for s, (sym, p) in enumerate(((p3 // V, pL), (p3 % V, pR))): wr.add2(s, sym, eta * W2[s][:, :, None] * (EYE[p] - P2[s]))
+    for i in range(4): wr.add1(i, ys[i], eta * W1[i][:, :, :, None] * (EYE[ts[i]] - P1[i]))
 
 
 def practice(wr, rd, w, rng, how):

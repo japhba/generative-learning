@@ -17,9 +17,10 @@ Steps:
                              naming layers' probability of that row's code, in units of chance)
   own sample, verdict        failure-only step on every rejected row
 Scores are exact (enumeration) for the equivalent table writer: valid share, share of the valid strings written, KL(target || writer),
-I(u; feature at the cut) / H(feature).
+I(u; feature at the cut) / H(feature). Reading of teacher strings: I(name; feature at the cut) / H(feature), the name drawn from the naming layer of u
+on the cut of a teacher string (0 before any practice: the layer starts blank).
 Usage: python experiments/cross_coupling_prior_pilot.py [report] -> /var/tmp/jbauer/generative_practice_reading/cross_coupling_prior_pilot.npz,
-reports/cross-coupling-prior-pilot.png (about 6 minutes on 32 cores)"""
+reports/cross-coupling-prior-pilot.png (about 5 minutes on 32 cores)"""
 
 import sys
 from multiprocessing import Pool
@@ -37,9 +38,9 @@ U, J, N0, T, EVERY, WORLDS, CONDS = RHO, M // RHO, 30000, 60000, 1500, 32, ("bal
 # arm: (rule for teacher strings, one teacher string in every k samples (0: none), rule for own samples)
 ARMS = {"fresh": ("unnamed", 1, None), "fresh, codes inferred (not local)": ("inferred", 1, None), "half own: naming": ("named", 2, "naming"), "own only: accepted": (None, 0, "keep"),
         "own only: accepted, verdict": (None, 0, "keep+verdict"), "own only: naming, accepted if legible": (None, 0, "naming+keep legible"),
-        "own only: naming, accepted if legible, verdict": (None, 0, "naming+keep legible+verdict")}
+        "own only: naming, accepted if legible, verdict": (None, 0, "naming+keep legible+verdict"), "1 in 16 fresh: naming, accepted if legible": ("named", 16, "naming+keep legible")}
 PLOTTED = [arm for arm in ARMS if "verdict" not in arm]
-METRICS = ("share of own strings that are valid", "share of the valid strings written", "KL(target || writer), nats", "what u says about the cut")
+METRICS = ("share of own strings that are valid", "share of the valid strings written", "KL(target || writer), nats", "what u says about the cut", "teacher strings: what the name of u says about the cut")
 ROOT = Path(__file__).resolve().parents[1]; NPZ = Path("/var/tmp/jbauer/generative_practice_reading/cross_coupling_prior_pilot.npz"); PNG = ROOT / "reports/cross-coupling-prior-pilot.png"
 
 
@@ -86,28 +87,33 @@ def practice(wr, rd, w, rng, how):
         if "verdict" in how and not ok: row -= ETA * (EYE[i] - p)
 
 
+def reads(rd, w):
+    x2, x3 = w.trees[:, 2] % V, w.trees[:, 3] // V; q = soft(rd.u[x2, x3]); Jt = np.stack([q[w.phi[x2] == f].sum(0) for f in range(RHO)]) / len(q); Jf, Ju = Jt.sum(1, keepdims=True), Jt.sum(0, keepdims=True); nz = Jt > 0
+    return (Jt[nz] * np.log(Jt[nz] / (Jf * Ju)[nz])).sum() / -(Jf * np.log(Jf)).sum()
+
+
 def run(job):
     seed, cond = job; rng = np.random.default_rng(seed); w = World(rng); start, rd0 = Writer(rng), Reader()
     if cond == "balanced": rebalance(w, rng)
     for t in range(N0): teacher(start, rd0, w, rng, "unnamed")
     out = []
     for arm, (th, k, oh) in ARMS.items():
-        wr, rd, r = start.copy(), Reader(), np.random.default_rng(seed + 1000); rd.seen = rd0.seen.copy(); curve = [score(wr.tables(), w)]
+        wr, rd, r = start.copy(), Reader(), np.random.default_rng(seed + 1000); rd.seen = rd0.seen.copy(); curve = [(*score(wr.tables(), w), reads(rd, w))]
         for t in range(T):
             if k and t % k == 0: teacher(wr, rd, w, r, th)
             else: practice(wr, rd, w, r, oh)
-            if (t + 1) % EVERY == 0: curve.append(score(wr.tables(), w))
+            if (t + 1) % EVERY == 0: curve.append((*score(wr.tables(), w), reads(rd, w)))
         out.append(curve)
     return np.array(out)
 
 
 def report():
-    d = np.load(NPZ); x = np.arange(T // EVERY + 1) * EVERY; fig, axes = plt.subplots(len(CONDS), len(METRICS), sharex=True, constrained_layout=True, figsize=(6.4 * 2.8, 4.8 * 1.5))
+    d = np.load(NPZ); x = np.arange(T // EVERY + 1) * EVERY; fig, axes = plt.subplots(len(CONDS), 4, sharex=True, constrained_layout=True, figsize=(6.4 * 2.8, 4.8 * 1.5))
     for cond, row in zip(CONDS, axes):
         s = d[cond]; print(f"{cond} world: start valid {np.median(s[:, 0, 0, 0]):.3f} written {np.median(s[:, 0, 0, 1]):.2f} KL {np.median(s[:, 0, 0, 2]):.3f}")
         for k, arm in enumerate(ARMS):
-            e = s[:, k, -1]; print(f"   {arm:48s} valid {np.median(e[:, 0]):.3f}  written {np.median(e[:, 1]):.2f} [{np.quantile(e[:, 1], 0.25):.2f}, {np.quantile(e[:, 1], 0.75):.2f}]  KL {np.median(e[:, 2]):.3f} "
-                                    f"[{np.quantile(e[:, 2], 0.25):.3f}, {np.quantile(e[:, 2], 0.75):.3f}]  u about the cut {np.median(e[:, 3]):.2f}  KL at the end below the start in {(e[:, 2] < s[:, k, 0, 2]).sum()}/{len(e)} worlds")
+            e = s[:, k, -1]; print(f"   {arm:50s} valid {np.median(e[:, 0]):.3f}  written {np.median(e[:, 1]):.2f} [{np.quantile(e[:, 1], 0.25):.2f}, {np.quantile(e[:, 1], 0.75):.2f}]  KL {np.median(e[:, 2]):.3f} "
+                                    f"[{np.quantile(e[:, 2], 0.25):.3f}, {np.quantile(e[:, 2], 0.75):.3f}]  u about the cut {np.median(e[:, 3]):.2f}  teacher strings read {np.median(e[:, 4]):.2f} (worlds above 0.9: {(e[:, 4] > 0.9).sum()})  KL at the end below the start in {(e[:, 2] < s[:, k, 0, 2]).sum()}/{len(e)} worlds")
         for j, ax in enumerate(row):
             for n, arm in enumerate(PLOTTED):
                 y = s[:, list(ARMS).index(arm), :, j]; ax.plot(x, np.median(y, 0), color=f"C{n}", linestyle="--" if "not local" in arm else "-", label=arm); ax.fill_between(x, *np.quantile(y, [0.25, 0.75], 0), color=f"C{n}", alpha=0.15, linewidth=0)

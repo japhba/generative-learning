@@ -50,6 +50,12 @@ def main():
     assert all(ob[n]['eta1'] < ob[n]['table'] for n in ('2048', '4096', '8192', '16384')) and ob['1024']['eta1'] > ob['1024']['table'] and all(w == od['worlds'] for w in od['mix_wins_worlds'][i2(18):]) and all(bm[:i2(18)] > np.array(od['flat'][:i2(18)]))
     assert all(np.array(od['clustered']) <= bm) and (mix[:5, i2(19):] < np.array(od['flat'][i2(19):])).all() and 0.25 <= min(od['best_own_share'][i2(18):]) and max(od['best_own_share'][i2(18):]) <= 0.9                                    # claims made in section 6
     assert nums['glock'] == 0 and h['table_wins'] == len(h['total']) and e['16384']['table'] > e['16384']['practice0.8'] and e['32768']['table'] < e['32768']['practice0.8']   # claims made in the text
+    pr = json.loads(Path(sys.argv[1]).with_name('propagation_numbers.json').read_text()); A, Bs, gr = pr['stack']['4096'], pr['stack']['16384'], pr['gradient']; at = lambda r, n: r['own'].index(n)   # section 7
+    gs = np.array(gr['samples']); gt, go = np.array(gr['t1_th0']), np.array(gr['o1_th0']); cross = int(gs[np.flatnonzero(~np.flip(np.cumprod(np.flip(gt >= go - 0.005)).astype(bool)))[-1] + 1]); imin = int(np.argmin(go))
+    nums |= dict(pr_sworlds=A['worlds'], pr_gworlds=gr['worlds'], pr_ao2=pct(A['o2'][0]), pr_at2=pct(A['t2'][0]), pr_ao2m=pct(A['o2'][at(A, 2 ** 16)]), pr_at2m=pct(A['t2'][at(A, 2 ** 16)]), pr_ao2e=pct(A['o2'][-1]), pr_at2e=pct(A['t2'][-1]),
+                 pr_bt2=pct(Bs['t2'][0]), pr_bo2=pct(Bs['o2'][0]), pr_at30=pct(A['t3'][0]), pr_at3e=pct(A['t3'][-1]), pr_bt30=pct(Bs['t3'][0]), pr_bt3e=pct(Bs['t3'][-1]), pr_go1=pct(go[0]), pr_gt1=pct(gt[0]), pr_go1min=pct(go[imin]),
+                 pr_go1min_at=f'{int(gs[imin]):,}', pr_gcross=f'{cross:,}', pr_gt1e=pct(min(gt[-1], go[-1])), pr_gloss=f(gr['loss_th0'][-1]), pr_gt1max1=pct(max(gr['t1_th1'])), pr_gloss1=f(gr['loss_th1'][-1]))
+    assert A['o2'][0] > A['t2'][0] and Bs['t2'][0] > Bs['o2'][0] and A['t3'][0] < 0.01 and Bs['t3'][0] < 0.05 and Bs['t3'][-1] > 0.95 and gt[0] < 0.1 < 0.7 < go[0] and max(gr['t1_th1']) < 0.15 and gt[-1] > 0.95 and go[-1] > 0.95   # claims made in section 7
     html = (ROOT / 'experiments/model5_page.html').read_text()
     for key in sorted(set(re.findall(r'\{\{(\w+)\}\}', html))): html = html.replace('{{' + key + '}}', str(nums[key]))
     head, rest = html.split('<main>', 1); body, tail = rest.split('</main>', 1)

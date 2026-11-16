@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="overlyx" content="article">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>Model 5: lateral verdict</title>
+<style>/*__KATEX_CSS__*/</style>
+<style>
+:root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--ok:#2a78d6;--bad:#e34948;--good:#0ca30c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--ok:#3987e5;--bad:#e66767;--good:#0ca30c}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--link:#86b6ef;--note:#2a2218;--ok:#3987e5;--bad:#e66767;--good:#0ca30c}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:900px;margin:0 auto;padding:0 16px 64px}
+header{padding:48px 0 8px}
+h1{font-size:clamp(1.7rem,4.2vw,2.4rem);line-height:1.15;letter-spacing:-.02em;margin:8px 0 16px}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 12px}
+h3{font-size:1.05rem;margin:22px 0 6px}
+p{margin:0 0 14px}
+a{color:var(--link)}
+section{padding-top:44px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:650}
+.byline{color:var(--ink2);font-size:.92rem}
+.lede{font-size:1.1rem;color:var(--ink2)}
+.small{font-size:.88rem;color:var(--ink2)}
+.takeaways{padding-left:22px;margin:0 0 14px}.takeaways li{margin-bottom:10px}
+ul{padding-left:22px}li{margin-bottom:6px}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+figure{margin:22px 0}
+figure img{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:12px}
+figcaption{font-size:.88rem;color:var(--ink2);margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:6px 0 14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-space:nowrap}
+.table-wrap{overflow-x:auto}
+.counts th,.counts td{text-align:right;font-variant-numeric:tabular-nums}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
+code{overflow-wrap:anywhere}
+figure.widget{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.w-controls{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-bottom:8px;font-size:.9rem}
+.w-controls button,.w-controls select{font:inherit;font-size:.88rem;padding:5px 10px;border-radius:8px;border:1px solid var(--axis);background:var(--bg);color:var(--ink);cursor:pointer}
+.w-controls button:hover{border-color:var(--ink2)}
+.w-controls button.primary{border-color:var(--ok)}
+#wSvg{display:block;width:100%;height:auto}
+#wSvg text{font:11px system-ui,sans-serif;pointer-events:none}
+.w-controls label{display:inline-flex;gap:5px;align-items:center}
+.w-legend .sw{display:inline-block;width:11px;height:11px;margin:0 3px 0 10px;vertical-align:-1px;border-radius:2px}
+.w-legend .sw-dot{background:radial-gradient(circle,var(--ink) 30%,transparent 36%);border:1px solid var(--axis)}
+.w-legend .sw-ok{background:var(--ok)}.w-legend .sw-bad{background:var(--bad)}
+.w-legend .sw-acc{border:2px solid var(--good);border-radius:50%}.w-legend .sw-rej{border:2px solid var(--bad);border-radius:50%}
+.w-status{font-size:.88rem;color:var(--ink2);min-height:2.9em;margin:6px 0 4px}
+.w-stats td,.w-stats th{font-size:.86rem;padding:5px 8px}
+@media (max-width:720px){body{font-size:16px}header{padding-top:28px}section{padding-top:34px}}
+@media print{body{background:#fff}}
+</style>
+</head>
+<body>
+<main>
+<article>
+<header>
+<div class="eyebrow">Generative learning · model 5 · lateral verdict</div>
+<h1>Model 5: pair counts between shallow codes judge the next level, the prior names it</h1>
+<p class="byline">Simulation note, 16 November 2026 (UK time). Claude (Fable 5.2) for Jan Bauer.</p>
+<p class="abstract lede">The open point was how a verdict can depend on deep codes that have not been learned yet. Here it does not read them: the teacher's pair counts \(\mathbf{M}\) between shallow codes judge what a deep unit writes. Class units start as copies of the shallow codes and try further codes, and \(\mathbf{M}\) vetoes the wrong ones. With 4,096 teacher pairs this names all 16 hidden classes in {{locked}} of {{worlds}} worlds and lowers the population loss from {{start}} to {{full}} nats without a further teacher sample; a counted table of the same pairs stays at {{table}}. Credit goes to the units that read the own sample, not to those that wrote it, and practising on a twin's samples of the same quality ends at {{twin}}. There are three limits. Below about four teacher pairs per valid pair, practice makes the learner worse than the table. A reader that recalls through \(\mathbf{M}\) names the classes without any own sample. And at an equal number of samples, fresh teacher pairs counted in a table beat every mix of teacher and own samples.</p>
+</header>
+
+<div class="table-wrap"><table>
+<thead><tr><th>README requirement</th><th>Met</th><th>Where, or why not</th></tr></thead>
+<tbody>
+<tr><td>Tabula rasa; watching trains recognition</td><td>partly</td><td>The shallow codes are given, nothing above them. Watching fills \(\mathbf{M}\) and \(\mathbf{T}\) (section 1).</td></tr>
+<tr><td>Unbiased teacher set</td><td>yes</td><td>Independent draws from the population; every score is on the population.</td></tr>
+<tr><td>Teacher and own samples alike on the surface</td><td>not measured</td><td>Single codes are about equally frequent in both; they differ in which pairs occur.</td></tr>
+<tr><td>Recognition and generation in the same space</td><td>yes</td><td>Both act on pairs of codes.</td></tr>
+<tr><td>Simple, decoupled encoder and decoder</td><td>partly</td><td>The reader is the transpose of the writer, computed from the same weights, not a second set of weights that started equal.</td></tr>
+<tr><td>Depth is necessary</td><td>partly</td><td>A block has two learned layers. Naming one level is what makes the next one countable (section 4).</td></tr>
+<tr><td>Local three-factor rule</td><td>yes</td><td>The weights between the active units move by the verdict minus a fraction of its running mean.</td></tr>
+<tr><td>Generation improves offline, through a loop of generation and recognition</td><td>yes</td><td>{{start}} to {{full}} nats with no teacher sample (section 2).</td></tr>
+<tr><td>Worse without the generative phase</td><td>partly</td><td>Yes against the same learner without practice. No against as many fresh teacher samples (section 3).</td></tr>
+<tr><td>Own samples beat foreign ones of the same quality</td><td>yes</td><td>{{own}} against {{twin}} nats for a twin's samples (section 3).</td></tr>
+<tr><td>A split budget beats teacher samples only</td><td>no</td><td>A counted table of the same number of teacher pairs is better at every budget (section 3).</td></tr>
+<tr><td>The advantage is not the generator's code used as a label</td><td>yes</td><td>Credit by the reader's own reading gives the same result as credit to the writing units (section 2).</td></tr>
+<tr><td>Own samples reach deep units, teacher samples do not yet</td><td>only in a worse learner</td><td>With a threshold on the reader, {{gel_o}} of own and {{gel_t}} of teacher samples pass, but that learner is far worse than one without a threshold (section 2).</td></tr>
+<tr><td>Recognition improves after practice</td><td>yes</td><td>Class units; valid pairs never shown are accepted; teacher strings can be read for the next level (sections 2, 4).</td></tr>
+<tr><td>Recognition infers causes or judges correctness</td><td>yes</td><td>\(\mathbf{M}\) judges, the class units name.</td></tr>
+<tr><td>Not explained by reconstructing the data</td><td>yes</td><td>Practice uses no teacher sample; without the verdict the loss rises to {{no_veto}}.</td></tr>
+<tr><td>Depthwise, not widthwise</td><td>partly</td><td>The deficit sits above the shallow codes. The control with a learner that differs only within a layer was not run.</td></tr>
+<tr><td>Normative grounding</td><td>no</td><td>The rule is a heuristic.</td></tr>
+<tr><td>Interpretable weights</td><td>yes</td><td>A pool is a class, an entry of \(\mathbf{T}\) a production.</td></tr>
+<tr><td>Mapping to in-context learning</td><td>no</td><td>Not addressed.</td></tr>
+<tr><td>Baseline: a reader trained on teacher samples only</td><td>not beaten</td><td>Recall through \(\mathbf{M}\) does at least as well (section 3).</td></tr>
+</tbody></table></div>
+
+<section>
+<h2>1. The model</h2>
+<h3>World</h3>
+<p>The world is one block of a hierarchy. Left and right of a cut, the shallow layer reads a code, \(k\) and \(k'\), each one of \(N=vm\) codes. A code stands for one production of the level below; the layer that reads it off the tokens is taken as learned. The codes fall into \(v\) classes of \(m\), \(c(k)\in\{1,\dots,v\}\): the symbol that the production belongs to. Of the \(v^2\) pairs of classes, \(vm\) are valid. They are the productions of the level above, with every class \(m\) times on each side. The population is uniform over the valid pairs of codes:</p>
+\[p^*(k,k')=\frac{1}{vm^3}\,\mathbb{1}\big[\,(c(k),c(k'))\ \text{valid}\,\big].\]
+<p>All runs use \(v=16\), \(m=4\): 64 codes per side and 1,024 valid pairs out of 4,096. The teacher set is \(n\) independent draws from \(p^*\), so a share \(\rho=1-e^{-n/1024}\) of the valid pairs has been shown. The learner is never told a class.</p>
+<h3>Learner</h3>
+<p>There are \(N\) class units on each side, \(a\) and \(a'\). A pair of units is drawn from a table, and each unit writes a code from its pool:</p>
+\[\begin{gathered}p_\theta(k,k')=\sum_{a,a'}T_{aa'}\,G^L_{ka}\,G^R_{k'a'},\\ \mathbf{G}^L=\operatorname{softmax}_k\boldsymbol{\Lambda}^L,\quad \mathbf{G}^R=\operatorname{softmax}_{k'}\boldsymbol{\Lambda}^R,\quad \mathbf{T}=\operatorname{softmax}_{aa'}\boldsymbol{\Theta}.\end{gathered}\]
+<p>The reader is the transpose. It assigns a pair of codes to one pair of units, \((\hat a,\hat a')\sim q(a,a'\mid k,k')\propto T_{aa'}G^L_{ka}G^R_{k'a'}\). A lateral memory between the shallow codes counts the teacher's pairs, \(M_{kk'}\); it needs no class unit. All weights are bounded, \(|\Lambda|,|\Theta|\le s=6\). At the start unit \(i\) relays code \(i\): \(\Lambda_{ii}=s\), every other entry 0, and \(\boldsymbol{\Theta}=0\).</p>
+<p>The prior is three properties of this form:</p>
+<ul>
+<li><strong>Independent children.</strong> Given the pair of units, the two codes are drawn independently. What a pair of units writes is a rectangle, pool times pool.</li>
+<li><strong>Spread.</strong> Every unit can try any code, and a weight that keeps being rewarded grows to the bound, so that all codes a unit keeps become equally likely.</li>
+<li><strong>Reuse.</strong> A unit has one pool for all the partners that \(\mathbf{T}\) gives it.</li>
+</ul>
+<h3>Watching and practice</h3>
+<p><strong>Watching</strong>, one teacher pair \((k,k')\): \(M_{kk'}\) grows by one, and the weights of the most probable reading \((\hat a,\hat a')\) grow by one, \(\Lambda^L_{k\hat a}\), \(\Lambda^R_{k'\hat a'}\) and \(\Theta_{\hat a\hat a'}\). After watching the learner is close to a table of the pairs it was shown. It is not exactly one: every unit keeps a small chance for every other code, so about a fifth of what it writes is not valid, and its loss is above the table's.</p>
+<p><strong>Practice</strong>, one own sample: draw \((a,a')\sim\mathbf{T}\), \(k\sim G^L_{\cdot a}\), \(k'\sim G^R_{\cdot a'}\). The verdict is whether the teacher ever showed this pair, \(v=\mathbb{1}[M_{kk'}>0]\). The reader assigns the pair to \((\hat a,\hat a')\), and</p>
+\[\Delta\Lambda^L_{k\hat a}=\Delta\Lambda^R_{k'\hat a'}=\Delta\Theta_{\hat a\hat a'}=\eta\,(v-c\,\bar v),\]
+<p>with \(\bar v\) the running mean of the verdict, \(\eta=0.3\) and \(c=0.8\). No teacher sample is used.</p>
+<p>The contrast \(v-c\,\bar v\) is what lets \(\mathbf{M}\) judge a deep choice. Suppose a unit tries a further code \(j\). If \(j\) is of the unit's class, the pair is valid with every partner of the unit and is accepted about as often as the unit's other samples, at a rate near \(\rho\). If \(j\) is of another class, it is accepted only with the partners that the two classes share. With \(c<1\) the first kind grows and the second is pushed out, and a valid pair that the teacher happened not to show does not undo a pool.</p>
+<p><strong>Scores</strong>, all computed exactly from the weights: the population loss \(\mathrm{KL}(p^*\,\Vert\,p_\theta)\) in nats; the share of classes that some unit holds entirely and purely; and the probability of the valid pairs that the teacher never showed, relative to \(p^*\).</p>
+</section>
+
+<section>
+<h2>2. What \(\mathbf{M}\) and the prior do</h2>
+<p>The figure runs the learner in the browser. Blue cells are valid pairs the learner writes, red cells invalid ones, dots the pairs the teacher showed.</p>
+<figure class="widget" id="lockBlock">
+<div class="w-controls">
+<label>Teacher pairs <select id="wN"><option>300</option><option>600</option><option selected>1000</option><option>1500</option><option>3000</option></select></label>
+<label><input type="checkbox" id="wVeto" checked> verdict of \(\mathbf{M}\)</label>
+<label><input type="checkbox" id="wSpread" checked> spread</label>
+<label><input type="checkbox" id="wShare" checked> shared pools</label>
+<button id="wRun" type="button" class="primary">Practise</button>
+<button id="wReset" type="button">Reset</button>
+</div>
+<svg id="wSvg" viewBox="0 0 760 372" role="img" aria-label="Left: a grid of all pairs of a left and a right code. A dot marks a pair the teacher has shown, blue shading a valid pair the learner writes, red shading an invalid pair it writes. Right: the pools of the left class units and the table over pairs of units."></svg>
+<p class="w-status" id="wStatus"></p>
+<p class="small w-legend"><span class="sw sw-dot"></span> shown by the teacher (\(M_{kk'}>0\)) <span class="sw sw-ok"></span> valid pair the learner writes <span class="sw sw-bad"></span> invalid pair it writes <span class="sw sw-acc"></span> own sample accepted <span class="sw sw-rej"></span> vetoed. Heavy lines separate the true classes, which the learner is never told.</p>
+<script>
+// One block of the model: N = V*MC codes per side, classes of MC codes (codes are numbered class by class for the display only), MC*V valid
+// class pairs. Learner as in experiments/model5_lateral_verdict.py (class Grower): pools LL, LR and table TH, additive weights in [LO, S];
+// watch = M += 1 and the reading units raised; practice = a pair of units writes, M says seen or not, the units that read the pair move by
+// ETA (v - C vbar). "shared pools" off: one unit per pair the teacher showed, with two pools of its own. OverLyX shows an article's block by
+// loading the whole page in a frame with the other blocks hidden, so the widget starts only where it is shown.
+(() => {
+'use strict';
+const V = 12, MC = 3, N = V * MC, S = 6, LO = -6, ETA = 0.3, ETAW = 1, C = 0.75, PER_FRAME = 3000, NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+function rng(s) { return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const range = n => Array.from({length: n}, (_, i) => i);
+function perm(n, r) { const a = range(n); for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pick(w, r) { let t = 0; for (let i = 0; i < w.length; i++) t += w[i]; let u = r() * t; for (let i = 0; i < w.length; i++) { u -= w[i]; if (u < 0) return i; } return w.length - 1; }
+function softmax(row) { let mx = -Infinity; for (const x of row) if (x > mx) mx = x; const o = new Float64Array(row.length); let z = 0; for (let i = 0; i < row.length; i++) { o[i] = Math.exp(row[i] - mx); z += o[i]; } for (let i = 0; i < o.length; i++) o[i] /= z; return o; }
+const cls = k => Math.floor(k / MC), clamp = x => Math.max(LO, Math.min(S, x));
+let r, B, valid, nValid, M, LL, LR, TH, units, vbar, own, running = false, flashes = [], cells = [], poolCells = [], tabCells = [], frame = 0;
+const opt = () => ({veto: $('wVeto').checked, spread: $('wSpread').checked, share: $('wShare').checked, n: +$('wN').value});
+
+function world() {
+  const q = rng(7);
+  for (;;) { B = range(V).map(() => new Uint8Array(V)); for (let j = 0; j < MC; j++) perm(V, q).forEach((b, a) => { B[a][b] = 1; }); let n = 0; for (const row of B) for (const x of row) n += x; if (n === V * MC) break; }
+  valid = range(N).map(k => Uint8Array.from(range(N), kp => B[cls(k)][cls(kp)])); nValid = V * MC * MC * MC;
+}
+function pool(seed, o) { const p = new Float64Array(N).fill(o.spread ? 0 : LO); p[seed] = S; return p; }
+function tables() {                                                       // pools, table and U[a][k'] = sum_a' T[a][a'] G_R[k'|a']
+  const GL = LL.map(softmax), GR = LR.map(softmax);
+  if (!opt().share) return {GL, GR};
+  const T = softmax(TH), U = range(N).map(() => new Float64Array(N)), cdf = new Float64Array(N * N); let z = 0;
+  for (let a = 0; a < N; a++) for (let b = 0; b < N; b++) { const t = T[a * N + b]; z += t; cdf[a * N + b] = z; if (t > 1e-9) for (let k = 0; k < N; k++) U[a][k] += t * GR[b][k]; }
+  return {GL, GR, T, U, cdf};
+}
+function read(t, k, kp, hard) {                                           // the units that read (k, k'): one winner of T G_L G_R
+  const wa = new Float64Array(N), wb = new Float64Array(N); for (let a = 0; a < N; a++) wa[a] = t.GL[a][k] * t.U[a][kp];
+  const best = w => w.indexOf(Math.max(...w)), a = hard ? best(wa) : pick(wa, r); for (let b = 0; b < N; b++) wb[b] = t.T[a * N + b] * t.GR[b][kp];
+  return [a, hard ? best(wb) : pick(wb, r)];
+}
+function reset() {
+  const o = opt(); r = rng(11); M = range(N).map(() => new Uint16Array(N)); vbar = 1; own = 0; flashes = []; running = false; $('wRun').textContent = 'Practise';
+  LL = o.share ? range(N).map(i => pool(i, o)) : []; LR = o.share ? range(N).map(i => pool(i, o)) : []; TH = new Float64Array(N * N); units = new Map();
+  const rules = []; for (let a = 0; a < V; a++) for (let b = 0; b < V; b++) if (B[a][b]) rules.push([a, b]);
+  for (let i = 0; i < o.n; i++) {                                         // watching
+    const [a, b] = rules[Math.floor(r() * rules.length)], k = a * MC + Math.floor(r() * MC), kp = b * MC + Math.floor(r() * MC); M[k][kp]++;
+    if (!o.share) { if (!units.has(k * N + kp)) { units.set(k * N + kp, 1); LL.push(pool(k, o)); LR.push(pool(kp, o)); } continue; }
+    const [ua, ub] = read(tables(), k, kp, true); LL[ua][k] = clamp(LL[ua][k] + ETAW); LR[ub][kp] = clamp(LR[ub][kp] + ETAW); TH[ua * N + ub] = clamp(TH[ua * N + ub] + ETAW);
+  }
+  draw();
+}
+function practise(n) {
+  const o = opt(); let t = o.share ? tables() : null;
+  for (let i = 0; i < n; i++) {
+    if (o.share && i % 32 === 31) t = tables();
+    let a, b, k, kp;
+    if (o.share) { const u = r(); let lo = 0, hi = N * N - 1; while (lo < hi) { const mid = lo + hi >> 1; if (t.cdf[mid] > u) hi = mid; else lo = mid + 1; } a = Math.floor(lo / N); b = lo % N; k = pick(t.GL[a], r); kp = pick(t.GR[b], r); }
+    else { a = b = Math.floor(r() * LL.length); k = pick(softmax(LL[a]), r); kp = pick(softmax(LR[b]), r); }
+    const seen = M[k][kp] > 0, v = o.veto ? +seen : 1, d = ETA * (v - C * vbar); vbar += 0.0003 * (v - vbar);
+    if (o.share) { [a, b] = read(t, k, kp, false); TH[a * N + b] = clamp(TH[a * N + b] + d); }
+    LL[a][k] = clamp(LL[a][k] + d); LR[b][kp] = clamp(LR[b][kp] + d);
+    if (n - i <= 10) flashes.push([k, kp, seen]);
+  }
+  own += n; flashes = flashes.slice(-10);
+}
+function density(t) {                                                     // p(k, k') of the learner
+  const P = range(N).map(() => new Float64Array(N));
+  if (opt().share) { for (let a = 0; a < N; a++) for (let k = 0; k < N; k++) { const g = t.GL[a][k]; if (g > 1e-7) for (let kp = 0; kp < N; kp++) P[k][kp] += g * t.U[a][kp]; } }
+  else { const R = LL.length; for (let u = 0; u < R; u++) for (let k = 0; k < N; k++) { const g = t.GL[u][k] / R; if (g > 1e-7) for (let kp = 0; kp < N; kp++) P[k][kp] += g * t.GR[u][kp]; } }
+  return P;
+}
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); parent.appendChild(e); return e; }
+const X0 = 34, Y0 = 34, CELL = 9, X1 = 410, X2 = 594, SM = 162;
+function build() {
+  const svg = $('wSvg'); svg.textContent = '';
+  const text = (x, y, s, extra = {}) => { el('text', {x, y, fill: 'var(--ink2)', ...extra}, svg).textContent = s; };
+  text(X0, 14, 'pairs of codes: left code (row), right code (column)'); text(X1, 14, 'pools of the left units', {id: 'wT1'}); text(X2, 14, 'table over pairs of units', {id: 'wT2'});
+  text(X1, Y0 + SM + 16, 'unit (row), code (column)', {id: 'wS1'}); text(X2, Y0 + SM + 16, 'left unit (row), right unit (column)', {id: 'wS2'});
+  el('rect', {x: X0, y: Y0, width: N * CELL, height: N * CELL, fill: 'var(--bg)', stroke: 'var(--axis)'}, svg);
+  cells = range(N).map(k => range(N).map(kp => { const g = el('g', {}, svg); const c = el('rect', {x: X0 + kp * CELL, y: Y0 + k * CELL, width: CELL, height: CELL, fill: 'var(--ok)', 'fill-opacity': 0}, g); el('title', {}, g); return c; }));
+  for (let c = 0; c <= V; c++) { el('line', {x1: X0 + c * MC * CELL, x2: X0 + c * MC * CELL, y1: Y0, y2: Y0 + N * CELL, stroke: 'var(--ink2)', 'stroke-width': 0.8}, svg); el('line', {y1: Y0 + c * MC * CELL, y2: Y0 + c * MC * CELL, x1: X0, x2: X0 + N * CELL, stroke: 'var(--ink2)', 'stroke-width': 0.8}, svg); }
+  el('g', {id: 'wDots'}, svg); el('g', {id: 'wFlash'}, svg);
+  for (const x of [X1, X2]) el('rect', {x, y: Y0, width: SM, height: SM, fill: 'var(--bg)', stroke: 'var(--axis)'}, svg);
+  el('g', {id: 'wPools'}, svg); el('g', {id: 'wTab'}, svg);
+}
+function grid(id, x0, rows, cols, value) {                               // a small shaded grid of rows x cols inside a square of side SM
+  const g = $(id); g.textContent = ''; const w = SM / cols, h = SM / rows;
+  for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) { const v = value(i, j); if (v > 0.02) el('rect', {x: x0 + j * w, y: Y0 + i * h, width: w, height: h, fill: 'var(--ok)', 'fill-opacity': Math.min(1, v)}, g); }
+}
+function draw() {
+  const o = opt(), t = tables(), P = density(t); let vm = 0, cov = 0, unshown = 0, unCov = 0;
+  for (let k = 0; k < N; k++) for (let kp = 0; kp < N; kp++) {
+    const rel = P[k][kp] * nValid, ok = valid[k][kp], c = cells[k][kp];
+    c.setAttribute('fill', ok ? 'var(--ok)' : 'var(--bad)'); c.setAttribute('fill-opacity', Math.min(1, ok ? 0.85 * rel : 3 * rel).toFixed(3));
+    c.nextSibling.textContent = `left code ${k + 1}, right code ${kp + 1}: ${ok ? 'valid' : 'not valid'}; shown by the teacher ${M[k][kp]} time${M[k][kp] === 1 ? '' : 's'}; the learner writes it ${rel.toFixed(2)} times as often as the population`;
+    if (ok) { vm += P[k][kp]; const w = rel > 0.25; cov += w; if (!M[k][kp]) { unshown++; unCov += w; } }
+  }
+  const dots = $('wDots'); if (!dots.childNodes.length) for (let k = 0; k < N; k++) for (let kp = 0; kp < N; kp++) if (M[k][kp]) el('circle', {cx: X0 + (kp + 0.5) * CELL, cy: Y0 + (k + 0.5) * CELL, r: 1.5, fill: 'var(--ink)', 'pointer-events': 'none'}, dots);
+  const fl = $('wFlash'); fl.textContent = ''; for (const [k, kp, seen] of flashes) el('circle', {cx: X0 + (kp + 0.5) * CELL, cy: Y0 + (k + 0.5) * CELL, r: 6, fill: 'none', stroke: seen ? 'var(--good)' : 'var(--bad)', 'stroke-width': 2, 'pointer-events': 'none'}, fl);
+  const R = LL.length; let whole = 0, mixed = 0;
+  for (const G of [t.GL, t.GR]) for (let u = 0; u < R; u++) { const m = new Float64Array(V); for (let k = 0; k < N; k++) m[cls(k)] += G[u][k]; mixed += Math.max(...m) < 0.8; }
+  for (let c = 0; c < V; c++) { let hit = false; for (let u = 0; u < R && !hit; u++) { let all = true, other = 0; for (let k = 0; k < N; k++) { if (cls(k) === c) all = all && t.GL[u][k] > 0.5 / MC; else other += t.GL[u][k]; } hit = all && other < 0.1; } whole += hit; }
+  grid('wPools', X1, R, N, (u, k) => t.GL[u][k] * MC);
+  if (o.share) { let mx = 0; for (const x of t.T) if (x > mx) mx = x; grid('wTab', X2, N, N, (a, b) => t.T[a * N + b] / mx); }
+  else grid('wTab', X2, R, N, (u, k) => t.GR[u][k] * MC);
+  $('wT1').textContent = o.share ? 'pools of the left units' : 'left pools, one unit per shown pair'; $('wT2').textContent = o.share ? 'table over pairs of units' : 'right pools of the same units';
+  $('wS2').textContent = o.share ? 'left unit (row), right unit (column)' : 'unit (row), code (column)';
+  $('wStatus').textContent = `${own.toLocaleString('en-GB')} own samples. Valid: ${(100 * vm).toFixed(0)}% of what the learner writes. Valid pairs written: ${cov} of ${nValid}` + (unshown ? `, among them ${unCov} of the ${unshown} the teacher never showed` : '') + `. Classes held by one unit: ${whole} of ${V}. Pools that mix classes: ${mixed} of ${2 * R}.`;
+}
+function tick() { if (!running) return; practise(opt().share ? PER_FRAME : 8 * PER_FRAME); if (++frame % 4 === 0) draw(); requestAnimationFrame(tick); }
+function start() {
+  const block = $('lockBlock'); if (!block || block.closest('[data-ol-embed-hidden]')) return;
+  world(); build(); reset();
+  $('wRun').addEventListener('click', () => { running = !running; $('wRun').textContent = running ? 'Pause' : 'Practise'; if (running) requestAnimationFrame(tick); else draw(); });
+  $('wReset').addEventListener('click', () => { $('wDots').textContent = ''; reset(); });
+  for (const id of ['wN', 'wVeto', 'wSpread', 'wShare']) $(id).addEventListener('change', () => { $('wDots').textContent = ''; reset(); });
+  window.__m5 = {practise, draw, state: () => ({own, status: $('wStatus').textContent})};          // for the page check
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once: true}); else start();
+})();
+</script>
+<figcaption><strong>Figure 1. The teacher's pair counts veto, spread makes units grow, and only pools that are shared between partners end as classes.</strong> Left: every pair of a left and a right code. Right: the pools of the left units and the table over pairs of units, both starting as the diagonal (unit \(i\) relays code \(i\)). Press Practise, then switch off one property at a time. Without the verdict every unit takes every code; without spread nothing the teacher did not show is ever written; without shared pools each unit fits the pairs shown around its own pair, and its pools run across classes. The case without shared pools needs a few million samples. The world here is smaller than in the runs (\(v=12\), \(m=3\), \(c=0.75\)) so that single cells can be seen.</figcaption>
+</figure>
+
+<p>The same four cases with 4,096 teacher pairs, {{worlds}} worlds and 2.1 million own samples each (Figure 2):</p>
+<ul>
+<li><strong>All three properties.</strong> The loss falls from {{start}} to {{full}} nats; the counted table of the same pairs is at {{table}}. All 16 classes are held by one unit each in {{locked}} of {{worlds}} worlds (at least {{locked_min}} of the classes in every world; {{locked_eff}} of {{worlds}} in the runs of section 3, which use other random numbers). {{valid}} of what the learner writes is valid. Valid pairs that the teacher never showed are written at {{full_new}} of their population rate, so the learner now knows more than the memory that judged it.</li>
+<li><strong>No verdict</strong> (every sample counts as accepted). Every unit takes every code and the loss goes to {{no_veto}} nats, the value for independent left and right codes. The prior alone merges everything.</li>
+<li><strong>No spread</strong> (a unit never tries another code). The learner stays a table: {{no_spread}} nats, and unshown pairs at {{no_spread_new}} of their population rate. The verdict alone merges nothing.</li>
+<li><strong>No reuse</strong> (one unit per shown pair, with two pools of its own). Within this many samples no class is named and the loss stays near the table's ({{private}} nats, unshown pairs at {{private_new}}). A unit with one partner can shape its rectangle around every missing pair.</li>
+</ul>
+<figure><img src="figures/model5-ablation.svg" alt="Three panels against the number of own samples on a logarithmic axis: population loss, share of classes held by one unit, and the relative probability of unshown valid pairs, each for the full learner and for the learner without the verdict, without spread and without shared pools."><figcaption><strong>Figure 2. Classes form only with the verdict, spread and shared pools together.</strong> Median over worlds, bands are the interquartile range. Left: population loss, with the counted table of the same teacher pairs as the dashed line. Middle: share of the classes that one unit holds entirely and purely. Right: probability of valid pairs the teacher never showed, relative to the population.</figcaption></figure>
+<p><strong>Who gets the credit.</strong> In the rule above the verdict goes to the units that read the own sample. Giving it to the units that wrote the sample ends at the same loss ({{gen}} nats). The generator's code is not needed as a label.</p>
+<h3>The same model with one unit per class, trained by its likelihood gradient</h3>
+<p>This was the first learner tried: \(v\) units per side, a random start, a wake step on teacher pairs and a step against own samples that \(\mathbf{M}\) rejects. It does not find the classes. From a weak, a moderate and a sharp random start it ends at {{gw}} nats with teacher pairs only and at {{gp}} with half the samples its own (medians for the three starts), in no world below 0.05 (Figure 3, left). Own samples raise the share of valid output ({{gvw}} without them, {{gvp}} with them) without lowering the loss: units that mix classes stay mixed, and the learner avoids invalid pairs by writing fewer pairs.</p>
+<p>This learner also tests the idea that own samples propagate deeper. Let a unit pair learn only if its drive, \(T_{aa'}G^L_{ka}G^R_{k'a'}N^2\), exceeds 1, that is, if the read explanation is more probable than a chance pair. From a sharp random start, {{gel_o}} of own samples pass and {{gel_t}} of teacher samples (Figure 3, right). With teacher pairs only the learner then keeps its random code ({{gth_w}} nats); with own samples it ends at {{gth_p}}. So the asymmetry exists and own samples help under a threshold, but both are far worse than the same learner without a threshold. From a weak or moderate start nothing passes the threshold at all.</p>
+<figure><img src="figures/model5-gradient.svg" alt="Left: population loss of the likelihood-gradient learner for three random starts, with and without a threshold on the reader, for teacher pairs only and for half own samples; one dot per world. Right: share of teacher and of own samples above the threshold for the three starts."><figcaption><strong>Figure 3. A likelihood-gradient learner with one unit per class stays in mixed units, and a threshold on the reader favours own samples but makes everything worse.</strong> One dot per world, bars are medians. Left: population loss after the same number of samples, by random start and threshold. Right: share of samples whose read explanation passes the threshold.</figcaption></figure>
+</section>
+
+<section>
+<h2>3. What it buys, and what it does not</h2>
+<h3>Against the size of the teacher set</h3>
+<div class="table-wrap"><table class="counts">
+<thead><tr><th>Teacher pairs</th><th>Valid pairs shown</th><th>Counted table</th><th>Practice</th><th>Recall through \(\mathbf{M}\)</th><th>Gradient learner</th><th>Worlds with all classes named (of {{worlds}})</th></tr></thead>
+<tbody>
+{{eff_rows}}
+</tbody></table></div>
+<p class="small">Population loss in nats, median over {{worlds}} worlds. Counted table: the teacher's counts with the best uniform smoothing. Practice: 2.1 million own samples after watching. Gradient learner: one unit per class, wake only, rehearsing the stored set.</p>
+<ul>
+<li><strong>A window.</strong> From 4,096 to 16,384 teacher pairs practice ends below the table, by a factor of {{x4096}} at 4,096 pairs ({{p4096}} against {{t4096}} nats) and of {{x16384}} at 16,384. The table needs about three times as many teacher pairs for the same loss.</li>
+<li><strong>Below the window practice hurts.</strong> At 2,048 pairs the loss after practice is {{p2048}} against {{t2048}} for the table. Too many valid pairs are still unshown, the verdict rejects them, and the learner narrows.</li>
+<li><strong>Above the window the table catches up</strong> ({{t32768}} against {{p32768}} at 32,768): the bounded weights leave a floor near 0.02 nats.</li>
+<li><strong>Recall through \(\mathbf{M}\) does it without own samples.</strong> This reader lets code \(j\) join the unit of code \(k\) if \(\mathbf{M}\) has seen \(j\) with most of the partners of \(k\). It uses the same statistic as practice, for all codes at once, and ends at or below practice from 4,096 pairs on ({{r4096}} and {{r8192}} nats at 4,096 and 8,192). It fails below that as well.</li>
+</ul>
+<figure><img src="figures/model5-efficiency.svg" alt="Population loss against the number of teacher pairs on logarithmic axes for the counted table, the likelihood-gradient learner, recall through M and practice."><figcaption><strong>Figure 4. Practice beats the counted table only in a window of teacher-set sizes, and a reader that recalls through the pair counts matches it without own samples.</strong> Median over worlds, bands are the interquartile range. Values above the top of the axis are cut off.</figcaption></figure>
+<h3>At an equal number of samples</h3>
+<p>Teacher and own batches were interleaved at a fixed share (Figure 5). The learner's best share of own samples is 0 at small budgets and between 0.5 and 0.9 at large ones, but a counted table fed the same total number of teacher pairs is better at all {{totals}} budgets: {{ht13}} against {{h13}} nats at \(2^{13}\) samples, {{ht22}} against {{h22}} at \(2^{22}\). With a share of own samples of 0.997 or more the learner ends worse than without practice, because it practises against a nearly empty \(\mathbf{M}\).</p>
+<figure><img src="figures/model5-heatmap.svg" alt="Heat map of the population loss over the total number of samples and the share of own samples, with a separate bottom row for the counted table that is fed teacher pairs only."><figcaption><strong>Figure 5. For a fixed total, more teacher pairs counted in a table always beat a mix with own samples.</strong> Median population loss over worlds; lighter is lower. Rows above the gap: the learner at a fixed share of own samples, with a dot at its best share for each total. Bottom row: the counted table fed the same total number of teacher pairs.</figcaption></figure>
+<h3>Whose samples</h3>
+<p>After 4,096 teacher pairs the learner practised on its own samples, or on the samples of a twin: the same learner with a teacher set of its own, practising on its own samples at the same time, so that its samples are as good as the learner's (the twin ends at {{twin_kl}} nats). Credit is by reading in both cases. On own samples the learner ends at {{own}} nats, on the twin's at {{twin}}, and own is ahead in {{own_wins}} of {{worlds}} worlds (Figure 6). The twin's samples show the learner which pairs the twin writes wrongly, not which the learner does. The same number of fresh teacher pairs, simply counted, ends at {{table_end}}. Fed to the practice rule instead of being counted, fresh teacher pairs do worse than own samples ({{teacher_end}} nats): they are almost always accepted, so nothing new is tried.</p>
+<figure><img src="figures/model5-source.svg" alt="Population loss against the number of further samples after 4,096 teacher pairs, for practice on own samples, practice on a twin's samples, and the same number of fresh teacher pairs counted in a table."><figcaption><strong>Figure 6. Own samples beat a twin's samples of the same quality, and fresh teacher pairs beat both.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
+</section>
+
+<section>
+<h2>4. Three levels</h2>
+<p>A string is now four codes, \(k_1k_2\,|\,k_3k_4\). Each half is the block above. The 64 valid class pairs are the productions of 16 symbols of a second level, and the top has 64 valid pairs of those symbols: 262,144 valid strings. Three learners get the same number of teacher strings:</p>
+<ul>
+<li><strong>A table of whole strings.</strong></li>
+<li><strong>All strings first, then practice.</strong> While the strings were shown no class unit could read them, so nothing about the second level was kept and the two halves stay independent.</li>
+<li><strong>Practice between two halves of the strings.</strong> The second half is read into the class units and their pairs are counted, which is the same lateral memory one level up.</li>
+</ul>
+<p>With 16,384 strings the table of strings is at {{d_flat}} nats, strings first at {{d_first}}, practice in between at {{d_between}}; with 131,072 strings {{d_flat2}}, {{d_first2}} and {{d_between2}} (Figure 7). Practice moves the frontier by one level and no further: the counts for the next level can only be taken from teacher samples that arrive after the classes are named. The remaining loss of the third learner is a naming error. Practice leaves several units with the same pool, and reading them as one unit is not yet reliable.</p>
+<figure><img src="figures/model5-depth.svg" alt="Population loss of strings against the number of teacher strings for a table of whole strings, for all strings first and then practice, and for practice between two halves of the strings."><figcaption><strong>Figure 7. Teacher strings that arrive after the classes are named can be counted one level up; strings shown before are lost for that level.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
+</section>
+
+<section>
+<h2>5. Against toy model 3, and what this shows</h2>
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>Toy model 3 (chain)</th><th>Model 5</th></tr></thead>
+<tbody>
+<tr><td>World</td><td>Chains of states, each with \(m\) allowed successors. No hidden cause.</td><td>Pairs of codes with hidden classes and rules over the classes.</td></tr>
+<tr><td>What watching gives recognition</td><td>A table of the links seen.</td><td>A table of the pairs seen, \(\mathbf{M}\). The same kind of object.</td></tr>
+<tr><td>What practice builds</td><td>Tables that write longer spans in one pass from accepted links.</td><td>Class units: names for a hidden cause.</td></tr>
+<tr><td>Does the learner end up writing what recognition never saw?</td><td>No. New chains, but only from links that were seen.</td><td>Yes. Valid pairs the teacher never showed, through the classes.</td></tr>
+<tr><td>Own samples against as many fresh teacher samples</td><td>Fresh samples win at every budget.</td><td>Fresh samples win at every budget.</td></tr>
+<tr><td>Own against foreign samples</td><td>No difference, except where the teacher was far widthwise.</td><td>Own samples beat a twin's of the same quality, with an unbiased teacher.</td></tr>
+<tr><td>Can practice hurt?</td><td>No.</td><td>Yes, when \(\mathbf{M}\) is sparse.</td></tr>
+<tr><td>What does the same without own samples</td><td>Teacher spans, with many more chains.</td><td>Recall through \(\mathbf{M}\), from the same teacher set.</td></tr>
+<tr><td>Depth</td><td>Levels arrive in order; practice adds no knowledge.</td><td>One level per round of watching and practice; naming is what the next level needs.</td></tr>
+</tbody></table></div>
+<h3>What this shows</h3>
+<ul>
+<li>A verdict on a deep choice does not need deep units. Pair counts between shallow codes separate a code of the right class from a code of another class.</li>
+<li>The verdict and the prior have different jobs: without the verdict everything merges, without spread nothing does, and without reuse no unit becomes a class.</li>
+<li>Credit by the reader's own reading is enough.</li>
+<li>Own samples beat equally good foreign ones, because they show the learner its own wrong pairs.</li>
+</ul>
+<h3>What it does not show</h3>
+<ul>
+<li>An advantage over more teacher samples. Per sample, own samples are worth far less.</li>
+<li>That own samples are needed. Recall through \(\mathbf{M}\) uses the same statistic without generating.</li>
+<li>A learner that starts from a weak random code. The classes form from units that start as copies of the shallow codes; the likelihood-gradient learner from a random start does not find them.</li>
+<li>Robustness. Practice hurts when fewer than about four teacher pairs per valid pair were seen; \(c=0.8\) was chosen from a scan over 0.6 to 0.9 on four worlds; several units end with the same pool and are not merged.</li>
+<li>A deeper stack. The three-level run names one level and counts the next.</li>
+</ul>
+</section>
+</article>
+<footer>
+<p>Built {{built}} by <code>experiments/model5_page.py</code> from <code>experiments/model5_page.html</code>; it overwrites this page, so edits made here are lost on a rebuild. Runs: <code>experiments/model5_lateral_verdict.py</code> (<code>ablation</code>, <code>efficiency</code>, <code>heatmap</code>, <code>source</code>, <code>gradient</code>) and <code>experiments/model5_depth.py</code>; figures and numbers: <code>experiments/model5_figures.py</code>. Data: <code>/nfs/gatsbystor/jbauer/generative-learning/model5_lateral_verdict/</code>.</p>
+</footer>
+</main>
+</body>
+</html>

@@ -1,5 +1,5 @@
 """Build tex/model_5_lateral_verdict.html (OverLyX article) from experiments/model5_page.html: fill in the numbers from numbers.json
-(model5_figures.py), typeset every \\(...\\) and \\[...\\] with KaTeX at build time (scripts are left alone) and inline KaTeX's stylesheet.
+(model5_figures.py) and own_benefit_numbers.json next to it (model5_own_benefit_figures.py), typeset every \\(...\\) and \\[...\\] with KaTeX at build time (scripts are left alone) and inline KaTeX's stylesheet.
 Figures are referenced from tex/figures/. Served at http://127.0.0.1:8095/practice-docs/model_5_lateral_verdict.html (reports/practice-docs -> tex/).
 Usage: python model5_page.py <numbers.json> <out.html>"""
 
@@ -41,6 +41,14 @@ def main():
                 gvp=f"{pct(min(gk('practice', 0, 'valid')))} to {pct(max(gk('practice', 0, 'valid')))}", glock=sum(g[k]['locked'] for k in g if '|0|' in k), gel_t=pct(g['random|1|practice']['el_teacher']), gel_o=pct(g['random|1|practice']['el_own']),
                 gth_w=f(g['random|1|wake']['kl']), gth_p=f(g['random|1|practice']['kl']), d_flat=f(d['16384']['flat']), d_first=f(d['16384']['first']), d_between=f(d['16384']['between']), d_flat2=f(d['131072']['flat']),
                 d_first2=f(d['131072']['first']), d_between2=f(d['131072']['between']), built=datetime.now(ZoneInfo('Europe/London')).strftime('%d %B %Y, %H:%M %Z'))
+    o = json.loads(Path(sys.argv[1]).with_name('own_benefit_numbers.json').read_text()); ob, od = o['block'], o['depth']; mix = np.array(od['mix']); bm = mix.min(0); tn = np.array(sorted(int(n) for n in ob)); tl = np.array([ob[str(n)]['table'] for n in tn])
+    cell = lambda x: f'<td class="num">{f(x) if x < 20 else "&gt; 20"}</td>'; i2 = lambda t: od['total'].index(2 ** t)
+    nums |= dict(ob_rows='\n'.join(f'<tr><td class="num">{int(n):,}</td>' + ''.join(cell(ob[n][k]) for k in ('table', 'note', 'eta1', 'found', 'oracle')) + '</tr>' for n in ('1024', '2048', '4096', '8192', '16384', '32768')),
+                 ob_drows='\n'.join(f'<tr><td class="num">\\(2^{{{int(np.log2(t))}}}\\)</td>{cell(od["flat"][i])}{cell(bm[i])}<td class="num">{od["best_own_share"][i]:g}</td>{cell(od["clustered"][i])}</tr>' for i, t in enumerate(od['total'])),
+                 ob_ratio=f"{np.exp(np.interp(-np.log(ob['2048']['found']), -np.log(tl), np.log(tn))) / 2048:.0f}", ob_own_below=f"{o['speed']['below_table']:,}", ob_dworlds=od['worlds'], ob_dc15=f(od['clustered'][i2(15)]), ob_df15=f(od['flat'][i2(15)]),
+                 **{f'ob_{k}{n}': f(ob[str(n)][key]) for k, key in (('t', 'table'), ('p', 'eta1'), ('f', 'found'), ('o', 'oracle')) for n in (1024, 2048, 4096)}, **{f'ob_d{k}{t}': f(v[i2(t)]) for k, v in (('m', bm), ('f', od['flat'])) for t in (19, 20, 21)})
+    assert all(ob[n]['eta1'] < ob[n]['table'] for n in ('2048', '4096', '8192', '16384')) and ob['1024']['eta1'] > ob['1024']['table'] and all(w == od['worlds'] for w in od['mix_wins_worlds'][i2(18):]) and all(bm[:i2(18)] > np.array(od['flat'][:i2(18)]))
+    assert all(np.array(od['clustered']) <= bm) and (mix[:5, i2(19):] < np.array(od['flat'][i2(19):])).all() and 0.25 <= min(od['best_own_share'][i2(18):]) and max(od['best_own_share'][i2(18):]) <= 0.9                                    # claims made in section 6
     assert nums['glock'] == 0 and h['table_wins'] == len(h['total']) and e['16384']['table'] > e['16384']['practice0.8'] and e['32768']['table'] < e['32768']['practice0.8']   # claims made in the text
     html = (ROOT / 'experiments/model5_page.html').read_text()
     for key in sorted(set(re.findall(r'\{\{(\w+)\}\}', html))): html = html.replace('{{' + key + '}}', str(nums[key]))

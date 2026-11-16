@@ -67,7 +67,7 @@ figure.widget{background:var(--surface);border:1px solid var(--border);border-ra
 <div class="eyebrow">Generative learning · model 5 · lateral verdict</div>
 <h1>Model 5: pair counts between shallow codes judge the next level, the prior names it</h1>
 <p class="byline">Simulation note, 16 November 2026 (UK time). Claude (Fable 5.2) for Jan Bauer.</p>
-<p class="abstract lede">The open point was how a verdict can depend on deep codes that have not been learned yet. Here it does not read them: the teacher's pair counts \(\mathbf{M}\) between shallow codes judge what a deep unit writes. Class units start as copies of the shallow codes and try further codes, and \(\mathbf{M}\) vetoes the wrong ones. With 4,096 teacher pairs this names all 16 hidden classes in {{locked}} of {{worlds}} worlds and lowers the population loss from {{start}} to {{full}} nats without a further teacher sample; a counted table of the same pairs stays at {{table}}. Credit goes to the units that read the own sample, not to those that wrote it, and practising on a twin's samples of the same quality ends at {{twin}}. There are three limits. Below about four teacher pairs per valid pair, practice makes the learner worse than the table. A reader that recalls through \(\mathbf{M}\) names the classes without any own sample. And at an equal number of samples, fresh teacher pairs counted in a table beat every mix of teacher and own samples.</p>
+<p class="abstract lede">The open point was how a verdict can depend on deep codes that have not been learned yet. Here it does not read them: the teacher's pair counts \(\mathbf{M}\) between shallow codes judge what a deep unit writes. Class units start as copies of the shallow codes and try further codes, and \(\mathbf{M}\) vetoes the wrong ones. With 4,096 teacher pairs this names all 16 hidden classes in {{locked}} of {{worlds}} worlds and lowers the population loss from {{start}} to {{full}} nats without a further teacher sample; a counted table of the same pairs stays at {{table}}. Credit goes to the units that read the own sample, not to those that wrote it, and practising on a twin's samples of the same quality ends at {{twin}}. There are three limits. Below about four teacher pairs per valid pair, practice makes the learner worse than the table. A reader that recalls through \(\mathbf{M}\) names the classes without any own sample. And at an equal number of samples, fresh teacher pairs counted in a table beat every mix of teacher and own samples. A follow-up (section 6) explains the last limit and where it ends: in one block no teacher pair is lost on the learner, so an own sample cannot be worth a fresh one; with three levels a budget split between teacher and own strings ends far below the same budget of teacher strings.</p>
 </header>
 
 <div class="table-wrap"><table>
@@ -81,11 +81,11 @@ figure.widget{background:var(--surface);border:1px solid var(--border);border-ra
 <tr><td>Depth is necessary</td><td>partly</td><td>A block has two learned layers. Naming one level is what makes the next one countable (section 4).</td></tr>
 <tr><td>Local three-factor rule</td><td>yes</td><td>The weights between the active units move by the verdict minus a fraction of its running mean.</td></tr>
 <tr><td>Generation improves offline, through a loop of generation and recognition</td><td>yes</td><td>{{start}} to {{full}} nats with no teacher sample (section 2).</td></tr>
-<tr><td>Worse without the generative phase</td><td>partly</td><td>Yes against the same learner without practice. No against as many fresh teacher samples (section 3).</td></tr>
+<tr><td>Worse without the generative phase</td><td>partly</td><td>Yes against the same learner without practice. Against as many fresh teacher samples: no in one block (section 3), yes with three levels (section 6).</td></tr>
 <tr><td>Own samples beat foreign ones of the same quality</td><td>yes</td><td>{{own}} against {{twin}} nats for a twin's samples (section 3).</td></tr>
-<tr><td>A split budget beats teacher samples only</td><td>no</td><td>A counted table of the same number of teacher pairs is better at every budget (section 3).</td></tr>
+<tr><td>A split budget beats teacher samples only</td><td>with three levels</td><td>In one block a counted table of the same number of teacher pairs is better at every budget (section 3). With three levels the split budget is below the table of strings from \(2^{18}\) strings on (section 6).</td></tr>
 <tr><td>The advantage is not the generator's code used as a label</td><td>yes</td><td>Credit by the reader's own reading gives the same result as credit to the writing units (section 2).</td></tr>
-<tr><td>Own samples reach deep units, teacher samples do not yet</td><td>only in a worse learner</td><td>With a threshold on the reader, {{gel_o}} of own and {{gel_t}} of teacher samples pass, but that learner is far worse than one without a threshold (section 2).</td></tr>
+<tr><td>Own samples reach deep units, teacher samples do not yet</td><td>only in a worse learner</td><td>With a threshold on the reader, {{gel_o}} of own and {{gel_t}} of teacher samples pass, but that learner is far worse than one without a threshold (section 2). With three levels the upper level of a teacher string cannot be counted before the classes are named (section 6).</td></tr>
 <tr><td>Recognition improves after practice</td><td>yes</td><td>Class units; valid pairs never shown are accepted; teacher strings can be read for the next level (sections 2, 4).</td></tr>
 <tr><td>Recognition infers causes or judges correctness</td><td>yes</td><td>\(\mathbf{M}\) judges, the class units name.</td></tr>
 <tr><td>Not explained by reconstructing the data</td><td>yes</td><td>Practice uses no teacher sample; without the verdict the loss rises to {{no_veto}}.</td></tr>
@@ -93,7 +93,7 @@ figure.widget{background:var(--surface);border:1px solid var(--border);border-ra
 <tr><td>Normative grounding</td><td>no</td><td>The rule is a heuristic.</td></tr>
 <tr><td>Interpretable weights</td><td>yes</td><td>A pool is a class, an entry of \(\mathbf{T}\) a production.</td></tr>
 <tr><td>Mapping to in-context learning</td><td>no</td><td>Not addressed.</td></tr>
-<tr><td>Baseline: a reader trained on teacher samples only</td><td>not beaten</td><td>Recall through \(\mathbf{M}\) does at least as well (section 3).</td></tr>
+<tr><td>Baseline: a reader trained on teacher samples only</td><td>not beaten</td><td>Recall through \(\mathbf{M}\) does at least as well (section 3); clustering the pair counts names the classes from fewer pairs (section 6).</td></tr>
 </tbody></table></div>
 
 <section>
@@ -332,16 +332,67 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 </ul>
 <h3>What it does not show</h3>
 <ul>
-<li>An advantage over more teacher samples. Per sample, own samples are worth far less.</li>
+<li>An advantage over more teacher samples in one block. Per sample, own samples are worth far less there (section 6 for three levels).</li>
 <li>That own samples are needed. Recall through \(\mathbf{M}\) uses the same statistic without generating.</li>
 <li>A learner that starts from a weak random code. The classes form from units that start as copies of the shallow codes; the likelihood-gradient learner from a random start does not find them.</li>
 <li>Robustness. Practice hurts when fewer than about four teacher pairs per valid pair were seen; \(c=0.8\) was chosen from a scan over 0.6 to 0.9 on four worlds; several units end with the same pool and are not merged.</li>
-<li>A deeper stack. The three-level run names one level and counts the next.</li>
+<li>A deeper stack. The three-level runs name one level and count the next.</li>
+</ul>
+</section>
+<section>
+<h2>6. Follow-up: where own samples beat fresh teacher samples, and why one block cannot show it</h2>
+<p class="small">Added 16 November 2026. Sections 1 to 5 are as they were; where this section corrects them, it says so.</p>
+<p><strong>In one block an own sample cannot be worth a fresh teacher pair, because no teacher pair is lost on the learner. With three levels part of every teacher string is lost until the classes are named, and there a budget split between teacher and own strings ends far below the same budget of teacher strings.</strong></p>
+<h3>Why one block cannot show it</h3>
+<ul>
+<li><strong>The judge knows what the writer knows.</strong> After watching, \(\mathbf{M}\) and the table \(\mathbf{T}\) that the generator starts from hold the same pairs. The verdict confirms an own sample only if the teacher showed that pair, and then the generator already writes it.</li>
+<li><strong>Nothing in a teacher pair is lost.</strong> Both codes are read by the shallow layer and \(\mathbf{M}\) stores the pair whole. A fresh pair always adds something about the world; an own sample can only reorganise what \(\mathbf{M}\) holds. For own samples to win at an equal number of samples, part of a teacher sample has to be unreadable for the learner at its current stage.</li>
+<li><strong>Own samples do not reach deeper than teacher pairs in this learner.</strong> The class units start as copies of the codes, so a teacher pair is read into them as easily as an own sample. The asymmetry of section 2 ({{gel_o}} of own against {{gel_t}} of teacher samples) existed only under a threshold that made the learner worse.</li>
+</ul>
+<h3>What naming the classes is worth, and what a verdict gets of it</h3>
+<p>Against the same teacher set, reorganising does buy something: a table over pairs of classes has 64 valid entries to estimate, the table over pairs of codes 1,024.</p>
+<div class="table-wrap"><table class="counts">
+<thead><tr><th>Teacher pairs</th><th>Counted table</th><th>Practice, verdict on the written pair (section 3)</th><th>Practice, pooled verdict</th><th>Clustering of the pair counts</th><th>Table over the true classes</th></tr></thead>
+<tbody>
+{{ob_rows}}
+</tbody></table></div>
+<p class="small">Population loss in nats, median over {{worlds}} worlds. Practice: 2.1 million own samples after watching. Clustering: the codes of each side are grouped by their partners (Ward linkage on the rows of \(\mathbf{M}\), summed over the groups of the other side, a few rounds, 16 groups per side), then pairs of groups are counted; it uses no own sample. True classes: pairs of the true classes counted.</p>
+<ul>
+<li><strong>The classes are in the pair counts from about 2,048 pairs.</strong> Clustering ends at {{ob_f2048}} nats there, the counted table at {{ob_t2048}}. The table needs about {{ob_ratio}} times as many pairs for that loss.</li>
+<li><strong>The verdict of section 1 gets little of this.</strong> It asks whether the teacher showed exactly the pair that was written, so a valid pair that was not shown counts against the units that wrote it. This is why practice needed about four teacher pairs per valid pair.</li>
+<li><strong>A pooled verdict gets more.</strong> A written code is judged against everything that its partner unit stands for:
+\[\begin{gathered}v_L=\mathbb{1}\Big[\sum_{k''\in\mathcal{P}(\hat a')}M_{kk''}>0\Big],\qquad v_R=\mathbb{1}\Big[\sum_{k''\in\mathcal{P}(\hat a)}M_{k''k'}>0\Big],\\ \Delta\Lambda^L_{k\hat a}=\eta\,(v_L-c\,\rho_L),\quad \Delta\Lambda^R_{k'\hat a'}=\eta\,(v_R-c\,\rho_R),\quad \Delta\Theta_{\hat a\hat a'}=\eta\,(v_Lv_R-c\,\bar v).\end{gathered}\]
+\(\mathcal{P}(a)\) is the pool of unit \(a\), the codes it writes at least half as often as its most frequent one. \(\rho_L\) and \(\rho_R\) are the rates at which the same verdict accepts the teacher's pairs (stored pairs replayed from \(\mathbf{M}\), their own count left out), so an own sample is held to \(c\) times what a true sample gets; \(\bar v\) is the running mean of \(v_Lv_R\) on own samples; \(\eta=1\), \(c=0.8\). At the start a pool is one code and this is the verdict of section 1. Once units grow, a valid pair that the teacher never showed is accepted through the other codes of the partner's pool. Practice then ends below the table from 2,048 pairs on ({{ob_p2048}} against {{ob_t2048}} nats) and at {{ob_p4096}} with 4,096 pairs, where the true classes give {{ob_o4096}}. With 1,024 pairs it still leaves the learner worse than the table ({{ob_p1024}} against {{ob_t1024}}).</li>
+<li><strong>At an equal number of samples nothing changes.</strong> With 4,096 teacher pairs, practice needs {{ob_own_below}} own samples before it is below the table of those pairs, and a table of that many fresh teacher pairs is far ahead (section 3). A larger step (\(\eta=1\) instead of 0.3, used here) brings the number of own samples for 0.1 nats from about a million to about a third of a million; more exploration by the units, or a table imprinted at the first sighting of a pair, made practice fail or end worse.</li>
+</ul>
+<figure><img src="figures/model5-own-block.svg" alt="Population loss against the number of teacher pairs on logarithmic axes for the counted table, practice with the verdict on the written pair, practice with the pooled verdict, clustering of the pair counts and a table over the true classes."><figcaption><strong>Figure 8. Naming the classes is worth many times the teacher pairs, and a pooled verdict gets most of that where the verdict on the written pair gets little.</strong> Median over worlds, bands are the interquartile range. Values above the top of the axis are cut off.</figcaption></figure>
+<h3>Three levels at a fixed budget of strings</h3>
+<p>The world is that of section 4: strings of four codes, 262,144 valid strings. A budget of \(B\) strings is split into \((1-f)B\) teacher strings and \(fB\) own strings. The learner watches half of its teacher strings, practises on its own strings (one pair for each half of the string, with the pooled verdict), then reads the other half of the teacher strings through its class units and counts pairs of named pairs. With \(f=0\) nothing is named, and the pairs of pairs it counts are whole strings: a table of strings. The runs use {{ob_dworlds}} worlds in which no two classes have the same partners.</p>
+<div class="table-wrap"><table class="counts">
+<thead><tr><th>Strings in total</th><th>Teacher strings only (table of strings)</th><th>Teacher and own strings, best share</th><th>Best share of own strings</th><th>Teacher strings only, classes by clustering</th></tr></thead>
+<tbody>
+{{ob_drows}}
+</tbody></table></div>
+<p class="small">Population loss of strings in nats, median over {{ob_dworlds}} worlds. Clustering: the pair counts of the first half of the teacher strings are clustered as above, the second half is read through the groups; no own string.</p>
+<ul>
+<li><strong>From \(2^{18}\) strings on, the split budget is below the table of strings in all {{ob_dworlds}} worlds</strong>: {{ob_dm19}} against {{ob_df19}} nats at \(2^{19}\) strings, {{ob_dm20}} against {{ob_df20}} at \(2^{20}\), {{ob_dm21}} against {{ob_df21}} at \(2^{21}\). The best share of own strings lies between 0.25 and 0.9, and from \(2^{19}\) on every share from 0.25 to 0.97 is below the table (Figure 9, right).</li>
+<li><strong>Below \(2^{18}\) strings it is worse than the table.</strong> Practice needs about a quarter to half a million own strings to name the classes, whatever the budget.</li>
+<li><strong>What is lost on the learner here is the upper level of a teacher string.</strong> Before the classes are named, pairs of pairs can only be counted as whole strings. Afterwards every teacher string adds to a table with 1,024 valid entries instead of 262,144.</li>
+<li><strong>The sampling is not what does it.</strong> Clustering the pair counts names the classes without an own string and is ahead of or level with the split budget at every total ({{ob_dc15}} nats at \(2^{15}\) strings, where the table of strings is at {{ob_df15}}). Practice estimates by samples what clustering reads off \(\mathbf{M}\) directly, and \(\mathbf{M}\) is a table of 64 by 64 counts.</li>
+</ul>
+<figure><img src="figures/model5-own-depth.svg" alt="Left: population loss of strings against the total number of strings for teacher strings only counted as a table of strings, for teacher and own strings at the best share, for teacher strings with classes found by clustering and for teacher strings with the true classes given. Right: heat map of the loss over the total number of strings and the share of own strings."><figcaption><strong>Figure 9. With three levels, a budget split between teacher and own strings ends far below the same budget of teacher strings once it pays for naming the classes, and clustering the pair counts does the naming without an own string.</strong> Left: median over worlds with the interquartile range; the split budget is shown at its best share for each total. Right: median loss by total and share of own strings; lighter is lower, and the bottom row is the table of strings.</figcaption></figure>
+<p><strong>Two corrections to section 4.</strong> The naming error reported there had two causes that are not about learning. First, practice leaves two or three of the 64 units per side with a pool that mixes two classes, and reading a code by its largest pool let those units merge the two classes one level up. Here a code is read as the group of like units with the most posterior mass, which gives exactly 16 names per position once practice has run for half a million own strings. Second, in 5 of the first 64 worlds two classes have the same partners. Within a block such classes are one class and can only be told apart one level up, so those worlds are left out here.</p>
+<h3>What this changes, and what stands</h3>
+<ul>
+<li><strong>Changed:</strong> a split budget beats teacher samples only once the world has three levels. The condition is that part of a teacher sample cannot be read before practice.</li>
+<li><strong>Stands:</strong> own samples are not needed as samples. A pass over \(\mathbf{M}\) without sampling names the classes from fewer teacher pairs. For sampling to be needed, the memory that judges would have to be too large to go through entry by entry.</li>
+<li><strong>Stands:</strong> practice is slow, about half a million own strings per level.</li>
+<li><strong>Not tested:</strong> four levels, where a table of strings is out of reach of any budget; practice at the top level (here the top is counted, not named); a start that is not a copy of the codes.</li>
 </ul>
 </section>
 </article>
 <footer>
-<p>Built {{built}} by <code>experiments/model5_page.py</code> from <code>experiments/model5_page.html</code>; it overwrites this page, so edits made here are lost on a rebuild. Runs: <code>experiments/model5_lateral_verdict.py</code> (<code>ablation</code>, <code>efficiency</code>, <code>heatmap</code>, <code>source</code>, <code>gradient</code>) and <code>experiments/model5_depth.py</code>; figures and numbers: <code>experiments/model5_figures.py</code>. Data: <code>/nfs/gatsbystor/jbauer/generative-learning/model5_lateral_verdict/</code>.</p>
+<p>Built {{built}} by <code>experiments/model5_page.py</code> from <code>experiments/model5_page.html</code>; it overwrites this page, so edits made here are lost on a rebuild. Runs: <code>experiments/model5_lateral_verdict.py</code> (<code>ablation</code>, <code>efficiency</code>, <code>heatmap</code>, <code>source</code>, <code>gradient</code>), <code>experiments/model5_depth.py</code> and, for section 6, <code>experiments/model5_own_benefit.py</code> (<code>bound</code>, <code>sparse</code>, <code>depth</code>); figures and numbers: <code>experiments/model5_figures.py</code> and <code>experiments/model5_own_benefit_figures.py</code>. Data: <code>/nfs/gatsbystor/jbauer/generative-learning/model5_lateral_verdict/</code>.</p>
 </footer>
 </main>
 </body>

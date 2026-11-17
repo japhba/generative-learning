@@ -1,5 +1,5 @@
 """Figures and numbers for the network runs of model 5 (model5_network_baseline.py, model5_network_practice.py), from /var/tmp/jbauer/model5_lateral_verdict/network_*.npz.
-Writes <out>/model5-network-{watching,practice,budget}.svg/.png and <out>/network_numbers.json.   Usage: MPLBACKEND=Agg python model5_network_figures.py <out>"""
+Writes <out>/model5-network-{watching,practice,budget,online,local,localrule}.svg/.png and <out>/network_numbers.json.   Usage: MPLBACKEND=Agg python model5_network_figures.py <out>"""
 
 import json
 from pathlib import Path
@@ -70,5 +70,33 @@ if (D / 'network_practice_budget.npz').exists():
     fig.legend(loc='outside lower center'); save(fig, 'model5-network-budget')
     nums['budget'] = dict(total=[int(t) for t in B], shares=[float(f) for f in fs], fresh=fresh.round(4).tolist(), table=np.median(d['fresh'][:, :, 1], 1).round(4).tolist(), mix=mix.round(4).tolist(), best_share=[float(fs[i]) for i in grid.argmin(0)],
                           wins=[int((d[arm][mix[:, j].argmin(), j, :, 0] < d['fresh'][j, :, 0]).sum()) for j in range(len(B))], worlds=int(d['fresh'].shape[1]), **{f'mix_{a}': np.median(d[str(a)][:, :, :, 0], 2).round(4).tolist() for a in d['arms'][1:]})
+# 4. the writer learns through its weights only (no memory of judged pairs)
+def practice_panels(d, show, arms, name, kept=None):
+    ns = list(d['ns']); P = d['P']; totals = list(d['totals']); fig, axes = plt.subplots(1, len(show), figsize=(len(show) * 0.95 * W, H), sharey=True, constrained_layout=True)
+    for ax, n in zip(axes, show):
+        i = ns.index(n); fr = np.array([d['fresh'][totals.index(n + int(c))] for c in P]); band(ax, P[1:], fr[1:, :, 0].T, GREY, 'fresh teacher pairs, same network', ls='--', marker='o'); ax.plot(P[1:], np.median(fr[1:, :, 1], 1), color=GREY, ls=':', marker='.', label='fresh teacher pairs, counted table')
+        for arm, label, col, ls in arms: band(ax, P[1:], d[arm][i][:, 1:, 0], col, label, ls=ls, marker='o')
+        ax.axhline(med(d[arms[0][0]][i][:, 0, 4]), color=INK, ls=':', label="the judge's own estimate"); ax.set_xscale('log', base=2); ax.set_yscale('log'); ax.set_xlabel(f'further samples after {n:,} teacher pairs')
+    axes[0].set_ylabel('population loss of the writer (nats)'); fig.legend(*axes[0].get_legend_handles_labels(), loc='outside lower center', ncols=4); save(fig, name)
+    return {str(n): dict(P=[int(c) for c in P], fresh=[med(d['fresh'][totals.index(n + int(c))][:, 0]) for c in P], table=[med(d['fresh'][totals.index(n + int(c))][:, 1]) for c in P], judge=med(d[arms[0][0]][ns.index(n)][:, 0, 4]), invalid=med(d[arms[0][0]][ns.index(n)][:, 0, 5]),
+                         **{arm: np.median(d[arm][ns.index(n)][:, :, 0], 0).round(4).tolist() for arm in d['arms']}, **{f'{arm}_apart': np.median(d[arm][ns.index(n)][:, :, 8], 0).round(3).tolist() for arm in d['arms']},
+                         **{f'{arm}_wins': [int((d[arm][ns.index(n)][:, j, 0] < d['fresh'][totals.index(n + int(c))][:, 0]).sum()) for j, c in enumerate(P)] for arm in d['arms']},
+                         **{f'{arm}_wins_table': [int((d[arm][ns.index(n)][:, j, 0] < d['fresh'][totals.index(n + int(c))][:, 1]).sum()) for j, c in enumerate(P)] for arm in d['arms']}, worlds=int(d[arms[0][0]].shape[1])) for n in ns}
+
+
+d = np.load(D / 'network_practice_curves_online.npz')
+nums['online'] = practice_panels(d, [4096, 8192, 16384], (('online', 'own proposals, weights only', MAGENTA, '-'), ('online_local', 'the same, only the two written codes move', AQUA, '-'), ('online_twin', "a twin's proposals, weights only", ORANGE, '-'), ('online_top', 'hidden layer frozen', YELLOW, '-'),
+                                                           ('own', 'own proposals, judged counts kept', BLUE, '-')), 'model5-network-online')
+
+# 5. the network trained by a local rule: plateau at small weights, hidden layer and output
+d = np.load(D / 'network_practice_local.npz'); keys = list(d['keys']); fig, axes = plt.subplots(1, 2, figsize=(1.8 * W, 0.9 * H), sharey=True, constrained_layout=True); x = np.arange(1, d['curves'].shape[2] + 1)
+for j, (ax, title) in enumerate(zip(axes, ('the hidden layer read out', 'what the output writes'))):
+    for i, init in enumerate(d['inits']): band(ax, x, d['curves'][i][:, :, j], SEQ(0.25 + 0.25 * i), f'random start of size {init:g}')
+    ax.set_xscale('log'); ax.set_yscale('log'); ax.set_xlabel('passes over the teacher pairs'); ax.set_title(title)
+axes[0].set_ylabel('population loss (nats)'); axes[0].legend(); save(fig, 'model5-network-local')
+nums['local'] = {str(int(n)): {k: med(d['stats'][i][:, keys.index(k)]) for k in keys} for i, n in enumerate(d['ns'])} | dict(first=[int(np.argmax(np.median(d['curves'][i][:, :, 0], 0) < 0.05)) + 1 for i in range(len(d['inits']))], inits=[float(i) for i in d['inits']], worlds=int(d['stats'].shape[1]))
+if (D / 'network_practice_curves_localrule.npz').exists():
+    d = np.load(D / 'network_practice_curves_localrule.npz'); nums['localrule'] = practice_panels(d, [4096, 8192, 16384], (('online_local', 'own proposals, only the two written codes move', AQUA, '-'), ('online', 'own proposals, normalised step', MAGENTA, '-')), 'model5-network-localrule')
+
 b = np.load(D / 'network_baseline.npz'); nums['baseline'] = {str(int(n)): {k: med(b[k][i]) for k in ('table', 'net16', 'hidden16', 'oracle', 'right16')} | dict(all_right=int((b['right16'][i] == 1).sum()), worlds=int(b['table'].shape[1])) for i, n in enumerate(b['n'])}
 (OUT / 'network_numbers.json').write_text(json.dumps(nums, indent=1)); print(OUT / 'network_numbers.json')

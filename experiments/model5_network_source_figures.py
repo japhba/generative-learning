@@ -1,6 +1,6 @@
 """Figures and numbers for section 10 of the model 5 note: whose proposals the writer practises on (one block), and three levels with networks.
 From /var/tmp/jbauer/model5_lateral_verdict/network_practice_curves_{source,source_local,mix,mix_local}.npz and network_depth_{watching,watching_local,saddle,curves}.npz.
-Writes <out>/model5-network-{source,parts,depth-watching,depth-practice}.svg/.png and <out>/source_numbers.json.   Usage: MPLBACKEND=Agg python model5_network_source_figures.py <out>"""
+Also the tied-reader twin test (twin_tied.npz). Writes <out>/model5-network-{source,parts,depth-watching,depth-practice}.svg/.png, <out>/model5-twin-tied.svg/.png and <out>/source_numbers.json.   Usage: MPLBACKEND=Agg python model5_network_source_figures.py <out>"""
 
 import json
 from pathlib import Path
@@ -97,4 +97,17 @@ for j, (title, x, get) in enumerate(cols):
     axes[0, j].set_title(title); axes[1, j].set_xlabel(f'proposals after {n:,} teacher samples')
     for ax in axes[:, j]: ax.set_xscale('symlog', base=2, linthresh=float(x[1])); ax.set_yscale('log')
 axes[0, 0].set_ylabel('invalid mass:  $-\\log$(valid share)  (nats)'); axes[1, 0].set_ylabel('unevenness among the valid (nats)'); fig.legend(*axes[0, 0].get_legend_handles_labels(), loc='outside lower center', ncols=3); save(fig, 'model5-network-parts')
+
+# 5. a reader tied to its own writer (model5_twin_tied.py): practice on own samples against a twin's, in the two table learners
+t = np.load(D / 'twin_tied.npz'); g = t['gradient']; marks = t['marks']; gr = t['grower']; fig, axes = plt.subplots(1, 3, figsize=(2.6 * W, 0.95 * H), constrained_layout=True); ARM3 = (('no practice', GREY, '--'), ('own samples', BLUE, '-'), ("a twin's samples", ORANGE, '-'))
+for i, (label, col, ls) in enumerate(ARM3): band(axes[0], marks, g[1, 0, i, :, :, 0], col, label, ls=ls, marker='o')
+axes[0].set_xscale('symlog', linthresh=100); axes[0].set_yscale('log'); axes[0].set_xlabel('wake batches (units from a sharp random start)'); axes[0].set_ylabel('population loss (nats)'); axes[0].legend()
+for key, label, col in ((3, 'own samples', BLUE), (4, "a twin's samples", ORANGE), (5, 'teacher pairs', INK)): band(axes[1], marks, g[1, 0, 1, :, :, key], col, label, marker='o')
+axes[1].set_xscale('symlog', linthresh=100); axes[1].set_xlabel('wake batches (same learner, practising on own samples)'); axes[1].set_ylabel('share the reader explains above chance'); axes[1].legend()
+for i, (label, col, ls) in enumerate((('own samples', BLUE, '-'), ("a twin's samples, same teacher pairs", ORANGE, '-'), ("a twin's samples, other teacher pairs", ORANGE, ':'))): band(axes[2], t['check'], gr[i, :, :, 0], col, label, ls=ls)
+axes[2].set_xscale('log', base=2); axes[2].set_yscale('log'); axes[2].set_xlabel('practice samples (units that start as copies of the codes)'); axes[2].set_ylabel('population loss (nats)'); axes[2].legend(); save(fig, 'model5-twin-tied')
+nums['tied'] = dict(worlds=int(g.shape[3]), marks=[int(x) for x in marks], loss={st: {arm: med(g[a, 0, i, :, :, 0], 0) for i, arm in enumerate(t['arms'])} for a, st in enumerate(t['starts'])}, own_below_twin={st: [wins(g[a, 0, 1, :, j, 0], g[a, 0, 2, :, j, 0]) for j in range(len(marks))] for a, st in enumerate(t['starts'])},
+                    none_below_twin={st: wins(g[a, 0, 0, :, -1, 0], g[a, 0, 2, :, -1, 0]) for a, st in enumerate(t['starts'])}, own_below_none={st: [wins(g[a, 0, 1, :, j, 0], g[a, 0, 0, :, j, 0]) for j in range(len(marks))] for a, st in enumerate(t['starts'])},
+                    reach={st: med(g[a, 0, 1, :, :, 3:6], 0) for a, st in enumerate(t['starts'])}, grower=dict(own=med(gr[0, :, :, 0], 0), twin_same=med(gr[1, :, :, 0], 0), twin_other=med(gr[2, :, :, 0], 0), check=[int(x) for x in t['check']], own_wins=[wins(gr[0, :, -1, 0], gr[i, :, -1, 0]) for i in (1, 2)],
+                    twin_kl=med(t['grower_twin_kl'], 1), mid_wins=wins(gr[0, :, list(t['check']).index(524288), 0], gr[1, :, list(t['check']).index(524288), 0])))
 (OUT / 'source_numbers.json').write_text(json.dumps(nums, indent=1)); print(OUT / 'source_numbers.json')

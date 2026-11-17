@@ -17,6 +17,10 @@ Arms after n teacher pairs, P further samples:  fresh    a network trained on n 
   online_twin  the same on a twin's proposals        online_explore  proposals drawn from the writer's output at temperature 2        online_top  only the top of the writer learns
   online_local  the same step without the normaliser's part: only the hidden vectors and biases of the two written codes move, by error x the partner's hidden vector
   own_reader  as own, and after every round the reader is fitted to the same memory, so that the judge is rebuilt from a hidden layer that has learned from the judged pairs
+  online_twinsame  the twin of the spec: the same teacher pairs, another random start        online_uniform  proposals drawn uniformly from all pairs (no writer needed to propose)
+  online_reward[_twinsame]  the judge only says accepted or refused; an accepted proposal is moved up, a refused one down (relative to the running acceptance rate)
+  online_judge  proposals drawn from the judge's estimate p_E itself (teacher pairs with codes swapped for neighbours; no writer needed)        online_mix[_twinsame]  every other proposal from p_E, the rest own (or the twin's)
+  --onesided: a refused proposal is only ever moved down to the floor (without it, a refused pair below the floor is moved up to it, which penalises proposals the learner would not write itself)
 Closed forms: p_E itself; the table over the true classes.
 Runs: curves (arms against P at fixed n), budget (total by own share), local (the network trained by a local rule: hidden layer, output, plateau).   Writes /var/tmp/jbauer/model5_lateral_verdict/network_practice_<run>.npz.
 Usage: python model5_network_practice.py <run> [--worlds 16] [--procs 28]"""
@@ -32,7 +36,7 @@ from model5_lateral_verdict import OUT, World, table_kl
 from model5_network_baseline import groups
 from model5_own_benefit import class_table, kl
 
-D, INIT, LR, STEPS, DECAYS, BATCH, LR_P, ETA, FLOOR = 16, 0.1, 0.02, 600, (1e-4, 1e-3, 3e-3), 64, 0.01, 0.5, 1e-3; RULE = 'backprop'   # --rule local: reader and writer trained by the local rule of local_net
+D, INIT, LR, STEPS, DECAYS, BATCH, LR_P, ETA, FLOOR = 16, 0.1, 0.02, 600, (1e-4, 1e-3, 3e-3), 64, 0.01, 0.5, 1e-3; RULE = 'backprop'; ONESIDED = False   # --rule local: reader and writer trained by the local rule of local_net
 TAUS = np.arange(0.3, 0.96, 0.05); CHECK = BATCH * 2 ** np.arange(2, 10)                                                             # own samples at which practice is scored: 256 .. 32,768
 
 
@@ -73,12 +77,12 @@ def bandwidth(reader, Q, Qv):                                                   
 
 
 class Learner:
-    def __init__(self, w, n, rng, tau=None):
-        self.w = w; k, kp = w.teacher(rng, n); val = rng.random(n) < 0.15; N = w.N; self.Q, self.Qv = np.zeros((N, N)), np.zeros((N, N)); np.add.at(self.Q, (k[~val], kp[~val]), 1); np.add.at(self.Qv, (k[val], kp[val]), 1)
+    def __init__(self, w, n, rng, tau=None, data=None):                                                                            # data: the teacher pairs (and held-out mask) of another learner, for a twin that differs only in its random start
+        self.w = w; k, kp, val = self.data = data or (*w.teacher(rng, n), rng.random(n) < 0.15); N = w.N; self.Q, self.Qv = np.zeros((N, N)), np.zeros((N, N)); np.add.at(self.Q, (k[~val], kp[~val]), 1); np.add.at(self.Qv, (k[val], kp[val]), 1)
         if RULE == 'local': self.reader, self.writer = (best_local(w, k, kp, val, rng)[0] for _ in range(2)); self.decay = 0.0                                                        # both networks trained by the local rule
         else: self.reader, _ = watch(w, self.Q, self.Qv, rng); self.writer, self.decay = watch(w, self.Q, self.Qv, rng)                                                                # separate weights: two random starts
         self.tau = bandwidth(self.reader, self.Q, self.Qv) if tau is None else tau
-        self.pE = evidence(self.reader, self.Q, self.tau) if self.tau <= 1 else self.Q / self.Q.sum(); self.asked = np.zeros((N, N), bool); self.extra = np.zeros((N, N)); self.ebar = None
+        self.pE = evidence(self.reader, self.Q, self.tau) if self.tau <= 1 else self.Q / self.Q.sum(); self.asked = np.zeros((N, N), bool); self.extra = np.zeros((N, N)); self.ebar = None; self.vbar = None
 
     def propose(self, rng, m): return rng.choice(self.Q.size, m, p=np.exp(self.writer.logp()).ravel())
 
@@ -94,17 +98,23 @@ class Learner:
         for _ in range(m // BATCH):
             p = np.exp(self.writer.logp()); x = rng.choice(p.size, BATCH, p=p.ravel()); wt = self.pE.ravel()[x] / p.ravel()[x]; self.writer.step(wt.mean() * p - np.bincount(x, wt, p.size).reshape(p.shape) / BATCH, LR_P, self.decay)
 
-    def online(self, rng, m, source=None, temp=1.0, top=False, local=False):                                                                    # nothing is kept: for every proposal one step of the writer's weights that moves its log-probability of the
+    def online(self, rng, m, source=None, temp=1.0, top=False, local=False, reward=False, mix=False):                                                                    # nothing is kept: for every proposal one step of the writer's weights that moves its log-probability of the
         U, V, a, b = [x.copy() for x in self.writer.P]; N = self.w.N; B = getattr(self, 'B', np.eye(D))                                                  # proposed pair towards the log of the judge's answer (an answer of zero counts as FLOOR times the mean positive answer);
-        for _ in range(m):                                                                                                         # the step is normalised by the squared gradient, so ETA is the share of the error removed at that pair
-            lp = log_softmax((U @ B @ V.T + a + b).ravel()).reshape(N, N); p = np.exp(lp); q = p if source is None else np.exp(source.writer.logp())
+        for i in range(m):                                                                                                         # the step is normalised by the squared gradient, so ETA is the share of the error removed at that pair
+            lp = log_softmax((U @ B @ V.T + a + b).ravel()).reshape(N, N); p = np.exp(lp); src = 'judge' if mix and i % 2 == 0 else source                                                                       # mix: every other proposal is drawn from the judge's estimate
+            q = p if src is None else np.full((N, N), 1 / N ** 2) if src == 'uniform' else self.pE if src == 'judge' else np.exp(src.writer.logp())                                                               # 'uniform', 'judge': proposals without a writer
             if temp != 1: q = q ** (1 / temp); q = q / q.sum()
             k, kp = divmod(int(rng.choice(N * N, p=q.ravel())), N); e = self.pE[k, kp]
             if e > 0: self.ebar = e if self.ebar is None else 0.99 * self.ebar + 0.01 * e
             err = float(np.clip(lp[k, kp] - np.log(max(e, FLOOR * (self.ebar or 1 / N ** 2))), -5, 5)); ga = -p.sum(1, keepdims=True); ga[k] += 1; gb = -p.sum(0, keepdims=True); gb[0, kp] += 1
+            if ONESIDED and e == 0: err = max(err, 0.0)                                                                             # a refused pair is only ever moved down (to the floor), never up to it
+            if reward: v = float(e > 0); self.vbar = v if self.vbar is None else 0.99 * self.vbar + 0.01 * v; err = -(v - self.vbar)   # the judge only says accepted or refused: log-probability up by 1 - vbar or down by vbar (vbar: running acceptance rate)
             if local: st = ETA * err / ((U[k] ** 2).sum() + (V[kp] ** 2).sum() + 2); du = st * V[kp]; V[kp] = V[kp] - st * U[k]; U[k] = U[k] - du; a[k] -= st; b[0, kp] -= st; continue   # only the weights of the two written codes move: error x partner's hidden vector
             if top: gB = np.outer(U[k], V[kp]) - U.T @ p @ V; st = ETA * err / ((gB ** 2).sum() + (ga ** 2).sum() + (gb ** 2).sum()); B = B - st * gB
-            else: gU = -(p @ V); gU[k] += V[kp]; gV = -(p.T @ U); gV[kp] += U[k]; st = ETA * err / ((gU ** 2).sum() + (gV ** 2).sum() + (ga ** 2).sum() + (gb ** 2).sum()); U = U - st * gU; V = V - st * gV
+            else:
+                gU = -(p @ V); gU[k] += V[kp]; gV = -(p.T @ U); gV[kp] += U[k]; den = (gU ** 2).sum() + (gV ** 2).sum() + (ga ** 2).sum() + (gb ** 2).sum()
+                if den == 0: continue                                                                                               # the writer has collapsed onto this one pair (happens under the accept-or-refuse rule): nothing left to move
+                st = ETA * err / den; U = U - st * gU; V = V - st * gV
             a = a - st * ga; b = b - st * gb
         self.writer.P = [U @ B, V, a, b] if top else [U, V, a, b]
         if top: self.B = np.eye(D)                                                                                                 # the top matrix is folded into the stored weights at every checkpoint; the hidden vectors themselves stay as they were up to it
@@ -122,20 +132,22 @@ class Learner:
         w = self.w; a = self.pE > 0; return [kl(w, 0.999 * self.pE + 0.001 / self.pE.size), int(a[~w.valid].sum()), int((~a[w.valid]).sum()), self.tau]
 
 
-def run_arm(w, n, seed, arm):
-    rng = np.random.default_rng(5000 + seed); L = Learner(w, n, rng, tau=1.5 if arm == 'written' else None); T = Learner(w, n, rng) if arm in ('twin', 'online_twin') else None; out = [L.score()]; done = 0
+def run_arm(w, n, seed, arm):                                                                                                      # online arms are named by their parts: online[_local][_reward][_mix][_twin | _twinsame | _uniform | _judge | _explore | _top]
+    rng = np.random.default_rng(5000 + seed); L = Learner(w, n, rng, tau=1.5 if arm == 'written' else None); T = Learner(w, n, rng, data=L.data if 'twinsame' in arm else None) if 'twin' in arm else None; out = [L.score()]; done = 0
+    kw = dict(top='top' in arm, local='local' in arm, reward='reward' in arm, mix='mix' in arm); mine = np.exp(L.writer.logp()); other = np.exp(T.writer.logp()) if T is not None else mine; bad = ~w.valid
+    start = [float(np.minimum(mine, other)[bad].sum() / mine[bad].sum()), float(np.corrcoef(np.log(mine[w.valid]), np.log(other[w.valid]))[0, 1])]   # before practice: share of the learner's invalid mass that the twin writes as well; correlation of their log-probabilities of the valid pairs
     if arm == 'steps': L.writer.reset()
     for c in CHECK:
         m = int(c) - done; done = int(c)
         if arm == 'steps': L.steps(rng, m)
-        elif arm == 'online_twin':                                                                                                  # the twin practises on its own proposals at the same pace; the learner takes the twin's proposals to its own judge
-            for _ in range(m // BATCH): L.online(rng, BATCH, source=T); T.online(rng, BATCH)
-        elif arm.startswith('online'): L.online(rng, m, temp=2.0 if arm == 'online_explore' else 1.0, top=arm == 'online_top', local=arm == 'online_local')
+        elif arm.startswith('online') and T is not None:                                                                            # the twin practises on its own proposals at the same pace; the learner takes the twin's proposals to its own judge
+            for _ in range(m // BATCH): L.online(rng, BATCH, source=T, **kw); T.online(rng, BATCH, **kw)
+        elif arm.startswith('online'): L.online(rng, m, source='uniform' if 'uniform' in arm else 'judge' if 'judge' in arm else None, temp=2.0 if 'explore' in arm else 1.0, **kw)
         elif arm == 'draws': L.extra += np.bincount(rng.choice(L.Q.size, m, p=L.pE.ravel()), minlength=L.Q.size).reshape(L.Q.shape); L.refit(rng)
         elif arm == 'twin': x = T.propose(rng, m); T.keep(x); T.refit(rng); L.keep(x); L.refit(rng)
         else: L.keep(L.propose(rng, m)); L.refit(rng, reader=arm == 'own_reader')
         out.append(L.score())
-    return np.array(out), L.judge(), (T.score()[0] if T is not None else np.nan)
+    return np.array(out), L.judge(), (T.score()[0] if T is not None else np.nan), start
 
 
 def fresh(w, total, seed):                                                                                                         # a network and a table given `total` teacher pairs
@@ -206,7 +218,7 @@ def curves():
     with Pool(args.procs) as p:
         for job, out in tqdm(p.imap_unordered(one_curve, jobs), total=len(jobs)): res[job] = out
     np.savez(OUT / f'network_practice_curves{args.tag}.npz', ns=ns, P=np.concatenate([[0], CHECK]), totals=totals, arms=arms, fresh=np.array([[res['fresh', t, s, ''] for s in S] for t in totals]),
-             judge=np.array([[res['arm', n, s, arms[0]][1] for s in S] for n in ns]), twin_kl=np.array([[res['arm', n, s, 'twin'][2] for s in S] for n in ns]) if 'twin' in arms else 0,
+             judge=np.array([[res['arm', n, s, arms[0]][1] for s in S] for n in ns]), twin_kl=np.array([[res['arm', n, s, 'twin'][2] for s in S] for n in ns]) if 'twin' in arms else 0, **{f'start_{arm}': np.array([[res['arm', n, s, arm][3] for s in S] for n in ns]) for arm in arms if 'twin' in arm},
              **{arm: np.array([[res['arm', n, s, arm][0] for s in S] for n in ns]) for arm in arms})
     f = {t: np.median([res['fresh', t, s, ''] for s in S], 0) for t in totals}
     for n in ns:
@@ -216,4 +228,4 @@ def curves():
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(); ap.add_argument('run'); ap.add_argument('--worlds', type=int, default=16); ap.add_argument('--procs', type=int, default=28); ap.add_argument('--ns', default='1024,2048,4096')
-    ap.add_argument('--arms', default=','.join(ARMS)); ap.add_argument('--tag', default=''); ap.add_argument('--rule', default='backprop'); args = ap.parse_args(); RULE = args.rule; OUT.mkdir(parents=True, exist_ok=True); globals()[args.run]()
+    ap.add_argument('--arms', default=','.join(ARMS)); ap.add_argument('--tag', default=''); ap.add_argument('--rule', default='backprop'); ap.add_argument('--onesided', action='store_true'); args = ap.parse_args(); RULE = args.rule; ONESIDED = args.onesided; OUT.mkdir(parents=True, exist_ok=True); globals()[args.run]()

@@ -1,5 +1,5 @@
 """Build tex/model_5_lateral_verdict.html (OverLyX article) from experiments/model5_page.html: fill in the numbers from numbers.json
-(model5_figures.py) and own_benefit_numbers.json, propagation_numbers.json and network_numbers.json next to it, typeset every \\(...\\) and \\[...\\] with KaTeX at build time (scripts are left alone) and inline KaTeX's stylesheet.
+(model5_figures.py) and own_benefit_numbers.json, propagation_numbers.json, network_numbers.json and source_numbers.json next to it, typeset every \\(...\\) and \\[...\\] with KaTeX at build time (scripts are left alone) and inline KaTeX's stylesheet.
 Figures are referenced from tex/figures/. Served at http://127.0.0.1:8095/practice-docs/model_5_lateral_verdict.html (reports/practice-docs -> tex/).
 Usage: python model5_page.py <numbers.json> <out.html>"""
 
@@ -21,6 +21,9 @@ def f(x): return f'{x:.2f}' if x >= 0.095 else (f'{x:.3f}' if x >= 0.001 else f'
 
 
 def pct(x): return f'{100 * x:.0f}%' if x >= 0.095 else f'{100 * x:.1f}%'
+
+
+def pct3(x): return f'{100 * x:.2f}%'
 
 
 def main():
@@ -79,6 +82,30 @@ def main():
     assert min(on['8192']['online_wins'][oi(8192, 1024):]) >= 15 and min(on['16384']['online_wins'][oi(16384, 256):]) >= 14 and oc(on, 2048, 'online', 4096) > oc(on, 2048, 'fresh', 4096) and abs(oc(on, 8192, 'online', 4096) - oc(on, 8192, 'own', 1024)) < 0.005
     assert all(lo[n]['right'] == 1 for n in ('2048', '4096', '8192', '16384')) and all(lo[n]['invalid'] == 0 for n in ('4096', '8192', '16384')) and all(lo[n]['table'] < lo[n]['writes'] for n in ('8192', '16384')) and lo['4096']['table'] < lo['4096']['writes'] + 0.03
     assert min(lr['8192']['online_local_wins'][1:]) == W9 and max(lr['8192']['online_local_wins_table']) <= 2 and min(lr['8192']['online_wins_table'][oi(8192, 8192):oi(8192, 16384) + 1]) == W9 and max(oc(lr, n, 'fresh', 32768) for n in (4096, 8192, 16384)) > 0.15   # claims made in section 9
+    sr = json.loads(Path(sys.argv[1]).with_name('source_numbers.json').read_text()); sb, sl, sd, sw, sp = sr['bp'], sr['local'], sr['depth'], sr['watching'], sr['passes']; si = lambda d, n, P: d[str(n)]['P'].index(P); sc = lambda d, n, arm, P: d[str(n)][arm][si(d, n, P)]   # section 10
+    row10 = lambda d, n, P, arms: f'<tr><td class="num">{P:,}</td>' + ''.join(cell(sc(d, n, a, P)) for a in arms) + '</tr>'; A10 = ('fresh', 'own', 'twin', 'judge', 'mix', 'mixtwin'); wi = lambda n: sw['ns'].index(n); W10, WD = sb['8192']['worlds'], sd['8192']['worlds']
+    nums |= dict(s10_bp_rows='\n'.join(row10(sb, 8192, P, A10 + ('uniform',)) for P in (1024, 4096, 16384, 32768)), s10_lo_rows='\n'.join(row10(sl, 8192, P, A10 + ('uniform',)) for P in (1024, 4096, 16384, 32768)), s10_worlds=W10,
+                 s10_bo=f(sc(sb, 8192, 'own', 4096)), s10_bt=f(sc(sb, 8192, 'twin', 4096)), s10_bw=sc(sb, 8192, 'twin_behind_own', 4096), s10_boe=f(sc(sb, 8192, 'own', 32768)), s10_bte=f(sc(sb, 8192, 'twin', 32768)), s10_bwe=sc(sb, 8192, 'twin_behind_own', 32768),
+                 s10_lo=f(sc(sl, 8192, 'own', 4096)), s10_lt=f(sc(sl, 8192, 'twin', 4096)), s10_bj=f(sc(sb, 8192, 'judge', 4096)), s10_bje=f(sc(sb, 8192, 'judge', 32768)), s10_lj=f(sc(sl, 8192, 'judge', 4096)), s10_ltab=f(sc(sl, 8192, 'table', 4096)), s10_lm=f(sc(sl, 8192, 'mix', 4096)), s10_lmt=f(sc(sl, 8192, 'mixtwin', 4096)),
+                 s10_bm=f(sc(sb, 8192, 'mix', 4096)), s10_bmt=f(sc(sb, 8192, 'mixtwin', 4096)), s10_bu=f(sc(sb, 8192, 'uniform', 4096)), s10_b0=f(sc(sb, 8192, 'own', 0)), s10_l0=f(sc(sl, 8192, 'own', 0)), s10_rv0=pct3(sc(sb, 8192, 'reward_valid', 0)), s10_rv1=pct3(sc(sb, 8192, 'reward_valid', 32768)),
+                 s10_r1=f(sc(sb, 8192, 'reward', 32768)), s10_rt1=f(sc(sb, 8192, 'rewardtwin', 32768)), s10_bw0=f(sc(sb, 8192, 'own_wrong', 0)), s10_lw0=f(sc(sl, 8192, 'own_wrong', 0)), s10_dw0=f(sc(sd, 8192, 'own_wrong', 0)), s10_d0=f(sc(sd, 8192, 'own', 0)),
+                 s10_cb=f"{sr['overlap']['bp']['8192'][1]:.2f}", s10_cl=f"{sr['overlap']['local']['8192'][1]:.2f}", s10_cd=f"{sd['8192']['corr']:.2f}", s10_ov=pct(sr['overlap']['local']['8192'][0]), s10_ltw=f(sc(sl, 8192, 'twin_wrong', 32768)), s10_low=f(sc(sl, 8192, 'own_wrong', 32768)),
+                 s10_dtw=f(sc(sd, 8192, 'twin_wrong', 16384)), s10_dow=f(sc(sd, 8192, 'own_wrong', 16384)), s10_bow=f(sc(sb, 8192, 'own_wrong', 32768)), s10_btw=f(sc(sb, 8192, 'twin_wrong', 32768)), s10_djw=f(sc(sd, 8192, 'judge_wrong', 16384)),
+                 s10_wrows='\n'.join(f'<tr><td class="num">{n:,}</td>' + ''.join(cell(sw[r][k][wi(n)]) for r, k in (('local', 'table'), ('local', 'writes'), ('local', 'hidden'), ('backprop', 'writes'), ('backprop', 'hidden'), ('local', 'oracle'))) + f'<td class="num">{pct(sw["local"]["right2"][wi(n)]) if sw["local"]["right2"][wi(n)] else "0%"}</td></tr>' for n in sw['ns']),
+                 s10_wworlds=sw['worlds'], s10_uniform=f(float(np.log(64 ** 4 / 262144))), s10_h8192=f(sw['local']['hidden'][wi(8192)]), s10_r2l=pct(sw['local']['right2'][wi(4096)]), s10_r2b=pct(sw['backprop']['right2'][wi(4096)]), s10_t8192=f(sw['local']['table'][wi(8192)]), s10_t32768=f(sw['local']['table'][wi(32768)]),
+                 s10_wb8192=f(sw['backprop']['writes'][wi(8192)]), s10_wb16384=f(sw['backprop']['writes'][wi(16384)]), s10_wl8192=f(sw['local']['writes'][wi(8192)]), s10_xb=f"{sw['backprop']['writes'][wi(8192)] / sw['backprop']['hidden'][wi(8192)]:.0f}", s10_pc0=sp['classes'][0], s10_ps0=sp['symbols'][0], s10_pc3=sp['classes'][3], s10_ps3=sp['symbols'][3],
+                 s10_inv8192=f"{sw['local']['invalid'][wi(8192)]:,.0f}", s10_inv32768=f"{sw['local']['invalid'][wi(32768)]:,.0f}", s10_dn='8,192', s10_drows='\n'.join(row10(sd, 8192, P, A10 + ('shallow',)) for P in (1024, 2048, 4096, 8192, 16384)), s10_dworlds=WD,
+                 s10_do=f(sc(sd, 8192, 'own', 16384)), s10_df=f(sc(sd, 8192, 'fresh', 16384)), s10_dwf=min(sd['8192']['own_below_fresh'][1:]), s10_do2=f(sc(sd, 16384, 'own', 16384)), s10_df2=f(sc(sd, 16384, 'fresh', 16384)), s10_dt=f(sc(sd, 8192, 'twin', 16384)), s10_dt2=f(sc(sd, 16384, 'twin', 16384)),
+                 s10_dtk=f(sd['8192']['twin_after']), s10_dj=f(sc(sd, 8192, 'judge', 16384)), s10_dj2=f(sc(sd, 16384, 'judge', 16384)), s10_dm=f(sc(sd, 8192, 'mix', 16384)), s10_dmt=f(sc(sd, 8192, 'mixtwin', 16384)), s10_ds=f(sc(sd, 8192, 'shallow', 16384)), s10_ds2=f(sc(sd, 16384, 'shallow', 16384)))
+    assert abs(sc(sb, 8192, 'own', 4096) - sc(sb, 8192, 'twin', 4096)) < 0.003 and sc(sb, 8192, 'twin_behind_own', 32768) == W10 and max(sl['8192']['twin_behind_own'][si(sl, 8192, 2048):]) == 0 and max(sl[n]['twin_behind_own'][si(sl, 8192, 2048)] for n in ('4096', '16384')) == 0
+    assert all(sc(sl, 8192, 'judge', P) <= sc(sl, 8192, 'twin', P) + 0.001 < sc(sl, 8192, 'own', P) for P in (1024, 4096, 16384)) and sc(sl, 8192, 'judge', 4096) < sc(sl, 8192, 'table', 4096) < sc(sl, 8192, 'own', 4096) and sc(sb, 8192, 'judge', 4096) <= sc(sb, 8192, 'own', 4096) and sc(sb, 8192, 'judge', 32768) > sc(sb, 8192, 'own', 32768)
+    assert sc(sb, 8192, 'uniform', 4096) > sc(sb, 8192, 'own', 0) and abs(sc(sb, 8192, 'uniform', 32768) - sc(sb, 8192, 'own', 32768)) < 0.002 and sc(sb, 8192, 'reward', 32768) > 2 * sc(sb, 8192, 'own', 0) and sc(sb, 8192, 'reward_valid', 32768) > sc(sb, 8192, 'reward_valid', 0) and sr['collapse']['loss'] > 10 and sr['collapse']['holes'] > 0.9
+    assert sc(sl, 8192, 'mixtwin', 4096) < sc(sl, 8192, 'mix', 4096) and abs(sc(sb, 8192, 'mix', 4096) - sc(sb, 8192, 'mixtwin', 4096)) < 0.002 and all(2 * sc(d, 8192, 'own_wrong', 0) < sc(d, 8192, 'own', 0) for d in (sb, sl, sd)) and abs(sc(sb, 8192, 'judge_wrong', 32768) - sc(sb, 8192, 'own_wrong', 0)) < 0.001
+    assert sc(sl, 8192, 'twin_wrong', 32768) < sc(sl, 8192, 'own_wrong', 32768) and sc(sd, 8192, 'twin_wrong', 16384) < sc(sd, 8192, 'own_wrong', 16384) and sc(sb, 8192, 'own_wrong', 32768) < sc(sb, 8192, 'twin_wrong', 32768) and sc(sd, 8192, 'judge_wrong', 16384) > sc(sd, 8192, 'own_wrong', 0)
+    assert all(abs(sw[r]['hidden'][wi(n)] - sw[r]['oracle'][wi(n)]) < 0.0005 and sw[r]['right2'][wi(n)] == 1 for r in ('local', 'backprop') for n in (8192, 16384, 32768)) and all(sw[r]['right1'][wi(n)] > 0.98 for r in ('local', 'backprop') for n in sw['ns'][1:]) and min(sw['local']['table']) > 3.7
+    assert all(sw['local']['refused'][wi(n)] == 0 for n in (8192, 16384, 32768)) and all(c < s_ for c, s_ in zip(sp['classes'], sp['symbols'])) and all(x == [1.0, 1.0] for x in sp['end'])
+    assert min(sd['8192']['own_below_fresh'][1:]) >= 14 and min(sd['16384']['own_below_fresh'][1:]) == WD and max(sd['8192']['twin_behind_own'][2:]) <= 1 and max(sd['16384']['twin_behind_own'][2:]) == 0 and max(sd['8192']['judge_behind_own'] + sd['16384']['judge_behind_own']) == 0 and abs(sc(sd, 8192, 'mix', 16384) - sc(sd, 8192, 'mixtwin', 16384)) < 0.03
+    assert all(min(sd[str(n)][a][-1] for a in ('own', 'twin', 'judge', 'mix', 'mixtwin')) > sw['backprop']['writes'][wi(n)] for n in (8192, 16384)) and sc(sd, 8192, 'shallow', 16384) > sc(sd, 8192, 'own', 0) and sc(sd, 16384, 'shallow', 16384) > 2 * sc(sd, 16384, 'own', 16384) and sc(sd, 8192, 'mix', 16384) < sc(sd, 8192, 'judge', 16384) and abs(sd['8192']['twin_after'] - sc(sd, 8192, 'own', 16384)) < 0.1   # claims made in section 10
     html = (ROOT / 'experiments/model5_page.html').read_text()
     for key in sorted(set(re.findall(r'\{\{(\w+)\}\}', html))): html = html.replace('{{' + key + '}}', str(nums[key]))
     head, rest = html.split('<main>', 1); body, tail = rest.split('</main>', 1)

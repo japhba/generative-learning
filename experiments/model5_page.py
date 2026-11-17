@@ -1,5 +1,5 @@
 """Build tex/model_5_lateral_verdict.html (OverLyX article) from experiments/model5_page.html: fill in the numbers from numbers.json
-(model5_figures.py) and own_benefit_numbers.json next to it (model5_own_benefit_figures.py), typeset every \\(...\\) and \\[...\\] with KaTeX at build time (scripts are left alone) and inline KaTeX's stylesheet.
+(model5_figures.py) and own_benefit_numbers.json, propagation_numbers.json and network_numbers.json next to it, typeset every \\(...\\) and \\[...\\] with KaTeX at build time (scripts are left alone) and inline KaTeX's stylesheet.
 Figures are referenced from tex/figures/. Served at http://127.0.0.1:8095/practice-docs/model_5_lateral_verdict.html (reports/practice-docs -> tex/).
 Usage: python model5_page.py <numbers.json> <out.html>"""
 
@@ -56,6 +56,19 @@ def main():
                  pr_bt2=pct(Bs['t2'][0]), pr_bo2=pct(Bs['o2'][0]), pr_at30=pct(A['t3'][0]), pr_at3e=pct(A['t3'][-1]), pr_bt30=pct(Bs['t3'][0]), pr_bt3e=pct(Bs['t3'][-1]), pr_go1=pct(go[0]), pr_gt1=pct(gt[0]), pr_go1min=pct(go[imin]),
                  pr_go1min_at=f'{int(gs[imin]):,}', pr_gcross=f'{cross:,}', pr_gt1e=pct(min(gt[-1], go[-1])), pr_gloss=f(gr['loss_th0'][-1]), pr_gt1max1=pct(max(gr['t1_th1'])), pr_gloss1=f(gr['loss_th1'][-1]))
     assert A['o2'][0] > A['t2'][0] and Bs['t2'][0] > Bs['o2'][0] and A['t3'][0] < 0.01 and Bs['t3'][0] < 0.05 and Bs['t3'][-1] > 0.95 and gt[0] < 0.1 < 0.7 < go[0] and max(gr['t1_th1']) < 0.15 and gt[-1] > 0.95 and go[-1] > 0.95   # claims made in section 7
+    nw = json.loads(Path(sys.argv[1]).with_name('network_numbers.json').read_text()); nb, nc, bu = nw['baseline'], nw['curves'], nw['budget']; Pi = lambda n, P: nc[str(n)]['P'].index(P); c = lambda n, arm, P: nc[str(n)][arm][Pi(n, P)]; tb = lambda t: bu['total'].index(2 ** t)   # section 8
+    bmix = np.array(bu['mix']).min(0); W8 = nc['4096']['worlds']
+    nums |= dict(nw_brows='\n'.join(f'<tr><td class="num">{int(n):,}</td>' + ''.join(cell(nb[n][k]) for k in ('table', 'net16', 'hidden16', 'oracle')) + '</tr>' for n in ('1024', '2048', '4096', '8192')), nw_bworlds=nb['2048']['worlds'],
+                 nw_bh2048=f(nb['2048']['hidden16']), nw_bh8192=f(nb['8192']['hidden16']), nw_bo2048=f(nb['2048']['oracle']), nw_bn2048=f(nb['2048']['net16']), nw_bratio=f"{nb['2048']['net16'] / nb['2048']['hidden16']:.0f}", nw_worlds=W8,
+                 nw_crows='\n'.join(f'<tr><td class="num">{P:,}</td>' + ''.join(cell(c(4096, arm, P)) for arm in ('fresh', 'own', 'twin', 'draws')) + '</tr>' for P in (512, 1024, 2048, 4096, 8192, 16384, 32768)),
+                 nw_o4096=f(c(4096, 'own', 4096)), nw_f4096=f(c(4096, 'fresh', 4096)), nw_o8192=f(c(8192, 'own', 8192)), nw_f8192=f(c(8192, 'fresh', 8192)), nw_o2048=f(c(2048, 'own', 8192)), nw_f2048=f(c(2048, 'fresh', 8192)),
+                 nw_o1024=f(c(1024, 'own', 4096)), nw_f1024=f(c(1024, 'fresh', 4096)), nw_inv1024=f"{nc['1024']['invalid']:.0f}", nw_j2048=f(nc['2048']['judge']), nw_j4096=f(nc['4096']['judge']), nw_j8192=f(nc['8192']['judge']),
+                 nw_t2048=f(c(2048, 'twin', 2048)), nw_ot2048=f(c(2048, 'own', 2048)), nw_s4096=f(c(4096, 'steps', 32768)), nw_w4096=f(c(4096, 'written', 32768)), nw_ri0=f"{nc['2048']['invalid_reader'][0]:.0f}", nw_ri1=f"{nc['2048']['invalid_reader'][-1]:.0f}",
+                 nw_rj0=f(nc['2048']['judge_reader'][0]), nw_rj1=f(nc['2048']['judge_reader'][-1]), nw_or2048=f(c(2048, 'own_reader', 32768)), nw_oe2048=f(c(2048, 'own', 32768)), nw_bw=bu['worlds'], nw_m13=f(bmix[tb(13)]), nw_bf13=f(bu['fresh'][tb(13)]),
+                 nw_m14=f(bmix[tb(14)]), nw_bf14=f(bu['fresh'][tb(14)]), nw_bt16=f(bu['table'][tb(16)]), nw_m16=f(bmix[tb(16)]), nw_s0=f(c(4096, 'own', 0)), nw_e4096=f(c(4096, 'own', 32768)))
+    assert all(x == W8 for x in nc['4096']['own_wins'][Pi(4096, 512):Pi(4096, 8192) + 1]) and all(x == W8 for x in nc['8192']['own_wins'][1:]) and c(2048, 'own', 4096) > c(2048, 'fresh', 4096) and abs(c(2048, 'own', 2048) - c(2048, 'fresh', 2048)) < 0.01
+    assert c(2048, 'twin', 2048) < c(2048, 'own', 2048) and all(c(n, 'draws', P) > 0.95 * c(n, 'fresh', P) for n in (2048, 4096, 8192) for P in nc['4096']['P'][1:]) and all(c(n, 'own', 32768) >= nc[str(n)]['judge'] for n in (2048, 4096, 8192))
+    assert nb['8192']['hidden16'] < c(4096, 'own', 4096) and all(sh in (0.125, 0.25) for sh in bu['best_share'][tb(12):]) and all(x == bu['worlds'] for x in bu['wins'][tb(12):]) and bu['table'][tb(16)] < bmix[tb(16)] and nc['2048']['invalid_reader'][-1] == 0                       # claims made in section 8
     html = (ROOT / 'experiments/model5_page.html').read_text()
     for key in sorted(set(re.findall(r'\{\{(\w+)\}\}', html))): html = html.replace('{{' + key + '}}', str(nums[key]))
     head, rest = html.split('<main>', 1); body, tail = rest.split('</main>', 1)

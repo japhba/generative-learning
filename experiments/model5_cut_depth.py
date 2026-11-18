@@ -71,7 +71,7 @@ def reader(c, S, val, seed):                                                    
 
 class Stack:                                                                                                                       # the writer's own units z -> u_A, u_B -> codes at the cuts, and the reader's two naming layers
     def __init__(self, R, U, Z, rng, eta):
-        N = len(R.PB); self.R, self.U, self.Z, self.eta = R, U, Z, eta; self.lR, self.lL = np.log(R.PB.sum(0)), np.log(R.PB.sum(1)); self.b, self.ebar, self.rbar = [0.0, 0.0], None, None
+        N = len(R.PB); self.R, self.U, self.Z, self.eta = R, U, Z, eta; self.lR, self.lL = np.log(R.PB.sum(0)), np.log(R.PB.sum(1)); self.b, self.ebar, self.rbar, self.only = [0.0, 0.0], None, None, None; D = R.XR.shape[1]   # only: 'refused' or 'accepted' keeps the verdicts of one kind (model5_cut_mechanism.py)
         self.D1, self.D2, self.THA, self.THB = INIT * rng.standard_normal((U, N)), INIT * rng.standard_normal((U, N)), INIT * rng.standard_normal((Z, U)), INIT * rng.standard_normal((Z, U))
         self.W2, self.W3, self.c, self.NA, self.NB, self.c2 = INIT * rng.standard_normal((U, D)), INIT * rng.standard_normal((U, D)), np.zeros(U), INIT * rng.standard_normal((U, Z)), INIT * rng.standard_normal((U, Z)), np.zeros(Z)
 
@@ -107,7 +107,9 @@ class Stack:                                                                    
         d1 = np.log(np.concatenate([pA.mean(0)[x[:, 0], x[:, 1]], pB.mean(0)[x[:, 2], x[:, 3]]])) - logE; d1[~pos] = np.maximum(d1[~pos], 0); d1 = np.clip(d1, -CLIP, CLIP); f = -(d1 - self.b[0])
         ok = (eA > 0) & (eB > 0); r = R.r2[R.cls1[x[:, 0]], R.cls1[x[:, 2]]]; rp = r > 0; self.rbar = (float(r[ok & rp].mean()) if self.rbar is None else 0.95 * self.rbar + 0.05 * float(r[ok & rp].mean())) if (ok & rp).any() else (self.rbar or 1.0)
         d2 = np.log((pA[:, x[:, 0], x[:, 1]] * pB[:, x[:, 2], x[:, 3]]).mean(0)) - logE[:n] - logE[n:] - np.log(np.where(rp, r, FLOOR * self.rbar)); d2[~rp] = np.maximum(d2[~rp], 0); d2 = np.clip(d2, -CLIP, CLIP)
-        self.step1(uA, x[:, 0], x[:, 1], f[:n], tab, self.eta[2]); self.step1(uB, x[:, 2], x[:, 3], f[n:], tab, self.eta[2]); self.step2(z, uA, uB, np.where(ok, -(d2 - self.b[1]), 0.0), tab, self.eta[2])
+        f2 = np.where(ok, -(d2 - self.b[1]), 0.0)
+        if self.only: f, f2 = f * (pos if self.only == 'accepted' else ~pos), f2 * (rp if self.only == 'accepted' else ~rp)
+        self.step1(uA, x[:, 0], x[:, 1], f[:n], tab, self.eta[2]); self.step1(uB, x[:, 2], x[:, 3], f[n:], tab, self.eta[2]); self.step2(z, uA, uB, f2, tab, self.eta[2])
         self.b[0] += 0.05 * (float(d1.mean()) - self.b[0]); self.b[1] += 0.05 * (float(d2[ok].mean()) - self.b[1]) if ok.any() else 0.0
 
     def score(self, c):

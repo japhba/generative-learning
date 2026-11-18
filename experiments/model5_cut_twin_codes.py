@@ -1,6 +1,6 @@
 """Model 5, check for model5_cut_twin.py: which deep code two finished learners hold. Reruns the cross_read arm (4,096 teacher strings, 16 worlds) and prints, for both learners, how much the top unit says
 about the value at the first and at the second cut in the learner's own samples, and how much of the top unit of its own and of the twin's samples the first learner's reader recovers.
-Usage: python model5_cut_twin_codes.py"""
+Writes OUT/cut_twin_codes.json.   Usage: python model5_cut_twin_codes.py"""
 
 import os
 
@@ -28,4 +28,8 @@ def one(seed):
 if __name__ == '__main__':
     with Pool(16) as pool: out = pool.map(one, range(16))
     print('world | first learner: top unit about value 1, value 2 | twin: same | reader recovers level 2 of own, of twin | written right (level 1, 2): first, twin')
+    import json; from model5_lateral_verdict import OUT
+    done = [(cl, ct, ro, rt) for s, cl, ct, ro, rt, sl, st in out if min(*sl, *st) > 0.9]; diff = [(cl[0] > cl[1]) != (ct[0] > ct[1]) for cl, ct, _, _ in done]                                      # pairs in which both learners finished; do they hold different codes
+    json.dump(dict(worlds=len(out), finished=len(done), different=int(sum(diff)), own_when_different=float(np.median([r[2] for r, x in zip(done, diff) if x])), twin_when_different=float(np.median([r[3] for r, x in zip(done, diff) if x])),
+                   own_when_same=float(np.median([r[2] for r, x in zip(done, diff) if not x])), twin_when_same=float(np.median([r[3] for r, x in zip(done, diff) if not x])), top_about_own_value=float(np.median([max(cl) for cl, _, _, _ in done])), top_about_other_value=float(np.median([min(cl) for cl, _, _, _ in done]))), open(OUT / 'cut_twin_codes.json', 'w'), indent=1)
     for s, cl, ct, ro, rt, sl, st in out: print(f'{s:3d} | {cl[0]:.2f} {cl[1]:.2f} | {ct[0]:.2f} {ct[1]:.2f} | {ro:.2f} {rt:.2f} | {sl[0]:.2f} {sl[1]:.2f}  {st[0]:.2f} {st[1]:.2f}', '  same code' if (cl[0] > cl[1]) == (ct[0] > ct[1]) else '  different code')

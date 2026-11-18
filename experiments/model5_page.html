@@ -7,7 +7,7 @@
 <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="expires" content="0">
-<title>Model 5: lateral verdict</title>
+<title>Model 5: practice on own units</title>
 <style>/*__KATEX_CSS__*/</style>
 <style>
 :root{color-scheme:light;--bg:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--link:#1c5cab;--note:#fdf3e7;--ok:#2a78d6;--bad:#e34948;--good:#0ca30c}
@@ -34,6 +34,8 @@ ul{padding-left:22px}li{margin-bottom:6px}
 figure{margin:22px 0}
 figure img{display:block;width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:12px}
 figcaption{font-size:.88rem;color:var(--ink2);margin-top:8px}
+figure.diagram svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+figure.diagram text{font:13px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--ink)}
 table{border-collapse:collapse;width:100%;font-size:.92rem;margin:6px 0 14px}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
 thead th{color:var(--ink2);font-weight:650;border-bottom:1px solid var(--axis)}
@@ -42,20 +44,6 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}td.num{white-sp
 .counts th,.counts td{text-align:right;font-variant-numeric:tabular-nums}
 footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--grid);font-size:.82rem;color:var(--ink2)}
 code{overflow-wrap:anywhere}
-figure.widget{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-.w-controls{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-bottom:8px;font-size:.9rem}
-.w-controls button,.w-controls select{font:inherit;font-size:.88rem;padding:5px 10px;border-radius:8px;border:1px solid var(--axis);background:var(--bg);color:var(--ink);cursor:pointer}
-.w-controls button:hover{border-color:var(--ink2)}
-.w-controls button.primary{border-color:var(--ok)}
-#wSvg{display:block;width:100%;height:auto}
-#wSvg text{font:11px system-ui,sans-serif;pointer-events:none}
-.w-controls label{display:inline-flex;gap:5px;align-items:center}
-.w-legend .sw{display:inline-block;width:11px;height:11px;margin:0 3px 0 10px;vertical-align:-1px;border-radius:2px}
-.w-legend .sw-dot{background:radial-gradient(circle,var(--ink) 30%,transparent 36%);border:1px solid var(--axis)}
-.w-legend .sw-ok{background:var(--ok)}.w-legend .sw-bad{background:var(--bad)}
-.w-legend .sw-acc{border:2px solid var(--good);border-radius:50%}.w-legend .sw-rej{border:2px solid var(--bad);border-radius:50%}
-.w-status{font-size:.88rem;color:var(--ink2);min-height:2.9em;margin:6px 0 4px}
-.w-stats td,.w-stats th{font-size:.86rem;padding:5px 8px}
 @media (max-width:720px){body{font-size:16px}header{padding-top:28px}section{padding-top:34px}}
 @media print{body{background:#fff}}
 </style>
@@ -64,662 +52,222 @@ figure.widget{background:var(--surface);border:1px solid var(--border);border-ra
 <main>
 <article>
 <header>
-<div class="eyebrow">Generative learning · model 5 · lateral verdict</div>
-<h1>Model 5: pair counts between shallow codes judge the next level, the prior names it</h1>
-<p class="byline">Simulation note, 16 November 2026 (UK time). Claude (Fable 5.2) for Jan Bauer.</p>
-<p class="abstract lede">The open point was how a verdict can depend on deep codes that have not been learned yet. Here it does not read them: the teacher's pair counts \(\mathbf{M}\) between shallow codes judge what a deep unit writes. Class units start as copies of the shallow codes and try further codes, and \(\mathbf{M}\) vetoes the wrong ones. With 4,096 teacher pairs this names all 16 hidden classes in {{locked}} of {{worlds}} worlds and lowers the population loss from {{start}} to {{full}} nats without a further teacher sample; a counted table of the same pairs stays at {{table}}. Credit goes to the units that read the own sample, not to those that wrote it, and practising on a twin's samples of the same quality ends at {{twin}}. There are three limits. Below about four teacher pairs per valid pair, practice makes the learner worse than the table. A reader that recalls through \(\mathbf{M}\) names the classes without any own sample. And at an equal number of samples, fresh teacher pairs counted in a table beat every mix of teacher and own samples. A follow-up (section 6) explains the last limit and where it ends: in one block no teacher pair is lost on the learner, so an own sample cannot be worth a fresh one; with three levels a budget split between teacher and own strings ends far below the same budget of teacher strings. Section 8 repeats the block with networks: the hidden layer of a plain network has the classes long before its output writes them, and practice in which the network's proposals are judged through that hidden layer beats the same number of fresh teacher pairs in one block from 4,096 teacher pairs on. Section 9 removes the memory of judged pairs and then the backpropagation: the writer learns from the judge's answers through its weights alone, and networks trained by a local rule keep the hidden layer but write poorly however many teacher pairs they get. Section 10 asks whose proposals are needed and adds a third level: a twin with the same teacher pairs and another random start supplies proposals that serve as well or better, and with three levels the hidden layers hold both levels long before anything is written well. Section 11 gives the writer latent units: recruited from the reader's hidden layer they leave practice nothing to do, and units of the writer's own end mixed, which practice does not repair.</p>
+<div class="eyebrow">Generative learning · model 5 · candidate</div>
+<h1>Model 5: practice binds the writer's own units, level by level</h1>
+<p class="byline">Simulation note, 18 November 2026 (UK time). Claude (Fable 5.2) for Jan Bauer. The runs this note replaces are in <code>tex/model_5_appendix.tex</code>.</p>
+<p class="abstract lede">The learner reads, judges and writes strings of a small grammar in which neighboring parts have to agree. Its reader and its judge are learned from teacher strings alone. Its writer has units of its own for the agreements, in two levels, and teacher strings do not bind them. Own samples do: each is judged, and the verdict goes to the units that wrote it. With the same teacher strings and the same number of own samples, this binds level 1 about {{lead1}} times and level 2 about {{lead2}} times sooner than classic wake-sleep. The upper level binds after the lower one without being told to, and a twin's samples do worse at the upper level. Inside the network the reason can be seen. A teacher string moves the top unit the wrong way or not at all, even when it is read as well as possible. An own sample moves it once the level below is bound, and the samples the judge refuses carry most of that. Two things the README expects do not happen: own samples are not read deeper than teacher strings, and with practice the reader's name for the top unit trails the writer. Four pieces of the learner are not local, its units are softmax units only, and a writer that takes its units from the reader needs no practice at all.</p>
 </header>
 
 <div class="table-wrap"><table>
 <thead><tr><th>README requirement</th><th>Met</th><th>Where, or why not</th></tr></thead>
 <tbody>
-<tr><td>Tabula rasa; watching trains recognition</td><td>partly</td><td>The shallow codes are given, nothing above them. Watching fills \(\mathbf{M}\) and \(\mathbf{T}\) (section 1).</td></tr>
-<tr><td>Unbiased teacher set</td><td>yes</td><td>Independent draws from the population; every score is on the population.</td></tr>
-<tr><td>Teacher and own samples alike on the surface</td><td>not measured</td><td>Single codes are about equally frequent in both; they differ in which pairs occur.</td></tr>
-<tr><td>Recognition and generation in the same space</td><td>yes</td><td>Both act on pairs of codes.</td></tr>
-<tr><td>Simple, decoupled encoder and decoder</td><td>partly</td><td>The reader is the transpose of the writer, computed from the same weights, not a second set of weights that started equal.</td></tr>
-<tr><td>Depth is necessary</td><td>partly</td><td>A block has two learned layers. Naming one level is what makes the next one countable (section 4).</td></tr>
-<tr><td>Local three-factor rule</td><td>yes</td><td>The weights between the active units move by the verdict minus a fraction of its running mean.</td></tr>
-<tr><td>Generation improves offline, through a loop of generation and recognition</td><td>yes</td><td>{{start}} to {{full}} nats with no teacher sample (section 2).</td></tr>
-<tr><td>Worse without the generative phase</td><td>partly</td><td>Yes against the same learner without practice. Against as many fresh teacher samples: no in one block (section 3), yes with three levels (section 6).</td></tr>
-<tr><td>Own samples beat foreign ones of the same quality</td><td>yes</td><td>{{own}} against {{twin}} nats for a twin's samples (section 3).</td></tr>
-<tr><td>A split budget beats teacher samples only</td><td>with three levels</td><td>In one block a counted table of the same number of teacher pairs is better at every budget (section 3). With three levels the split budget is below the table of strings from \(2^{18}\) strings on (section 6).</td></tr>
-<tr><td>The advantage is not the generator's code used as a label</td><td>yes</td><td>Credit by the reader's own reading gives the same result as credit to the writing units (section 2).</td></tr>
-<tr><td>Own samples reach deep units, teacher samples do not yet</td><td>only in a worse learner</td><td>With a threshold on the reader, {{gel_o}} of own and {{gel_t}} of teacher samples pass, but that learner is far worse than one without a threshold (section 2). With three levels the upper level of a teacher string cannot be counted before the classes are named (section 6). Over the course of learning, own samples lead only early, with few teacher samples or a misaligned start, and the top is reached by teacher strings (section 7).</td></tr>
-<tr><td>Recognition improves after practice</td><td>yes</td><td>Class units; valid pairs never shown are accepted; teacher strings can be read for the next level (sections 2, 4).</td></tr>
-<tr><td>Recognition infers causes or judges correctness</td><td>yes</td><td>\(\mathbf{M}\) judges, the class units name.</td></tr>
-<tr><td>Not explained by reconstructing the data</td><td>yes</td><td>Practice uses no teacher sample; without the verdict the loss rises to {{no_veto}}.</td></tr>
-<tr><td>Depthwise, not widthwise</td><td>partly</td><td>The deficit sits above the shallow codes. The control with a learner that differs only within a layer was not run.</td></tr>
-<tr><td>Normative grounding</td><td>no</td><td>The rule is a heuristic.</td></tr>
-<tr><td>Interpretable weights</td><td>yes</td><td>A pool is a class, an entry of \(\mathbf{T}\) a production.</td></tr>
-<tr><td>Mapping to in-context learning</td><td>no</td><td>Not addressed.</td></tr>
-<tr><td>Baseline: a reader trained on teacher samples only</td><td>not beaten</td><td>Recall through \(\mathbf{M}\) does at least as well (section 3); clustering the pair counts names the classes from fewer pairs (section 6).</td></tr>
+<tr><td>Tabula rasa; watching trains recognition</td><td>partly</td><td>Reader, judge and the writer's block part come from teacher strings. Given: which codes form a block and a cut, the number of values of each unit, a uniform prior over the top unit, and the order (reader first, units second).</td></tr>
+<tr><td>Unbiased teacher set</td><td>yes</td><td>Uniform over the valid strings. Wake reads fresh draws from the same distribution.</td></tr>
+<tr><td>Teacher and own samples alike on the surface</td><td>at level 2 only</td><td>Before level 1 is bound, own samples differ from teacher strings in the pair of codes at a cut. After that they differ only in the four codes at the two cuts taken together.</td></tr>
+<tr><td>Depth</td><td>two levels</td><td>Top unit, two units below it, codes (section 1).</td></tr>
+<tr><td>Local rule, at most three factors</td><td>partly</td><td>The rules of the units, the naming layers and the reader are. Four pieces around them are not (section 5).</td></tr>
+<tr><td>Generation improves offline, through a loop of generation and recognition</td><td>with wake in turn</td><td>Own samples alone diverge in {{sp_div}} of {{worlds}} worlds. With one batch of teacher strings per batch of own samples it works; the README allows this if every sample is counted (section 2).</td></tr>
+<tr><td>Better than the same amount of wake and sleep, in a window (Baselines, 17 November)</td><td>yes</td><td>Level 1 is halfway after {{t1_wsp}} samples against {{t1_ws}}, level 2 after {{t2_wsp}} against {{t2_ws}} (section 2).</td></tr>
+<tr><td>Own samples beat foreign ones of at least the same quality</td><td>at level 2</td><td>A twin at the same stage costs {{tw_ratio2}} times the rounds at level 2 and {{tw_ratio1}} times at level 1. In the one-level world a twin's samples do as well (section 3).</td></tr>
+<tr><td>The advantage is not the generator's code used as a label</td><td>partly</td><td>What the verdict knows comes from teacher strings. The writer's code decides which unit the verdict goes to; with credit by reading alone, level 2 takes {{read_ratio2}} times the rounds (section 3).</td></tr>
+<tr><td>Own samples are read into deep units, teacher samples not yet</td><td>no</td><td>The reader names the units for teacher strings as well as for own samples, at both levels and at every time (section 4).</td></tr>
+<tr><td>Recognition improves after practice</td><td>yes</td><td>What the named units say about a teacher string rises from {{read1_start}} to {{read1_end}} at level 1 and from 0 to {{read2_end}} at level 2 (section 2).</td></tr>
+<tr><td>Recognition infers causes or judges correctness</td><td>yes</td><td>The judge gives one verdict per rule; the naming layers name the units.</td></tr>
+<tr><td>Not explained by reconstructing the data</td><td>yes</td><td>The judged step never sees a teacher string, and wake alone never binds the units.</td></tr>
+<tr><td>Depthwise, with stages that emerge</td><td>yes, one control missing</td><td>Level 2 is never written before level 1, and the verdict reaches the top unit only through level 1 (sections 2, 4). The control with a learner that differs only within a layer was not run.</td></tr>
+<tr><td>Normative grounding</td><td>partly</td><td>The judged step is a sampled gradient of \(\mathrm{KL}(p_\theta\,\Vert\,p_E)\), level by level. Nothing guarantees the population loss, which first rises.</td></tr>
+<tr><td>Decoupled encoder and decoder, simple networks</td><td>partly</td><td>Separate weights. The units are softmax units and the reader's hidden layer is linear; there is no deep nonlinear network.</td></tr>
+<tr><td>Interpretable weights</td><td>yes</td><td>Every unit ends with one meaning (section 4).</td></tr>
+<tr><td>Mapping to in-context or on-policy learning</td><td>no</td><td>Not addressed.</td></tr>
+<tr><td>Baseline: a reader trained on teacher strings only gives the writer its units</td><td>not beaten</td><td>Such a writer obeys the agreement as soon as the judge can check it, with no own sample (section 5). The README counts it as a stronger baseline that need not be beaten.</td></tr>
 </tbody></table></div>
 
 <section>
-<h2>1. The model</h2>
-<h3>World</h3>
-<p>The world is one block of a hierarchy. Left and right of a cut, the shallow layer reads a code, \(k\) and \(k'\), each one of \(N=vm\) codes. A code stands for one production of the level below; the layer that reads it off the tokens is taken as learned. The codes fall into \(v\) classes of \(m\), \(c(k)\in\{1,\dots,v\}\): the symbol that the production belongs to. Of the \(v^2\) pairs of classes, \(vm\) are valid. They are the productions of the level above, with every class \(m\) times on each side. The population is uniform over the valid pairs of codes:</p>
-\[p^*(k,k')=\frac{1}{vm^3}\,\mathbb{1}\big[\,(c(k),c(k'))\ \text{valid}\,\big].\]
-<p>All runs use \(v=16\), \(m=4\): 64 codes per side and 1,024 valid pairs out of 4,096. The teacher set is \(n\) independent draws from \(p^*\), so a share \(\rho=1-e^{-n/1024}\) of the valid pairs has been shown. The learner is never told a class.</p>
-<h3>Learner</h3>
-<p>There are \(N\) class units on each side, \(a\) and \(a'\). A pair of units is drawn from a table, and each unit writes a code from its pool:</p>
-\[\begin{gathered}p_\theta(k,k')=\sum_{a,a'}T_{aa'}\,G^L_{ka}\,G^R_{k'a'},\\ \mathbf{G}^L=\operatorname{softmax}_k\boldsymbol{\Lambda}^L,\quad \mathbf{G}^R=\operatorname{softmax}_{k'}\boldsymbol{\Lambda}^R,\quad \mathbf{T}=\operatorname{softmax}_{aa'}\boldsymbol{\Theta}.\end{gathered}\]
-<p>The reader is the transpose. It assigns a pair of codes to one pair of units, \((\hat a,\hat a')\sim q(a,a'\mid k,k')\propto T_{aa'}G^L_{ka}G^R_{k'a'}\). A lateral memory between the shallow codes counts the teacher's pairs, \(M_{kk'}\); it needs no class unit. All weights are bounded, \(|\Lambda|,|\Theta|\le s=6\). At the start unit \(i\) relays code \(i\): \(\Lambda_{ii}=s\), every other entry 0, and \(\boldsymbol{\Theta}=0\).</p>
-<p>The prior is three properties of this form:</p>
+<h2>1. The world and the learner</h2>
+<p><strong>World.</strong> A string is eight codes in four blocks, \(k_1k_2\,|\,k_3k_4\,|\,k_5k_6\,|\,k_7k_8\). There are 64 codes in 16 classes of four, \(c(k)\). Three rules make a string valid.</p>
 <ul>
-<li><strong>Independent children.</strong> Given the pair of units, the two codes are drawn independently. What a pair of units writes is a rectangle, pool times pool.</li>
-<li><strong>Spread.</strong> Every unit can try any code, and a weight that keeps being rewarded grows to the bound, so that all codes a unit keeps become equally likely.</li>
-<li><strong>Reuse.</strong> A unit has one pool for all the partners that \(\mathbf{T}\) gives it.</li>
+<li><strong>Blocks.</strong> The two classes of a block have to be one of 64 valid pairs out of 256. Every class has four partners on each side.</li>
+<li><strong>Level 1.</strong> At the cut between the first two blocks, a four-valued feature of the two classes has to agree, \(f_R(c(k_2))=f_L(c(k_3))=a\). The same holds at the cut between the last two blocks, with value \(b\). A quarter of the pairs of codes at a cut agree.</li>
+<li><strong>Level 2.</strong> The two values have to fit: \(b=a\) or \(b=a+1 \pmod 4\). Half of the pairs of values fit. This rule is a table with no feature of a single value behind it, so it cannot be read off single codes.</li>
 </ul>
-<h3>Watching and practice</h3>
-<p><strong>Watching</strong>, one teacher pair \((k,k')\): \(M_{kk'}\) grows by one, and the weights of the most probable reading \((\hat a,\hat a')\) grow by one, \(\Lambda^L_{k\hat a}\), \(\Lambda^R_{k'\hat a'}\) and \(\Theta_{\hat a\hat a'}\). After watching the learner is close to a table of the pairs it was shown. It is not exactly one: every unit keeps a small chance for every other code, so about a fifth of what it writes is not valid, and its loss is above the table's.</p>
-<p><strong>Practice</strong>, one own sample: draw \((a,a')\sim\mathbf{T}\), \(k\sim G^L_{\cdot a}\), \(k'\sim G^R_{\cdot a'}\). The verdict is whether the teacher ever showed this pair, \(v=\mathbb{1}[M_{kk'}>0]\). The reader assigns the pair to \((\hat a,\hat a')\), and</p>
-\[\Delta\Lambda^L_{k\hat a}=\Delta\Lambda^R_{k'\hat a'}=\Delta\Theta_{\hat a\hat a'}=\eta\,(v-c\,\bar v),\]
-<p>with \(\bar v\) the running mean of the verdict, \(\eta=0.3\) and \(c=0.8\). No teacher sample is used.</p>
-<p>The contrast \(v-c\,\bar v\) is what lets \(\mathbf{M}\) judge a deep choice. Suppose a unit tries a further code \(j\). If \(j\) is of the unit's class, the pair is valid with every partner of the unit and is accepted about as often as the unit's other samples, at a rate near \(\rho\). If \(j\) is of another class, it is accepted only with the partners that the two classes share. With \(c<1\) the first kind grows and the second is pushed out, and a valid pair that the teacher happened not to show does not undo a pool.</p>
-<p><strong>Scores</strong>, all computed exactly from the weights: the population loss \(\mathrm{KL}(p^*\,\Vert\,p_\theta)\) in nats; the share of classes that some unit holds entirely and purely; and the probability of the valid pairs that the teacher never showed, relative to \(p^*\).</p>
-</section>
+<p>The teacher draws uniformly from the valid strings. A writer that knows the blocks and ignores the other rules writes 1 valid string in 32. The first run of section 2 uses a smaller world with one level: two blocks and one agreement with two values.</p>
 
-<section>
-<h2>2. What \(\mathbf{M}\) and the prior do</h2>
-<p>The figure runs the learner in the browser. Blue cells are valid pairs the learner writes, red cells invalid ones, dots the pairs the teacher showed.</p>
-<figure class="widget" id="lockBlock">
-<div class="w-controls">
-<label>Teacher pairs <select id="wN"><option>300</option><option>600</option><option selected>1000</option><option>1500</option><option>3000</option></select></label>
-<label><input type="checkbox" id="wVeto" checked> verdict of \(\mathbf{M}\)</label>
-<label><input type="checkbox" id="wSpread" checked> spread</label>
-<label><input type="checkbox" id="wShare" checked> shared pools</label>
-<button id="wRun" type="button" class="primary">Practise</button>
-<button id="wReset" type="button">Reset</button>
-</div>
-<svg id="wSvg" viewBox="0 0 760 372" role="img" aria-label="Left: a grid of all pairs of a left and a right code. A dot marks a pair the teacher has shown, blue shading a valid pair the learner writes, red shading an invalid pair it writes. Right: the pools of the left class units and the table over pairs of units."></svg>
-<p class="w-status" id="wStatus"></p>
-<p class="small w-legend"><span class="sw sw-dot"></span> shown by the teacher (\(M_{kk'}>0\)) <span class="sw sw-ok"></span> valid pair the learner writes <span class="sw sw-bad"></span> invalid pair it writes <span class="sw sw-acc"></span> own sample accepted <span class="sw sw-rej"></span> vetoed. Heavy lines separate the true classes, which the learner is never told.</p>
-<script>
-// One block of the model: N = V*MC codes per side, classes of MC codes (codes are numbered class by class for the display only), MC*V valid
-// class pairs. Learner as in experiments/model5_lateral_verdict.py (class Grower): pools LL, LR and table TH, additive weights in [LO, S];
-// watch = M += 1 and the reading units raised; practice = a pair of units writes, M says seen or not, the units that read the pair move by
-// ETA (v - C vbar). "shared pools" off: one unit per pair the teacher showed, with two pools of its own. OverLyX shows an article's block by
-// loading the whole page in a frame with the other blocks hidden, so the widget starts only where it is shown.
-(() => {
-'use strict';
-const V = 12, MC = 3, N = V * MC, S = 6, LO = -6, ETA = 0.3, ETAW = 1, C = 0.75, PER_FRAME = 3000, NS = 'http://www.w3.org/2000/svg';
-const $ = id => document.getElementById(id);
-function rng(s) { return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-const range = n => Array.from({length: n}, (_, i) => i);
-function perm(n, r) { const a = range(n); for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-function pick(w, r) { let t = 0; for (let i = 0; i < w.length; i++) t += w[i]; let u = r() * t; for (let i = 0; i < w.length; i++) { u -= w[i]; if (u < 0) return i; } return w.length - 1; }
-function softmax(row) { let mx = -Infinity; for (const x of row) if (x > mx) mx = x; const o = new Float64Array(row.length); let z = 0; for (let i = 0; i < row.length; i++) { o[i] = Math.exp(row[i] - mx); z += o[i]; } for (let i = 0; i < o.length; i++) o[i] /= z; return o; }
-const cls = k => Math.floor(k / MC), clamp = x => Math.max(LO, Math.min(S, x));
-let r, B, valid, nValid, M, LL, LR, TH, units, vbar, own, running = false, flashes = [], cells = [], poolCells = [], tabCells = [], frame = 0;
-const opt = () => ({veto: $('wVeto').checked, spread: $('wSpread').checked, share: $('wShare').checked, n: +$('wN').value});
-
-function world() {
-  const q = rng(7);
-  for (;;) { B = range(V).map(() => new Uint8Array(V)); for (let j = 0; j < MC; j++) perm(V, q).forEach((b, a) => { B[a][b] = 1; }); let n = 0; for (const row of B) for (const x of row) n += x; if (n === V * MC) break; }
-  valid = range(N).map(k => Uint8Array.from(range(N), kp => B[cls(k)][cls(kp)])); nValid = V * MC * MC * MC;
-}
-function pool(seed, o) { const p = new Float64Array(N).fill(o.spread ? 0 : LO); p[seed] = S; return p; }
-function tables() {                                                       // pools, table and U[a][k'] = sum_a' T[a][a'] G_R[k'|a']
-  const GL = LL.map(softmax), GR = LR.map(softmax);
-  if (!opt().share) return {GL, GR};
-  const T = softmax(TH), U = range(N).map(() => new Float64Array(N)), cdf = new Float64Array(N * N); let z = 0;
-  for (let a = 0; a < N; a++) for (let b = 0; b < N; b++) { const t = T[a * N + b]; z += t; cdf[a * N + b] = z; if (t > 1e-9) for (let k = 0; k < N; k++) U[a][k] += t * GR[b][k]; }
-  return {GL, GR, T, U, cdf};
-}
-function read(t, k, kp, hard) {                                           // the units that read (k, k'): one winner of T G_L G_R
-  const wa = new Float64Array(N), wb = new Float64Array(N); for (let a = 0; a < N; a++) wa[a] = t.GL[a][k] * t.U[a][kp];
-  const best = w => w.indexOf(Math.max(...w)), a = hard ? best(wa) : pick(wa, r); for (let b = 0; b < N; b++) wb[b] = t.T[a * N + b] * t.GR[b][kp];
-  return [a, hard ? best(wb) : pick(wb, r)];
-}
-function reset() {
-  const o = opt(); r = rng(11); M = range(N).map(() => new Uint16Array(N)); vbar = 1; own = 0; flashes = []; running = false; $('wRun').textContent = 'Practise';
-  LL = o.share ? range(N).map(i => pool(i, o)) : []; LR = o.share ? range(N).map(i => pool(i, o)) : []; TH = new Float64Array(N * N); units = new Map();
-  const rules = []; for (let a = 0; a < V; a++) for (let b = 0; b < V; b++) if (B[a][b]) rules.push([a, b]);
-  for (let i = 0; i < o.n; i++) {                                         // watching
-    const [a, b] = rules[Math.floor(r() * rules.length)], k = a * MC + Math.floor(r() * MC), kp = b * MC + Math.floor(r() * MC); M[k][kp]++;
-    if (!o.share) { if (!units.has(k * N + kp)) { units.set(k * N + kp, 1); LL.push(pool(k, o)); LR.push(pool(kp, o)); } continue; }
-    const [ua, ub] = read(tables(), k, kp, true); LL[ua][k] = clamp(LL[ua][k] + ETAW); LR[ub][kp] = clamp(LR[ub][kp] + ETAW); TH[ua * N + ub] = clamp(TH[ua * N + ub] + ETAW);
-  }
-  draw();
-}
-function practise(n) {
-  const o = opt(); let t = o.share ? tables() : null;
-  for (let i = 0; i < n; i++) {
-    if (o.share && i % 32 === 31) t = tables();
-    let a, b, k, kp;
-    if (o.share) { const u = r(); let lo = 0, hi = N * N - 1; while (lo < hi) { const mid = lo + hi >> 1; if (t.cdf[mid] > u) hi = mid; else lo = mid + 1; } a = Math.floor(lo / N); b = lo % N; k = pick(t.GL[a], r); kp = pick(t.GR[b], r); }
-    else { a = b = Math.floor(r() * LL.length); k = pick(softmax(LL[a]), r); kp = pick(softmax(LR[b]), r); }
-    const seen = M[k][kp] > 0, v = o.veto ? +seen : 1, d = ETA * (v - C * vbar); vbar += 0.0003 * (v - vbar);
-    if (o.share) { [a, b] = read(t, k, kp, false); TH[a * N + b] = clamp(TH[a * N + b] + d); }
-    LL[a][k] = clamp(LL[a][k] + d); LR[b][kp] = clamp(LR[b][kp] + d);
-    if (n - i <= 10) flashes.push([k, kp, seen]);
-  }
-  own += n; flashes = flashes.slice(-10);
-}
-function density(t) {                                                     // p(k, k') of the learner
-  const P = range(N).map(() => new Float64Array(N));
-  if (opt().share) { for (let a = 0; a < N; a++) for (let k = 0; k < N; k++) { const g = t.GL[a][k]; if (g > 1e-7) for (let kp = 0; kp < N; kp++) P[k][kp] += g * t.U[a][kp]; } }
-  else { const R = LL.length; for (let u = 0; u < R; u++) for (let k = 0; k < N; k++) { const g = t.GL[u][k] / R; if (g > 1e-7) for (let kp = 0; kp < N; kp++) P[k][kp] += g * t.GR[u][kp]; } }
-  return P;
-}
-function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); parent.appendChild(e); return e; }
-const X0 = 34, Y0 = 34, CELL = 9, X1 = 410, X2 = 594, SM = 162;
-function build() {
-  const svg = $('wSvg'); svg.textContent = '';
-  const text = (x, y, s, extra = {}) => { el('text', {x, y, fill: 'var(--ink2)', ...extra}, svg).textContent = s; };
-  text(X0, 14, 'pairs of codes: left code (row), right code (column)'); text(X1, 14, 'pools of the left units', {id: 'wT1'}); text(X2, 14, 'table over pairs of units', {id: 'wT2'});
-  text(X1, Y0 + SM + 16, 'unit (row), code (column)', {id: 'wS1'}); text(X2, Y0 + SM + 16, 'left unit (row), right unit (column)', {id: 'wS2'});
-  el('rect', {x: X0, y: Y0, width: N * CELL, height: N * CELL, fill: 'var(--bg)', stroke: 'var(--axis)'}, svg);
-  cells = range(N).map(k => range(N).map(kp => { const g = el('g', {}, svg); const c = el('rect', {x: X0 + kp * CELL, y: Y0 + k * CELL, width: CELL, height: CELL, fill: 'var(--ok)', 'fill-opacity': 0}, g); el('title', {}, g); return c; }));
-  for (let c = 0; c <= V; c++) { el('line', {x1: X0 + c * MC * CELL, x2: X0 + c * MC * CELL, y1: Y0, y2: Y0 + N * CELL, stroke: 'var(--ink2)', 'stroke-width': 0.8}, svg); el('line', {y1: Y0 + c * MC * CELL, y2: Y0 + c * MC * CELL, x1: X0, x2: X0 + N * CELL, stroke: 'var(--ink2)', 'stroke-width': 0.8}, svg); }
-  el('g', {id: 'wDots'}, svg); el('g', {id: 'wFlash'}, svg);
-  for (const x of [X1, X2]) el('rect', {x, y: Y0, width: SM, height: SM, fill: 'var(--bg)', stroke: 'var(--axis)'}, svg);
-  el('g', {id: 'wPools'}, svg); el('g', {id: 'wTab'}, svg);
-}
-function grid(id, x0, rows, cols, value) {                               // a small shaded grid of rows x cols inside a square of side SM
-  const g = $(id); g.textContent = ''; const w = SM / cols, h = SM / rows;
-  for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) { const v = value(i, j); if (v > 0.02) el('rect', {x: x0 + j * w, y: Y0 + i * h, width: w, height: h, fill: 'var(--ok)', 'fill-opacity': Math.min(1, v)}, g); }
-}
-function draw() {
-  const o = opt(), t = tables(), P = density(t); let vm = 0, cov = 0, unshown = 0, unCov = 0;
-  for (let k = 0; k < N; k++) for (let kp = 0; kp < N; kp++) {
-    const rel = P[k][kp] * nValid, ok = valid[k][kp], c = cells[k][kp];
-    c.setAttribute('fill', ok ? 'var(--ok)' : 'var(--bad)'); c.setAttribute('fill-opacity', Math.min(1, ok ? 0.85 * rel : 3 * rel).toFixed(3));
-    c.nextSibling.textContent = `left code ${k + 1}, right code ${kp + 1}: ${ok ? 'valid' : 'not valid'}; shown by the teacher ${M[k][kp]} time${M[k][kp] === 1 ? '' : 's'}; the learner writes it ${rel.toFixed(2)} times as often as the population`;
-    if (ok) { vm += P[k][kp]; const w = rel > 0.25; cov += w; if (!M[k][kp]) { unshown++; unCov += w; } }
-  }
-  const dots = $('wDots'); if (!dots.childNodes.length) for (let k = 0; k < N; k++) for (let kp = 0; kp < N; kp++) if (M[k][kp]) el('circle', {cx: X0 + (kp + 0.5) * CELL, cy: Y0 + (k + 0.5) * CELL, r: 1.5, fill: 'var(--ink)', 'pointer-events': 'none'}, dots);
-  const fl = $('wFlash'); fl.textContent = ''; for (const [k, kp, seen] of flashes) el('circle', {cx: X0 + (kp + 0.5) * CELL, cy: Y0 + (k + 0.5) * CELL, r: 6, fill: 'none', stroke: seen ? 'var(--good)' : 'var(--bad)', 'stroke-width': 2, 'pointer-events': 'none'}, fl);
-  const R = LL.length; let whole = 0, mixed = 0;
-  for (const G of [t.GL, t.GR]) for (let u = 0; u < R; u++) { const m = new Float64Array(V); for (let k = 0; k < N; k++) m[cls(k)] += G[u][k]; mixed += Math.max(...m) < 0.8; }
-  for (let c = 0; c < V; c++) { let hit = false; for (let u = 0; u < R && !hit; u++) { let all = true, other = 0; for (let k = 0; k < N; k++) { if (cls(k) === c) all = all && t.GL[u][k] > 0.5 / MC; else other += t.GL[u][k]; } hit = all && other < 0.1; } whole += hit; }
-  grid('wPools', X1, R, N, (u, k) => t.GL[u][k] * MC);
-  if (o.share) { let mx = 0; for (const x of t.T) if (x > mx) mx = x; grid('wTab', X2, N, N, (a, b) => t.T[a * N + b] / mx); }
-  else grid('wTab', X2, R, N, (u, k) => t.GR[u][k] * MC);
-  $('wT1').textContent = o.share ? 'pools of the left units' : 'left pools, one unit per shown pair'; $('wT2').textContent = o.share ? 'table over pairs of units' : 'right pools of the same units';
-  $('wS2').textContent = o.share ? 'left unit (row), right unit (column)' : 'unit (row), code (column)';
-  $('wStatus').textContent = `${own.toLocaleString('en-GB')} own samples. Valid: ${(100 * vm).toFixed(0)}% of what the learner writes. Valid pairs written: ${cov} of ${nValid}` + (unshown ? `, among them ${unCov} of the ${unshown} the teacher never showed` : '') + `. Classes held by one unit: ${whole} of ${V}. Pools that mix classes: ${mixed} of ${2 * R}.`;
-}
-function tick() { if (!running) return; practise(opt().share ? PER_FRAME : 8 * PER_FRAME); if (++frame % 4 === 0) draw(); requestAnimationFrame(tick); }
-function start() {
-  const block = $('lockBlock'); if (!block || block.closest('[data-ol-embed-hidden]')) return;
-  world(); build(); reset();
-  $('wRun').addEventListener('click', () => { running = !running; $('wRun').textContent = running ? 'Pause' : 'Practise'; if (running) requestAnimationFrame(tick); else draw(); });
-  $('wReset').addEventListener('click', () => { $('wDots').textContent = ''; reset(); });
-  for (const id of ['wN', 'wVeto', 'wSpread', 'wShare']) $(id).addEventListener('change', () => { $('wDots').textContent = ''; reset(); });
-  window.__m5 = {practise, draw, state: () => ({own, status: $('wStatus').textContent})};          // for the page check
-}
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, {once: true}); else start();
-})();
-</script>
-<figcaption><strong>Figure 1. The teacher's pair counts veto, spread makes units grow, and only pools that are shared between partners end as classes.</strong> Left: every pair of a left and a right code. Right: the pools of the left units and the table over pairs of units, both starting as the diagonal (unit \(i\) relays code \(i\)). Press Practise, then switch off one property at a time. Without the verdict every unit takes every code; without spread nothing the teacher did not show is ever written; without shared pools each unit fits the pairs shown around its own pair, and its pools run across classes. The case without shared pools needs a few million samples. The world here is smaller than in the runs (\(v=12\), \(m=3\), \(c=0.75\)) so that single cells can be seen.</figcaption>
+<figure class="diagram">
+<svg viewBox="0 0 780 300" role="img" aria-label="Eight codes in four blocks. A unit sits above each of the two cuts and writes the two codes next to it; a top unit chooses both. Below the codes, one judge per cut and one judge of the two values.">
+<defs><marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--ink)"/></marker></defs>
+<g style="fill:none;stroke:var(--axis);stroke-width:1.2"><rect x="52" y="160" width="156" height="50" rx="10"/><rect x="222" y="160" width="156" height="50" rx="10"/><rect x="392" y="160" width="156" height="50" rx="10"/><rect x="562" y="160" width="156" height="50" rx="10"/></g>
+<g style="fill:var(--bg);stroke:var(--ink);stroke-width:1.3"><rect x="62" y="168" width="60" height="34" rx="6"/><rect x="138" y="168" width="60" height="34" rx="6"/><rect x="232" y="168" width="60" height="34" rx="6"/><rect x="308" y="168" width="60" height="34" rx="6"/><rect x="402" y="168" width="60" height="34" rx="6"/><rect x="478" y="168" width="60" height="34" rx="6"/><rect x="572" y="168" width="60" height="34" rx="6"/><rect x="648" y="168" width="60" height="34" rx="6"/><circle cx="215" cy="96" r="20"/><circle cx="555" cy="96" r="20"/><circle cx="385" cy="30" r="20"/></g>
+<g text-anchor="middle"><text x="92" y="190">k₁</text><text x="168" y="190">k₂</text><text x="262" y="190">k₃</text><text x="338" y="190">k₄</text><text x="432" y="190">k₅</text><text x="508" y="190">k₆</text><text x="602" y="190">k₇</text><text x="678" y="190">k₈</text><text x="215" y="100">u<tspan dy="4" font-size="10">A</tspan></text><text x="555" y="100">u<tspan dy="4" font-size="10">B</tspan></text><text x="385" y="35">z</text></g>
+<g style="stroke:var(--ink);stroke-width:1.3;fill:none" marker-end="url(#ah)"><path d="M367,38 L236,88"/><path d="M403,38 L534,88"/><path d="M204,113 L174,165"/><path d="M226,113 L256,165"/><path d="M544,113 L514,165"/><path d="M566,113 L596,165"/></g>
+<g style="stroke:var(--ink2);stroke-width:1.2;fill:none;stroke-dasharray:5 4"><path d="M168,216 v10 h94 v-10"/><path d="M508,216 v10 h94 v-10"/><path d="M215,252 v12 h340 v-12"/></g>
+<g><text x="420" y="24">top unit: chooses the two units below</text><text x="40" y="101">a unit at each cut</text><text x="215" y="242" text-anchor="middle" style="fill:var(--ink2)">judge of the cut</text><text x="555" y="242" text-anchor="middle" style="fill:var(--ink2)">judge of the cut</text><text x="385" y="284" text-anchor="middle" style="fill:var(--ink2)">judge of level 2: do the two values fit</text><text x="16" y="150" style="fill:var(--ink2)">block</text></g>
+</svg>
+<figcaption><strong>Figure 1. The writer's own units sit above the cuts, and the judges read the codes.</strong> Solid: what the writer's units write. Dashed: what the judges check. The four outer codes follow from the writer's block part.</figcaption>
 </figure>
 
-<p>The same four cases with 4,096 teacher pairs, {{worlds}} worlds and 2.1 million own samples each (Figure 2):</p>
+<p><strong>From teacher strings alone.</strong> A stored set of \(n\) teacher strings gives the learner everything it knows about the world, before any own sample.</p>
 <ul>
-<li><strong>All three properties.</strong> The loss falls from {{start}} to {{full}} nats; the counted table of the same pairs is at {{table}}. All 16 classes are held by one unit each in {{locked}} of {{worlds}} worlds (at least {{locked_min}} of the classes in every world; {{locked_eff}} of {{worlds}} in the runs of section 3, which use other random numbers). {{valid}} of what the learner writes is valid. Valid pairs that the teacher never showed are written at {{full_new}} of their population rate, so the learner now knows more than the memory that judged it.</li>
-<li><strong>No verdict</strong> (every sample counts as accepted). Every unit takes every code and the loss goes to {{no_veto}} nats, the value for independent left and right codes. The prior alone merges everything.</li>
-<li><strong>No spread</strong> (a unit never tries another code). The learner stays a table: {{no_spread}} nats, and unshown pairs at {{no_spread_new}} of their population rate. The verdict alone merges nothing.</li>
-<li><strong>No reuse</strong> (one unit per shown pair, with two pools of its own). Within this many samples no class is named and the loss stays near the table's ({{private}} nats, unshown pairs at {{private_new}}). A unit with one partner can shape its rectangle around every missing pair.</li>
+<li><strong>Reader.</strong> Two small networks give every code a hidden vector of 16 numbers, one network for the two codes of a block and one for the two codes at a cut. A teacher pair raises the product of its two vectors and a shuffled pair lowers it:
+\[\Delta\mathbf{u}_k=\eta\,\big(t-\sigma(\mathbf{u}_k\cdot\mathbf{v}_{k'}+c)\big)\,\mathbf{v}_{k'},\qquad t=1\ \text{for a teacher pair},\ 0\ \text{for a shuffled one.}\]</li>
+<li><strong>Judge of a cut.</strong> The teacher's pair counts \(\mathbf{M}\) at the cuts, spread over codes with similar hidden vectors: \(p_E(k_2,k_3)=\big(\mathbf{K}\,\mathbf{M}\,\mathbf{K}'^{\top}\big)_{k_2k_3}\). It refuses a pair when this is zero.</li>
+<li><strong>Judge of level 2.</strong> The reader groups the codes at a cut by their hidden vectors. The judge counts which two groups the teacher shows together at the two cuts, \(r_E\), relative to chance.</li>
+<li><strong>The writer's block part</strong> \(P_B(k,k')\): the teacher's blocks counted in the reader's groups of codes.</li>
 </ul>
-<figure><img src="figures/model5-ablation.svg" alt="Three panels against the number of own samples on a logarithmic axis: population loss, share of classes held by one unit, and the relative probability of unshown valid pairs, each for the full learner and for the learner without the verdict, without spread and without shared pools."><figcaption><strong>Figure 2. Classes form only with the verdict, spread and shared pools together.</strong> Median over worlds, bands are the interquartile range. Left: population loss, with the counted table of the same teacher pairs as the dashed line. Middle: share of the classes that one unit holds entirely and purely. Right: probability of valid pairs the teacher never showed, relative to the population.</figcaption></figure>
-<p><strong>Who gets the credit.</strong> In the rule above the verdict goes to the units that read the own sample. Giving it to the units that wrote the sample ends at the same loss ({{gen}} nats). The generator's code is not needed as a label.</p>
-<h3>The same model with one unit per class, trained by its likelihood gradient</h3>
-<p>This was the first learner tried: \(v\) units per side, a random start, a wake step on teacher pairs and a step against own samples that \(\mathbf{M}\) rejects. It does not find the classes. From a weak, a moderate and a sharp random start it ends at {{gw}} nats with teacher pairs only and at {{gp}} with half the samples its own (medians for the three starts), in no world below 0.05 (Figure 3, left). Own samples raise the share of valid output ({{gvw}} without them, {{gvp}} with them) without lowering the loss: units that mix classes stay mixed, and the learner avoids invalid pairs by writing fewer pairs.</p>
-<p>This learner also tests the idea that own samples propagate deeper. Let a unit pair learn only if its drive, \(T_{aa'}G^L_{ka}G^R_{k'a'}N^2\), exceeds 1, that is, if the read explanation is more probable than a chance pair. From a sharp random start, {{gel_o}} of own samples pass and {{gel_t}} of teacher samples (Figure 3, right). With teacher pairs only the learner then keeps its random code ({{gth_w}} nats); with own samples it ends at {{gth_p}}. So the asymmetry exists and own samples help under a threshold, but both are far worse than the same learner without a threshold. From a weak or moderate start nothing passes the threshold at all.</p>
-<figure><img src="figures/model5-gradient.svg" alt="Left: population loss of the likelihood-gradient learner for three random starts, with and without a threshold on the reader, for teacher pairs only and for half own samples; one dot per world. Right: share of teacher and of own samples above the threshold for the three starts."><figcaption><strong>Figure 3. A likelihood-gradient learner with one unit per class stays in mixed units, and a threshold on the reader favours own samples but makes everything worse.</strong> One dot per world, bars are medians. Left: population loss after the same number of samples, by random start and threshold. Right: share of samples whose read explanation passes the threshold.</figcaption></figure>
+<p><strong>The writer's own units.</strong> A top unit \(z\) with four values chooses a unit at each cut, and each of these writes the two codes at its cut:</p>
+\[\begin{gathered}z\sim\mathrm{uniform},\qquad u_A\sim\mathbf{T}_A[z],\quad u_B\sim\mathbf{T}_B[z],\\ p(k_2\mid u)=\mathrm{softmax}\big(\log\mathbf{m}_R+\mathbf{d}_u\big),\qquad p(k_3\mid u)=\mathrm{softmax}\big(\log\mathbf{m}_L+\mathbf{d}'_u\big).\end{gathered}\]
+<p>\(\mathbf{T}_A,\mathbf{T}_B\) are softmax tables, \(\mathbf{m}_R,\mathbf{m}_L\) are what the block part writes at these places, and the same \(\mathbf{d}\) serve both cuts. All of these weights start small and random, so at the start every value of a unit writes the same.</p>
+<p><strong>The reader's naming layers</strong> have their own weights. Level 1 names a unit from the hidden vectors of the two codes, \(q(u\mid k_2,k_3)\). Level 2 names the top unit from the two units named below it, \(q(z\mid u_A,u_B)\).</p>
+<p><strong>Three rules.</strong> Each moves the weights between the units that were active, by a delta rule.</p>
+<ul>
+<li><strong>Wake.</strong> A teacher string is read by the naming layers, and the named units learn to write it: \(\Delta\mathbf{d}_u=\eta\,(\mathbf{e}_k-\mathbf{p}_u)\), and the same for the rows of \(\mathbf{T}_A,\mathbf{T}_B\).</li>
+<li><strong>Sleep.</strong> The naming layers learn to name the units that wrote an own sample.</li>
+<li><strong>Practice.</strong> An own sample gets one verdict per level, and each verdict goes to the unit directly above what it judges, as a third factor on the wake step:
+\[\begin{gathered}\delta_1=\log\frac{p_\theta(k_2,k_3)}{p_E(k_2,k_3)}\quad\text{at each cut, to its unit }u,\\ \delta_2=\log\frac{p_\theta(x_A,x_B)}{p_E(x_A)\,p_E(x_B)\,r_E}\quad\text{to the top unit }z,\\ \Delta\mathbf{w}=\eta\,\big(-(\delta-\bar\delta)\big)\,(\mathbf{e}-\mathbf{p}).\end{gathered}\]
+Here \(x_A,x_B\) are the pairs of codes at the two cuts. The level-2 verdict is given only when the judge accepts both cuts. Averaged over own samples, this is the gradient of \(\mathrm{KL}(p_\theta\,\Vert\,p_E)\).</li>
+</ul>
+<p><strong>A round</strong> is one batch of 64 fresh teacher strings for wake and one batch of 64 own samples. Classic wake-sleep uses the own samples for sleep. The learner with practice uses the same own samples for sleep and for practice. Every sample counts, teacher or own.</p>
 </section>
 
 <section>
-<h2>3. What it buys, and what it does not</h2>
-<h3>Against the size of the teacher set</h3>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Teacher pairs</th><th>Valid pairs shown</th><th>Counted table</th><th>Practice</th><th>Recall through \(\mathbf{M}\)</th><th>Gradient learner</th><th>Worlds with all classes named (of {{worlds}})</th></tr></thead>
+<h2>2. Practice against the same amount of wake and sleep</h2>
+<p>The README asks that in some window of training, own samples used for practice do more than the same number of samples spent on wake, on sleep, or on both. All losses are population losses in nats, exact, medians over {{worlds}} worlds.</p>
+
+<h3>One level</h3>
+<p>With one agreement and 1,024 stored teacher strings, the learner with practice is ahead of the best mix of wake and sleep from about 4,000 samples on. Before that it is behind, because practice first raises the loss.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Samples used</th><th class="num">2,048</th><th class="num">4,096</th><th class="num">8,192</th><th class="num">16,384</th><th class="num">65,536</th></tr></thead>
 <tbody>
-{{eff_rows}}
+{{one_rows}}
 </tbody></table></div>
-<p class="small">Population loss in nats, median over {{worlds}} worlds. Counted table: the teacher's counts with the best uniform smoothing. Practice: 2.1 million own samples after watching. Gradient learner: one unit per class, wake only, rehearsing the stored set.</p>
+<p class="small">Loss of the pair of codes at the cut. "Best split" is the best of three wake to sleep ratios, chosen per world. The last row counts the worlds in which practice is below that.</p>
+<figure class="wide"><img src="figures/model5-cut-practice.svg" alt="Four panels for the one-level world: loss against samples used for wake only, wake and sleep at three ratios, wake read by the writer's own posterior and wake, sleep and practice; the share of written pairs that agree and of teacher pairs read, for wake-sleep with and without practice; the loss early and late by size of the teacher set; and the loss for own samples credited to the writing unit, own samples credited by reading and a twin's samples."><figcaption><strong>Figure 2. Own samples used for practice lower the loss sooner than the same samples used for sleep, once the judge can be trusted.</strong> Top left: loss against samples used, by arm; bands are the interquartile range. Top right: how often written pairs agree, and how well teacher pairs are read. Bottom left: the comparison by size of the teacher set, early and late. Bottom right: own samples against a twin's.</figcaption></figure>
 <ul>
-<li><strong>A window.</strong> From 4,096 to 16,384 teacher pairs practice ends below the table, by a factor of {{x4096}} at 4,096 pairs ({{p4096}} against {{t4096}} nats) and of {{x16384}} at 16,384. The table needs about three times as many teacher pairs for the same loss.</li>
-<li><strong>Below the window practice hurts.</strong> At 2,048 pairs the loss after practice is {{p2048}} against {{t2048}} for the table. Too many valid pairs are still unshown, the verdict rejects them, and the learner narrows.</li>
-<li><strong>Above the window the table catches up</strong> ({{t32768}} against {{p32768}} at 32,768): the bounded weights leave a floor near 0.02 nats.</li>
-<li><strong>Recall through \(\mathbf{M}\) does it without own samples.</strong> This reader lets code \(j\) join the unit of code \(k\) if \(\mathbf{M}\) has seen \(j\) with most of the partners of \(k\). It uses the same statistic as practice, for all codes at once, and ends at or below practice from 4,096 pairs on ({{r4096}} and {{r8192}} nats at 4,096 and 8,192). It fails below that as well.</li>
+<li><strong>Wake alone never binds the unit.</strong> The loss stays at {{one_w}} in every world.</li>
+<li><strong>The judge has to be right.</strong> With 256 teacher strings it accepts {{one_wrong256}} of the pairs that do not agree, and practice ends worse ({{one_wsp256}} against {{one_ws256}}). With 512 strings the lead is closing by the end: practice is ahead in {{one_512_worlds}} of {{worlds}} worlds.</li>
+<li><strong>Wake in turn is needed.</strong> Own samples alone diverge in {{sp_div}} of {{worlds}} worlds.</li>
+<li><strong>Sleep is needed.</strong> Without it the learner stops at {{wp_agree}} of pairs that agree.</li>
+<li><strong>The prior over the unit's values is fixed uniform.</strong> With a learned prior, classic wake-sleep collapses onto one value at these step sizes. At its best smaller steps it needs {{lp_ws}} samples to leave the plateau, against {{lp_wsp}} with practice.</li>
 </ul>
-<figure><img src="figures/model5-efficiency.svg" alt="Population loss against the number of teacher pairs on logarithmic axes for the counted table, the likelihood-gradient learner, recall through M and practice."><figcaption><strong>Figure 4. Practice beats the counted table only in a window of teacher-set sizes, and a reader that recalls through the pair counts matches it without own samples.</strong> Median over worlds, bands are the interquartile range. Values above the top of the axis are cut off.</figcaption></figure>
-<h3>At an equal number of samples</h3>
-<p>Teacher and own batches were interleaved at a fixed share (Figure 5). The learner's best share of own samples is 0 at small budgets and between 0.5 and 0.9 at large ones, but a counted table fed the same total number of teacher pairs is better at all {{totals}} budgets: {{ht13}} against {{h13}} nats at \(2^{13}\) samples, {{ht22}} against {{h22}} at \(2^{22}\). With a share of own samples of 0.997 or more the learner ends worse than without practice, because it practises against a nearly empty \(\mathbf{M}\).</p>
-<figure><img src="figures/model5-heatmap.svg" alt="Heat map of the population loss over the total number of samples and the share of own samples, with a separate bottom row for the counted table that is fed teacher pairs only."><figcaption><strong>Figure 5. For a fixed total, more teacher pairs counted in a table always beat a mix with own samples.</strong> Median population loss over worlds; lighter is lower. Rows above the gap: the learner at a fixed share of own samples, with a dot at its best share for each total. Bottom row: the counted table fed the same total number of teacher pairs.</figcaption></figure>
-<h3>Whose samples</h3>
-<p>After 4,096 teacher pairs the learner practised on its own samples, or on the samples of a twin: the same learner with a teacher set of its own, practising on its own samples at the same time, so that its samples are as good as the learner's (the twin ends at {{twin_kl}} nats). Credit is by reading in both cases. On own samples the learner ends at {{own}} nats, on the twin's at {{twin}}, and own is ahead in {{own_wins}} of {{worlds}} worlds (Figure 6). The twin's samples show the learner which pairs the twin writes wrongly, not which the learner does. The same number of fresh teacher pairs, simply counted, ends at {{table_end}}. Fed to the practice rule instead of being counted, fresh teacher pairs do worse than own samples ({{teacher_end}} nats): they are almost always accepted, so nothing new is tried.</p>
-<figure><img src="figures/model5-source.svg" alt="Population loss against the number of further samples after 4,096 teacher pairs, for practice on own samples, practice on a twin's samples, and the same number of fresh teacher pairs counted in a table."><figcaption><strong>Figure 6. Own samples beat a twin's samples of the same quality, and fresh teacher pairs beat both.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
+
+<h3>Two levels</h3>
+<p>With the world of section 1 and 4,096 stored teacher strings, both levels bind with practice in every world, level 2 after level 1.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Arm</th><th class="num">Level 1 written</th><th class="num">Level 2 written</th><th class="num">Level 1 read</th><th class="num">Level 2 read</th><th class="num">Worlds bound at both levels</th></tr></thead>
+<tbody>
+{{two_rows}}
+</tbody></table></div>
+<p class="small">Samples used until the level is halfway. Written: the share of own strings that obey the level. Read: what the unit named for a teacher string says about the string's value.</p>
+<figure class="wide"><img src="figures/model5-cut-depth.svg" alt="Four panels for the two-level world: loss against samples used by arm; the share of written strings that obey level 1 and level 2 for wake-sleep with and without practice; how well teacher strings are read at each level; and level 2 for own samples credited to the writing units, own samples credited by reading and a twin's samples."><figcaption><strong>Figure 3. Each level is written and read after the one below it, and practice shortens the wait most at the upper level.</strong> Top left: loss against samples used. Top right: share of written strings that obey each level. Bottom left: how well teacher strings are read at each level. Bottom right: level 2 by whose samples are judged.</figcaption></figure>
+<ul>
+<li><strong>The lead grows with depth.</strong> Practice is {{lead1}} times sooner at level 1 and {{lead2}} times sooner at level 2.</li>
+<li><strong>Stages emerge.</strong> With a separate reader, level 2 is never written before level 1: in {{nb_ws}} of {{nb_ws_n}} runs of wake-sleep and {{nb_wsp}} of {{nb_wsp_n}} runs with practice, over three sizes of the teacher set. Nothing in the rules orders the levels.</li>
+<li><strong>Loss at equal samples.</strong> Against the best wake to sleep ratio per world, practice is at {{d_wsp32}} against {{d_ws32}} after 32,768 samples and {{d_wsp262}} against {{d_ws262}} after 262,144.</li>
+<li><strong>Reliability.</strong> Over the three sizes practice binds both levels in {{b_wsp}} of 48 runs, and in {{b_twin}} of 48 from a second random start. Wake-sleep manages {{b_ws}} to {{b_ws31}} of 48.</li>
+<li><strong>Too much practice loses coverage.</strong> At three own batches per wake batch, only {{g_wsp13}} of {{worlds}} worlds end with a low loss. Without sleep, level 2 binds in {{wp2}} worlds.</li>
+<li><strong>The writer's own posterior as reader</strong> (no separate reader) is fast when it works and binds both levels together, but ends bound in {{b_tied}} of {{worlds}} worlds.</li>
+</ul>
 </section>
 
 <section>
-<h2>4. Three levels</h2>
-<p>A string is now four codes, \(k_1k_2\,|\,k_3k_4\). Each half is the block above. The 64 valid class pairs are the productions of 16 symbols of a second level, and the top has 64 valid pairs of those symbols: 262,144 valid strings. Three learners get the same number of teacher strings:</p>
+<h2>3. Whose samples</h2>
+<p>Two learners with the same teacher strings and different random starts practice on each other's samples. By symmetry they are equally good at every moment. Every judged sample is credited to the units the reader names, so only the source differs.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Judged samples</th><th class="num">Level 1 halfway</th><th class="num">Level 2 halfway</th><th class="num">Worlds bound at both levels</th></tr></thead>
+<tbody>
+{{twin_rows}}
+</tbody></table></div>
+<p class="small">Rounds, one judged batch of 64 per round; 4,096 teacher strings.</p>
+<figure class="wide"><img src="figures/model5-cut-twin.svg" alt="Four panels: the share of written strings that obey level 1 and level 2 against rounds for own samples credited to the writing units, own samples credited by reading, a twin at the same stage and a twin that is ahead; the distance between what two learners write at a cut and in the pair of cut values; and how much of a sample's causes the reader recovers for own and for the twin's samples at each level."><figcaption><strong>Figure 4. A twin's samples cost more at the upper level, where the two learners differ in what a sample's deep cause is.</strong> Top: share of written strings that obey each level, by whose samples are judged. Bottom left: how far apart the two learners write at each level. Bottom right: how much of a sample's causes the reader recovers, for own and for the twin's samples.</figcaption></figure>
 <ul>
-<li><strong>A table of whole strings.</strong></li>
-<li><strong>All strings first, then practice.</strong> While the strings were shown no class unit could read them, so nothing about the second level was kept and the two halves stay independent.</li>
-<li><strong>Practice between two halves of the strings.</strong> The second half is read into the class units and their pairs are counted, which is the same lateral memory one level up.</li>
+<li><strong>The cost grows with the level.</strong> Against own samples credited the same way, a twin at the same stage takes {{tw_ratio1}} times the rounds at level 1 (later in {{tw_later1}} of {{tw_n}} worlds) and {{tw_ratio2}} times at level 2 (later in {{tw_later2}}). A twin that is ahead, and so writes better strings, takes {{ah_ratio2}} times at level 2.</li>
+<li><strong>The learners differ at the level that is forming.</strong> The distance between what they write at a cut peaks early ({{tv1_16}} at round 16) and fades to {{tv1_128}} by round 128. The distance between their pairs of values peaks later ({{tv2_64}} at round 64).</li>
+<li><strong>Two finished learners can hold different deep codes for the same strings.</strong> The top unit can stand for the value at the first cut or at the second; both write exactly the same strings. Of {{co_fin}} pairs in which both learners finished, {{co_diff}} hold different codes. There the reader recovers {{co_twin}} of the twin's top unit, against {{co_own}} of its own.</li>
+<li><strong>Credit to the writing units is the larger effect.</strong> Own samples credited to the units that wrote them reach level 2 in {{oc_t2}} rounds, against {{or_t2}} when the same samples are credited by reading.</li>
+<li><strong>Limits.</strong> In the one-level world a twin's samples do as well as own samples, and better early. Here the twin arm ends bound in {{tw_bound}} of {{worlds}} worlds against {{or_bound}} for own samples credited by reading. It is not shown that the difference in deep code is what makes a twin's samples slower.</li>
 </ul>
-<p>With 16,384 strings the table of strings is at {{d_flat}} nats, strings first at {{d_first}}, practice in between at {{d_between}}; with 131,072 strings {{d_flat2}}, {{d_first2}} and {{d_between2}} (Figure 7). Practice moves the frontier by one level and no further: the counts for the next level can only be taken from teacher samples that arrive after the classes are named. The remaining loss of the third learner is a naming error. Practice leaves several units with the same pool, and reading them as one unit is not yet reliable.</p>
-<figure><img src="figures/model5-depth.svg" alt="Population loss of strings against the number of teacher strings for a table of whole strings, for all strings first and then practice, and for practice between two halves of the strings."><figcaption><strong>Figure 7. Teacher strings that arrive after the classes are named can be counted one level up; strings shown before are lost for that level.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
 </section>
 
 <section>
-<h2>5. Against toy model 3, and what this shows</h2>
+<h2>4. Inside the network</h2>
+<p>This section looks at the units and at what single samples do to them, in the two-level learner with 4,096 teacher strings.</p>
+
+<h3>What the units come to stand for</h3>
+<figure class="wide"><img src="figures/model5-cut-units.svg" alt="A grid of small four by four tables at six times of training, from round 0 to round 2,048, for one world: the value each level-1 unit writes, the units the top unit chooses at the first and at the second cut, and the unit named for a teacher pair of each value. All tables start grey and end with one or two black cells per row."><figcaption><strong>Figure 5. Every unit starts by writing everything and ends with one meaning; the level-1 units get theirs first, the top unit after.</strong> One world, learner with practice. Each small table has one row per value of the unit; dark is probability near one. Rows of tables, from the top: the value a level-1 unit writes; the level-1 units the top unit chooses at the first and at the second cut; the unit the reader names for a teacher pair of each value.</figcaption></figure>
+<ul>
+<li><strong>The start is a saddle.</strong> All four values of a unit write the same, so nothing tells them apart.</li>
+<li><strong>Level-1 units take their values one after another.</strong> After 32 rounds a median of {{u32}} of the four units write one value with probability above 0.8, after 64 rounds all four. In the world shown, the last unit takes the value that is left.</li>
+<li><strong>The top unit sharpens after them</strong>, and ends in one of two codes: one table has one unit per row and the other two. It stands for the value at the first cut in {{code1}} worlds and at the second in {{code2}}.</li>
+<li><strong>A stuck world is one with a double.</strong> With practice no world ends that way here. Under wake-sleep {{ws_stuck}} worlds do, and in each of them two level-1 units write the same value.</li>
+</ul>
+
+<h3>Which sample moves which level</h3>
+<p>At each state of training the learner is copied, and one rule alone is applied at a small step. The table gives the change in the share of written strings that obey a level, per 1,000 samples, at states where that level is forming.</p>
 <div class="table-wrap"><table>
-<thead><tr><th></th><th>Toy model 3 (chain)</th><th>Model 5</th></tr></thead>
+<thead><tr><th>One kind of sample alone</th><th class="num">Level 1, with practice</th><th class="num">Level 2, with practice</th><th class="num">Level 1, wake-sleep</th><th class="num">Level 2, wake-sleep</th></tr></thead>
 <tbody>
-<tr><td>World</td><td>Chains of states, each with \(m\) allowed successors. No hidden cause.</td><td>Pairs of codes with hidden classes and rules over the classes.</td></tr>
-<tr><td>What watching gives recognition</td><td>A table of the links seen.</td><td>A table of the pairs seen, \(\mathbf{M}\). The same kind of object.</td></tr>
-<tr><td>What practice builds</td><td>Tables that write longer spans in one pass from accepted links.</td><td>Class units: names for a hidden cause.</td></tr>
-<tr><td>Does the learner end up writing what recognition never saw?</td><td>No. New chains, but only from links that were seen.</td><td>Yes. Valid pairs the teacher never showed, through the classes.</td></tr>
-<tr><td>Own samples against as many fresh teacher samples</td><td>Fresh samples win at every budget.</td><td>Fresh samples win at every budget.</td></tr>
-<tr><td>Own against foreign samples</td><td>No difference, except where the teacher was far widthwise.</td><td>Own samples beat a twin's of the same quality, with an unbiased teacher.</td></tr>
-<tr><td>Can practice hurt?</td><td>No.</td><td>Yes, when \(\mathbf{M}\) is sparse.</td></tr>
-<tr><td>What does the same without own samples</td><td>Teacher spans, with many more chains.</td><td>Recall through \(\mathbf{M}\), from the same teacher set.</td></tr>
-<tr><td>Depth</td><td>Levels arrive in order; practice adds no knowledge.</td><td>One level per round of watching and practice; naming is what the next level needs.</td></tr>
+{{probe_rows}}
 </tbody></table></div>
-<h3>What this shows</h3>
+<p class="small">Median over the states in which 30 to 60% of written strings obey level 1, or 55 to 70% obey level 2. Columns: states of the learner with practice, and states of the wake-sleep learner.</p>
+<figure class="wide"><img src="figures/model5-cut-probes.svg" alt="Six panels, level 1 in the top row and level 2 in the bottom row, each against how far the level has formed: the change per 1,000 samples for a teacher string read by the reader, a teacher string read as well as possible and an own sample; for own samples the judge accepts and refuses; and for own samples credited to the writing units, own samples credited by reading and a twin's samples."><figcaption><strong>Figure 6. An own sample moves each level forward, a teacher string does not, and at the upper level the refused samples do most of the work.</strong> States of the learner with practice, binned by how far the level has formed. Top row: level 1. Bottom row: level 2. Left: a teacher string against an own sample. Middle: own samples split by the judge's verdict. Right: whose sample, and how it is credited.</figcaption></figure>
 <ul>
-<li>A verdict on a deep choice does not need deep units. Pair counts between shallow codes separate a code of the right class from a code of another class.</li>
-<li>The verdict and the prior have different jobs: without the verdict everything merges, without spread nothing does, and without reuse no unit becomes a class.</li>
-<li>Credit by the reader's own reading is enough.</li>
-<li>Own samples beat equally good foreign ones, because they show the learner its own wrong pairs.</li>
+<li><strong>Teacher strings do not move the top unit.</strong> Read by the reader they push level 2 back ({{p_wake2}} per 1,000 samples, and forward in {{p_wake2_pos}} of the states). Read as well as possible, by the writer's own posterior, they give {{p_tied2}}. An own sample gives {{p_prac2}}.</li>
+<li><strong>So the top unit sits on a saddle under teacher strings.</strong> The exact step from a teacher string is close to zero there, however well the string is read. This is the README's point about saddles under teacher samples.</li>
+<li><strong>Refused samples carry more than accepted ones once a level has started to form.</strong> At level 2 they give {{p_ref2}} against {{p_acc2}}, and {{p_ref2_late}} against {{p_acc2_late}} when the level is further along. At level 1 it is {{p_ref1}} against {{p_acc1}}; at the very start of level 1 the two give the same ({{p_ref1_early}} and {{p_acc1_early}}).</li>
+<li><strong>Teacher strings and own samples do different jobs.</strong> Teacher strings lower the loss ({{l_wake}} nats per 1,000 samples) while they lower the share of valid strings: they keep the writer covering everything. Refused own samples raise the valid share and raise the loss ({{l_ref}}). This is why practice first raises the loss, and why it diverges without wake.</li>
+<li><strong>A twin's sample is worth little at these states.</strong> Credited by reading, an own sample gives {{p_or2}} at level 2 and a twin's {{p_tw2}}.</li>
+<li><strong>In the wake-sleep learner</strong> a teacher string read as well as possible does help level 2 ({{p_tied2_ws}}), but the reader's own reading does not ({{p_wake2_ws}}), and an own sample would give {{p_prac2_ws}}.</li>
 </ul>
-<h3>What it does not show</h3>
+
+<h3>The upper level waits for the lower</h3>
+<figure class="wide"><img src="figures/model5-cut-gating.svg" alt="Two panels. Left: the change of the level-2 share per 1,000 own samples against the share of written strings that obey level 1, rising from zero, for states of the wake-sleep learner and of the learner with practice. Right: against rounds, how often the reader names the unit the writer would for teacher strings and own samples at level 1 and at level 2, with the level-2 share of written strings."><figcaption><strong>Figure 7. A verdict reaches the top unit only as far as level 1 is bound, and the reader's name for the top unit trails what the writer writes.</strong> Left: what an own sample does to level 2, against how much of level 1 is written, at states where level 2 has not formed. Right: how often the reader names the unit the writer's own posterior would, for teacher strings and own samples at both levels; dotted, level 2 as written.</figcaption></figure>
 <ul>
-<li>An advantage over more teacher samples in one block. Per sample, own samples are worth far less there (section 6 for three levels).</li>
-<li>That own samples are needed. Recall through \(\mathbf{M}\) uses the same statistic without generating.</li>
-<li>A learner that starts from a weak random code. The classes form from units that start as copies of the shallow codes; the likelihood-gradient learner from a random start does not find them.</li>
-<li>Robustness. Practice hurts when fewer than about four teacher pairs per valid pair were seen; \(c=0.8\) was chosen from a scan over 0.6 to 0.9 on four worlds; several units end with the same pool and are not merged.</li>
-<li>A deeper stack. The three-level runs name one level and count the next.</li>
+<li><strong>The verdict is gated by the level below.</strong> While under 10% of strings obey level 1, an own sample changes level 2 by {{g0}} per 1,000 samples. At 10 to 30% it is {{g1}}, at 30 to 60% {{g2}}. The top unit acts on the string only through the units below it, so its verdict carries nothing until they are bound.</li>
+<li><strong>Teacher strings are read as well as own samples.</strong> At round 128 the agreement between reader and writer on the top unit is {{ag2_t}} for teacher strings and {{ag2_o}} for own samples (0 is chance, 1 is always); at level 1 it is {{ag1_t}} and {{ag1_o}}. Own samples are not read deeper. They reach the deep unit because the unit that wrote them is known, not because they are read better.</li>
+<li><strong>With practice, writing leads reading at level 2.</strong> At round 64 the writer is {{w64}} of the way at level 2 and the reader {{r64}}. What is ahead of the writer is the judge, which was complete before the first own sample.</li>
 </ul>
-</section>
-<section>
-<h2>6. Follow-up: where own samples beat fresh teacher samples, and why one block cannot show it</h2>
-<p class="small">Added 16 November 2026. Sections 1 to 5 are as they were; where this section corrects them, it says so.</p>
-<p><strong>In one block an own sample cannot be worth a fresh teacher pair, because no teacher pair is lost on the learner. With three levels part of every teacher string is lost until the classes are named, and there a budget split between teacher and own strings ends far below the same budget of teacher strings.</strong></p>
-<h3>Why one block cannot show it</h3>
+
+<h3>What the network parts add</h3>
 <ul>
-<li><strong>The judge knows what the writer knows.</strong> After watching, \(\mathbf{M}\) and the table \(\mathbf{T}\) that the generator starts from hold the same pairs. The verdict confirms an own sample only if the teacher showed that pair, and then the generator already writes it.</li>
-<li><strong>Nothing in a teacher pair is lost.</strong> Both codes are read by the shallow layer and \(\mathbf{M}\) stores the pair whole. A fresh pair always adds something about the world; an own sample can only reorganise what \(\mathbf{M}\) holds. For own samples to win at an equal number of samples, part of a teacher sample has to be unreadable for the learner at its current stage.</li>
-<li><strong>Own samples do not reach deeper than teacher pairs in this learner.</strong> The class units start as copies of the codes, so a teacher pair is read into them as easily as an own sample. The asymmetry of section 2 ({{gel_o}} of own against {{gel_t}} of teacher samples) existed only under a threshold that made the learner worse.</li>
+<li><strong>The judge accepts pairs it was never shown.</strong> With 256 teacher strings the stored set holds {{j_shown256}} of the valid pairs at a cut; the judge accepts {{j_acc256}} of the valid pairs and {{j_wrong256}} of the invalid ones. With 512 it holds {{j_shown512}} and the judge is exact. The hidden layer does this.</li>
+<li><strong>The naming layer needs the reader's hidden layer for reliability.</strong> Reading the codes directly, at its best sleep step, practice binds both levels in {{ab_wsp}} of {{worlds}} worlds and wake-sleep in {{ab_ws}}, against {{b_wsp_here}} and {{b_ws_here}}.</li>
 </ul>
-<h3>What naming the classes is worth, and what a verdict gets of it</h3>
-<p>Against the same teacher set, reorganising does buy something: a table over pairs of classes has 64 valid entries to estimate, the table over pairs of codes 1,024.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Teacher pairs</th><th>Counted table</th><th>Practice, verdict on the written pair (section 3)</th><th>Practice, pooled verdict</th><th>Clustering of the pair counts</th><th>Table over the true classes</th></tr></thead>
-<tbody>
-{{ob_rows}}
-</tbody></table></div>
-<p class="small">Population loss in nats, median over {{worlds}} worlds. Practice: 2.1 million own samples after watching. Clustering: the codes of each side are grouped by their partners (Ward linkage on the rows of \(\mathbf{M}\), summed over the groups of the other side, a few rounds, 16 groups per side), then pairs of groups are counted; it uses no own sample. True classes: pairs of the true classes counted.</p>
-<ul>
-<li><strong>The classes are in the pair counts from about 2,048 pairs.</strong> Clustering ends at {{ob_f2048}} nats there, the counted table at {{ob_t2048}}. The table needs about {{ob_ratio}} times as many pairs for that loss.</li>
-<li><strong>The verdict of section 1 gets little of this.</strong> It asks whether the teacher showed exactly the pair that was written, so a valid pair that was not shown counts against the units that wrote it. This is why practice needed about four teacher pairs per valid pair.</li>
-<li><strong>A pooled verdict gets more.</strong> A written code is judged against everything that its partner unit stands for:
-\[\begin{gathered}v_L=\mathbb{1}\Big[\sum_{k''\in\mathcal{P}(\hat a')}M_{kk''}>0\Big],\qquad v_R=\mathbb{1}\Big[\sum_{k''\in\mathcal{P}(\hat a)}M_{k''k'}>0\Big],\\ \Delta\Lambda^L_{k\hat a}=\eta\,(v_L-c\,\rho_L),\quad \Delta\Lambda^R_{k'\hat a'}=\eta\,(v_R-c\,\rho_R),\quad \Delta\Theta_{\hat a\hat a'}=\eta\,(v_Lv_R-c\,\bar v).\end{gathered}\]
-\(\mathcal{P}(a)\) is the pool of unit \(a\), the codes it writes at least half as often as its most frequent one. \(\rho_L\) and \(\rho_R\) are the rates at which the same verdict accepts the teacher's pairs (stored pairs replayed from \(\mathbf{M}\), their own count left out), so an own sample is held to \(c\) times what a true sample gets; \(\bar v\) is the running mean of \(v_Lv_R\) on own samples; \(\eta=1\), \(c=0.8\). At the start a pool is one code and this is the verdict of section 1. Once units grow, a valid pair that the teacher never showed is accepted through the other codes of the partner's pool. Practice then ends below the table from 2,048 pairs on ({{ob_p2048}} against {{ob_t2048}} nats) and at {{ob_p4096}} with 4,096 pairs, where the true classes give {{ob_o4096}}. With 1,024 pairs it still leaves the learner worse than the table ({{ob_p1024}} against {{ob_t1024}}).</li>
-<li><strong>At an equal number of samples nothing changes.</strong> With 4,096 teacher pairs, practice needs {{ob_own_below}} own samples before it is below the table of those pairs, and a table of that many fresh teacher pairs is far ahead (section 3). A larger step (\(\eta=1\) instead of 0.3, used here) brings the number of own samples for 0.1 nats from about a million to about a third of a million; more exploration by the units, or a table imprinted at the first sighting of a pair, made practice fail or end worse.</li>
-</ul>
-<figure><img src="figures/model5-own-block.svg" alt="Population loss against the number of teacher pairs on logarithmic axes for the counted table, practice with the verdict on the written pair, practice with the pooled verdict, clustering of the pair counts and a table over the true classes."><figcaption><strong>Figure 8. Naming the classes is worth many times the teacher pairs, and a pooled verdict gets most of that where the verdict on the written pair gets little.</strong> Median over worlds, bands are the interquartile range. Values above the top of the axis are cut off.</figcaption></figure>
-<h3>Three levels at a fixed budget of strings</h3>
-<p>The world is that of section 4: strings of four codes, 262,144 valid strings. A budget of \(B\) strings is split into \((1-f)B\) teacher strings and \(fB\) own strings. The learner watches half of its teacher strings, practises on its own strings (one pair for each half of the string, with the pooled verdict), then reads the other half of the teacher strings through its class units and counts pairs of named pairs. With \(f=0\) nothing is named, and the pairs of pairs it counts are whole strings: a table of strings. The runs use {{ob_dworlds}} worlds in which no two classes have the same partners.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Strings in total</th><th>Teacher strings only (table of strings)</th><th>Teacher and own strings, best share</th><th>Best share of own strings</th><th>Teacher strings only, classes by clustering</th></tr></thead>
-<tbody>
-{{ob_drows}}
-</tbody></table></div>
-<p class="small">Population loss of strings in nats, median over {{ob_dworlds}} worlds. Clustering: the pair counts of the first half of the teacher strings are clustered as above, the second half is read through the groups; no own string.</p>
-<ul>
-<li><strong>From \(2^{18}\) strings on, the split budget is below the table of strings in all {{ob_dworlds}} worlds</strong>: {{ob_dm19}} against {{ob_df19}} nats at \(2^{19}\) strings, {{ob_dm20}} against {{ob_df20}} at \(2^{20}\), {{ob_dm21}} against {{ob_df21}} at \(2^{21}\). The best share of own strings lies between 0.25 and 0.9, and from \(2^{19}\) on every share from 0.25 to 0.97 is below the table (Figure 9, right).</li>
-<li><strong>Below \(2^{18}\) strings it is worse than the table.</strong> Practice needs about a quarter to half a million own strings to name the classes, whatever the budget.</li>
-<li><strong>What is lost on the learner here is the upper level of a teacher string.</strong> Before the classes are named, pairs of pairs can only be counted as whole strings. Afterwards every teacher string adds to a table with 1,024 valid entries instead of 262,144.</li>
-<li><strong>The sampling is not what does it.</strong> Clustering the pair counts names the classes without an own string and is ahead of or level with the split budget at every total ({{ob_dc15}} nats at \(2^{15}\) strings, where the table of strings is at {{ob_df15}}). Practice estimates by samples what clustering reads off \(\mathbf{M}\) directly, and \(\mathbf{M}\) is a table of 64 by 64 counts.</li>
-</ul>
-<figure><img src="figures/model5-own-depth.svg" alt="Left: population loss of strings against the total number of strings for teacher strings only counted as a table of strings, for teacher and own strings at the best share, for teacher strings with classes found by clustering and for teacher strings with the true classes given. Right: heat map of the loss over the total number of strings and the share of own strings."><figcaption><strong>Figure 9. With three levels, a budget split between teacher and own strings ends far below the same budget of teacher strings once it pays for naming the classes, and clustering the pair counts does the naming without an own string.</strong> Left: median over worlds with the interquartile range; the split budget is shown at its best share for each total. Right: median loss by total and share of own strings; lighter is lower, and the bottom row is the table of strings.</figcaption></figure>
-<p><strong>Two corrections to section 4.</strong> The naming error reported there had two causes that are not about learning. First, practice leaves two or three of the 64 units per side with a pool that mixes two classes, and reading a code by its largest pool let those units merge the two classes one level up. Here a code is read as the group of like units with the most posterior mass, which gives exactly 16 names per position once practice has run for half a million own strings. Second, in 5 of the first 64 worlds two classes have the same partners. Within a block such classes are one class and can only be told apart one level up, so those worlds are left out here.</p>
-<h3>What this changes, and what stands</h3>
-<ul>
-<li><strong>Changed:</strong> a split budget beats teacher samples only once the world has three levels. The condition is that part of a teacher sample cannot be read before practice.</li>
-<li><strong>Stands:</strong> own samples are not needed as samples. A pass over \(\mathbf{M}\) without sampling names the classes from fewer teacher pairs. For sampling to be needed, the memory that judges would have to be too large to go through entry by entry.</li>
-<li><strong>Stands:</strong> practice is slow, about half a million own strings per level.</li>
-<li><strong>Not tested:</strong> four levels, where a table of strings is out of reach of any budget; practice at the top level (here the top is counted, not named); a start that is not a copy of the codes.</li>
-</ul>
-</section>
-<section>
-<h2>7. How deep a teacher sample and an own sample reach, over the course of learning</h2>
-<p class="small">Added 16 November 2026.</p>
-<p><strong>In the learner of this note, own samples reach further than teacher samples only while few teacher strings have been seen, and the gap closes once practice has named the classes. The top level is reached by teacher strings, and only after the naming; own samples never reach it, because practice runs within the blocks. The lead that the README expects for own samples does appear in the likelihood-gradient learner from a sharp random start. There it is gone after {{pr_gcross}} samples or, if only samples read above chance may learn, teacher samples stay locked out and the learner gets worse.</strong></p>
-<p>A sample reaches level \(\ell\) if the reader's explanation of it is more probable than chance at \(\ell\) and at every level below:</p>
-<ul>
-<li>level 1: the units that read the codes hold them above chance, \(N\,G_{k\hat a}>1\), for every code of the sample;</li>
-<li>level 2: in addition, the pair of units is above chance in the table, \(K^2\,T_{\hat a\hat a'}>1\), with \(K\) units per side;</li>
-<li>level 3 (three levels only): in addition, the string read through the class names falls on a pair of named pairs that the counted teacher strings also fall on.</li>
-</ul>
-<p>Levels 1 and 2 are averaged over the reader's posterior \(q(a,a'\mid k,k')\), so they give the probability that the winner the rule credits passes. This is the drive of section 2, taken level by level. Teacher samples are fresh draws from the population. Own samples are the learner's own pairs, one from each block, as in practice.</p>
-<p>The two learners: the learner of section 6 (pooled verdict, \(\eta=1\)) on three levels, {{pr_sworlds}} worlds, which watches half of the teacher strings and then practices; at every checkpoint the other half is read through the current names and counted at the top. And the likelihood-gradient learner of section 2 on one block, 16 units per side, each starting as a copy of one random code, with \(\mathbf{M}\) filled from 8,192 teacher pairs and teacher and own batches alternating, {{pr_gworlds}} worlds.</p>
-<figure><img src="figures/model5-propagation.svg" alt="Four panels of the share of samples that reach levels 1, 2 and 3 against learning progress on a logarithmic axis, for fresh teacher samples and own samples. Top: the learner of section 6 on three levels with 4,096 and 16,384 teacher strings, against own strings practised, with the share of classes named. Bottom: the likelihood-gradient learner from a sharp random start, with every sample learning and with only samples read above chance learning, against samples."><figcaption><strong>Figure 10. Own samples reach further than teacher samples only early, with few teacher strings or a misaligned start; once the reader has changed, teacher samples reach as far, and teacher strings reach the top once the classes are named.</strong> Top: the learner of section 6 on three levels; own samples have no level 3, since practice runs within the blocks. Bottom: the likelihood-gradient learner of section 2 on one block from a sharp random start, with every sample learning (left) or only samples whose read explanation is above chance (right). A sample reaches a level if the reader's explanation is above chance there and at every level below. Colors: levels. Solid: fresh teacher samples; dashed: own samples; dotted: share of classes named. Median over worlds, bands are the interquartile range.</figcaption></figure>
-<ul>
-<li><strong>With few teacher strings, own strings reach further at first.</strong> With 4,096 teacher strings, {{pr_ao2}} of own and {{pr_at2}} of teacher strings reach level 2 after watching, and early practice widens the gap ({{pr_ao2m}} against {{pr_at2m}} after \(2^{16}\) own strings). Own pairs are written where the table is strong. A pair the teacher showed only once sits below chance: every sighting raises its weight by the same step and the table is exponential in the weights, so the pairs seen often take most of its mass. After naming both are near the top ({{pr_ao2e}} and {{pr_at2e}} at \(2^{20}\) own strings).</li>
-<li><strong>With more teacher strings there is no lead.</strong> With 16,384 teacher strings, teacher strings reach level 2 more often than own strings after watching ({{pr_bt2}} against {{pr_bo2}}).</li>
-<li><strong>The top is reached by teacher strings, once the classes are named.</strong> Level 3 rises from {{pr_at30}} to {{pr_at3e}} of teacher strings with 4,096 of them and from {{pr_bt30}} to {{pr_bt3e}} with 16,384, in step with the share of classes named. Before the naming the top holds whole strings, and a fresh string is almost never among them.</li>
-<li><strong>The README's picture appears in the gradient learner, and does not last.</strong> From the sharp random start, {{pr_go1}} of own and {{pr_gt1}} of teacher samples reach level 1. When every sample learns, the pools spread out and the reach of both falls (own samples to {{pr_go1min}} after {{pr_go1min_at}} samples); then the two rise together, from {{pr_gcross}} samples on teacher samples reach level 1 about as often as own ones or more, and at the end both are near {{pr_gt1e}} (loss {{pr_gloss}} nats). When only samples read above chance learn (the threshold of section 2), teacher samples never exceed {{pr_gt1max1}}, and the loss ends at {{pr_gloss1}} nats.</li>
-</ul>
-<p>So in neither learner do own samples open a level that teacher samples cannot reach afterwards. Practice changes the reader, and then teacher samples reach as far as own ones. The one level where reach decides the loss is the top of the stack, and there teacher strings get through, using the names that practice built.</p>
-</section>
-<section>
-<h2>8. With networks: the hidden layer has the classes before the output writes them</h2>
-<p class="small">Added 17 November 2026. Runs: <code>experiments/model5_network_baseline.py</code>, <code>experiments/model5_network_practice.py</code>.</p>
-<p><strong>A plain network trained on the teacher pairs has the classes in its hidden layer from 2,048 pairs on, while its output writes about 16 times worse than that hidden layer allows. Practice in which the writer proposes pairs, the reader's hidden layer judges them against the teacher pairs and the answer is kept closes most of this gap without a further teacher pair. From 4,096 teacher pairs on it beats the same number of fresh teacher pairs, in one block. Whose proposals are judged does not matter, and a verified pair used as one more sample is worth at most a teacher pair.</strong></p>
-<h3>The network, and what watching gives it</h3>
-<p>The network has two linear layers with 16 hidden units: a code is mapped to a hidden vector, and the hidden vector to the partner,</p>
-\[p_\theta(k,k')=\operatorname{softmax}_{kk'}\big(\mathbf{u}_k\cdot\mathbf{v}_{k'}+a_k+b_{k'}\big).\]
-<p>It is trained by backpropagation on 85% of the teacher pairs; the other 15% choose the weight decay and the step at which training stops. The table shows its loss in two readings: what its output writes, and what its hidden layer holds, measured by grouping the codes by their hidden vectors (16 groups per side) and counting the same teacher pairs over pairs of groups.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Teacher pairs</th><th>Counted table</th><th>Network, what its output writes</th><th>Network, its hidden layer read out</th><th>Table over the true classes</th></tr></thead>
-<tbody>
-{{nw_brows}}
-</tbody></table></div>
-<p class="small">Population loss in nats, median over {{nw_bworlds}} worlds.</p>
-<ul>
-<li><strong>Watching does reach the hidden layer.</strong> With 2,048 pairs the hidden layer read out is at {{nw_bh2048}} nats, the table over the true classes at {{nw_bo2048}}. The premise that teacher samples do not train the deep layer does not hold for backpropagation.</li>
-<li><strong>The output does not use it.</strong> It writes at {{nw_bn2048}} nats, {{nw_bratio}} times the loss of its own hidden layer and not far below the counted table. Training on lowers the loss on the pairs it is trained on and raises it on held-out pairs (Figure 11): the output starts to fit which pairs happened to be shown.</li>
-</ul>
-<figure><img src="figures/model5-network-watching.svg" alt="Left: cross-entropy on the teacher pairs the network is trained on and on held-out teacher pairs against the training step. Right: population loss of what the output writes and of the hidden layer read out against the training step. A vertical line marks the step with the lowest held-out loss."><figcaption><strong>Figure 11. During watching the hidden layer comes to hold the classes, and the output stops improving on held-out pairs long before it writes what the hidden layer holds.</strong> 2,048 teacher pairs, median over worlds with the interquartile range. The dotted line marks the step with the lowest loss on held-out teacher pairs, where training stops.</figcaption></figure>
-<h3>Judge and practice</h3>
-<p>There are two networks of this form with separate weights, a reader and a writer, each trained as above from its own random start. The judge is the reader's hidden layer together with the stored teacher pairs \(\mathbf{M}\). Two codes are neighbours if their hidden vectors (mean removed) have a cosine of at least \(\tau\), and every stored pair is spread evenly over the pairs of its neighbours:</p>
-\[p_E=\frac{1}{n}\,\tilde{\mathbf{K}}_L\,\mathbf{M}\,\tilde{\mathbf{K}}_R^{\top},\qquad K_{kj}=\mathbb{1}\big[\cos(\mathbf{u}_k,\mathbf{u}_j)\ge\tau\big],\]
-<p>with \(\tilde{\mathbf{K}}\) the neighbourhood matrix with columns normalised to one. \(\tau\) is the width of this estimate and is chosen by the likelihood of the held-out teacher pairs. The judge's answer to a pair is \(p_E(k,k')\): zero if the teacher showed no pair of neighbours, otherwise how often it showed them.</p>
-<p><strong>Practice.</strong> The writer is trained on a memory \(\mathbf{C}\) that starts as the teacher's counts, \(\mathbf{C}=\mathbf{M}\). In a round the writer proposes pairs by drawing them from its own output; for every proposed pair the judged count replaces the raw one, \(C_{kk'}\leftarrow n\,p_E(k,k')\); then the writer is fitted to \(\mathbf{C}\) again, as in watching. A sample is one proposal. No teacher pair is drawn during practice.</p>
-<h3>Against as many fresh teacher pairs</h3>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Further samples after 4,096 teacher pairs</th><th>Fresh teacher pairs</th><th>Own proposals, judged</th><th>A twin's proposals, judged</th><th>Pairs drawn from the judge, used as teacher pairs</th></tr></thead>
-<tbody>
-{{nw_crows}}
-</tbody></table></div>
-<p class="small">Population loss of the writer in nats, median over {{nw_worlds}} worlds. Fresh teacher pairs: a network trained in the same way on all the teacher pairs.</p>
-<ul>
-<li><strong>From 4,096 teacher pairs on, a judged proposal is worth more than a fresh teacher pair.</strong> After 4,096 pairs and 4,096 proposals the writer is at {{nw_o4096}} nats, a network given 8,192 teacher pairs at {{nw_f4096}}; own proposals are ahead in all {{nw_worlds}} worlds from 512 to 8,192 further samples. After 8,192 pairs the same holds for every number of proposals ({{nw_o8192}} against {{nw_f8192}} after 8,192 more).</li>
-<li><strong>With fewer teacher pairs it is not.</strong> After 2,048 pairs proposals tie with fresh pairs up to 2,048 further samples and fall behind after that ({{nw_o2048}} against {{nw_f2048}} after 8,192 more). After 1,024 pairs they are far behind ({{nw_o1024}} against {{nw_f1024}} after 4,096 more): the judge then accepts {{nw_inv1024}} invalid pairs.</li>
-<li><strong>The judge's own estimate is the limit.</strong> The dotted lines in Figure 12 are the loss of \(p_E\) itself ({{nw_j2048}}, {{nw_j4096}} and {{nw_j8192}} nats after 2,048, 4,096 and 8,192 pairs). Practice hands the writer what the judge holds, and nothing beyond it.</li>
-<li><strong>Whose proposals are judged does not matter; a twin's are slightly better.</strong> The twin is a second learner with a teacher set of its own. Its proposals, judged by the learner's own judge, are ahead of the learner's own at small numbers ({{nw_t2048}} against {{nw_ot2048}} after 2,048 pairs and 2,048 proposals) and end at the same loss. Own proposals fall where the writer already writes; a twin's fall more often on valid pairs the learner was never shown.</li>
-<li><strong>A verified pair used as a sample is worth no more than a teacher pair.</strong> Pairs drawn from \(p_E\) and added to the teacher pairs do as well as fresh teacher pairs at best. Weighted likelihood steps on own samples, with nothing kept, did worse than that ({{nw_s4096}} nats after 4,096 pairs and 32,768 samples). What makes a proposal worth more than a teacher pair is the answer: a count pooled over the neighbourhood, about 16 pairs for a class of four codes on each side.</li>
-<li><strong>The comparison is with a network that writes through its output.</strong> The hidden layer of a network given the same total of teacher pairs, read out directly, is ahead of both ({{nw_bh8192}} nats at 8,192 pairs, against {{nw_o4096}} for 4,096 pairs and 4,096 proposals).</li>
-<li><strong>Without the hidden layer there is nothing to gain.</strong> If the judge only says whether exactly this pair was shown, the writer stays where it was ({{nw_w4096}} nats).</li>
-<li><strong>The reader can learn from the judged pairs too.</strong> If after every round the reader is fitted to the same memory and the judge is rebuilt from its new hidden layer, the judge stops accepting invalid pairs (after 2,048 teacher pairs: from {{nw_ri0}} to {{nw_ri1}} invalid pairs accepted, its loss from {{nw_rj0}} to {{nw_rj1}} nats), and the writer ends lower ({{nw_or2048}} instead of {{nw_oe2048}}).</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-practice.svg" alt="Three panels, after 2,048, 4,096 and 8,192 teacher pairs: population loss of the writer against the number of further samples for fresh teacher pairs, own proposals judged, the same with the reader learning too, a twin's proposals judged, and pairs drawn from the judge used as teacher pairs; a dotted line marks the loss of the judge's own estimate."><figcaption><strong>Figure 12. Once the teacher set is large enough for the judge to be sharp, judged proposals lower the writer's loss faster than the same number of fresh teacher pairs, until the writer levels off at or above the judge's own estimate.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
-<h3>A fixed budget</h3>
-<p>A budget of samples is split into teacher pairs and proposals (four rounds of practice). With 4,096 samples or more in total, the best split has an eighth to a quarter of proposals and is below teacher pairs only in all {{nw_bw}} worlds: {{nw_m13}} against {{nw_bf13}} nats at \(2^{13}\) samples, {{nw_m14}} against {{nw_bf14}} at \(2^{14}\) (Figure 13). At \(2^{16}\) the counted table of the teacher pairs ({{nw_bt16}}) has overtaken the best split ({{nw_m16}}); the writer network has a floor near 0.009 nats.</p>
-<figure><img src="figures/model5-network-budget.svg" alt="Heat map of the population loss of the writer over the total number of samples and the share of own proposals; the bottom row is a network trained on teacher pairs only."><figcaption><strong>Figure 13. With a network, a budget split between teacher pairs and judged proposals is better than teacher pairs alone already in one block, once the budget is large enough.</strong> Median over worlds; lighter is lower. The bottom row is a network given teacher pairs only.</figcaption></figure>
-<h3>What this shows, and what it does not</h3>
+
+<h3>Against the README's intuitions</h3>
 <div class="table-wrap"><table>
-<thead><tr><th>README requirement</th><th>Network learner</th><th>Why</th></tr></thead>
+<thead><tr><th>Intuition</th><th>Found</th><th>How</th></tr></thead>
 <tbody>
-<tr><td>Decoupled encoder and decoder, networks</td><td>yes</td><td>Two networks with separate weights and random starts.</td></tr>
-<tr><td>Generation improves offline</td><td>yes</td><td>{{nw_s0}} to {{nw_e4096}} nats after 4,096 teacher pairs, with no further teacher pair.</td></tr>
-<tr><td>A split budget beats teacher samples only</td><td>yes, from 4,096 samples</td><td>Figure 13.</td></tr>
-<tr><td>Own samples beat foreign ones of the same quality</td><td>no</td><td>A twin's proposals are as good or slightly better.</td></tr>
-<tr><td>Recognition improves after practice</td><td>if the reader learns from the judged pairs</td><td>The judge stops accepting invalid pairs.</td></tr>
-<tr><td>Trial and error is needed</td><td>no</td><td>\(p_E\) can be computed for all pairs at once, without a proposal. From 2,048 teacher pairs on it is at or below the writer (dotted lines in Figure 12).</td></tr>
-<tr><td>Local learning rule</td><td>no</td><td>Backpropagation, and a memory of judged pairs.</td></tr>
-<tr><td>Depth</td><td>no</td><td>One block.</td></tr>
+<tr><td>Watching reaches only the shallow layers; generation uses the full stack</td><td>yes</td><td>Teacher strings train the reader, the judge and the block part. They do not bind the writer's units, and at the top unit their exact step is near zero.</td></tr>
+<tr><td>Saddles under teacher samples, left by generation</td><td>yes</td><td>One saddle per level. The upper one cannot be left before the lower one.</td></tr>
+<tr><td>Deeper layers are learned later, without being told</td><td>yes</td><td>The verdict reaches the top unit in proportion to what level 1 has bound.</td></tr>
+<tr><td>Wrong samples matter more than right ones</td><td>yes, once a level has started to form</td><td>Refused samples then give about {{neg_ratio}} times what accepted ones give, at both levels.</td></tr>
+<tr><td>Units become clean and one-hot; several structured solutions exist</td><td>yes</td><td>Each unit ends with one meaning; the top unit ends in one of two codes.</td></tr>
+<tr><td>Recognition stays ahead of generation</td><td>for judging only</td><td>The judge is ahead. The reader's naming of the top unit trails the writer.</td></tr>
+<tr><td>Own samples are recognized, foreign ones are not</td><td>no</td><td>Teacher strings are read into the writer's units as well as own samples. A twin's are read slightly worse at level 2.</td></tr>
 </tbody></table></div>
-<p>The gain has one source: the judge's answer is a count pooled over hidden-layer neighbours, so one answer carries what many teacher pairs carry about that pair. Proposals pay for themselves once the judge is sharp and the teacher's raw counts are the remaining error. The proposals have to cover the pairs, which costs a few thousand of them here; a learner that could go through all pairs would not need them.</p>
 </section>
+
 <section>
-<h2>9. A writer that learns through its weights, and a local rule</h2>
-<p class="small">Added 17 November 2026. Runs: <code>experiments/model5_network_practice.py</code> (<code>curves</code> with the <code>online</code> arms, <code>local</code>, <code>curves --rule local</code>).</p>
-<p><strong>The writer can learn from the judge's answers through its weights alone, one step per proposal with nothing kept, and a step in which only the two written codes move does almost as well. From 8,192 teacher pairs on this is ahead of the same number of fresh teacher pairs; it needs about four times as many proposals as keeping the answers. The networks can also be trained by a local rule. Their hidden layer then holds the classes as before, but what they write stops near 0.2 nats however many teacher pairs they are given. Practice takes such a network far below that. A table that simply counts the teacher pairs is local too, and it stays ahead of or level with the local network after practice.</strong></p>
-<h3>The writer learns through its weights</h3>
-<p>There is no memory of judged pairs. For every proposal \(x=(k,k')\) drawn from the writer, the judge returns \(p_E(x)\) and the writer takes one step that moves its own log-probability of \(x\) towards the log of the answer:</p>
-\[\delta=\log p_\theta(x)-\log\max\big(p_E(x),\,\varepsilon\,\bar e\big),\qquad \theta\leftarrow\theta-\eta\,\delta\,\frac{\mathbf{g}}{\Vert\mathbf{g}\Vert^2},\quad \mathbf{g}=\nabla_\theta\log p_\theta(x).\]
-<p>\(\bar e\) is the running mean of the positive answers, so an answer of zero counts as a small fraction \(\varepsilon=10^{-3}\) of a typical one; \(\eta=0.5\) is the share of the error at \(x\) that one step removes; \(\delta\) is cut off at \(\pm5\). In a second version only the weights of the two written codes move, each hidden vector by the error times the other one, and the part of \(\mathbf{g}\) that comes from the normaliser is left out:</p>
-\[\mathbf{u}_k\leftarrow\mathbf{u}_k-s\,\mathbf{v}_{k'},\quad \mathbf{v}_{k'}\leftarrow\mathbf{v}_{k'}-s\,\mathbf{u}_k,\quad a_k\leftarrow a_k-s,\quad b_{k'}\leftarrow b_{k'}-s,\qquad s=\frac{\eta\,\delta}{\Vert\mathbf{u}_k\Vert^2+\Vert\mathbf{v}_{k'}\Vert^2+2}.\]
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Further samples after 8,192 teacher pairs</th><th>Fresh teacher pairs, same network</th><th>Fresh teacher pairs, counted table</th><th>Own proposals, weights only</th><th>Only the two written codes move</th><th>A twin's proposals, weights only</th><th>Own proposals, judged counts kept (section 8)</th></tr></thead>
-<tbody>
-{{w9_rows}}
-</tbody></table></div>
-<p class="small">Population loss of the writer in nats, median over {{w9_worlds}} worlds. Reader, writer and judge as in section 8.</p>
-<ul>
-<li><strong>From 8,192 teacher pairs on it is ahead of fresh teacher pairs.</strong> After 8,192 pairs and 4,096 proposals the writer is at {{w9_o}} nats, a network given 12,288 teacher pairs at {{w9_f}}; it is ahead in at least 15 of {{w9_worlds}} worlds from 1,024 proposals on, and after 16,384 pairs in at least 14 from 256 on. After 4,096 pairs the two are level, after 2,048 pairs proposals are behind ({{w9_o2048}} against {{w9_f2048}} after 4,096 more).</li>
-<li><strong>It costs about four times the proposals of keeping the answers.</strong> What the memory of section 8 reaches with 1,024 proposals ({{w9_k1024}} nats) takes 4,096 here.</li>
-<li><strong>The step in which only the two written codes move does almost as well</strong> ({{w9_l}} nats at the same point).</li>
-<li><strong>The hidden layer of the writer has to move.</strong> With the hidden vectors frozen and only a matrix between them learning, the writer stays at {{w9_top}} nats. During practice the writer's hidden layer separates the classes further: the gap between the cosine within a class and between classes grows from {{w9_ap0}} to {{w9_ap1}} after 4,096 teacher pairs, and stays at {{w9_apt}} when frozen.</li>
-<li><strong>A twin's proposals do as well as own ones</strong>, as in section 8.</li>
-<li><strong>The answer is used as a value, not as a sample.</strong> The weighted likelihood steps of section 8 treat a verified pair as one more draw and make the writer worse; here the size of the judge's answer sets the target.</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-online.svg" alt="Three panels, after 4,096, 8,192 and 16,384 teacher pairs: population loss of the writer against the number of further samples for fresh teacher pairs given to the same network and to a counted table, own proposals with weights only, the same with only the two written codes moving, a twin's proposals, the writer with a frozen hidden layer, and own proposals with judged counts kept."><figcaption><strong>Figure 14. A writer that takes one step of its weights per judged proposal, and keeps nothing, falls below the same number of fresh teacher pairs once the teacher set is large, but more slowly than a writer that keeps the answers, and not at all if its hidden layer is frozen.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
-<h3>A local rule for the networks themselves</h3>
-<p>So far the two networks were trained by backpropagation with an exact normaliser. A local rule for the same network: for a teacher pair \((k,k')\), and for \(\nu\) contrast pairs \((k,k'')\) whose right code is taken from another teacher pair,</p>
-\[g=y-\sigma\big(\mathbf{u}_k\cdot\mathbf{v}_{k'}+c\big),\qquad \mathbf{u}_k\leftarrow\mathbf{u}_k+\eta\,g\,\mathbf{v}_{k'},\quad \mathbf{v}_{k'}\leftarrow\mathbf{v}_{k'}+\eta\,g\,\mathbf{u}_k,\]
-<p>with \(y=1\) for the teacher pair and \(y=0\) for a contrast pair. A step touches the two active codes only, and no sum over all pairs is taken. What such a network writes is \(p(k,k')\propto p_L(k)\,p_R(k')\,e^{\mathbf{u}_k\cdot\mathbf{v}_{k'}}\). The number of contrast pairs (1, 4 or 16) and of passes over the teacher pairs are chosen by the likelihood of held-out teacher pairs under what it writes.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Teacher pairs</th><th>Counted table</th><th>Local network, what its output writes</th><th>Local network, its hidden layer read out</th><th>Judge built from its hidden layer</th><th>Invalid pairs the judge accepts</th></tr></thead>
-<tbody>
-{{w9_lrows}}
-</tbody></table></div>
-<p class="small">Population loss in nats, median over {{w9_worlds}} worlds.</p>
-<ul>
-<li><strong>The hidden layer and the judge are as good as with backpropagation.</strong> The classes are in the hidden layer from 2,048 pairs on, and from 4,096 pairs the judge accepts no invalid pair.</li>
-<li><strong>The output is not.</strong> It writes at {{w9_lw4096}}, {{w9_lw8192}} and {{w9_lw16384}} nats with 4,096, 8,192 and 16,384 teacher pairs, while its hidden layer read out falls to {{w9_lh16384}}. The rule learns which pairs go together, not how much of its output each should get; that needs the comparison with everything else it could write.</li>
-<li><strong>There is a plateau at small weights, and teacher pairs leave it by themselves.</strong> A step is the error times the partner's hidden vector, so nothing moves while the hidden vectors are small. With random starts of size 0.1, 0.01, 0.001 and 0.0001 the hidden layer holds the classes from pass {{w9_first}} over the teacher pairs (Figure 15). The plateau grows with the logarithm of the start and needs no own sample to end.</li>
-<li><strong>Counting is local too.</strong> From 8,192 pairs on the counted table writes better than the local network.</li>
-</ul>
-<figure><img src="figures/model5-network-local.svg" alt="Two panels against the number of passes over 4,096 teacher pairs for random starts of four sizes: population loss of the hidden layer read out, and of what the output writes."><figcaption><strong>Figure 15. Under the local rule the hidden layer comes to hold the classes after a plateau that lengthens as the random start shrinks, and the output stalls far above it.</strong> 4,096 teacher pairs, four contrast pairs per teacher pair; median over worlds with the interquartile range.</figcaption></figure>
-<h3>A learner that is local throughout</h3>
-<p>Reader and writer are now both trained by the local rule, the judge is built from the reader as before, and the writer practises with one step per proposal.</p>
-<ul>
-<li><strong>More teacher pairs do not help this network; proposals do.</strong> After 8,192 pairs, the network given 4,096 more teacher pairs is at {{w9_rf}} nats. With 4,096 proposals instead it is at {{w9_rl}} if only the two written codes move and at {{w9_rn}} with the normalised step. It is ahead of the network given fresh pairs in all {{w9_worlds}} worlds from 256 proposals on.</li>
-<li><strong>The counted table of the same total is the harder comparison.</strong> It is at {{w9_rt}} nats at that point and stays ahead of the step in which only the written codes move. The normalised step overtakes it from 8,192 proposals on after 8,192 pairs ({{w9_rn2}} against {{w9_rt2}}).</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-localrule.svg" alt="Three panels, after 4,096, 8,192 and 16,384 teacher pairs, for networks trained by the local rule: population loss of the writer against the number of further samples for fresh teacher pairs given to the same network and to a counted table, own proposals with only the two written codes moving, and own proposals with the normalised step."><figcaption><strong>Figure 16. A network trained by the local rule does not write better with more teacher pairs, and practice lowers its loss by an order of magnitude; the counted table of the teacher pairs is ahead of or level with it.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
-<h3>What this shows, and what it does not</h3>
-<ul>
-<li><strong>Locality and what the network gives recognition go together.</strong> A rule that touches only the two active codes gives the same hidden layer and the same judge.</li>
-<li><strong>Locality does not give a deep layer that teacher samples fail to reach.</strong> The plateau at small weights is short, and teacher pairs end it. What a local rule does leave behind is the writing: the output stays far from what the hidden layer holds, and more teacher pairs do not close that.</li>
-<li><strong>Practice closes it, with a local step.</strong> The step uses the judge's answer, the writer's own confidence, and the hidden vectors of the two written codes.</li>
-<li><strong>Not local:</strong> drawing a proposal needs a competition over all pairs; the judge compares hidden vectors across codes; the width of its neighbourhoods and the stopping points are chosen on held-out teacher pairs.</li>
-<li><strong>Not shown:</strong> an advantage over a learner that counts the teacher pairs, a difference between own and foreign proposals, and anything beyond one block.</li>
-</ul>
-</section>
-<section>
-<h2>10. Whose proposals, and three levels</h2>
-<p class="small">Added 17 November 2026. Runs: <code>experiments/model5_network_practice.py</code> (<code>curves --onesided</code> with the arms <code>online[_local]</code> followed by <code>_twinsame</code>, <code>_judge</code>, <code>_mix</code>, <code>_mix_twinsame</code>, <code>_uniform</code>, <code>_reward</code>) and <code>experiments/model5_network_depth.py</code> (<code>watching</code>, <code>saddle</code>, <code>curves</code>); figures and numbers: <code>experiments/model5_network_source_figures.py</code>.</p>
-<p><strong>Whose proposals the writer practises on decides only where the judge is asked, and the writer's own proposals are not the best place to ask. With the README's twin (the same teacher pairs, another random start), own and twin proposals are level for networks trained by backpropagation, and the twin's are better for networks trained by the local rule. Proposals drawn from the judge's own estimate, which need no writer, do as well or better. Own proposals lead only late, and only with backpropagation. With three levels the hidden layers hold both levels from 8,192 teacher strings, where a table of strings has learned nothing, and what the networks write is much further behind them than in one block. Practice with a local step lowers the loss of the local-rule network where fresh teacher strings barely do. But a twin's proposals are ahead of own ones in every world, and the network trained by backpropagation on the same strings writes better with no practice at all. Own samples do beat a twin's in the two table learners of sections 1 to 3, whose writer is built from units and whose reader is tied to it (last part of this section).</strong></p>
-<h3>Whose proposals, in one block</h3>
-<p>The README now asks that a twin's samples do worse than the learner's own, the twin being a second learner that starts from other random weights. In sections 8 and 9 the twin also had teacher pairs of its own; here it is given the same teacher pairs. The writer of section 9 practises on proposals from different sources. Judge, answer and step are the same throughout, only the source of the proposals changes:</p>
-<ul>
-<li><strong>own</strong>: drawn from the writer;</li>
-<li><strong>twin</strong>: drawn from the twin's writer. The twin practises on its own proposals at the same pace, so its samples are as good as the learner's own;</li>
-<li><strong>from the judge</strong>: drawn from \(p_E\) itself, that is, a stored teacher pair with each code swapped for one of its neighbours in the reader's hidden layer. No writer is needed;</li>
-<li><strong>half and half</strong>: every other proposal from the judge, the rest own, or the twin's;</li>
-<li><strong>uniform</strong>: drawn uniformly from all 4,096 pairs.</li>
-</ul>
-<p>One change to the step of section 9: a refused proposal is only ever moved down to the floor \(\varepsilon\,\bar e\), never up to it.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Proposals after 8,192 teacher pairs</th><th>Fresh teacher pairs instead</th><th>Own</th><th>Twin</th><th>From the judge</th><th>Half own, half judge</th><th>Half twin, half judge</th><th>Uniform</th></tr></thead>
-<tbody>
-<tr><td colspan="8"><em>Networks trained by backpropagation, normalised step</em></td></tr>
-{{s10_bp_rows}}
-<tr><td colspan="8"><em>Networks trained by the local rule, step that moves only the two written codes</em></td></tr>
-{{s10_lo_rows}}
-</tbody></table></div>
-<p class="small">Population loss of the writer in nats, median over {{s10_worlds}} worlds.</p>
-<ul>
-<li><strong>With backpropagation, own and twin are level.</strong> After 8,192 teacher pairs and 4,096 proposals the writer is at {{s10_bo}} nats on its own proposals and at {{s10_bt}} on the twin's; own is ahead in {{s10_bw}} of {{s10_worlds}} worlds. Own leads only late: {{s10_boe}} against {{s10_bte}} after 32,768 proposals, in {{s10_bwe}} of {{s10_worlds}} worlds.</li>
-<li><strong>With the local rule, the twin's proposals are better.</strong> {{s10_lo}} nats on own proposals against {{s10_lt}} on the twin's at the same point; the twin's are ahead in all {{s10_worlds}} worlds from 2,048 proposals on.</li>
-<li><strong>Proposals drawn from the judge do as well or better, and no writer is needed to make them.</strong> {{s10_bj}} nats with backpropagation and {{s10_lj}} with the local rule. With the local rule this is below the counted table of the same total ({{s10_ltab}}), which own proposals are not (section 9). With backpropagation they level off at {{s10_bje}} nats, because they never ask about an invalid pair and the invalid mass stays.</li>
-<li><strong>Next to the judge's draws, the twin's proposals are as good a second half as own ones:</strong> {{s10_lm}} (own) against {{s10_lmt}} (twin) with the local rule, {{s10_bm}} against {{s10_bmt}} with backpropagation.</li>
-<li><strong>Uniform proposals hurt for a long time.</strong> After 4,096 of them the writer is at {{s10_bu}} nats with backpropagation, above where it started ({{s10_b0}}). Three in four ask about an invalid pair, and pushing those down disturbs the valid ones. After 32,768, eight per pair, they are level with the others.</li>
-<li><strong>A judge that only accepts or refuses does not help.</strong> If an accepted proposal is moved up and a refused one down, the valid share rises from {{s10_rv0}} to {{s10_rv1}}, but the loss goes from {{s10_b0}} to {{s10_r1}} nats after 32,768 proposals, on own and on twin proposals alike ({{s10_rt1}}): the writer narrows. After 2,048 teacher pairs it collapses onto a few pairs.</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-source.svg" alt="Two panels, for networks trained by backpropagation and by the local rule, after 8,192 teacher pairs: population loss of the writer against the number of proposals, for own proposals, a twin's proposals, proposals drawn from the judge's estimate, proposals drawn uniformly from all pairs, and fresh teacher pairs given to the same network instead."><figcaption><strong>Figure 17. In one block a twin's proposals serve the writer as well as its own with backpropagation and better under the local rule, and proposals drawn from the judge's estimate need no writer at all.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
-<h3>Why the source matters the way it does</h3>
-<p>A step at a proposed pair \(x\) lowers \(\log p_\theta(x)\) by \(\eta\,\delta(x)\), with \(\delta=\log p_\theta-\log p_E\). Leave aside what the step does to other pairs through shared weights, and measure the writer by its cross-entropy to the judge's estimate, \(L=-\sum_x p_E(x)\log p_\theta(x)\). One step at \(x\) changes it by \(\eta\,\delta(x)\,(p_E(x)-p_\theta(x))\), so for proposals drawn from a source \(q\)</p>
-\[\mathbb{E}_{x\sim q}\big[\Delta L\big]=-\eta\sum_x q(x)\,\big(p_\theta(x)-p_E(x)\big)\,\log\frac{p_\theta(x)}{p_E(x)}\;\le\;0 .\]
-<p>Every term is negative or zero, so a question helps wherever it is asked. The source enters only through \(q(x)\), how often \(x\) is asked about. That separates two kinds of error:</p>
-<ul>
-<li><strong>A valid pair that the writer hardly writes</strong> (\(p_\theta\ll p_E\)) is repaired at a rate proportional to \(q(x)\). Own proposals ask about it rarely, for the very reason that it needs repair. The judge's draws ask as often as it should occur, and so does a twin whose gaps lie elsewhere.</li>
-<li><strong>An invalid pair that the writer writes</strong> (\(p_E=0\)) is removed at a rate proportional to \(q(x)\) too. The judge's draws never ask about it, a twin only if it writes it as well, own proposals always.</li>
-</ul>
-<p>So own proposals are the right ones for one part of the loss only. The loss splits exactly into that part and the rest,</p>
-\[\mathrm{KL}\big(p^*\,\Vert\,p_\theta\big)=\underbrace{-\log\textstyle\sum_{x\ \mathrm{valid}}p_\theta(x)}_{\text{invalid mass}}\;+\;\underbrace{\mathrm{KL}\big(p^*\,\Vert\,p_\theta(\cdot\mid\mathrm{valid})\big)}_{\text{unevenness among the valid}} ,\]
-<p>and after watching the second part is the larger one. After 8,192 teacher pairs the invalid mass is {{s10_bw0}} of the writer's {{s10_b0}} nats with backpropagation and {{s10_lw0}} of {{s10_l0}} with the local rule; with three levels it is {{s10_dw0}} of {{s10_d0}}.</p>
-<figure class="wide"><img src="figures/model5-network-parts.svg" alt="Four panels, for one block and for three levels with networks trained by the local rule, after 8,192 teacher samples: the invalid mass of the writer, minus the log of the valid share, and the unevenness among the valid strings, against the number of proposals, for own proposals, a twin's proposals, proposals drawn from the judge's estimate, and the two half-and-half mixtures."><figcaption><strong>Figure 18. Own proposals are ahead on neither part of the loss: the unevenness among the valid strings is repaired fastest by proposals drawn from the judge, and the invalid mass is removed at least as fast by a twin's proposals; only the judge's draws leave the invalid mass in place.</strong> Median over worlds, bands are the interquartile range; the leftmost point is the writer before practice.</figcaption></figure>
-<ul>
-<li><strong>How much a twin helps depends on how unlike its gaps are.</strong> Before practice, the log-probabilities that learner and twin give the valid pairs correlate at {{s10_cb}} with backpropagation and at {{s10_cl}} with the local rule ({{s10_cd}} with three levels). With backpropagation the two networks are uneven in the same places, so the twin asks what the learner would ask; with the local rule they are uneven in different places, and the twin asks about the learner's gaps.</li>
-<li><strong>The invalid mass is not removed faster by own proposals either, except late with backpropagation.</strong> With the local rule the twin's proposals leave less of it ({{s10_ltw}} against {{s10_low}} nats after 32,768 proposals in one block; {{s10_dtw}} against {{s10_dow}} after 16,384 with three levels), although the twin writes only {{s10_ov}} of the learner's invalid mass itself. A step at one invalid string lowers the strings of the same kind through the shared weights, so the twin need not write the same strings. With backpropagation own proposals do remove more ({{s10_bow}} against {{s10_btw}}), and that is the late lead above.</li>
-<li><strong>Proposals drawn from the judge leave the invalid mass in place,</strong> as the formula says: unchanged in one block with backpropagation, and rising with three levels ({{s10_dw0}} to {{s10_djw}} nats).</li>
-</ul>
-<h3>Three levels: what watching gives</h3>
-<p>Strings of four codes \((k_1k_2\,|\,k_3k_4)\) as in section 4: two blocks \(L=(k_1,k_2)\), \(R=(k_3,k_4)\); each of 16 symbols has four valid class pairs, and 64 of the 256 pairs of symbols are valid. There are 262,144 valid strings among 16.8 million. The network is the network of section 8 with a second level on top, with separate weights for the two halves \(h=0,1\):</p>
-\[\begin{gathered}s_h(k,k')=\mathbf{u}_k\cdot\mathbf{v}_{k'}+a_k+b_{k'},\qquad \mathbf{e}_h(k,k')=\mathbf{A}_h^\top\big(\hat{\mathbf{u}}_k\otimes\hat{\mathbf{v}}_{k'}\big),\\ p(L,R)=\operatorname{softmax}_{L,R}\Big(s_0(L)+s_1(R)+\mathbf{e}_0(L)\cdot\mathbf{e}_1(R)\Big).\end{gathered}\]
-<p>\(\mathbf{u}_k,\mathbf{v}_{k'}\) are the hidden vectors of the two codes of a block (16 units), \(\mathbf{e}_h\) is the hidden vector of the block (16 units), computed from the outer product of the two code vectors scaled to unit length. The local rule is the rule of section 9 at both levels: at level 1 the two codes of a block against the same left code with a right code from another teacher string; at level 2 the two blocks of a string against the same left block with the right block of another teacher string,</p>
-\[g=y-\sigma\big(\mathbf{e}_0(L)\cdot\mathbf{e}_1(R)+c\big),\qquad \mathbf{A}_0\leftarrow\mathbf{A}_0+\eta\,g\,\big(\hat{\mathbf{u}}_{k_1}\otimes\hat{\mathbf{v}}_{k_2}\big)\,\mathbf{e}_1(R)^\top,\quad \mathbf{A}_1\ \text{likewise}.\]
-<p>Level 2 does not change level 1. As a reference the same network is trained by backpropagation on the likelihood of the teacher strings. <em>Read out</em> means: codes grouped by their hidden vectors into 16 classes per position, the class pairs that were shown grouped by the mean hidden vector of their blocks into 16 symbols per side, and pairs of symbols counted. The judge is built as in section 8, level by level: a block is accepted if a neighbouring block was shown, and the teacher strings are spread over the strings of neighbouring accepted blocks.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Teacher strings</th><th>Counted table of strings</th><th>Local rule, what it writes</th><th>Local rule, hidden layers read out</th><th>Backpropagation, what it writes</th><th>Backpropagation, hidden layers read out</th><th>Table over the true symbols</th><th>Symbols held in one group (local rule)</th></tr></thead>
-<tbody>
-{{s10_wrows}}
-</tbody></table></div>
-<p class="small">Population loss in nats, median over {{s10_wworlds}} worlds (worlds in which two classes have the same partners are left out, as in section 6). Uniform over all strings: {{s10_uniform}} nats.</p>
-<ul>
-<li><strong>The hidden layers hold both levels from 8,192 teacher strings on, under both rules.</strong> Read out, they are at {{s10_h8192}} nats, the same as a table over the true symbols. The classes are held from 2,048 strings, the symbols from 8,192 (at 4,096 strings {{s10_r2l}} of them under the local rule and {{s10_r2b}} with backpropagation).</li>
-<li><strong>A table of strings has learned nothing at these sizes:</strong> {{s10_t8192}} nats at 8,192 strings and {{s10_t32768}} at 32,768.</li>
-<li><strong>What the networks write is far behind what their hidden layers hold, more than in one block.</strong> At 8,192 strings the network trained by backpropagation writes at {{s10_wb8192}} nats, {{s10_xb}} times its hidden layers read out, and the network trained by the local rule at {{s10_wl8192}}. In one block the factor was {{nw_bratio}}.</li>
-<li><strong>Level 2 forms after level 1, and teacher strings are all it needs.</strong> Under the local rule the classes are held in the hidden vectors from pass {{s10_pc0}} over 8,192 teacher strings and the symbols from pass {{s10_ps0}}; with a random start of size 0.0001 from pass {{s10_pc3}} and {{s10_ps3}} (Figure 19, right). No own sample is involved.</li>
-<li><strong>The judge:</strong> from 8,192 strings on it refuses no valid string. It still accepts {{s10_inv8192}} of the 16.5 million invalid strings at 8,192 strings and {{s10_inv32768}} at 32,768.</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-depth-watching.svg" alt="Two panels. Left: population loss against the number of teacher strings for a counted table of strings, for what the networks trained by the local rule and by backpropagation write, for their hidden layers read out, and for a table over the true symbols. Right: against the number of passes over the teacher strings under the local rule, the share of classes and of symbols held in one group of hidden vectors, for random starts of four sizes."><figcaption><strong>Figure 19. With three levels both hidden levels form from teacher strings alone, the symbols a few passes after the classes, and what the networks write stays far behind what their hidden layers hold, while a table of strings learns nothing at these sizes.</strong> Median over worlds; bands on the left are the interquartile range.</figcaption></figure>
-<h3>Three levels: practice</h3>
-<p>Reader and writer are two networks trained by the local rule from separate random starts; the reader is kept at the pass at which it tells held-out teacher strings best from shuffled ones, the writer at the pass at which it writes them best. For every proposed string the judge gives three answers, one per block, \(p_E(L)=\sum_R p_E(L,R)\) and \(p_E(R)\), and one for the pair of blocks. Each level takes the local step of section 9 towards its own answer:</p>
-\[\begin{aligned}\text{level 1:}\quad&\delta=\log\operatorname{softmax}_L s_0(L)-\log p_E(L),\quad\text{the two codes of the block move as in section 9;}\\ \text{level 2:}\quad&\delta=\mathbf{e}_0(L)\cdot\mathbf{e}_1(R)+b-\log\frac{p_E(L,R)}{p_E(L)\,p_E(R)},\\ &\mathbf{A}_0\leftarrow\mathbf{A}_0-s\,\big(\hat{\mathbf{u}}_{k_1}\otimes\hat{\mathbf{v}}_{k_2}\big)\,\mathbf{e}_1(R)^\top,\quad \mathbf{A}_1\ \text{likewise},\quad b\leftarrow b-s .\end{aligned}\]
-<p>As in section 9, \(s\) is \(\eta\,\delta\) divided by the squared length of what the step multiplies, so that one step removes the share \(\eta\) of the error. Level 2 steps only if both blocks are accepted. The sources are those of the one-block run; one more draws the two blocks from the writer's level 1 and combines them at random.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Proposals after {{s10_dn}} teacher strings</th><th>Fresh teacher strings instead</th><th>Own</th><th>Twin</th><th>From the judge</th><th>Half own, half judge</th><th>Half twin, half judge</th><th>Own blocks, combined at random</th></tr></thead>
-<tbody>
-{{s10_drows}}
-</tbody></table></div>
-<p class="small">Population loss of the writer in nats, median over {{s10_dworlds}} worlds. Fresh teacher strings are given to a network trained by the local rule.</p>
-<ul>
-<li><strong>Practice does what fresh teacher strings do not for this network.</strong> After 8,192 strings and 16,384 proposals the writer is at {{s10_do}} nats, the same network given 24,576 teacher strings at {{s10_df}}; own proposals are ahead in at least {{s10_dwf}} of {{s10_dworlds}} worlds from 1,024 proposals on. After 16,384 strings: {{s10_do2}} against {{s10_df2}}.</li>
-<li><strong>A twin's proposals are ahead of own ones,</strong> {{s10_dt}} against {{s10_do}} nats, in at least 15 of {{s10_dworlds}} worlds from 2,048 proposals on, and in all of them after 16,384 strings ({{s10_dt2}} against {{s10_do2}}). The twin's own writer is no better than the learner's ({{s10_dtk}} nats after its own practice).</li>
-<li><strong>Proposals drawn from the judge are ahead of both</strong> ({{s10_dj}}; {{s10_dj2}} after 16,384 strings). Next to them own and twin proposals are level as the second half ({{s10_dm}} against {{s10_dmt}}), and with enough proposals these mixtures catch up with the judge's draws alone, because they also remove invalid mass.</li>
-<li><strong>Blocks of the writer combined at random hardly help</strong> ({{s10_ds}} nats; {{s10_ds2}} after 16,384 strings): three in four of them are refused at level 2.</li>
-<li><strong>None of it reaches backpropagation.</strong> The network trained by backpropagation on the same 8,192 strings writes at {{s10_wb8192}} nats with no further sample, and at {{s10_wb16384}} on 16,384 strings.</li>
-<li><strong>Not done:</strong> practice from networks trained by backpropagation with three levels. The step per level assumes the form that the local rule gives the weights; applied to a network trained by backpropagation it raised the loss from 0.33 to above 2 nats (two worlds).</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-depth-practice.svg" alt="Panels after 8,192 and 16,384 teacher strings: population loss of the writer against the number of proposals for own proposals, a twin's proposals, proposals drawn from the judge's estimate, the two half-and-half mixtures, the writer's own blocks combined at random, and fresh teacher strings given to the same network; horizontal lines for the network trained by backpropagation on the same teacher strings and for the judge's own estimate."><figcaption><strong>Figure 20. With three levels, practice with a local step takes the local-rule network far below what fresh teacher strings give it, a twin's proposals are ahead of own ones and the judge's draws ahead of both, and none reaches the network trained by backpropagation on the same strings.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
-<h3>Against the README, for the network learner of sections 8 to 10</h3>
+<h2>5. What is missing</h2>
+<p><strong>The stronger baseline.</strong> A writer does not have to own the unit for an agreement. The judge of a cut is a small network, and its hidden layer holds the agreement's value. A writer that takes the unit from there is taught by teacher strings alone.</p>
 <div class="table-wrap"><table>
-<thead><tr><th>README requirement</th><th>Met</th><th>Where, or why not</th></tr></thead>
+<thead><tr><th>Teacher strings</th><th class="num">256</th><th class="num">512</th><th class="num">1,024</th><th class="num">2,048</th></tr></thead>
 <tbody>
-<tr><td>Tabula rasa; watching trains recognition</td><td>yes</td><td>Both networks start from small random weights. Teacher samples alone put the classes, and with three levels the symbols, into the hidden layers.</td></tr>
-<tr><td>Unbiased teacher set; recognition and generation in the same space</td><td>yes</td><td>Independent draws from the population; both networks act on pairs of codes or strings.</td></tr>
-<tr><td>Simple, decoupled encoder and decoder of equal expressivity</td><td>yes</td><td>Two networks of the same form with separate random starts.</td></tr>
-<tr><td>Local rule</td><td>mostly</td><td>The contrast rule and the practice step touch only the active items. Not local: drawing a proposal, comparing hidden vectors across items for the judge, and the choices made on held-out teacher samples.</td></tr>
-<tr><td>Watching is simple associative learning, the weights are the only state (added 17 November)</td><td>partly</td><td>The contrast rule changes only the weights of the active items. But watching here makes several passes over a stored set of teacher strings, takes its contrast pairs from that set, and keeps the pass that does best on held-out strings; the judge keeps the counts of the teacher strings between blocks.</td></tr>
-<tr><td>Depth is necessary</td><td>no</td><td>Everything shown appears in one block. Three levels change the sizes, not the kind: what is written lags further behind, and a table of strings is out of reach.</td></tr>
-<tr><td>Generation improves offline, through a loop of generation and recognition</td><td>yes</td><td>Sections 8 to 10.</td></tr>
-<tr><td>Worse without the generative phase</td><td>partly</td><td>Against the same network without practice: yes. Against the same network given as many fresh teacher samples: in one block from 8,192 pairs with backpropagation and at every size with the local rule (section 9); with three levels for the local-rule network. But with three levels the network trained by backpropagation on the teacher strings alone writes better than the local-rule network after practice.</td></tr>
-<tr><td>Own samples beat foreign ones of the same quality; a twin does worse</td><td>no</td><td>With the same teacher pairs and another random start, the twin's proposals do as well (backpropagation, one block) or better (local rule; with three levels in every world). Own proposals lead only late in one block with backpropagation ({{s10_boe}} against {{s10_bte}} nats). The table learners of sections 1 to 3 do meet it (end of this section).</td></tr>
-<tr><td>Drivers are exploration and the alignment of reader and writer</td><td>no</td><td>The gain is the judge's answer, and the answer does not depend on who asked.</td></tr>
-<tr><td>Own samples reach deep units, teacher samples do not yet</td><td>no</td><td>Teacher samples train the hidden layers at both levels; level 2 follows level 1 by a few passes (this section).</td></tr>
-<tr><td>Rewarding only accepted samples may collapse; exploration may be needed (intuition added 17 November)</td><td>seen</td><td>With a judge that only accepts or refuses, the writer narrows, and with few teacher pairs it collapses; moving refused proposals down does not prevent it. Using the size of the judge's answer does, because a pair that is written too often is moved down as well. What that does not give is coverage: the valid pairs the writer hardly writes are asked about by other sources, not by its own proposals.</td></tr>
-<tr><td>Recognition improves after practice</td><td>partly</td><td>Only where the reader is fitted again to the judged pairs (section 8). Not tried with three levels.</td></tr>
-<tr><td>Recognition infers causes or judges correctness</td><td>yes</td><td>The judge accepts what lies next to a teacher sample in the reader's hidden layers.</td></tr>
-<tr><td>Not explained by reconstructing the data</td><td>no</td><td>The judge's estimate is the teacher data smoothed through the reader's hidden layers. Where the items can be listed it can be computed, and drawn from, without any proposal; practice copies it into the writer.</td></tr>
-<tr><td>Depthwise, not widthwise</td><td>no</td><td>The deficit is in what is written, at every level, not in how deep watching reaches.</td></tr>
-<tr><td>Exclusive to networks</td><td>for recognition</td><td>The hidden layers generalise where a table does not: both levels from a few thousand strings. The plateau at small weights is short and teacher samples end it.</td></tr>
-<tr><td>Baseline: a reader trained on teacher samples only</td><td>not beaten</td><td>The hidden layers read out are ahead of every writer at every size.</td></tr>
+{{check_rows}}
 </tbody></table></div>
-<h3>Where own samples do beat a twin's: a reader tied to its own writer</h3>
-<p class="small">Added 17 November 2026, after the question whether a shared start of generator and recogniser, or a sleep stage, would give own samples the edge. Run: <code>experiments/model5_twin_tied.py</code>.</p>
-<p>In the network learner the judge sees the string and the writer steps at the string, so two sources can differ only in where their strings fall. The two table learners of sections 1 to 3 are built differently. Their writer consists of units (pools and a table over pairs of units), the probability of a sample is a sum over the units that could have written it, and a verdict has to be divided among them. They divide it by the reader's reading, and their reader is the transpose of the writer, which is what a shared start followed by a completed sleep stage gives. Both were run with the README's twin: the same teacher pairs, another random start (for the learner of section 1, which has no random start, other draws), the twin practising on its own samples at the same pace.</p>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Learner</th><th>No practice</th><th>Practice on own samples</th><th>Practice on a twin's samples</th><th>Worlds in which own is ahead of the twin</th></tr></thead>
-<tbody>
-<tr><td>16 units from a weak random start (section 2), 8,192 stored teacher pairs</td>{{s10_tw_weak}}</tr>
-<tr><td>16 units from a sharp random start</td>{{s10_tw_sharp}}</tr>
-<tr><td>Units that start as copies of the codes (section 1), 4,096 teacher pairs</td>{{s10_tw_grower}}</tr>
-</tbody></table></div>
-<p class="small">Population loss in nats at the end of the run, median over {{s10_tw_worlds}} worlds. No threshold on the reader. The twins themselves end where the learner on its own samples does.</p>
-<ul>
-<li><strong>With a reader tied to its own writer, a twin's samples do worse than own ones, in every world.</strong> For units grown from a random start they leave the learner worse than no practice at all.</li>
-<li><strong>The shared start is not what does it; the lasting tie is.</strong> With a sharp start, before anything is learned, the reader explains {{s10_tw_ro}} of own samples above chance, {{s10_tw_rt}} of the twin's and {{s10_tw_rte}} of teacher pairs: own samples are legible, and the twin's are as foreign as the teacher's. The first 100 wake batches erase this. The outcome is the same from a weak start, where nothing is legible at first. What lasts is that the reader stays the writer's transpose, so that a verdict is divided among the units in the proportions in which they write such a sample. For an own sample that division is right on average. For a twin's sample it charges the learner's units with the twin's mistakes. The twin's samples also stay less legible to the end ({{s10_tw_rte1}} against {{s10_tw_ro1}}).</li>
-<li><strong>Limits of the two learners.</strong> For units from a random start, own practice only speeds learning ({{s10_tw_om}} against {{s10_tw_nm}} nats after 3,000 wake batches) and ends level with no practice; the gap to the twin is the harm its samples do. That learner writes at about 0.4 nats where a counted table of the same pairs is at {{s10_tw_table}}. In the learner of section 1 the twin's samples keep pace for the first half million samples and fall behind only at the end. Neither beats as many fresh teacher pairs in one block (section 3).</li>
-<li><strong>The reader here is the transpose.</strong> With separate weights the tie needs a shared start and the same updates on both sides, or sleep; sleep is the generator's code used as a label for recognition.</li>
-<li><strong>The two things asked for are so far shown in different learners.</strong> Practice that beats fresh teacher samples needs a judge that knows more than a teacher sample says, and the network's hidden layer gives that. Own samples that beat a twin's need a writer built from units and a reader tied to it. One learner with both has not been built.</li>
-</ul>
-<figure class="wide"><img src="figures/model5-twin-tied.svg" alt="Three panels. Left: population loss against wake batches for 16 units from a sharp random start with no practice, with practice on own samples and with practice on a twin's samples. Middle: for the same learner practising on own samples, the share of own samples, of a twin's samples and of teacher pairs that the reader explains above chance. Right: for units that start as copies of the codes, population loss against the number of practice samples for own samples and for the samples of a twin with the same and with other teacher pairs."><figcaption><strong>Figure 21. With a reader tied to its own writer, practising on a twin's samples leaves the learner worse than practising on its own, and for units grown from a random start worse than not practising; the head start in legibility that a sharp start gives own samples is gone after the first wake batches.</strong> Median over worlds, bands are the interquartile range.</figcaption></figure>
-</section>
-<section>
-<h2>11. A writer with latent units</h2>
-<p class="small">Added 17 November 2026, after the question why not everything is a network, with the README's line on a neural-network shaped prior \(P(x,z\mid\theta)\). Runs: <code>experiments/model5_network_units.py</code> (grid, and <code>--run scan</code>); figure and numbers: <code>experiments/model5_network_units_figures.py</code>. One block, {{u_worlds}} worlds.</p>
-<p><strong>The writer of sections 8 to 10 has no latent units. Here it has them, and where they come from decides the outcome. If the units are recruited from the reader's hidden layer, with no own sample involved, teacher pairs read through them put the writer at the table over the true classes from 4,096 pairs on, and practice only smooths it, whoever's samples it uses. If the units are the writer's own, from a random start, watching ends in units that mix classes, above the counted table, with each of three readers. Practice against the judge then raises the valid share of what is written and does not lower the loss.</strong></p>
-<h3>The learner</h3>
-<p>Trunk and judge are the reader of section 9: hidden vectors of the codes, trained by the local rule on teacher pairs only, and \(p_E\), the teacher pairs spread over hidden-layer neighbours. The writer has \(K\) units per side and a table over pairs of units, with weights of its own from a small random start:</p>
-\[\begin{gathered}p_\theta(k,k')=\sum_{a,a'}T_{aa'}\,G^L_{ka}\,G^R_{k'a'},\\ \mathbf{G}^L=\operatorname{softmax}_k\boldsymbol{\Lambda}^L,\quad \mathbf{G}^R=\operatorname{softmax}_{k'}\boldsymbol{\Lambda}^R,\quad \mathbf{T}=\operatorname{softmax}_{aa'}\boldsymbol{\Theta}.\end{gathered}\]
-<p>A reader assigns a pair of codes to a pair of units \((\hat a,\hat a')\). Four readers were run:</p>
-<ul>
-<li><strong>recruited units</strong>, no own samples: a code joins the unit whose mean hidden vector is most similar to its own if the cosine is at least the judge's bandwidth, otherwise it founds a unit;</li>
-<li><strong>own posterior</strong>: \(q(a,a'\mid k,k')\propto T_{aa'}G^L_{ka}G^R_{k'a'}\), what sleep run to the end would give;</li>
-<li><strong>sleep on the codes</strong>: one softmax layer from the two codes to the units of each side, trained on own samples with the units that wrote them as targets. This is classic wake-sleep;</li>
-<li><strong>sleep on the hidden layer</strong>: the same layer on the trunk's hidden vectors of the two codes.</li>
-</ul>
-<p>All steps on the writer have one form, on the weights of the active units, with a third factor \(d\):</p>
-\[\begin{gathered}\Delta\boldsymbol{\Lambda}^L_{\cdot a}=\eta\,d\,\big(\mathbf{e}_k-\mathbf{G}^L_{\cdot a}\big),\qquad \Delta\boldsymbol{\Lambda}^R_{\cdot a'}=\eta\,d\,\big(\mathbf{e}_{k'}-\mathbf{G}^R_{\cdot a'}\big),\qquad \Delta\boldsymbol{\Theta}=\eta\,d\,\big(\mathbf{e}_{aa'}-\mathbf{T}\big),\\ \text{wake: } d=1,\qquad \text{practice: } d=-(\delta-\bar\delta),\quad \delta=\log p_\theta(x)-\log p_E(x).\end{gathered}\]
-<ul>
-<li><strong>Wake</strong>: a teacher pair, at the units the reader assigns it to.</li>
-<li><strong>Sleep</strong>: an own sample; the reader's layer moves towards the units that wrote it.</li>
-<li><strong>Practice</strong>: an own sample \(x\), at the units that wrote it. \(\delta\) is cut off at \(\pm5\), \(\bar\delta\) is its running mean, and a refused sample is only moved down. Averaged over own samples this step is the gradient of \(\mathrm{KL}(p_\theta\,\Vert\,p_E)\). A twin's sample is read into the learner's units by its reader.</li>
-</ul>
-<p>Watching is 40,000 wake batches of 64 from the stored teacher pairs, each followed by a sleep batch where the reader learns by sleep. Then come 32,768 further samples by arm. The twin has the same teacher pairs and other random starts, and practises on its own samples at the same pace. Scores are taken from a running mean of the writer's weights over about 50 batches. Counted as the README asks since 17 November, the readers that learn by sleep use 2.56 million own samples during watching; recruited units use none.</p>
-<h3>What watching gives</h3>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Teacher pairs</th><th>Counted table</th><th>Table over the true classes</th><th>Recruited units</th><th>Own posterior</th><th>Sleep on the codes</th><th>Sleep on the hidden layer</th><th>Sleep on the hidden layer, 32 units</th></tr></thead>
-<tbody>
-{{u_rows}}
-</tbody></table></div>
-<p class="small">Population loss of the writer in nats, median over {{u_worlds}} worlds. Recruited units: in the limit of small wake steps, where the writer is the counted table over pairs of units. Own units: 16 per side unless stated.</p>
-<ul>
-<li><strong>Recruited units need no own sample.</strong> From 4,096 teacher pairs on there are {{u_units}} units per side, each a class, and the writer is at the table over the true classes ({{u_lim4096}} against {{u_cls4096}} nats). With 1,024 pairs the hidden layer does not have the classes yet ({{u_lim1024}}). At the wake step used here the writer sits a little above its limit ({{u_sim4096}} at 4,096 pairs), which is the noise of the steps.</li>
-<li><strong>Own units end mixed, above the counted table.</strong> At 4,096 pairs the three readers end at {{u_t4096}}, {{u_r4096}} and {{u_h4096}} nats, the counted table at {{u_tab4096}}; a unit puts {{u_pt}}, {{u_pr}} and {{u_ph}} of its mass on its main class. From 4,096 pairs on every world is above the counted table.</li>
-<li><strong>More teacher pairs do not help them.</strong> With 8,192 pairs they end at {{u_t8192}}, {{u_r8192}} and {{u_h8192}}, the counted table at {{u_tab8192}}.</li>
-<li><strong>The hidden layer helps the reader that learns by sleep, but not enough.</strong> It is the best of the three, and with 32 units it reaches {{u_h32}} nats at 4,096 pairs, still above the counted table.</li>
-<li><strong>There is a plateau, and sleep ends it.</strong> With a reader that learns by sleep the units stay alike for about {{u_plat_raw}} wake batches (codes) or {{u_plat_trunk}} (hidden layer), at the loss of independent left and right codes; with the writer's own posterior they separate within the first {{u_plat_tied}}. What follows the plateau is the mixed state above.</li>
-</ul>
-<h3>Practice</h3>
-<div class="table-wrap"><table class="counts">
-<thead><tr><th>Reader, after 4,096 teacher pairs</th><th>More watching</th><th>Own samples</th><th>Own samples and watching in turn</th><th>A twin's samples</th><th>Own samples, judge accepts everything</th></tr></thead>
-<tbody>
-{{u_prows}}
-</tbody></table></div>
-<p class="small">Population loss in nats and, in brackets, the valid share of what the writer writes, after 32,768 further samples; median over {{u_worlds}} worlds. Twice the teacher pairs instead: the next row of the table above.</p>
-<ul>
-<li><strong>With recruited units, practice is smoothing.</strong> Own samples, a twin's samples and credit by reading all end at {{u_co}} nats, and a judge that accepts everything does best ({{u_cb}}). The world is uniform over its valid pairs, so evening out what the units write is right whatever the judge says. Nothing is transferred from the judge that the writer lacks.</li>
-<li><strong>With own units, practice trades coverage for validity.</strong> For the reader on the hidden layer the valid share rises from {{u_v0}} to {{u_v1}} and the loss from {{u_l0}} to {{u_l1}} nats. Practice and watching in turn end at {{u_lm}}, still above more watching. No world of any size or reader ends below more watching with own samples alone, and at most {{u_mixmax}} of {{u_worlds}} do with watching in turn.</li>
-<li><strong>Only own samples raise the valid share.</strong> A twin's samples leave it at {{u_vt}} (loss {{u_lt}}). This is the one place where own and twin differ, and it follows section 10: invalid mass is removed at the rate at which it is asked about.</li>
-<li><strong>Crediting the units that wrote a sample or the units that read it makes no difference</strong> ({{u_l1}} against {{u_lr}} nats).</li>
-<li><strong>The step size, the length and the form of the verdict do not change this.</strong> With a step of 0.01 over 8,192 further batches, practice and watching in turn, the loss ends at {{u_s_slow}} nats against {{u_s_replay}} for more watching (reader on the hidden layer; below it in {{u_s_slow_w}} of {{u_worlds}} worlds). With a judge that only accepts or refuses, and the most even writer among those it accepts as the target: {{u_s_bin}} (in {{u_s_bin_w}} worlds).</li>
-</ul>
-<h3>Why</h3>
-<ul>
-<li><strong>Given the reader's units, writing is the easy half.</strong> A writer that uses them has to see each of the 64 valid pairs of classes and each code of a class once, which a few hundred teacher pairs do. The reader needs two to four thousand pairs to have the classes. By the time the judge is right, the teacher pairs already shown have told such a writer everything.</li>
-<li><strong>Own units are a fit from a random start, and the fit stops at mixed units.</strong> A verdict says which pairs are wrong, not which unit should hold a code. A mixed unit gets rid of invalid pairs fastest by dropping codes or partners. Moving a code to the right unit needs that unit to write the code first, which it does at a rate proportional to the small probability it gives it.</li>
-<li><strong>So the two things the README asks for pull in opposite directions here.</strong> Own samples can differ from a twin's only if the writer has units of its own. Practice can beat fresh teacher samples only if the reader holds something the writer cannot take from a teacher sample. With units of its own the writer does lack something, the grouping of the codes, but the reader's hidden layer has it and a verdict does not pass it on; with the reader's units it lacks nothing.</li>
-</ul>
-<figure class="wide"><img src="figures/model5-network-units.svg" alt="Four panels. Top left: population loss of the writer after watching against the number of teacher pairs, for the counted table, the table over the true classes, a writer with units recruited from the reader's hidden layer, and writers with 16 units of their own under three readers. Top right: for recruited units after 4,096 teacher pairs, the loss against further samples for more watching, practice on own samples, practice and watching in turn, practice on a twin's samples and practice with a judge that accepts everything. Bottom: the same arms for own units with the reader trained by sleep on the hidden layer, loss on the left and valid share of what is written on the right."><figcaption><strong>Figure 22. A writer whose units are recruited from the reader's hidden layer writes at the level of the true classes from teacher pairs alone, and practice only smooths it; a writer with units of its own ends above the counted table, and practice raises its valid share at the cost of its loss.</strong> Median over worlds, bands are the interquartile range. Bottom row: 16 own units, reader trained by sleep on the hidden layer, same colours as top right.</figcaption></figure>
+<p class="small">One-level world. The writer's tables are the teacher strings counted in the reader's units, which is what wake steps converge to as the step shrinks.</p>
+<figure class="wide"><img src="figures/model5-cut-check.svg" alt="Three panels against the number of teacher strings: the shares of pairs the judges of the agreement and of a block accept and refuse; the share of written strings whose blocks agree for a writer with no unit for the agreement and for writers that take it from the judge; and the loss of these writers."><figcaption><strong>Figure 8. A writer that takes the agreement's unit from the judge obeys the agreement as soon as the judge can check it.</strong> Left: what the two judges accept and refuse. Middle: how often the writer's two blocks agree. Right: the writer's population loss.</figcaption></figure>
+<p>The README counts this as a stronger baseline that need not be beaten. The learner of this note is the one whose reader has units only for what the level above reads, so the writer has to own the rest.</p>
+<p><strong>Not local.</strong> Four pieces are not network operations: the judge pools stored teacher pairs over hidden-layer neighbors, with a width chosen on held-out strings; the reader's groups of codes come from a clustering pass; the writer's block part is counted in closed form; and the reader stops early on held-out strings.</p>
+<p><strong>Not a deep nonlinear network.</strong> Every map is one linear layer followed by a softmax, and the reader's hidden layer is linear.</p>
+<p><strong>Small.</strong> Two levels, units with four values, one table for the upper rule. Whether the lead keeps growing at a third level is not known.</p>
+<p><strong>Not every world binds.</strong> Practice binds both levels in {{b_wsp}} of 48 runs, {{b_twin}} of 48 from another start.</p>
+<p><strong>Level 1 is visible on the surface.</strong> Before level 1 is bound, own samples differ from teacher strings in a pair of neighboring codes.</p>
+<p><strong>The probes of section 4</strong> measure what one rule does at a small step with the reader held still. They do not add up to the run, in which steps are large and the reader moves.</p>
+<p><strong>Not run:</strong> the control with a learner that differs only within a layer; a learner in which reader and units learn at the same time; a variational autoencoder; the mapping to learning in context.</p>
 </section>
 </article>
 <footer>
-<p>Built {{built}} by <code>experiments/model5_page.py</code> from <code>experiments/model5_page.html</code>; it overwrites this page, so edits made here are lost on a rebuild. Runs: <code>experiments/model5_lateral_verdict.py</code> (<code>ablation</code>, <code>efficiency</code>, <code>heatmap</code>, <code>source</code>, <code>gradient</code>), <code>experiments/model5_depth.py</code> and, for section 6, <code>experiments/model5_own_benefit.py</code> (<code>bound</code>, <code>sparse</code>, <code>depth</code>) and, for section 7, <code>experiments/model5_propagation.py</code> (<code>stack</code>, <code>gradient</code>, <code>figure</code>); <code>experiments/model5_network_baseline.py</code> and <code>experiments/model5_network_practice.py</code> (sections 8 to 10), <code>experiments/model5_network_depth.py</code> (section 10); figures and numbers: <code>experiments/model5_figures.py</code>, <code>experiments/model5_own_benefit_figures.py</code>, for sections 8 and 9 <code>experiments/model5_network_figures.py</code>, for section 10 <code>experiments/model5_network_source_figures.py</code>, and for section 11 <code>experiments/model5_network_units.py</code> with <code>experiments/model5_network_units_figures.py</code>. Data: <code>/nfs/gatsbystor/jbauer/generative-learning/model5_lateral_verdict/</code>.</p>
+<p>Built {{built}} by <code>experiments/model5_page.py</code> from <code>experiments/model5_page.html</code>; it overwrites this page, so edits made here are lost on a rebuild. Runs: <code>experiments/model5_cut_check.py</code> (section 5), <code>experiments/model5_cut_practice.py</code> and <code>experiments/model5_cut_depth.py</code> (section 2), <code>experiments/model5_cut_twin.py</code> and <code>experiments/model5_cut_twin_codes.py</code> (section 3), <code>experiments/model5_cut_mechanism.py</code> (section 4); figures and numbers from the scripts of the same names ending in <code>_figures.py</code>. Data: <code>/nfs/gatsbystor/jbauer/generative-learning/model5_lateral_verdict/</code>. Earlier runs of model 5: <code>tex/model_5_appendix.tex</code>.</p>
 </footer>
 </main>
 </body>

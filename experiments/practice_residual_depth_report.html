@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="An exact model of how a learner's incomplete practice strings can improve generation and recognition of a hidden state.">
+  <title>Learning from an incomplete example · Generative learning</title>
+  <style>@@KATEX_CSS@@</style>
+  <style>
+    :root {
+      --ink: #172c35; --muted: #4c646d; --blue: #174e72; --line: #cbd7d8;
+      --paper: #fcfbf8; --white: #fff; --tint: #edf4f5;
+      --sans: Inter, "Segoe UI", system-ui, sans-serif;
+      --serif: "PT Serif", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 1.5rem; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 var(--sans); }
+    a { color: var(--blue); text-underline-offset: .2em; }
+    :focus-visible { outline: .18rem solid #136783; outline-offset: .18rem; }
+    .wrap { width: min(72rem, 100% - 3rem); margin-inline: auto; }
+    .skip-link { position: absolute; left: 1rem; top: -5rem; padding: .4rem; background: white; }
+    .skip-link:focus { top: .2rem; }
+    .masthead { border-bottom: 1px solid var(--line); }
+    .masthead .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .75rem; }
+    .project { font-weight: 680; letter-spacing: -.02em; }
+    .masthead nav { display: flex; flex-wrap: wrap; gap: .4rem 1.3rem; }
+    .masthead nav a { color: var(--muted); font-size: .9rem; text-decoration: none; }
+    .masthead nav a:hover, .masthead nav a:focus-visible { color: var(--blue); text-decoration: underline; }
+    main { padding-bottom: 4rem; }
+    .intro { padding: clamp(2rem, 5vw, 4rem) 0 clamp(1.5rem, 3vw, 2.5rem); }
+    h1, h2, h3, p, figure { margin: 0; }
+    h1, h2 { font-family: var(--serif); font-weight: 400; line-height: 1.13; letter-spacing: -.035em; }
+    h1 { font-size: clamp(2.4rem, 5.3vw, 4.3rem); text-wrap: balance; }
+    h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); text-wrap: balance; }
+    h3 { font-size: 1.05rem; line-height: 1.4; }
+    .standfirst { font: 1.22rem/1.5 var(--serif); max-width: 60rem; margin-top: .8rem; color: #344e59; }
+    section { margin-bottom: clamp(2.5rem, 6vw, 5rem); border-top: 1px solid var(--line); padding-top: 1.35rem; }
+    .section-lead { max-width: 79ch; margin: .7rem 0 1.25rem; }
+    .lab { background: var(--white); border: 1px solid var(--line); border-radius: .55rem; }
+    .lab-bar { padding: .85rem 1.15rem; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .55rem 1rem; }
+    .segmented, .buttons { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+    .segmented { padding: 0; margin: 0; border: 0; min-width: 0; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+    .segmented label, button { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: .28rem; padding: .36rem .7rem; font: 550 .88rem/1.4 var(--sans); color: var(--blue); background: var(--white); cursor: pointer; }
+    .segmented label:has(input:checked) { border-color: var(--blue); background: var(--blue); color: white; }
+    .segmented label:has(input:focus-visible) { outline: .18rem solid #136783; outline-offset: .18rem; }
+    button:hover, .segmented label:has(input:not(:checked)):hover { background: var(--tint); }
+    .string-body { display: grid; grid-template-columns: .94fr 1.06fr; }
+    .string-body > div { padding: 1.1rem 1.25rem; min-width: 0; }
+    .string-body > div + div { border-left: 1px solid var(--line); background: #f7faf9; }
+    .string-body h3 { margin-bottom: .55rem; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-variant-numeric: tabular-nums; }
+    th, td { border-bottom: 1px solid var(--line); padding: .38rem .45rem; }
+    th:first-child, td:first-child { padding-left: 0; }
+    th:last-child, td:last-child { padding-right: 0; }
+    thead th { color: var(--muted); font-size: .84rem; font-weight: 600; }
+    tbody th { font-weight: 500; }
+    tbody tr:last-child > * { border: 0; }
+    .pose-chain { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+    .pose-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .pose-step + .pose-step::before { content: "→"; position: absolute; left: -.5em; top: 28%; color: var(--muted); }
+    .pose-step small { color: var(--muted); }
+    .pose { display: block; width: 100%; max-width: 6.5rem; }
+    .pose path { fill: #edf3ef; stroke: #667d82; stroke-width: 2; stroke-linejoin: round; }
+    .pose circle { stroke: #294c57; }
+    .vertex-A { fill: #f6cb80; } .vertex-B { fill: #add8de; } .vertex-C { fill: #d9c5e7; }
+    .pose text { font-family: var(--sans); fill: #192d34; font-weight: 650; }
+    .lab-foot { border-top: 1px solid var(--line); padding: .7rem 1.15rem; color: var(--muted); }
+    .spread { display: grid; grid-template-columns: minmax(0, .83fr) minmax(0, 1.17fr); align-items: start; gap: clamp(1.25rem, 4vw, 3.5rem); margin-top: 1.55rem; }
+    .text > * + *, .controls > * + * { margin-top: .9rem; }
+    .text > h3:not(:first-child) { margin-top: 1.45rem; }
+    .text { max-width: 72ch; }
+    .katex { font-size: 1.06em; }
+    .katex-display { padding: .1rem 0; margin: .55rem 0; }
+    .equation { border-left: .2rem solid #9db8bf; padding: .45rem .7rem; background: var(--tint); }
+    .equation .katex-display { text-align: left; }
+    .equation .katex-display > .katex { text-align: left; }
+    .plot { min-width: 0; }
+    .plot img, .plot > svg { width: 100%; height: auto; display: block; background: white; border: 1px solid var(--line); }
+    figcaption { margin-top: .65rem; font-size: .94rem; color: var(--muted); }
+    figcaption strong { font-weight: 650; color: var(--ink); }
+    .controls { padding: 1rem 1.15rem; }
+    .range-label { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .3rem .8rem; font-weight: 600; }
+    output { font-variant-numeric: tabular-nums; color: var(--blue); }
+    input[type=range] { display: block; width: 100%; padding: .25rem 0; margin: .25rem 0 0; accent-color: var(--blue); cursor: pointer; }
+    .metric-table td, .metric-table thead th:not(:first-child), .twin-table td, .twin-table thead th:not(:first-child) { text-align: right; }
+    .metric-table tbody tr:first-child, .twin-table tbody tr:first-child { color: var(--blue); }
+    .metric-table td, .twin-table td { white-space: nowrap; }
+    .control-note { color: var(--muted); font-size: .89rem; }
+    .allocation-pick { cursor: crosshair; }
+    .caveats { max-width: 82ch; margin-top: 1.35rem; }
+    .caveats summary { color: var(--blue); font-weight: 600; cursor: pointer; }
+    .caveats p { margin-top: .6rem; }
+    footer { border-top: 1px solid var(--line); padding: 1.2rem 0 .5rem; }
+    footer p { color: var(--muted); margin-bottom: .45rem; }
+    footer a + a { margin-left: 1.25rem; }
+    .backing-file { margin-top: .6rem; font-size: .84rem; overflow-wrap: anywhere; }
+    @media (max-width: 54rem) {
+      .spread { grid-template-columns: minmax(0, 1fr); }
+      .plot { width: min(100%, 40rem); justify-self: center; }
+      .string-body > div { padding: .8rem; }
+      .text, .caveats { max-width: none; }
+    }
+    @media (max-width: 40rem) {
+      .wrap { width: calc(100% - 1.5rem); }
+      .masthead .wrap { align-items: flex-start; flex-direction: column; gap: .25rem; }
+      .masthead nav { gap: .3rem 1rem; }
+      .string-body { grid-template-columns: minmax(0, 1fr); }
+      .string-body > div + div { border-left: 0; border-top: 1px solid var(--line); }
+      .lab-bar, .lab-foot, .controls { padding: .75rem; }
+      .metric-table, .twin-table { font-size: .89rem; }
+      .lab-bar { justify-content: flex-start; }
+      footer a { display: block; }
+      footer a + a { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to report</a>
+<header class="masthead">
+  <div class="wrap">
+    <span class="project">Generative learning</span>
+    <nav aria-label="Report sections"><a href="#data">Data model</a><a href="#learning">Learning</a><a href="#budget">Budget</a><a href="#twins">Twins</a></nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <div class="intro">
+    <h1>Learning from an incomplete example</h1>
+    <p class="standfirst">A learner watches someone move a labeled triangle, then invents strings of moves to practice on. When it omits a difficult move, its reader can reach a deeper operation. In this model, that makes it better at writing and reading fully worked teacher strings.</p>
+  </div>
+
+  <section id="data" aria-labelledby="data-title">
+    <h2 id="data-title">What is one observation?</h2>
+    <p class="section-lead">A string records where the triangle ended and which moves were made. The starting arrangement \(z\) is hidden. Each field arrives as a pair of tokens. Multiply the tokens within each pair, then apply the two decoded moves to the final arrangement to recover the start.</p>
+    <div class="lab">
+      <div class="lab-bar">
+        <fieldset class="segmented">
+          <legend class="visually-hidden">String source</legend>
+          <label><input class="visually-hidden" type="radio" name="source" value="teacher" checked>Teacher string</label>
+          <label><input class="visually-hidden" type="radio" name="source" value="copy">Writer omits rotation</label>
+        </fieldset>
+        <div class="buttons"><button type="button" id="next-masks">Next masks</button><button type="button" id="next-root">Next root</button></div>
+      </div>
+      <div class="string-body">
+        <div>
+          <h3>The visible string</h3>
+          <table>
+            <thead><tr><th scope="col">Field</th><th scope="col">Token pair</th><th scope="col">Product</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Final arrangement</th><td id="pair-0">\((R,R^2)\)</td><td id="mark-0">\(e\)</td></tr>
+              <tr><th scope="row">Lower move</th><td id="pair-1">\((S,R^2S)\)</td><td id="mark-1">\(R\)</td></tr>
+              <tr><th scope="row">Upper move</th><td id="pair-2">\((R^2,RS)\)</td><td id="mark-2">\(S\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>A successful read</h3>
+          <div class="pose-chain">
+            <div class="pose-step"><span id="pose-slot-0">@@FINAL_POSE@@</span><small>Final</small><span id="state-0">\(e\)</span></div>
+            <div class="pose-step"><span id="pose-slot-1">@@MIDDLE_POSE@@</span><small>After lower</small><span id="state-1">\(R\)</span></div>
+            <div class="pose-step"><span id="pose-slot-2">@@ROOT_POSE@@</span><small>Hidden start</small><span id="state-2">\(RS\)</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="lab-foot" id="string-note" aria-live="polite">The teacher executes both moves. Following the lower rotation requires the reader’s rotation circuit to fire.</p>
+    </div>
+    <div class="spread">
+      <div class="text">
+        <h3>What the writer draws</h3>
+        <p>The six elements of \(S_3\) are the arrangements of the three labels. Here \(e\) copies, \(R\) rotates by \(120^\circ\), and \(S\) reflects. The rule \(SRS=R^{-1}\) makes the order of the moves matter.</p>
+        <p>Draw the root uniformly. Choose the lower and upper moves \(g_1,g_2\), then write downward with their inverses to obtain the final arrangement \(y\). Reading undoes this construction.</p>
+        <div class="equation">\[ y=z\,g_2^{-1}g_1^{-1}, \qquad z=y\,g_1g_2. \]</div>
+        <p>For each field \(h\), independently draw a uniform mask \(u\) and write \((u,u^{-1}h)\). Changing the masks in the example changes its appearance while preserving its entire read. The fixed-rule teacher generates \(6^4=1{,}296\) equally likely strings from the root and the three masks.</p>
+        <p>Both sources have identical single-token marginals. A two-token detector can distinguish a copy from a rotation by their product. In the broader model, each level also has a visible context \(c_j\) and its own learned rule for that context. The plots use one context.</p>
+      </div>
+      <figure class="plot">
+        <img src="@@DATA_FIGURE@@" alt="Two heatmaps of lower token pairs. The teacher places mass on products equal to a rotation. The writer places mass on rotations and identity copies. All row and column sums are identical.">
+        <figcaption><strong>The lower move is visible in the joint law of the pair.</strong> Each row and column has the same total mass for teacher and writer. The second band in the writer’s distribution comes from omitted rotations.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="learning" aria-labelledby="learning-title">
+    <h2 id="learning-title">How does a wrong string improve a weight?</h2>
+    <div class="spread">
+      <div class="text">
+        <p><strong>Watching learns a local verdict.</strong> A bank of synapses counts observed context–move pairs at every level. The teacher uses a deterministic rule, so a covered row can judge an attempted move. An unseen row abstains. Meanwhile the reader and writer update their separate weights only at blocks the reader reaches.</p>
+        <p><strong>Practice spends that verdict at depth.</strong> The writer discards its trajectory after generating the string. The reader starts from the visible tokens. A copy passes its state through; an executed move transmits with probability \(r\). If the source executes with probability \(p\), the next block is reached with probability</p>
+        <div class="equation">\[h(p,r)=(1-p)+pr.\]</div>
+        <p>At \(p=r=1/2\), the upper block is reached on \(3/4\) of own strings and \(1/2\) of teacher strings. When a binary choice is rejected, the other choice is identified. Either verdict therefore updates a reached true entry by \(s\gets s+\eta(1-s)\), in both pathways. A later move can receive credit even when an earlier move was wrong.</p>
+        <h3>What counts as improvement?</h3>
+        <p>For the developed teacher, \(p_j\) is the writer’s probability of its correct move and \(r_j\) the reader’s chance of passing it. The writer pays forward population KL on every teacher string. The reader reports the hidden root on a fresh teacher string, guessing uniformly if the parse breaks.</p>
+        <div class="equation">\[\begin{aligned}
+        \mathcal L&=-\log(p_1p_2),\\
+        \Pr(\hat z=z)&=\tfrac16+\tfrac56 r_1r_2 .
+        \end{aligned}\]</div>
+      </div>
+      <figure class="plot">
+        <img src="@@LEARNING_FIGURE@@" alt="Exact population learning curves. Both schedules coincide during Watching. After the switch, the own arm reaches lower population KL and higher teacher-root accuracy. The lower panels show the small differences on their own scales.">
+        <figcaption><strong>After a common Watching phase, own practice improves both writing and reading on the teacher population.</strong> The dotted line marks the switch. The lower panels resolve the difference between the learning curves. Every attempted string counts toward the budget.</figcaption>
+      </figure>
+    </div>
+    <details class="caveats">
+      <summary>Why these learning curves can be computed exactly</summary>
+      <p>In this binary model, every primed string trains the first block. Its strength after \(t\) updates is \(s_t=1-(1-s_0)(1-\eta)^t\). The deeper block receives independent Bernoulli updates with known, time-dependent probabilities \(r_1(t)\) on teacher strings and \(h(p_1(t),r_1(t))\) on own strings. Propagating the distribution of the update count gives the expected loss and accuracy at each budget, including the uncertainty from Watching. The plot uses \(\eta=0.01\) and starts all four probabilities at \(1/2\).</p>
+      <p>The extra probability of reaching the second block on an own string is \((1-p_1)(1-r_1)\). Couple the two learners using the same uniform random draw for that block. Each teacher update also occurs on the own arm, and the own arm sometimes receives an additional update. This proves strictly lower expected KL at every finite positive budget after priming. Classic sleep spends a sample updating only the reader, and even a perfect teacher-directed sleep update cannot increase first-block reader strength faster than fresh wake here. All-wake therefore bounds the writer improvements of any fresh-wake/classic-sleep schedule in this binary comparison.</p>
+    </details>
+  </section>
+
+  <section id="budget" aria-labelledby="budget-title">
+    <h2 id="budget-title">How should a fixed string budget be spent?</h2>
+    <p class="section-lead">Choose a total and how many teacher strings come first. The learner spends the balance on its own strings. The reference keeps watching fresh draws from the same teacher for the entire budget.</p>
+    <div class="spread">
+      <div class="lab controls">
+        <div>
+          <label class="range-label" for="total">Total strings <output for="total" id="total-count">@@TOTAL@@</output></label>
+          <input id="total" type="range" min="0" max="@@MAX_TOTAL@@" value="@@TOTAL@@">
+        </div>
+        <div>
+          <label class="range-label" for="teacher">Teacher strings first <output for="teacher" id="teacher-count">@@WATCH@@</output></label>
+          <input id="teacher" type="range" min="0" max="@@TOTAL@@" value="@@WATCH@@">
+        </div>
+        <div class="buttons"><button type="button" id="one-teacher">One teacher</button><button type="button" id="half-teacher">Half teacher</button><button type="button" id="all-own">All own</button></div>
+        <p id="allocation-count" aria-live="polite"><strong>@@WATCH@@ teacher + @@WATCH@@ own</strong></p>
+        <table class="metric-table" aria-label="Comparison at the selected total budget">
+          <thead><tr><th scope="col">Schedule</th><th scope="col">KL (nats)</th><th scope="col">Root accuracy</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Selected</th><td id="selected-kl">@@SPLIT_KL@@</td><td id="selected-acc">@@SPLIT_ACC@@</td></tr>
+            <tr><th scope="row">All teacher</th><td id="fresh-kl">@@FRESH_KL@@</td><td id="fresh-acc">@@FRESH_ACC@@</td></tr>
+            <tr><th scope="row">Gain</th><td id="gain-kl">@@KL_GAIN@@</td><td id="gain-acc">@@ACC_GAIN@@</td></tr>
+          </tbody>
+        </table>
+        <p class="control-note">Positive gains mean lower KL or higher accuracy. Accuracy differences are in percentage points.</p>
+        <p id="budget-note">One teacher string identifies both local rules in this noiseless, single-context world. The reader and writer still need repeated updates to learn them.</p>
+      </div>
+      <figure class="plot" id="budget-figure">
+        @@BUDGET_SVG@@
+        <figcaption><strong>The largest gain occurs when practice begins as soon as the judge knows the rules.</strong> Each column fixes the total budget. Click either heatmap to select an allocation. Gray marks schedules where the judge has never seen a teacher.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="twins" aria-labelledby="twins-title">
+    <h2 id="twins-title">Does it matter whose string it is?</h2>
+    <p class="section-lead">Add a third, three-way operation. Give two primed learners lower-level strengths \((1/3,5/6)\) and \((5/6,1/3)\) and a uniform terminal choice. The writers now have equal population KL, equal validity, and the same distribution of the number of executed lower moves. They differ in <em>where</em> an omission occurs.</p>
+    <div class="spread">
+      <div class="text">
+        <p>For either recipient, the terminal block is initially reached on \(217/324\) of its own strings, \(34/81\) of its twin’s, and \(5/18\) of the teacher’s. Exchanging the two lower strengths therefore costs exactly \(1/4\) in terminal reach at equal source quality.</p>
+        <p>The <strong>live twin</strong> changes as the two learners train on each other’s strings. The <strong>KL-matched swap</strong> instead exchanges the recipient’s current lower writer strengths on every draw and keeps its terminal row, enforcing equal proposal KL throughout.</p>
+        <div class="lab controls">
+          <div>
+            <label class="range-label" for="twin-step">Extra strings <output for="twin-step" id="twin-count">5</output></label>
+            <input id="twin-step" type="range" min="0" max="@@MAX_TWIN_STEP@@" value="5">
+          </div>
+          <table class="twin-table" aria-label="Expected population KL in nats by recipient">
+            <thead><tr><th scope="col">Source</th><th scope="col">Weak early</th><th scope="col">Weak middle</th></tr></thead>
+            <tbody id="twin-body">@@TWIN_ROWS@@</tbody>
+          </table>
+          <p class="control-note">Entries are expected population KL in nats. Lower values are better.</p>
+        </div>
+        <p>The step size here is \(\eta=0.1\). At the fifth extra string both recipients gain more from own practice than from fresh teacher data. At the sixth, fresh wake has overtaken own practice for the reader with the weak middle gate. A teacher confirmation at the three-way terminal narrows the possibilities more than rejection of one wrong proposal.</p>
+      </div>
+      <figure class="plot">
+        <img src="@@TWINS_FIGURE@@" alt="For both depth profiles, own strings reach the terminal gate most often. The loss advantage is initially positive against the twin and teacher. Fresh wake overtakes own practice for the weak-middle reader at the last plotted horizon.">
+        <figcaption><strong>Two equally accurate writers can each supply the more readable strings for their own reader.</strong> The upper panels show eligibility before training. The lower panels show each comparator’s population loss minus own practice loss. A curve below zero favors the comparator.</figcaption>
+      </figure>
+    </div>
+    <details class="caveats" open>
+      <summary>Which parts depend on the architecture?</summary>
+      <p>The construction assumes a local detector for a word product, a reliable copy path, and a parser that loses its state after a failed move. The early advantage holds for this bounded parser and local update rule. A reader that can train every deep row directly from a teacher string can match or beat practice. Whether a generic MLP learns these circuits remains open.</p>
+      <p>Matching the full distribution of visible strings would force identical expected updates for a fixed reader. The surface control here matches individual tokens, leaving their products free to differ. Offline learning transfers information acquired during Watching from the judge into the writer and reader weights.</p>
+    </details>
+  </section>
+
+  <footer>
+    <p>The technical note gives the coupling argument, the classic wake–sleep comparison, and extensions to missing marks and noisy teachers. All plotted values are exact finite-state expectations up to floating-point rounding.</p>
+    <a href="practice-docs/practice_residual_depth.tex" download>Technical note (.tex)</a>
+    <a href="@@NPZ_DOWNLOAD@@" download="figure_values.npz">Figure data (.npz)</a>
+    <p class="backing-file">Archived figure data at <code>/nfs/gatsbystor/jbauer/generative-learning/residual_depth/figure_values.npz</code></p>
+  </footer>
+</main>
+@@GROUP_TEMPLATES@@
+<script id="values" type="application/json">@@APP_DATA@@</script>
+<script>
+  "use strict";
+  const byId = id => document.getElementById(id);
+  const {product, budget, twins} = JSON.parse(byId("values").textContent);
+  const inverses = product.map(row => row.indexOf(0));
+  const place = (target, template) => byId(target).replaceChildren(byId(template).content.cloneNode(true));
+  let root = 4;
+  let maskIndex = 1 + 6 * 3 + 36 * 2;
+
+  function showString() {
+    const omit = document.querySelector('input[name="source"]:checked').value === "copy";
+    const lower = omit ? 0 : 1;
+    const upper = 3;
+    const end = product[product[root][inverses[upper]]][inverses[lower]];
+    const fields = [end, lower, upper];
+    const decoded = fields.map((field, i) => {
+      const first = Math.floor(maskIndex / (6 ** i)) % 6;
+      const second = product[inverses[first]][field];
+      const mark = product[first][second];
+      place("pair-" + i, "pair-" + first + "-" + second);
+      place("mark-" + i, "sym-" + mark);
+      return mark;
+    });
+    let state = 0;
+    decoded.forEach((mark, i) => {
+      state = product[state][mark];
+      place("pose-slot-" + i, "pose-" + state);
+      place("state-" + i, "sym-" + state);
+    });
+    byId("string-note").textContent = omit
+      ? "The writer omitted the lower rotation. The copy passes the incoming state unchanged, so the upper move can be read even when the rotation circuit is weak."
+      : "The teacher executes both moves. Following the lower rotation requires the reader’s rotation circuit to fire.";
+  }
+  document.querySelectorAll('input[name="source"]').forEach(input => input.addEventListener("change", showString));
+  byId("next-masks").addEventListener("click", () => { maskIndex = (maskIndex + 1) % (6 ** 3); showString(); });
+  byId("next-root").addEventListener("click", () => { root = (root + 1) % 6; showString(); });
+
+  const totalSlider = byId("total");
+  const teacherSlider = byId("teacher");
+  const maxTotal = budget.length - 1;
+  const picks = document.querySelectorAll("#allocation-chart .allocation-pick");
+
+  function signed(value, digits) {
+    const s = Math.abs(value).toFixed(digits);
+    return (Number(s) === 0 ? "" : value > 0 ? "+" : "−") + s;
+  }
+  function showBudget(total, teacher) {
+    teacher = Math.min(total, teacher);
+    totalSlider.value = total;
+    teacherSlider.max = total;
+    teacherSlider.value = teacher;
+    teacherSlider.disabled = total === 0;
+    byId("one-teacher").disabled = total === 0;
+    byId("total-count").value = total;
+    byId("teacher-count").value = teacher;
+    byId("allocation-count").firstElementChild.textContent = teacher + " teacher + " + (total - teacher) + " own";
+    const [loss, accuracy] = budget[total][teacher];
+    const [freshLoss, freshAccuracy] = budget[total][total];
+    byId("selected-kl").textContent = loss.toFixed(5);
+    byId("selected-acc").textContent = (100 * accuracy).toFixed(2) + "%";
+    byId("fresh-kl").textContent = freshLoss.toFixed(5);
+    byId("fresh-acc").textContent = (100 * freshAccuracy).toFixed(2) + "%";
+    byId("gain-kl").textContent = signed(freshLoss - loss, 5);
+    byId("gain-acc").textContent = signed(100 * (accuracy - freshAccuracy), 2) + " pp";
+    byId("budget-note").textContent = total === 0
+      ? "The two schedules start from identical weights."
+      : teacher === 0
+      ? "With no teacher exposure, the judge abstains on every attempt. The writer and reader stay at their initial strengths."
+      : "One teacher string identifies both local rules in this noiseless, single-context world. The reader and writer still need repeated updates to learn them.";
+    for (const pick of picks) {
+      const marker = pick.parentElement.querySelector(".allocation-marker");
+      marker.setAttribute("visibility", total ? "visible" : "hidden");
+      if (total) {
+        const box = pick.getBBox();
+        marker.setAttribute("x", box.x + (total - 0.5) / maxTotal * box.width);
+        marker.setAttribute("y", box.y + teacher / total * box.height);
+      }
+    }
+  }
+  totalSlider.addEventListener("input", () => showBudget(totalSlider.valueAsNumber, teacherSlider.valueAsNumber));
+  teacherSlider.addEventListener("input", () => showBudget(totalSlider.valueAsNumber, teacherSlider.valueAsNumber));
+  byId("one-teacher").addEventListener("click", () => showBudget(totalSlider.valueAsNumber, 1));
+  byId("half-teacher").addEventListener("click", () => showBudget(totalSlider.valueAsNumber, Math.round(totalSlider.valueAsNumber / 2)));
+  byId("all-own").addEventListener("click", () => showBudget(totalSlider.valueAsNumber, 0));
+  for (const pick of picks) {
+    pick.addEventListener("pointerup", event => {
+      if (!event.isPrimary || event.button !== 0) return;
+      const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(pick.getScreenCTM().inverse());
+      const box = pick.getBBox();
+      const total = Math.max(1, Math.min(maxTotal, Math.round(0.5 + maxTotal * (point.x - box.x) / box.width)));
+      const ownShare = Math.max(0, Math.min(1, 1 - (point.y - box.y) / box.height));
+      showBudget(total, total - Math.round(total * ownShare));
+    });
+  }
+
+  function showTwins() {
+    const step = byId("twin-step").valueAsNumber;
+    byId("twin-count").value = step;
+    Array.from(byId("twin-body").rows).forEach((row, i) => {
+      twins.forEach((reader, j) => { row.cells[j + 1].textContent = reader[step][i].toFixed(5); });
+    });
+  }
+  byId("twin-step").addEventListener("input", showTwins);
+  showString();
+  showBudget(totalSlider.valueAsNumber, teacherSlider.valueAsNumber);
+  showTwins();
+</script>
+</body>
+</html>

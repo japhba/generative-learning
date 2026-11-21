@@ -93,6 +93,7 @@ for name, ls, lab in (('units256_practice', ':', '256 units'), ('units4096_pract
     ax.plot(np.maximum(x, 32), m, color='C1', ls=ls, label=f'token pairs, {lab} (81 tokens)')
 ax.axhspan(-3, 3, color='gray', alpha=.15, lw=0)
 ax.set_xscale('log'); ax.set_yscale('symlog', linthresh=10); ax.set_xlabel('own samples'); ax.set_ylabel('MMD$^2$ own vs teacher, in s.d. of teacher vs teacher')
+ax.set_ylim(-5, None)
 ax.set_title('(d) first level: can a statistic tell own samples\nfrom teacher strings? (1,024 samples each; band: no)')
 legend(ax)
 
@@ -113,6 +114,7 @@ for key, kw in (('single tokens', dict(color='C0')), ('token pairs', dict(color=
     draw(ax, 'level2_practice', f'mmd_practice/{key}', key, **kw)
 ax.axhspan(-3, 3, color='gray', alpha=.15, lw=0)
 ax.set_xscale('log'); ax.set_yscale('symlog', linthresh=10); ax.set_xlabel('own samples'); ax.set_ylabel('MMD$^2$ own vs teacher, in s.d. of teacher vs teacher')
+ax.set_ylim(-5, None)
 ax.set_title('(f) second level: which statistic tells own samples\nfrom teacher strings')
 legend(ax)
 
@@ -155,6 +157,7 @@ for name, label, color in (('sparse_lam0.2', 'units wired to a third of the toke
 ax.axhline(27 * np.log(Q), color='gray', lw=.8); ax.text(40, 27 * np.log(Q) * 1.05, 'blank deep layer', color='gray')
 ax.plot([], [], color='k', ls=':', label='dotted: share of writers that fire on their own sample\n(same axis, 0 to 1)')
 ax.set_xscale('log'); ax.set_yscale('symlog', linthresh=1); ax.set_xlabel('own samples'); ax.set_ylabel('KL(teacher || learner), nats')
+ax.set_ylim(0, None)
 ax.set_title('(i) 81 tokens: attempts at local units')
 legend(ax, **{})
 fig.savefig(REPORTS / 'order3-practice.png', dpi=110, facecolor='white')

@@ -20,7 +20,8 @@ changes nothing).
 Sources of the (deep, check) pairs the rule is applied to:
   teacher string: deep = reading of the string.
   own sample:     check = what the first layer reads back from the written string (readback) or the check units as drawn;
-                  deep = the units that wrote (credit 'writer') or the reading of the own string (credit 'read').
+                  deep = the units that wrote (credit 'writer') or the reading of the own string (credit 'read'); credit 'split': the
+                  writer G gets the units that wrote, the reader R the reading of the own string.
   twin:           a second network runs the same schedule from another start; its samples replace the own samples (deep = this network's reading).
 teacher_trains / own_trains say which of R and G a source moves. Watching: teacher strings move both. Classic wake-sleep: teacher
 strings move G only, own samples R only. The first `watch_first` samples are always watching; a stored set of `set` teacher strings
@@ -227,7 +228,10 @@ def run(job):
         z = rng.integers(source.n, size=(bt, source.K))
         x, code, tau = source.write(rng, z)
         pre = code if cfg['readback'] else tau
-        m.hebb(tuple(cfg['own_trains']), z if cfg['credit'] == 'writer' and source is m else m.read(rng, pre)[0], pre, eps * cfg['eps_own'])
+        if cfg['credit'] == 'split' and source is m:                                             # the writer learns from its own units, the reader only from reading the string
+            m.hebb(('G',), z, pre, eps * cfg['eps_own']); m.hebb(('R',), m.read(rng, pre)[0], pre, eps * cfg['eps_own'])
+        else:
+            m.hebb(tuple(cfg['own_trains']), z if cfg['credit'] == 'writer' and source is m else m.read(rng, pre)[0], pre, eps * cfg['eps_own'])
 
     for step in range(n_steps + 1):
         if step in evals:
@@ -256,6 +260,8 @@ def arms(only):
     a = dict(watching={}, ws=ws, ws_intended=dict(ws, readback=False), ws_twin=dict(ws, twin=True), watch_sleep=dict(own=.5, own_trains='R'),
              practice=dict(own=1.), practice_read=dict(own=1., credit='read'), mix=dict(own=.5), mix_read=dict(own=.5, credit='read'), mix_g=dict(own=.5, own_trains='G'))
     a['mix_intended'] = dict(own=.5, readback=False)
+    a['sleep_read'] = dict(own=.5, own_trains='R', credit='read')                                # own samples reach the reader only through the string
+    a['split'] = dict(own=.5, credit='split')                                                   # ... and the writer learns from its own units
     for share in (.03125, .0625, .125, .25, .75, .875, .9375):                                  # own samples teach the reader only, teacher strings both
         a[f'sleep_own{share}'] = dict(own=share, own_trains='R')
     for share in (.125, .25, .75, .875):                                                        # budget: share of own samples at a fixed total
@@ -268,6 +274,9 @@ def arms(only):
         a[f'first{first}_offline_intended'] = dict(watch_first=first, own=1., readback=False)   # ... without the first layer reading the own string back
         a[f'first{first}_offline_read'] = dict(watch_first=first, own=1., credit='read')        # ... credited by reading instead of to the writing units
         a[f'first{first}_offline_twin'] = dict(watch_first=first, own=1., twin=True)
+        a[f'first{first}_mix_read_r'] = dict(watch_first=first, own=.5, own_trains='R', credit='read')
+        a[f'first{first}_mix_split'] = dict(watch_first=first, own=.5, credit='split')
+        a[f'first{first}_mix_g'] = dict(watch_first=first, own=.5, own_trains='G')
     for n in (256, 1024, 4096):                                                                 # a stored teacher set, shown again and again
         a[f'set{n}_watching'] = dict(set=n)
         a[f'set{n}_mix'] = dict(set=n, own=.5)

@@ -10,6 +10,8 @@ Deep group: K-state softmax y = softmax(a V h) on a code h; drive D = E[y h^T] -
 2. Ring of three overlapping checks in the code of its check units (9 per site): teacher = the 27 valid components, noise = one check
    unit per site drawn independently (what a blank deep layer writes). Drive on a 3-state group that reads the shared token t0.
 
+3. Block world with reader and writer apart (the writer holds a code at amplitude of order one, the reader is diffuse).
+
     python order3_saddle_check.py
 """
 import itertools
@@ -63,6 +65,33 @@ def ring_world():
           f'teacher-specific drive on a group reading a shared token: exponent {slope(d):.2f}, at a = 0.16 {d[-1]:+.2e}')
 
 
+def writer_ahead():
+    """Block world, reader and writer apart: the writer has weights b * V_w with b of order one, the reader is diffuse, a * V_r. Drive of the
+    writer's samples on the reader (minus the drive of noise) along V_r, its exponent in a, and the same for teacher strings. Writers: the
+    conjunction group of the valid triples, a conjunction group of the triples with s1 + s2 + s3 = 1 (pairs uniform, no triple valid), the
+    star group (three of the nine valid triples, pairs not uniform)."""
+    S = np.array(list(itertools.product(range(3), repeat=3)))
+    H = np.zeros((27, 9)); H[np.arange(27)[:, None], np.arange(3) * 3 + S] = 1
+    pT, pU = (S.sum(1) % 3 == 0) / 9., np.full(27, 1 / 27)
+    pairs = lambda p: max(abs(np.bincount(S[:, i] * 3 + S[:, j], weights=p, minlength=9) - 1 / 9).max() for i, j in ((0, 1), (0, 2), (1, 2)))
+    own = lambda W: np.mean([np.prod(sm(W.reshape(len(W), 3, 3))[k, np.arange(3), S], 1) for k in range(len(W))], 0)
+
+    def group(triples):
+        V = np.zeros((len(triples), 9)); V[np.arange(len(triples))[:, None], np.arange(3) * 3 + triples] = 1
+        return V - 1 / 3
+    V_and, V_shift, V_star = group(S[S.sum(1) % 3 == 0]), group(S[S.sum(1) % 3 == 1]), group(np.arange(3)[:, None].repeat(3, 1))
+    along = lambda p, V: np.array([np.sum((drive(H, p, a * V) - drive(H, pU, a * V)) * V) / np.sum(V * V) for a in A])
+    print('block world, reader diffuse (amplitude a), writer at amplitude b: drive on the reader along its own code, minus the drive of noise')
+    for name, V_w, V_r in (('valid conjunction group', V_and, V_and), ('shifted conjunction group', V_shift, V_shift), ('star group', V_star, V_star)):
+        dT = along(pT, V_r)
+        print(f'  writer = {name}, reader coupled to it;   teacher strings: exponent {slope(dT):.2f}, at a = 0.16 {dT[-1]:+.2e}')
+        for b in (1., 2., 4.):
+            p = own(b * V_w)
+            dO = along(p, V_r)
+            print(f'    b = {b:.0f}: own samples: exponent {slope(dO):.2f}, at a = 0.16 {dO[-1]:+.2e} ({dO[-1] / dT[-1]:+.2f} x teacher)   valid {p[pT > 0].sum():.2f}   pairs off uniform by {pairs(p):.1e}')
+
+
 if __name__ == '__main__':
     block_world()
     ring_world()
+    writer_ahead()

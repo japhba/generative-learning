@@ -9,7 +9,8 @@
 3. Per-check rule on one block of three tokens (weights w[token, value], samples from softmax(w); if the triple passes
    the sampled weights are multiplied by 1 + eta, otherwise by 1 - lam; bounded to [floor, wmax]): the exact expected
    change of the log weights at a diffuse block and at a sharp block (valid or not), and the number of samples until
-   the block is sharp on a valid triple, by simulation, over a grid of eta and lam.
+   the block is sharp on a valid triple, by simulation, over a grid of eta and lam. The same grid for the rule with two
+   factors (sampled weights of a passed triple times 1 + eta, every weight times 1 - lam on every sample).
 
     python order3_paper_checks.py --out /nfs/nhome/live/jbauer/generative-learning/reports/order3-paper-checks.json
 """
@@ -72,8 +73,9 @@ def drift(w, q, eta, lam):
     return d, float(passed)
 
 
-def time_to_valid(rng, q, eta, lam, start, w0, wmax, floor, trials, horizon):
-    """samples until the block writes one valid triple with probability > 0.9; inf if not within the horizon."""
+def time_to_valid(rng, q, eta, lam, start, w0, wmax, floor, trials, horizon, rule='three'):
+    """samples until the block writes one valid triple with probability > 0.9; inf if not within the horizon.
+    rule 'hebb': sampled weights of a passed check times 1 + eta, then every weight times 1 - lam (the unit fires on every sample)."""
     w = np.full((trials, 3, q), floor)
     if start == 'invalid':
         w[:, 0, 0] = w[:, 1, 0] = w[:, 2, 1] = w0
@@ -84,7 +86,8 @@ def time_to_valid(rng, q, eta, lam, start, w0, wmax, floor, trials, horizon):
         x = (p.cumsum(2) < rng.random((trials, 3, 1))).sum(2).clip(max=q - 1)
         ok = x.sum(1) % q == 0
         for tok in range(3):
-            w[idx, tok, x[:, tok]] = np.clip(w[idx, tok, x[:, tok]] * np.where(ok, 1 + eta, 1 - lam), floor, wmax)
+            w[idx, tok, x[:, tok]] = w[idx, tok, x[:, tok]] * np.where(ok, 1 + eta, 1 if rule == 'hebb' else 1 - lam)
+        w = np.clip(w * (1 - lam if rule == 'hebb' else 1), floor, wmax)
         top = w.argmax(2)
         sharp = (np.take_along_axis(p, top[..., None], 2)[..., 0].prod(1) > .9) & (top.sum(1) % q == 0)
         t_done = np.where(sharp & np.isinf(t_done), t, t_done)
@@ -126,6 +129,14 @@ def main():
         grid.append(row)
         print(json.dumps(row), flush=True)
     out['time_to_valid'] = grid
+    grid = []
+    for eta, lam in tqdm(list(itertools.product((.3, 1., 3.), (.01, .03, .1, .3)))):
+        row = dict(eta=eta, lam=lam, diffuse_drift=float(np.log1p(eta) / q ** 2 + np.log1p(-lam)))
+        for start in ('invalid', 'diffuse'):
+            t = time_to_valid(rng, q, eta, lam, start, w0, wmax, floor, 512, 20000, rule='hebb')
+            row[start] = dict(median=float(np.median(t)), share_done=float(np.isfinite(t).mean()))
+        grid.append(row)
+    out['time_to_valid_hebb'] = grid
     json.dump(out, open(args.out, 'w'), indent=1)
     for name, m in out['marginals'].items():
         print(name, m['strings'], {o: (round(v['max_deviation'], 4), v['n_sets']) for o, v in m['by_order'].items()})

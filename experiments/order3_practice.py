@@ -16,7 +16,8 @@ Start: every unit has one random preferred value per slot at weight w0 (sharp, r
 
 Practice (one unit at a time writes; lesson per check; credit by reading): for each unit that fires on the sample and each check, the
 weights of the sampled values of the check's slots are multiplied by 1 + eta if the check passed and by 1 - lam if it failed (bounded
-to [floor, wmax]). Watching uses the same reader and the same rule on teacher strings (all checks pass). 'store': the unit with the
+to [floor, wmax]). rule = 'hebb' has two factors only: the weights of the sampled values that a check unit confirmed are multiplied by
+1 + eta, and every weight of a unit is multiplied by 1 - lam each time the unit fires. Watching uses the same reader and the same rule on teacher strings (all checks pass). 'store': the unit with the
 largest drive takes a teacher string in one shot, no threshold. 'twin': the learner reads the samples of a second learner that practices.
 
 Scores. kl: exact KL(teacher || learner) for the generator in which every check site is written by one unit drawn among the units that
@@ -167,6 +168,8 @@ class Learner:
             gain = gain * (1 - (p.reshape(len(x1), -1) * x1).reshape(len(x1), self.S, self.V).sum(2))
         up = fire.T @ (x1 * np.repeat(gain, self.V, 1))
         down = fire.T @ (x1 * np.repeat(sign == -1, self.V, 1))
+        if self.cfg['rule'] == 'hebb':                                                          # two factors: every synapse of a unit decays when the unit fires; `sign` only says which tokens a check unit confirmed
+            down = np.repeat(fire.sum(0)[:, None], self.S * self.V, 1)
         self.W = np.where(self.mask[:, :, None], np.clip(self.W * np.exp(up * np.log1p(eta) + down * np.log1p(-lam)).reshape(self.W.shape).astype(F), self.cfg['floor'], self.cfg['wmax']), F(self.cfg['floor']))
 
     def store(self, x, theta):
@@ -370,7 +373,7 @@ def run(job):
 
 
 BASE = dict(q=3, blocks=81, kind='rule', level=1, groups=1, units=1024, w0=4., wmax=6., floor=.05, theta=.7, norm_min=1.5, eta=1., lam=.2, source='own', credit='read',
-            samples=262144, batch=64, n_evals=14, n_eval=2048, n_mmd=1024, n_kl=512, n_judge=256, surprise=False, m0=1., ramp=.02, read_hi=.8, read_lo=.6, fanin=0)
+            samples=262144, batch=64, n_evals=14, n_eval=2048, n_mmd=1024, n_kl=512, n_judge=256, surprise=False, m0=1., ramp=.02, read_hi=.8, read_lo=.6, fanin=0, rule='three')
 
 
 def judge_scan(job):
@@ -415,6 +418,15 @@ def arms(only):
     a['sparse_lam0.2'] = dict(small, fanin=27, lam=.2, theta=.75, samples=262144)                # each unit wired to a third of the slots
     a['sparse_lam0.4'] = dict(small, fanin=27, lam=.4, theta=.75, samples=262144)
     a['groups_coactive'] = dict(small, groups=54, units=972, theta=.55, surprise=True, eta=3., n_kl=128)
+    hebb = dict(rule='hebb', lam=.05)                                                           # Hebb on the tokens the check units confirm, decay with the unit's own firing
+    a['hebb_practice'] = dict(hebb)
+    a['hebb_watching'] = dict(hebb, source='teacher')
+    a['hebb_twin'] = dict(hebb, source='twin')
+    a['hebb_free_world'] = dict(hebb, kind='free')
+    a['hebb_level2_practice'] = dict(lvl2, rule='hebb', eta=3., lam=.02, samples=524288)
+    a['hebb_level2_watching'] = dict(lvl2, rule='hebb', eta=3., lam=.02, source='teacher', samples=524288)
+    for eta, lam in itertools.product((.3, 1., 3.), (.01, .03, .1, .3)):
+        a[f'hebbstep_eta{eta}_lam{lam}'] = dict(small, rule='hebb', eta=eta, lam=lam)
     return {k: dict(BASE, **v) for k, v in a.items() if any(k.startswith(o) for o in only)}
 
 

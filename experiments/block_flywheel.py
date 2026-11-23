@@ -21,10 +21,11 @@ A share `own` of the samples are own samples from `t_own` samples on. One step s
     python block_flywheel.py
 """
 import itertools
+import os
 
 import numpy as np
 
-FLOOR, EPS = 1e-3, .003
+FLOOR, EPS = float(os.environ.get('BLOCK_FLOOR', 1e-3)), .003                               # the reader's lapse; 1e-3 as in order3_net.py unless BLOCK_FLOOR is set
 sm = lambda u: (lambda e: e / e.sum(-1, keepdims=True))(np.exp(u - u.max(-1, keepdims=True)))
 
 

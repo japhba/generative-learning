@@ -27,6 +27,12 @@ ARMS = {'teacher strings only': dict(own=0., mode='strict', beta=1.), 'own, stat
         'own, through the string, gain 4': dict(own=.5, mode='strict', beta=4.), "twin's, through the string, gain 4": dict(own=.5, mode='twin', beta=4.)}
 
 
+def thin(curve):
+    """about 50 points of a curve, evenly spaced in the log of the index (keeps the stored numbers small)."""
+    keep = sorted(set(np.unique(np.round(np.geomspace(1, len(curve), 50)).astype(int) - 1).tolist()) | {0, len(curve) - 1})
+    return [{k: (float(f'{v:.4g}') if isinstance(v, float) else v) for k, v in curve[i].items()} for i in keep]
+
+
 def go(job):
     name, C, a, seed, t_max = job
     arm, world = ARMS[name], World(C)
@@ -36,13 +42,13 @@ def go(job):
     while t <= t_max:
         now = measure(m); curve.append(dict(samples=t, kl=now['kl'], recover=now['recover'], reach_teacher=now['reach_teacher']))
         if now['kl'] < .1:
-            return dict(name=name, C=C, a=a, seed=seed, t=t, kl=now['kl'], curve=curve)
+            return dict(name=name, C=C, a=a, seed=seed, t=t, kl=now['kl'], curve=thin(curve))
         for _ in range(20):
             moves = [(m, step(m, eta, arm['own'], arm['mode'], twin))] + ([(twin, step(twin, eta, arm['own'], 'strict'))] if twin else [])
             for net, (dR, dG, _) in moves:
                 net.R, net.G = norm(net.R + eta * dR), norm(net.G + eta * dG)
         t += 20 * eta / EPS
-    return dict(name=name, C=C, a=a, seed=seed, t=None, kl=now['kl'], curve=curve)
+    return dict(name=name, C=C, a=a, seed=seed, t=None, kl=now['kl'], curve=thin(curve))
 
 
 def growth(beta, a=1e-6, n=3000, eta=.03):

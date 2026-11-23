@@ -14,7 +14,7 @@ Rule in expectation over the samples of a source, P <- P + eta * E[post_k * (1[h
                   'sleep': post = the state that wrote; 'twin': strict, with the samples of a second learner from another start.
 rule 'gated': post as above (the rule of order3_net.py); 'cov': post minus its mean 1 / K, so a diffuse reader moves nothing.
 response 'match': a state's activity is the probability of the string under that state alone (no competition inside the group), so a
-string fires a state only as far as it fits. prior_rate > 0: the writer's prior over the states of a group follows how often teacher
+string fires a state only as far as it fits. beta: gain of the writer (it draws from softmax(beta * its log weights)). prior_rate > 0: the writer's prior over the states of a group follows how often teacher
 strings fire each state.
 A share `own` of the samples are own samples from `t_own` samples on. One step stands for eta / eps samples at rate eps.
 
@@ -38,8 +38,8 @@ class World:
 
 
 class Learner:
-    def __init__(self, rng, world, K, a, b, response='posterior'):
-        self.w, self.K, self.response = world, K, response
+    def __init__(self, rng, world, K, a, b, response='posterior', beta=1.):
+        self.w, self.K, self.response, self.beta = world, K, response, beta
         n = rng.normal(size=(world.C, K, world.L, 3))
         self.R, self.G, self.pi = sm(a * n), sm(b * n), np.full((world.C, K), 1 / K)
 
@@ -53,7 +53,7 @@ class Learner:
         """p(string, joint state) [K^C, N] and the joint states [K^C, C]; the states of a group are drawn from its prior pi."""
         lift = np.log(self.G + FLOOR) - np.log(self.G.mean(1, keepdims=True) + FLOOR)
         states = np.array(list(itertools.product(range(self.K), repeat=self.w.C)))
-        logq = np.log(sm(sum(lift[g, states[:, g]] for g in range(self.w.C))))                  # [J, L, 3]
+        logq = np.log(sm(self.beta * sum(lift[g, states[:, g]] for g in range(self.w.C))))      # [J, L, 3]; beta > 1: the writer draws more sharply than its weights say
         weight = np.prod([self.pi[g, states[:, g]] for g in range(self.w.C)], 0)
         return weight[:, None] * np.exp(np.einsum('jbs,nbs->jn', logq, self.w.H)), states
 
@@ -83,17 +83,18 @@ def measure(m):
     mode = pj.argmax(1)                                                                         # the string a joint state writes most often
     used = pj.sum(1) > .5 / len(states)                                                         # joint states the prior still draws
     marg = np.einsum('n,nbs->bs', p, w.H)
-    return dict(kl=float(np.sum(w.pT[w.valid] * np.log(w.pT[w.valid] / np.maximum(p[w.valid], 1e-12)))), valid=float(p[w.valid].sum()),
+    recover = float(np.mean([sum((pj[states[:, g] == k] * y[g, :, k]).sum() for k in range(m.K)) for g in range(w.C)]))   # probability that reading an own sample gives the state that wrote it
+    return dict(kl=float(np.sum(w.pT[w.valid] * np.log(w.pT[w.valid] / np.maximum(p[w.valid], 1e-12)))), valid=float(p[w.valid].sum()), recover=recover,
                 reach_teacher=float(np.mean(np.einsum('n,gn->g', w.pT, y.max(2)))), reach_own=float(np.mean(np.einsum('n,gn->g', p, y.max(2)))),
                 modes_valid=float(w.valid[mode][used].mean()), covered=float(len(set(mode[w.valid[mode] & used].tolist())) / w.valid.sum()), single=float(abs(marg - 1 / 3).max()),
                 states_used=float(used.mean()),
                 pairs=float(max(abs(np.einsum('n,ns,nt->st', p, w.H[:, i], w.H[:, j]) - 1 / 9).max() for i, j in itertools.combinations(range(w.L), 2))))
 
 
-def run(C=1, K=9, a=.1, b=None, own=0., mode='strict', t_own=0, samples=400000, eta=.3, seed=0, every=None, rule='gated', response='posterior', prior_rate=0.):
+def run(C=1, K=9, a=.1, b=None, own=0., mode='strict', t_own=0, samples=400000, eta=.3, seed=0, every=None, rule='gated', response='posterior', prior_rate=0., beta=1.):
     world = World(C)
-    m = Learner(np.random.default_rng([seed, 1]), world, K, a, a if b is None else b, response)
-    twin = Learner(np.random.default_rng([seed, 2]), world, K, a, a if b is None else b, response) if mode == 'twin' else None
+    m = Learner(np.random.default_rng([seed, 1]), world, K, a, a if b is None else b, response, beta)
+    twin = Learner(np.random.default_rng([seed, 2]), world, K, a, a if b is None else b, response, beta) if mode == 'twin' else None
     per, curve = eta / EPS, []
     n_steps = int(samples / per)
     marks = set(np.unique(np.round(np.geomspace(1, n_steps, every or 40)).astype(int)).tolist()) | {0}

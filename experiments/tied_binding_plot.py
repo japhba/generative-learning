@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ap = argparse.ArgumentParser(); ap.add_argument('--dir'); ap.add_argument('--out'); a = ap.parse_args()
-main, shares = json.load(open(f'{a.dir}/main.json')), json.load(open(f'{a.dir}/shares.json'))
+main, shares = json.load(open(f'{a.dir}/main_v2.json')), json.load(open(f'{a.dir}/shares.json'))   # main_v2: main.json with the twin arm rerun as a practising twin
 STYLE = {'watching (teacher only)': ('k', '-'), 'watching, exact posterior': ('0.45', '-'), 'watching + inhibition (c 3)': ('0.45', '--'),
          'classic wake-sleep': ('C0', '-'), 'sleep only': ('C9', '-'), 'practice (sleep + verdict)': ('C3', '-'),
          'practice, strict credit': ('C3', ':'), 'twin samples (credit by reading)': ('C1', ':'), 'equal-validity foreign (credit by reading)': ('C4', ':')}

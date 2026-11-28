@@ -45,3 +45,8 @@ All outputs: `/nfs/gatsbystor/jbauer/generative-learning/results/practice_identi
    narrowed in the main run.
 8. `--explain` (level 2 learns only from strings the level-1 code rewrites exactly), no stage, 16 seeds: fails.
 9. `--part G2` / `--part R2` with `--stage 1e6`: the stage freezes only the writer's or only the reader's level 2, 16 seeds, tied world.
+10. `--nosleep2` (own samples do not move the reader's level 2), no stage, 16 seeds.
+11. `--learned_wiring`: the verifier counts all 20 triples of blocks and treats a triple as a check once it has shown <= 9 patterns in >= 100
+    teacher strings. 32 seeds, stage 1e6, verdict arms.
+12. Twin fixed to practise on its own samples in parallel (before, it only watched); rerun 32 seeds (`twin_practising.json`); the figure uses
+    `main_v2.json` = main.json with the twin arm replaced by this rerun.

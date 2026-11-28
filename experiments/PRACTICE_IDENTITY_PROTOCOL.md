@@ -37,3 +37,11 @@ python3 tied_binding_trap.py --out /var/tmp/jbauer/tied_binding/trap.json
 python3 tied_binding_plot.py --dir /var/tmp/jbauer/tied_binding --out ../tex/figures/tied_binding
 ```
 All outputs: `/nfs/gatsbystor/jbauer/generative-learning/results/practice_identity/`.
+
+## Later runs (16:40-17:30)
+7. novelty-weighted verdict (`'offline practice, novelty-weighted verdict'`, `'practice, novelty-weighted verdict'`): each check unit keeps a
+   running share of own triples (rate 0.02 per batch); an accepted own sample is kept with probability min(1, w / 9),
+   w = prod_c teacher share(t_c) / own share(t_c). 16 seeds, stage 1e6. Motivated by the identity's on-policy term after plain offline practice
+   narrowed in the main run.
+8. `--explain` (level 2 learns only from strings the level-1 code rewrites exactly), no stage, 16 seeds: fails.
+9. `--part G2` / `--part R2` with `--stage 1e6`: the stage freezes only the writer's or only the reader's level 2, 16 seeds, tied world.

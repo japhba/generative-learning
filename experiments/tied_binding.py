@@ -61,6 +61,8 @@ class Net:
         self.G2, self.R2 = sm(a * n2), sm(a * n2)
         self.L = np.zeros((G1n, G1n, self.K1, self.K1))                                          # lateral inhibition between reader groups
         self.seen = np.zeros((w.C, w.q, w.q, w.q), bool)                                         # verifier: triples each check unit has counted
+        self.tcount = np.zeros((w.C, w.q, w.q, w.q))                                              # teacher triples per check unit
+        self.ocount = np.full((w.C, w.q, w.q, w.q), 1. / w.q ** 3)                                # running share of own triples per check unit
 
     # ---------------- writing
     def lift(self, P):
@@ -122,6 +124,13 @@ class Net:
 def confidence(net, x):
     u = np.einsum('gkbn->ngk', np.log(net.R1 + FLOOR)[:, :, np.arange(net.w.B)[:, None], x.T])
     return sm(u).max(-1).prod(-1)
+
+
+def explains(net, k1, x):
+    """does the writer's level 1, driven by the level-1 states k1, rewrite the string x exactly (most probable symbol in every block)?"""
+    l1 = net.lift(net.G1)
+    logit0 = sum(l1[g, k1[:, g]] for g in range(len(net.G1)))
+    return (logit0.argmax(-1) == x).all(1)
 
 
 def hebb(P, states, symbols, eps):
@@ -203,6 +212,8 @@ ARMS = {
     'twin samples (credit by reading)':  dict(own=.5, sleep=True, verdict=True, twin=True),
     'equal-validity foreign (credit by reading)': dict(own=.5, sleep=True, verdict=True, foreign=True),
     'offline practice after watching':   dict(own=1., sleep=True, verdict=True, offline=True),
+    'offline practice, novelty-weighted verdict': dict(own=1., sleep=True, verdict=True, offline=True, novelty=True),
+    'practice, novelty-weighted verdict': dict(own=.5, sleep=True, verdict=True, novelty=True),
     'watching + inhibition':             dict(own=0., inhibit=True),
     'watching + inhibition (c 3)':       dict(own=0., inhibit=True, c=3),
     'watching + inhibition (c 300)':     dict(own=0., inhibit=True, c=300),
@@ -216,6 +227,8 @@ def run(job):
     slow2 = job[11] if len(job) > 11 else 1.
     gate2 = job[12] if len(job) > 12 else 0.
     pass_on = job[13] if len(job) > 13 else 0.             # level 2 plastic once a probe of own samples passes the checks this often
+    explain = job[14] if len(job) > 14 else False          # level 2 learns only from strings the level-1 code rewrites exactly
+    part = job[15] if len(job) > 15 else 'both'             # which level-2 table the stage freezes: 'both', 'G2' (writer) or 'R2' (reader)
     unlocked, t_unlock = pass_on == 0, None
     cfg = dict(ARMS[arm.split(' @ ')[0]])
     if ' @ ' in arm: cfg['own'] = float(arm.split(' @ ')[1])                               # 'practice (sleep + verdict) @ 0.25'
@@ -236,6 +249,8 @@ def run(job):
             if (net.seen[np.arange(w.C)[None, :], xp[:, w.checks[:, 0]], xp[:, w.checks[:, 1]], xp[:, w.checks[:, 2]]]).all(1).mean() >= pass_on:
                 unlocked, t_unlock = True, i * batch
         e2 = eps * slow2 if (i * batch >= stage and unlocked) else 0.
+        eG2 = eps * slow2 if part == 'R2' and unlocked else e2                                      # stage on the reader only: the writer's level 2 learns from the start
+        eR2 = eps * slow2 if part == 'G2' and unlocked else e2
         for m in [net] + ([twin] if twin is not None else []):
             if own_now and not (m is twin):
                 src = twin if twin is not None else m
@@ -247,26 +262,36 @@ def run(job):
                     xf[junk] = rng.integers(w.q, size=(junk.sum(), w.B))
                     x = xf
                 V = (m.seen[np.arange(w.C)[None, :], x[:, w.checks[:, 0]], x[:, w.checks[:, 1]], x[:, w.checks[:, 2]]]).all(1)
+                if cfg.get('novelty'):
+                    idx = (np.arange(w.C)[None, :], x[:, w.checks[:, 0]], x[:, w.checks[:, 1]], x[:, w.checks[:, 2]])
+                    pt = m.tcount / np.maximum(m.tcount.sum((1, 2, 3), keepdims=True), 1)
+                    wgt = np.prod(pt[idx] / m.ocount[idx], 1)
+                    V = V & (rng.random(batch) < np.minimum(1, wgt / 9.))
+                    oc = np.zeros_like(m.ocount); np.add.at(oc, idx, 1. / batch)
+                    m.ocount = (1 - .02) * m.ocount + .02 * oc
                 if cfg.get('strict') or twin is not None or cfg.get('foreign'):
                     k1, _ = m.read1(x, rng); k2 = m.read2(k1, rng)
                 g2 = rng.random(batch) < confidence(m, x) ** gate2 if gate2 else np.ones(batch, bool)   # level 2 learns from confidently read strings
+                if explain: g2 &= explains(m, k1, x)
                 if cfg.get('sleep'):
-                    m.R1, m.R2 = hebb(m.R1, k1, x, eps), hebb(m.R2, k2[g2], k1[g2], e2)
+                    m.R1, m.R2 = hebb(m.R1, k1, x, eps), hebb(m.R2, k2[g2], k1[g2], eR2)
                 if cfg.get('verdict') and V.any():
                     m.G1 = hebb(m.G1, k1[V], x[V], eps)
-                    if cfg.get('verdict2'): m.G2 = hebb(m.G2, k2[V & g2], k1[V & g2], e2)              # the verdict checks level 1 only
+                    if cfg.get('verdict2'): m.G2 = hebb(m.G2, k2[V & g2], k1[V & g2], eG2)              # the verdict checks level 1 only
             else:
                 x = w.teacher(rng, batch)
                 m.seen[np.arange(w.C)[None, :].repeat(batch, 0), x[:, w.checks[:, 0]], x[:, w.checks[:, 1]], x[:, w.checks[:, 2]]] = True
+                np.add.at(m.tcount, (np.arange(w.C)[None, :].repeat(batch, 0), x[:, w.checks[:, 0]], x[:, w.checks[:, 1]], x[:, w.checks[:, 2]]), 1)
                 if cfg.get('exact'):
                     k2, k1 = m.exact_post(x, rng)
                 else:
                     k1, u = m.read1(x, rng, inhibit=cfg.get('inhibit', False))
                     k2 = m.read2(k1, rng)
                 g2 = rng.random(batch) < confidence(m, x) ** gate2 if gate2 else np.ones(batch, bool)
+                if explain: g2 &= explains(m, k1, x)
                 if not cfg.get('ws'):
-                    m.R1, m.R2 = hebb(m.R1, k1, x, eps), hebb(m.R2, k2[g2], k1[g2], e2)
-                m.G1, m.G2 = hebb(m.G1, k1, x, eps), hebb(m.G2, k2[g2], k1[g2], e2)
+                    m.R1, m.R2 = hebb(m.R1, k1, x, eps), hebb(m.R2, k2[g2], k1[g2], eR2)
+                m.G1, m.G2 = hebb(m.G1, k1, x, eps), hebb(m.G2, k2[g2], k1[g2], eG2)
                 if cfg.get('inhibit'):
                     y = sm(u)
                     cov = np.einsum('nk,nl->kl', y[:, 0], y[:, 1]) / batch - np.outer(y[:, 0].mean(0), y[:, 1].mean(0))
@@ -280,10 +305,10 @@ if __name__ == '__main__':
     ap.add_argument('--out', default='/var/tmp/jbauer/tied_binding/main.json')
     ap.add_argument('--samples', type=float, default=6e5); ap.add_argument('--seeds', type=int, default=8)
     ap.add_argument('--arms', default='|'.join(ARMS)); ap.add_argument('--worlds', default='tied,free')
-    ap.add_argument('--a', type=float, default=.1); ap.add_argument('--eps', type=float, default=.003); ap.add_argument('--watch', type=float, default=0); ap.add_argument('--stage', type=float, default=0); ap.add_argument('--slow2', type=float, default=1.); ap.add_argument('--gate2', type=float, default=0.); ap.add_argument('--pass_on', type=float, default=0.)
+    ap.add_argument('--a', type=float, default=.1); ap.add_argument('--eps', type=float, default=.003); ap.add_argument('--watch', type=float, default=0); ap.add_argument('--stage', type=float, default=0); ap.add_argument('--slow2', type=float, default=1.); ap.add_argument('--gate2', type=float, default=0.); ap.add_argument('--pass_on', type=float, default=0.); ap.add_argument('--explain', action='store_true'); ap.add_argument('--part', default='both')
     args = ap.parse_args()
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
-    jobs = [(arm, world, s, 2, 3, 3, args.a, args.eps, args.samples, args.watch, args.stage, args.slow2, args.gate2, args.pass_on) for world in args.worlds.split(',') for arm in args.arms.split('|') for s in range(args.seeds)]
+    jobs = [(arm, world, s, 2, 3, 3, args.a, args.eps, args.samples, args.watch, args.stage, args.slow2, args.gate2, args.pass_on, args.explain, args.part) for world in args.worlds.split(',') for arm in args.arms.split('|') for s in range(args.seeds)]
     t0 = time.time()
     with Pool(min(30, len(jobs))) as pool:
         res = pool.map(run, jobs, chunksize=1)

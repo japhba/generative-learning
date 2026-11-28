@@ -50,3 +50,6 @@ All outputs: `/nfs/gatsbystor/jbauer/generative-learning/results/practice_identi
     teacher strings. 32 seeds, stage 1e6, verdict arms.
 12. Twin fixed to practise on its own samples in parallel (before, it only watched); rerun 32 seeds (`twin_practising.json`); the figure uses
     `main_v2.json` = main.json with the twin arm replaced by this rerun.
+13. Rate separation instead of a schedule (19:00): `--slow2 0.03` and `0.01`, no stage, 16 seeds, tied world; then the main configuration
+    becomes `--slow2 0.01` (32 seeds, all arms, both worlds; shares 16 seeds): `slow_main.json`, `slow_shares.json`. The figure is drawn from
+    these with `--main slow_main.json --shares slow_shares.json --stage 0 --probe 3.4e5`.
